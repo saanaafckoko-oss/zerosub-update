@@ -2759,6 +2759,8 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 <textarea id="zsfGlossary" rows="3" spellcheck="false" placeholder="ឧទាហរណ៍៖&#10;陈凡&#10;薛少&#10;扬州&#10;以工代赈" style="width:100%;box-sizing:border-box;border:1px solid var(--border-color);background:#071222;color:#eef7ff;border-radius:12px;padding:10px 12px;outline:none;font-size:14px;resize:vertical"></textarea>
 <div style="font-size:11px;color:var(--text-gray);margin-top:4px;line-height:1.4">ជួយ Whisper និង Gemini ឱ្យសរសេរឈ្មោះ/ពាក្យពិសេសឱ្យត្រូវ (រក្សាទុកក្នុង browser ស្វ័យប្រវត្តិ)។</div>
 </div>
+<details id="zsfAdvOpts" style="margin-top:10px;border:1px solid var(--border-color);border-radius:12px;padding:8px 12px">
+<summary style="cursor:pointer;font-size:13px;font-weight:600;list-style-position:inside">⚙️ ជម្រើសកែ SRT កម្រិតខ្ពស់ (បើកទាំងអស់ស្រាប់ — ចុចដើម្បីកែ)</summary>
 <div style="margin-top:10px;display:grid;gap:8px">
 <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer"><input type="checkbox" id="zsfGapFill" checked style="width:auto;margin-top:3px"><span>🔎 ស្វែងរក និងបំពេញអត្ថបទដែលបាត់ (ស្តាប់ឡើងវិញត្រង់កន្លែងស្ងាត់ពីរវិនាទីឡើង)</span></label>
 <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer"><input type="checkbox" id="zsfAiSeg" checked style="width:auto;margin-top:3px"><span>✂️ ឱ្យ Gemini ជួយកាត់ឃ្លាតាមបែប CapCut (ត្រូវការ Gemini Key — បើមិនបានលទ្ធផល កម្មវិធីប្រើវចនានុក្រមចិនជំនួសដោយស្វ័យប្រវត្តិ)</span></label>
@@ -2766,7 +2768,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer"><input type="checkbox" id="zsfProofread" checked style="width:auto;margin-top:3px"><span>✨ កែអក្សរចិនខុសតាមបរិបទដោយ Gemini (ត្រូវការ Gemini Key — មិនប៉ះពេលវេលា មិនប្តូរលេខបន្ទាត់)</span></label>
 <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer"><input type="checkbox" id="zsfSnapTiming" checked style="width:auto;margin-top:3px"><span>🎯 កែពេលវេលា៖ កាត់ចំណុចស្ងាត់ចេញពីដើម/ចុងបន្ទាត់ តាមសំឡេងពិត</span></label>
 <label style="display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.4"><span>⏱️ ទាញពេលវេលាទាំងអស់មកមុន (វិនាទី)៖</span><input type="number" id="zsfTimeShift" value="0.4" min="0" max="1.5" step="0.05" style="width:72px"><span style="opacity:.7;font-size:12px">(0.4 = ត្រូវនឹងអក្សរដុតក្នុងវីដេអូសាកល្បង · បើបិទ 🎯 ប្រើ ~0.2 · 0 = មិនប្តូរ)</span></label>
-</div>
+</div></details>
 <div class="media" id="mediaBox">
 <video controls="" id="video" playsinline=""></video>
 <audio controls="" id="audio"></audio><audio id="audioCapture" preload="metadata" style="display:none"></audio><video id="videoCapture" muted="" playsinline="" preload="metadata" style="display:none;width:1px;height:1px"></video>
@@ -4799,37 +4801,21 @@ function validateTranslations(extracted,items){
   return expected.every(id=>got.includes(id));
 }
 function zsfUserPrompt(genre){
-  return `You are a professional subtitle translator (Subtitle Translator) and an expert movie story adapter.
-Your task is to translate the provided subtitle text into natural, conversational, and highly engaging Khmer ("ភាសាខ្មែរ") following these extremely strict guidelines:
-
-១. ប្រើប្រាស់ភាសានិយាយប្រចាំថ្ងៃ (Natural & Conversational)៖
-- Translate using conversational words that Khmer people naturally use in daily life.
-- Avoid word-for-word translation that sounds rigid or violates natural Khmer grammar.
-
-២. កែសម្រួល និងសង្ខេបឱ្យទាក់ទាញ (Adaptation & Conciseness)៖
-- If the original sentences are long, or use complex/difficult idioms, adapt and condense them into shorter, easy-to-read Khmer that remains synced to subtitle reading speeds while fully retaining the original intent and essence. Condense ONLY by choosing shorter Khmer wording - NEVER delete a fact, name, number, negation, question or action from the source line.
-- Make the dialogue punchy, smooth, dramatic, and captivating to keep the audience hooked.
-
-៣. ប្រើប្រាស់សព្វនាមឱ្យស័ក្តិសម (Appropriate Pronouns)៖
-- Based on the context of the dialogue, use Khmer pronouns that represent the character's status, age, power dynamics, and relationship (e.g., ខ្ញុំ/ឯង, បង/អូន, កូន/ម៉ែ, លោកម្ចាស់/ឯកឧត្ដម...).
-- Reflect the character's exact emotions in the context (anger, pleading, teasing, respect, sarcasm, etc.).
-
-៤. ហាមប្រើប្រាស់សញ្ញា 'ៗ' (No Repetition Symbol)៖
-- ABSOLUTE STRICT RULE: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the translation. Instead, you MUST spell out the repeated words directly. For example, write "ទេទេ" instead of "ទេៗ"; write "លឿនលឿន" instead of "លឿនៗ"; write "ទេទេទេទេ" instead of "ទេៗៗៗ"; write "យឺតយឺត" instead of "យឺតៗ". This is extremely critical because the Text-to-Speech (TTS) program cannot read or understand the 'ៗ' symbol and will fail to announce it.
+  return `You are a professional Khmer subtitle translator for short dramas. The Khmer will be read aloud by Khmer voice actors (dubbing), so it must sound like real spoken Khmer ("ភាសាខ្មែរ").
 
 Atmosphere/Genre Context: ${genre}
 
-Rules:
-1. Maintain the emotional tone and context of the conversation according to the specified atmosphere.
-2. Keep the translation natural and fluent in Khmer.
-3. NO OMISSION: Preserve the meaning of each block exactly. Translate EVERY word that carries meaning: subjects, verbs, negations (不/没/别/无), numbers, names, question words and emotional particles. If a source line is only a fragment of a longer sentence (see the SENTENCE markers in STORY CONTEXT), translate just that fragment faithfully: do NOT add words that belong to the neighbouring line, do NOT repeat words already translated in the previous line, and do NOT move words from one line to another.
-4. STRICT RULE: Do not attempt to modify, suggest, or return any changes to timestamps or subtitle indices.
-5. TAG PRESERVATION: If you see tags like [1], [2], [3], [4] (any number enclosed in square brackets) in the source text, you MUST preserve them exactly in the Khmer translation. Do not translate or modify these tags.
-6. NAME TRANSLITERATION: All proper names (people, places, brands) MUST be translated or transliterated into Khmer script. DO NOT leave any names in English or Latin characters. (Only common Latin abbreviations/technical terms that appear in the source, such as VIP, AI, WiFi, OK, may stay as they are.)
-7. Return the translations mapped to their original IDs in the FORMAT given below (not JSON).
-8. The output must be concise enough for subtitle reading speeds.
-9. GENDER IDENTIFICATION: [1] = male voice speaking aloud, [2] = female voice speaking aloud, [3] = male inner thought, [4] = female inner thought. Use this to understand the dialogue context and choose appropriate gender-based language in Khmer. If ONE line contains several tags (for example [1] ... [2] ...), the voice changes in the middle of that line: keep ALL tags in the same order and the same count, each placed right before its own Khmer part.
-10. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write "ទេទេ" instead of "ទេៗ").`;
+TRANSLATION RULES (strict):
+1. SPOKEN & NATURAL: use everyday spoken Khmer that people really say. Meaning and natural tone matter more than word-for-word. Make the dialogue punchy, smooth and dramatic.
+2. STORY CARD IS LAW: use the character names, forms of address and special terms from the STORY CARD exactly and identically on every line. Never invent a different Khmer spelling for a name.
+3. PRONOUNS: choose Khmer pronouns from the character's status, age, power and relationship (ខ្ញុំ/ឯង, បង/អូន, កូន/ម៉ែ, លោកម្ចាស់ ...) and show the exact emotion (anger, pleading, teasing, respect, sarcasm).
+4. SHORT ENOUGH TO SPEAK: each Khmer line must be speakable within its subtitle time (about 6-8 Khmer syllables per second). If the source is long, condense ONLY by choosing shorter Khmer wording. NEVER delete a fact, name, number, negation (不/没/别/无), question or action.
+5. FRAGMENTS: if a source line is only part of a longer sentence (see the SENTENCE markers in STORY CONTEXT), translate only that fragment faithfully. Do not add words from the neighbouring line, do not repeat the previous line, and do not move words between lines.
+6. STRICT: never modify, suggest or return any change to timestamps or subtitle indices.
+7. TAGS: [1] = male speaking aloud, [2] = female speaking aloud, [3] = male inner thought, [4] = female inner thought. Keep every tag exactly as in the source (same order and same count; if one line has several tags the voice changes in the middle, so place each tag right before its own Khmer part). The tag is the AUTHORITY for the speaker's gender: a male speaker ([1]/[3]) uses ខ្ញុំ / ខ្ញុំបាទ and the reply «បាទ»; a female speaker ([2]/[4]) uses ខ្ញុំ / នាងខ្ញុំ and the reply «ចាស». Never mix them. Inner thought ([3]/[4]) is a private first-person monologue: address nobody and add no polite reply particles.
+8. NAMES: write all proper names (people, places, brands) in Khmer script. Only common Latin abbreviations from the source (VIP, AI, WiFi, OK) may stay.
+9. NO 'ៗ': NEVER use the Khmer repetition symbol 'ៗ' (the TTS program cannot read it). Spell the word out: write "ទេទេ" not "ទេៗ", "លឿនលឿន" not "លឿនៗ", "យឺតយឺត" not "យឺតៗ".
+10. Return only what the OUTPUT FORMAT asks: no notes and no explanations in brackets.`;
 }
 function buildPrompt(items){
   const keep=$("keepTags")?.value==="true";
@@ -5991,11 +5977,11 @@ function zsfCleanBible(j){
   arr(j.characters).forEach(c=>{const zh=zsfTxt(c&&c.zh,10),km=zsfTxt(c&&c.km,40);if(!zh||!ZH.test(zh)||seen.has(zh)||!zsfKmOnly(km))return;seen.add(zh);
     const g=/^f/i.test(c.gender||"")?"ស្រី":/^m/i.test(c.gender||"")?"ប្រុស":"?";
     const e=/anc/i.test(c.era||"")?"បុរាណ":/mod/i.test(c.era||"")?"ទំនើប":"?";
-    chars.push({zh,km,gender:g,era:e,role:zsfKmOnly(c.role_km)?zsfTxt(c.role_km,40):""});});
+    chars.push({zh,km,gender:g,era:e,role:zsfKmOnly(c.role_km)?zsfTxt(c.role_km,80):""});});
   const genres=arr(j.genre_codes).map(x=>String(x||"").trim()).filter(c=>zsfGenreByCode(c)).filter((c,i,a)=>a.indexOf(c)===i).slice(0,3);
   return {
     genres,
-    synopsis:zsfKmOnly(j.synopsis_km)?zsfTxt(j.synopsis_km,300):"",
+    synopsis:zsfKmOnly(j.synopsis_km)?zsfTxt(j.synopsis_km,600):"",
     tone:zsfKmOnly(j.tone_km)?zsfTxt(j.tone_km,160):"",
     characters:chars.slice(0,16),
     places:pairs(j.places,12,ZH),
@@ -6003,6 +5989,64 @@ function zsfCleanBible(j){
     address:pairs(j.address,16,ZH),
     keep_latin:arr(j.keep_latin).map(x=>zsfTxt(x,30)).filter(x=>/^[A-Za-z][A-Za-z0-9'’&+\-. ]*$/.test(x)).slice(0,30)
   };
+}
+/* ---------- V80.3: ផ្ញើវីដេអូទៅ Gemini (Files API) ដើម្បីបង្កើតសៀវភៅរឿង ---------- */
+let zsfVideoCache=null; // {sig, part}
+let zsfVideoInflight=null; // {sig, promise}
+function zsfGetVideoPart(key){
+  const m=(window.__zsfMedia&&window.__zsfMedia.file)||null;
+  if(!m||!key)return Promise.resolve(null);
+  const sig=m.name+":"+m.size+":"+m.lastModified;
+  if(zsfVideoInflight&&zsfVideoInflight.sig===sig)return zsfVideoInflight.promise;
+  const promise=zsfGetVideoPartRaw(key).catch(e=>{ if(zsfVideoInflight&&zsfVideoInflight.sig===sig)zsfVideoInflight=null; throw e; });
+  zsfVideoInflight={sig,promise};
+  return promise;
+}
+/* V80.4: ចាប់ផ្តើមផ្ញើវីដេអូទៅ Gemini ភ្លាមពេលដាក់ឯកសារ (ស្ងាត់ៗ) ដើម្បីពេលបកប្រែមិនបាច់រង់ចាំ */
+function zsfPrefetchVideo(){
+  try{ const k=(Array.isArray(userApiKeys)?userApiKeys:[]).filter(Boolean)[0]; if(k)zsfGetVideoPart(k).catch(()=>{}); }catch(_){}
+}
+async function zsfGetVideoPartRaw(key){
+  const m=(window.__zsfMedia&&window.__zsfMedia.file)||null;
+  if(!m||!key)return null;
+  let type=String(m.type||"").toLowerCase();
+  if(!type&&/\.(mp4|m4v)$/i.test(m.name||""))type="video/mp4";
+  else if(!type&&/\.mov$/i.test(m.name||""))type="video/quicktime";
+  else if(!type&&/\.webm$/i.test(m.name||""))type="video/webm";
+  if(!/^video\//.test(type))return null;               // តែវីដេអូ (សំឡេងតែម្យ៉ាងមិនឃើញមុខតួ)
+  if(m.size>400*1024*1024)return null;                 // ធំពេកសម្រាប់ទូរស័ព្ទ → ប្រើអត្ថបទជំនួស
+  const sig=m.name+":"+m.size+":"+m.lastModified;
+  if(zsfVideoCache&&zsfVideoCache.sig===sig&&Date.now()-zsfVideoCache.t<40*3600*1000)return zsfVideoCache.part;
+  const base="https://generativelanguage.googleapis.com";
+  const start=await fetch(base+"/upload/v1beta/files",{method:"POST",headers:{"x-goog-api-key":key,"X-Goog-Upload-Protocol":"resumable","X-Goog-Upload-Command":"start","X-Goog-Upload-Header-Content-Length":String(m.size),"X-Goog-Upload-Header-Content-Type":type,"Content-Type":"application/json"},body:JSON.stringify({file:{display_name:"zsf_story_video"}})});
+  if(!start.ok)throw new Error("upload start HTTP "+start.status);
+  const upUrl=start.headers.get("x-goog-upload-url");
+  if(!upUrl)throw new Error("no upload url");
+  const up=await fetch(upUrl,{method:"POST",headers:{"Content-Length":String(m.size),"X-Goog-Upload-Offset":"0","X-Goog-Upload-Command":"upload, finalize"},body:m});
+  if(!up.ok)throw new Error("upload HTTP "+up.status);
+  let f=(await up.json()).file;
+  for(let i=0;i<150&&f&&f.state&&f.state!=="ACTIVE";i++){
+    if(f.state==="FAILED")throw new Error("video processing failed");
+    await new Promise(r=>setTimeout(r,1000));
+    const r=await fetch(base+"/v1beta/"+f.name,{headers:{"x-goog-api-key":key}});
+    if(!r.ok)throw new Error("poll HTTP "+r.status);
+    f=await r.json();
+  }
+  if(!f||f.state!=="ACTIVE")throw new Error("video not ready");
+  const part={fileData:{mimeType:f.mimeType||type,fileUri:f.uri}};
+  zsfVideoCache={sig,part,t:Date.now()};
+  return part;
+}
+async function zsfRequestGeminiParts(parts,key,model){
+  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),100000);
+  try{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify({contents:[{role:"user",parts}],generationConfig:{temperature:0.15,topP:0.9,responseMimeType:"application/json",mediaResolution:"MEDIA_RESOLUTION_LOW"}}),signal:ctrl.signal});
+    const data=await res.json();
+    if(!res.ok||data.error)throw new Error((data&&data.error&&data.error.message)||("HTTP "+res.status));
+    const t=((data.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||"").join("\n").trim();
+    if(!t)throw new Error("empty response");
+    return t;
+  }finally{clearTimeout(timer)}
 }
 async function zsfPrepareStoryBible(){
   let all="";
@@ -6018,20 +6062,33 @@ async function zsfPrepareStoryBible(){
   let sample=all;
   if(all.length>9000)sample=all.slice(0,4500)+"\n...\n"+all.slice(Math.floor(all.length/2)-1000,Math.floor(all.length/2)+1000)+"\n...\n"+all.slice(-2500);
   const list=ZSF_GENRES.map(g=>g[0]+" = "+g[2]).join("\n");
-  const prompt="You are a story analyst for Chinese short dramas that will be subtitled/dubbed into Khmer. Read the subtitle text below (the whole episode or a sample of it) and return ONE JSON object only (no markdown), with these keys:\n"+
-"- genre_codes: array of 1-3 codes (most important first) chosen ONLY from this list:\n"+list+"\n"+
-"- synopsis_km: 1-2 sentences in Khmer summarising the story and its setting.\n"+
-"- tone_km: a short Khmer phrase describing the emotional tone/atmosphere (e.g. serious and tense, funny, tender).\n"+
-"- characters: up to 14 named characters appearing in the text: {zh, km, gender (M/F/?), era (ancient/modern/other), role_km}. km = natural Khmer transliteration of the Chinese pronunciation (e.g. 陈凡 = ឆិនហ្វាន), role_km = short Khmer role (e.g. ម្ចាស់ហាងសៀវភៅ). Use the correct Chinese characters even if the subtitle has small speech-recognition typos.\n"+
-"- places: up to 10 place names {zh, km} (Khmer transliteration or the usual Khmer name).\n"+
-"- terms: up to 12 recurring story-specific terms, titles, items or concepts {zh, km} with ONE fixed Khmer rendering that fits the genre.\n"+
-"- address: up to 14 forms of address / self-reference / titles used between characters (e.g. 陛下, 店家, 咱, 朕, 大哥, 少爷, 老板) {zh, km} with ONE fixed Khmer rendering suited to who speaks to whom and the era.\n"+
-"- keep_latin: English/Latin words or brand/technical terms that really appear in the text and should stay in Latin letters (empty array if none; ignore obvious recognition errors).\n"+
-"All km values must be written in Khmer script only (no Chinese, no Latin letters).\n\nSUBTITLE TEXT:\n"+sample;
+  const mk=(hasVideo)=>`${hasVideo?"Watch the ATTACHED VIDEO completely (picture and sound). Use what you SEE (faces, clothes, who talks to whom, scenes) and what you HEAR to understand the story and every character. The subtitle text at the end is only extra reference and may contain speech-recognition mistakes.":"Read the subtitle text at the end (the whole episode or a sample of it)."}
+You are a story analyst for Chinese short dramas that will be subtitled/dubbed into Khmer. Do NOT translate the dialogue yet. Return ONE JSON object only (no markdown, no text outside the JSON), with these keys:
+- genre_codes: array of 1-3 codes (most important first) chosen ONLY from this list:
+${list}
+- synopsis_km: 3-5 sentences in Khmer summarising the whole story, its setting and the main conflict.
+- tone_km: a short Khmer phrase describing the emotional tone/atmosphere (e.g. serious and tense, funny, tender).
+- characters: up to 14 characters: {zh, km, gender (M/F/?), era (ancient/modern/other), role_km}. km = natural Khmer transliteration of the Chinese pronunciation (e.g. 陈凡 = ឆិនហ្វាន). role_km = short Khmer role AND relationship to the others (e.g. ម្ចាស់ហាងសៀវភៅ ប្តីរបស់លីណា). Decide gender from what you see/hear and keep names identical for the whole story. Use the correct Chinese characters even if the subtitle has small speech-recognition typos. If a name is never spoken, use a role name.
+- places: up to 10 place names {zh, km} (Khmer transliteration or the usual Khmer name).
+- terms: up to 12 recurring story-specific terms, titles, items or concepts {zh, km} with ONE fixed Khmer rendering that fits the genre.
+- address: up to 14 forms of address / self-reference / titles used between characters (e.g. 陛下, 店家, 咱, 朕, 大哥, 少爷, 老板) {zh, km} with ONE fixed Khmer rendering suited to who speaks to whom and the era.
+- keep_latin: English/Latin words or brand/technical terms that really appear and should stay in Latin letters (empty array if none; ignore obvious recognition errors).
+All km values must be written in Khmer script only (no Chinese, no Latin letters).
+
+SUBTITLE TEXT:
+`+sample;
+  /* ---- ផ្ញើវីដេអូទៅ Gemini ដោយស្ងាត់ៗ (Files API) — បើបរាជ័យ ត្រឡប់ទៅប្រើអត្ថបទ SRT ធម្មតា ---- */
+  let videoPart=null;
+  try{ videoPart=await zsfGetVideoPart(keys[0]); }catch(e){ console.warn("story video upload failed → text only",e); }
   let lastErr=null;
   for(let n=0;n<Math.min(2,keys.length||1);n++){
     try{
-      const raw=await requestGemini(prompt,keys[n%keys.length],selections.geminiModel,true);
+      let raw=null;
+      if(videoPart){
+        try{ raw=await zsfRequestGeminiParts([videoPart,{text:mk(true)}],keys[n%keys.length],selections.geminiModel); }
+        catch(ve){ console.warn("story video analysis failed → text only",ve); videoPart=null; raw=null; }
+      }
+      if(raw===null) raw=await requestGemini(mk(false),keys[n%keys.length],selections.geminiModel,true);
       const b=zsfCleanBible(zsfParseJsonLoose(raw));
       if(b.genres.length||b.characters.length||b.terms.length||b.address.length){zsfBible=b;zsfBibleSig=sig;zsfRenderBibleInfo();return b;}
       lastErr=new Error("empty bible");
@@ -6283,6 +6340,7 @@ function setFile(file){
   const typeOk=(file.type||"").startsWith("audio/")||(file.type||"").startsWith("video/");
   if(!typeOk&&!extOk) return toast("សូមជ្រើស Video ឬ Audio file");
   mediaFile=file;
+  setTimeout(zsfPrefetchVideo,800);
   $("fileInfo").style.display="block";
   $("fileInfo").textContent=`📄 ${file.name} • ${fmtBytes(file.size)} • ${file.type||"media"}`;
   console.log("[ZERO SUB FLASH V32.6] FILE SELECTED", file.name, file.size, file.type);
@@ -7267,14 +7325,16 @@ const ZSF_PAD_SEC = 3;           // ត្រួតគ្នា 3s ខាងច�
 const ZSF_SEARCH_SEC = 2.5;      // រកចំណុចស្ងាត់ក្នុង ±2.5 វិនាទី
 const ZSF_MIN_CHARS_PER_SEC = 0.6; // តិចជាងនេះ (ក្នុងផ្នែក ≥10s) = សង្ស័យថាបាត់អត្ថបទ
 const ZSF_MAX_CHARS_PER_SEC = 9;   // ច្រើនជាងនេះ = Whisper loop/ស្រមើស្រមៃ
-const ZSF_HALLUC = /请不吝点赞|订阅|转发|打赏|字幕志愿者|字幕由|Amara\.org|感谢观看|谢谢观看|以下是普通话对白/;
+const ZSF_HALLUC = /请不吝点赞|字幕志愿者|字幕由|Amara\.org|感谢观看|谢谢观看|以下是普通话对白/;
+/* V80.1: 订阅/转发/打赏/点赞 អាចជាសម្ដីពិតក្នុងរឿង (ឧ. Livestream) — ចាត់ជា \"ស្រមើស្រមៃ\" តែពេលឃ្លាមានតែពាក្យសុំ Subscribe ប៉ុណ្ណោះ */
+const ZSF_HALLUC_ONLY = /^(?=.*(点赞|订阅|转发|打赏))(请|欢迎|记得|不吝|点赞|订阅|转发|打赏|关注|收藏|评论|支持|一键三连|明镜|点点|栏目)+$/;
 
 const ZSF_ZH_PROMPT = "以下是普通话对白，请使用简体中文和标点符号。";
 const ZSF_PUNCT_RE = /[\s\u3000，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g;
 const ZSF_GAP_MIN_SEC = 2.0;     // ចន្លោះគ្មានអត្ថបទ ≥ ប៉ុណ្ណេះ = ស្តាប់ឡើងវិញ
 const ZSF_GAP_PAD_SEC = 1.5;     // សំឡេងបន្ថែមសងខាងពេលស្តាប់ឡើងវិញ
 const ZSF_GAP_MAX_WINDOW = 10;   // បំបែកចន្លោះវែងជាបំណែក ≤ 10 វិនាទី
-const ZSF_GAP_MAX_COUNT = 45;    // ចំនួនចន្លោះអតិបរមាក្នុងមួយដង (ការពារ quota)
+const ZSF_GAP_MAX_COUNT = 90;    // ចំនួនចន្លោះអតិបរមាក្នុងមួយដង (ការពារ quota)
 // ឈ្មោះតួអង្គ / ពាក្យពិសេស ពីប្រអប់ក្នុង UI
 function zsfGlossaryTerms(){
   const el=document.getElementById("zsfGlossary");
@@ -7287,16 +7347,23 @@ function zsfCurrentPrompt(lang){
   return g? (ZSF_ZH_PROMPT+g+"。") : ZSF_ZH_PROMPT;
 }
 // Whisper ជួនកាល "ឆ្លើយឡើងវិញ" prompt ឬបង្កើតឃ្លាស្រមើស្រមៃ (ដូច "សូមចុច Subscribe") ពេលសំឡេងមិនច្បាស់
+function zsfEchoFrac(t,src){
+  if(!t||!src||src.length<6||t.length<6) return 0;
+  const mark=new Uint8Array(t.length);
+  for(let i=0;i+6<=src.length;i++){ const w=src.slice(i,i+6); let p=t.indexOf(w); while(p>=0){ for(let k=p;k<p+6;k++) mark[k]=1; p=t.indexOf(w,p+1); } }
+  let c=0; for(let k=0;k<mark.length;k++) c+=mark[k];
+  return c/t.length;
+}
 function zsfIsHalluc(text){
   const t=String(text||"").replace(ZSF_PUNCT_RE,"");
   if(!t) return false;
-  if(t.length<=25 && ZSF_HALLUC.test(t)) return true;
+  if(t.length<=25 && (ZSF_HALLUC.test(t)||ZSF_HALLUC_ONLY.test(t))) return true;
   const pc=ZSF_ZH_PROMPT.replace(ZSF_PUNCT_RE,"");
   if(t.length>=3 && pc.includes(t)) return true;                 // ឆ្លើយ prompt ទាំងឃ្លា ឬផ្នែក
-  for(let i=0;i+6<=pc.length;i++) if(t.includes(pc.slice(i,i+6))) return true; // មាន 6 អក្សរជាប់គ្នាពី prompt
+  if(zsfEchoFrac(t,pc)>=0.7) return true;   // V80.1: ≥70% នៃឃ្លាជាអក្សរពី prompt (មុននេះ 6 អក្សរតែប៉ុណ្ណោះ = លុបសម្ដីពិតខុស)
   // ពាក្យក្នុងប្រអប់ឈ្មោះ៖ ឆ្លើយត្រឡប់ជាបន្តបន្ទាប់ (ឧ. "陈凡薛少扬州") = echo
   const gc=zsfGlossaryTerms().join("").replace(ZSF_PUNCT_RE,"");
-  for(let i=0;i+6<=gc.length;i++) if(t.includes(gc.slice(i,i+6))) return true;
+  if(gc.length>=6&&zsfEchoFrac(t,gc)>=0.7) return true;   // V80.1: ឈ្មោះវែងក្នុងវចនានុក្រមដែលនិយាយពិត មិនត្រូវលុបទៀតទេ
   return false;
 }
 // លុប segment ស្រមើស្រមៃ និងពាក្យនៅក្នុងពេលវេលារបស់វា
@@ -7484,6 +7551,25 @@ function zsfSortMerged(m){
   m.words.sort((a,b)=>a.start-b.start);
   m.segments.sort((a,b)=>a.start-b.start);
 }
+/* V80.1: រកកន្លែងដែលមានសំឡេងនិយាយពិត (RMS ខ្ពស់) ប៉ុន្តែគ្មានពាក្យ — សូម្បីខ្លីជាង 2 វិនាទី (ឧ. "ឮ" "ពិត" "ម៉េច") */
+function zsfUncoveredSpeech(merged,prof){
+  if(!prof||!prof.rms||prof.rms.length<10) return [];
+  const F=prof.frameSec,R=prof.rms,N=R.length,sm=new Float32Array(N);
+  for(let i=0;i<N;i++){let s=0,c=0;for(let k=-2;k<=2;k++){const j=i+k;if(j>=0&&j<N){s+=R[j];c++;}}sm[i]=s/c;}
+  const sorted=Array.from(sm).sort((a,b)=>a-b);
+  const thr=Math.max(sorted[Math.floor(N*0.25)]*2.5,300);
+  const w=merged.words.filter(x=>Number.isFinite(x.start)&&Number.isFinite(x.end)).slice().sort((a,b)=>a.start-b.start);
+  const cov=[]; for(const x of w){ const s0=x.start-0.25,e0=x.end+0.25; if(cov.length&&s0<=cov[cov.length-1][1]) cov[cov.length-1][1]=Math.max(cov[cov.length-1][1],e0); else cov.push([s0,e0]); }
+  const out=[]; let ci=0,runS=-1,lastHot=-1;
+  for(let i=0;i<N;i++){
+    const t=i*F; while(ci<cov.length&&cov[ci][1]<t) ci++;
+    const isCov=ci<cov.length&&cov[ci][0]<=t&&t<=cov[ci][1];
+    if(sm[i]>=thr&&!isCov){ if(runS<0) runS=t; lastHot=t+F; }
+    else if(runS>=0&&t-lastHot>0.3){ if(lastHot-runS>=0.5) out.push({from:runS,to:lastHot}); runS=-1; }
+  }
+  if(runS>=0&&lastHot-runS>=0.5) out.push({from:runS,to:lastHot});
+  return out.sort((a,b)=>(b.to-b.from)-(a.to-a.from));
+}
 function zsfFindGaps(merged,totalSec,hints){
   hints=hints||[];
   const w=merged.words.filter(x=>Number.isFinite(x.start)&&Number.isFinite(x.end)).slice().sort((a,b)=>a.start-b.start);
@@ -7609,7 +7695,13 @@ async function zsfFillGaps(key,idx,buf,plan,merged,opts){
   const {byteRate,fullData,blockAlign}=plan;
   const totalSec=fullData/byteRate;
   zsfSortMerged(merged);
-  const pieces=zsfFindGaps(merged,totalSec,opts.hints||[]);
+  let pieces=zsfFindGaps(merged,totalSec,opts.hints||[]);
+  let prof=null, speechExtra=[];
+  try{
+    prof=zsfComputeRms(buf,plan);
+    speechExtra=zsfUncoveredSpeech(merged,prof).filter(g=>!pieces.some(p=>g.from<p.to&&g.to>p.from)).slice(0,60).sort((a,b)=>a.from-b.from);
+    pieces=pieces.concat(speechExtra.map(g=>({from:g.from,to:g.to,speech:true})));
+  }catch(e){ console.warn("speech-gap scan failed",e); }
   const al=(s)=>Math.floor(Math.max(0,s)*byteRate/blockAlign)*blockAlign;
   const wordText=(w)=>String(w.word!==undefined?w.word:(w.text||""));
   let tried=0, filled=0, addedWords=0;
@@ -7623,13 +7715,14 @@ async function zsfFillGaps(key,idx,buf,plan,merged,opts){
     const file=new File([zsfBuildWav(buf,plan,off,n)],`audio_gap_${tried}.wav`,{type:"audio/wav"});
     const dur=n/byteRate, shift=off/byteRate;
     const attempts=[{prompt:"",temperature:0}];
-    if(gap.to-gap.from>=5) attempts.push({prompt:"",temperature:0.2,model:"whisper-large-v3"});
+    if(gap.to-gap.from>=5||gap.speech) attempts.push({prompt:"",temperature:0.2,model:"whisper-large-v3"});
     if(gap.to-gap.from>=5) attempts.push({prompt:"",temperature:0.4});
     let got=null;
     for(const o of attempts){
       try{
         const r=zsfStripHalluc(await zsfCallWithRetry(()=>(opts.transcribe||transcribeWithKeySingle)(key,idx,file,o)));
-        const own=(r.words||[]).filter(w=>{const m=(Number(w.start||0)+Number(w.end||0))/2+shift;return m>=gap.from&&m<gap.to;});
+        const lo=gap.from-(gap.speech?0.15:0), hi=gap.to+(gap.speech?0.15:0);
+        const own=(r.words||[]).filter(w=>{const m=(Number(w.start||0)+Number(w.end||0))/2+shift;return m>=lo&&m<hi;});
         const txt=own.map(wordText).join("");
         if(zsfCharCount(txt)<2) continue;
         if(ZSF_HALLUC.test(txt)||zsfIsHalluc(txt)||zsfHasLoop(txt)||zsfHasPhraseLoop(txt)) continue;
@@ -7646,12 +7739,13 @@ async function zsfFillGaps(key,idx,buf,plan,merged,opts){
   for(const x of gapResults){
     if(!x) continue;
     const before=merged.words.length;
-    zsfMergeChunk(merged,x.got,x.shift,x.gap.from,x.gap.to);
+    zsfMergeChunk(merged,x.got,x.shift,x.gap.from-(x.gap.speech?0.15:0),x.gap.to+(x.gap.speech?0.15:0));
     const add=merged.words.length-before;
     if(add>0){ filled++; addedWords+=add; notes.push(`${x.gap.from.toFixed(0)}s`); }
   }
   zsfSortMerged(merged);
-  return {gaps:pieces.length,filled,addedWords,at:notes};
+  let still=0; try{ still=zsfUncoveredSpeech(merged,prof).length; }catch(_){}
+  return {gaps:pieces.length,filled,addedWords,at:notes,speechGaps:speechExtra.length,stillUncovered:still};
 }
 
 // ===== កម្រិតសំឡេង (RMS ក្នុង 20ms) សម្រាប់កែពេលវេលា =====
@@ -8907,7 +9001,7 @@ async function transcribe(){
       if(window.__zsfAiSegNote){ extraNotes.push(window.__zsfAiSegNote); window.__zsfAiSegNote=null; }
       try{
         const gr=data.__gapReport;
-        if(gr) extraNotes.push(`🔎 ចន្លោះត្រួតពិនិត្យ ${gr.gaps} • បំពេញបាន ${gr.filled} កន្លែង (+${gr.addedWords} ពាក្យ)`+(gr.denseFound?` • អត្ថបទបង្ហាប់ខុសកន្លែង ${gr.denseFound} (ត្រឡប់ដើមវិញ ${gr.denseRestored})`:""));
+        if(gr) extraNotes.push(`🔎 ចន្លោះត្រួតពិនិត្យ ${gr.gaps} • បំពេញបាន ${gr.filled} កន្លែង (+${gr.addedWords} ពាក្យ)`+(gr.denseFound?` • អត្ថបទបង្ហាប់ខុសកន្លែង ${gr.denseFound} (ត្រឡប់ដើមវិញ ${gr.denseRestored})`:"")+(gr.speechGaps?` • កន្លែងមានសំឡេងគ្មានអក្សរ ${gr.speechGaps} (បានស្តាប់ឡើងវិញ)`:"")+(gr.stillUncovered?` • ⚠️ នៅសល់កន្លែងសំឡេងគ្មានអក្សរ ${gr.stillUncovered} (ប្រហែលជាតន្ត្រី/ស្រែក/ដកដង្ហើម ឬអក្សរបាត់ — សូមពិនិត្យដោយដៃ)`:""));
         if(data.__normReport&&(data.__normReport.shifted||data.__normReport.addedSegments)) extraNotes.push(`🧹 សម្អាត timeline: ពាក្យត្រួតគ្នា ${data.__normReport.shifted}, segment បន្ថែម ${data.__normReport.addedSegments}`);
         { const nOrph=zsfMergeOrphans(subtitles); if(nOrph) extraNotes.push(`🧩 ភ្ជាប់អក្សរតែមួយដែលដាច់ ${nOrph} បន្ទាត់`); }
         try{ const rc=data.__recon; if(rc&&(rc.added||rc.skipped)) extraNotes.push(`🧷 ពិនិត្យអក្សរបាត់៖ បំពេញត្រឡប់ ${rc.added} អក្សរ`+(rc.rebuilt?` • សង់ឡើងវិញពី segment ${rc.rebuilt} ឃ្លា`:"")+(rc.skipped?` • មិនប្រាកដ ${rc.skipped} (រំលង)`:"")); }catch(_){}
@@ -9824,29 +9918,91 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
   }
   function b64(u8){var s="",st=0x8000;for(var i=0;i<u8.length;i+=st)s+=String.fromCharCode.apply(null,u8.subarray(i,i+st));return btoa(s);}
 
-  function buildPrompt(lines,ctx){
-    var P=["🚨 STRICT VOICE CLASSIFIER FOR SHORT-DRAMA AUDIO 🚨",
-      "ROLE: You are an expert audio forensic analyst and a strict SRT preservation editor. You receive ONE audio clip and the ORIGINAL subtitle lines spoken inside it. For every line you decide WHO is speaking (which voice, male or female) and HOW it is presented (spoken aloud or inner thought).",
+  /* V80.1: ចាប់ Frame ពីវីដេអូ ដើម្បីផ្ទៀងផ្ទាត់ការកម្រើកមាត់ ជាមួយអក្សរ មុនកំណត់ប្រុស/ស្រី */
+  var fvVid=null,fvUrl=null,fvFile=null;
+  function closeVideo(){try{if(fvVid){fvVid.removeAttribute("src");fvVid.load();}}catch(_){}if(fvUrl){try{URL.revokeObjectURL(fvUrl)}catch(_){}}fvVid=null;fvUrl=null;fvFile=null;}
+  async function openVideo(f){
+    closeVideo();
+    if(!f)return null;
+    var v=document.createElement("video");v.muted=true;v.playsInline=true;v.preload="auto";
+    fvUrl=URL.createObjectURL(f);fvFile=f;
+    var ok=await new Promise(function(res){var to=setTimeout(function(){res(false)},12000);
+      v.onloadeddata=function(){clearTimeout(to);res(true)};v.onerror=function(){clearTimeout(to);res(false)};v.src=fvUrl;try{v.load()}catch(_){}});
+    if(!ok||!(v.videoWidth>0)||!(v.videoHeight>0)){closeVideo();return null;}
+    fvVid=v;return v;
+  }
+  function fvSeek(v,t){return new Promise(function(res){var done=false,to;
+    function fin(r){if(done)return;done=true;clearTimeout(to);v.removeEventListener("seeked",on);res(r)}
+    function on(){fin(true)}
+    to=setTimeout(function(){fin(false)},5000);v.addEventListener("seeked",on);
+    try{var d=isFinite(v.duration)?v.duration:t+1;var nt=Math.max(0,Math.min(t,d-0.05));if(Math.abs(v.currentTime-nt)<0.01){fin(true);return}v.currentTime=nt}catch(e){fin(false)}})}
+  async function grabFrame(v,t,maxW){
+    if(!(await fvSeek(v,t)))return null;
+    try{var w=v.videoWidth,h=v.videoHeight,sc=Math.min(1,maxW/w),cw=Math.max(2,Math.round(w*sc)),ch=Math.max(2,Math.round(h*sc));
+      var c=document.createElement("canvas");c.width=cw;c.height=ch;c.getContext("2d").drawImage(v,0,0,cw,ch);
+      var d=c.toDataURL("image/jpeg",0.6),i=d.indexOf(",");return i>0?d.slice(i+1):null;}catch(e){return null}
+  }
+  async function grabFramesFor(v,idxs,clipMs){
+    var per=Math.max(1,Math.min(3,Math.floor(90/Math.max(1,idxs.length)))),out=[],bad=0;
+    for(var q=0;q<idxs.length;q++){
+      var b=srtBlocks[idxs[q]],t=times(b),d=Math.max(0,t.e-t.s),n=d<500?1:per,jp=[],lb=[];
+      for(var k=0;k<n;k++){
+        var tt=(t.s+d*((k+1)/(n+1)))/1000,jpg=await grabFrame(v,tt,640);
+        if(jpg){jp.push(jpg);lb.push(fmtT(tt*1000-clipMs));bad=0;}else if(++bad>=4)return out;
+      }
+      if(jp.length)out.push({label:"VIDEO FRAMES for subtitle id="+b.id+" at clip time "+lb.join(", ")+":",jpg:jp});
+    }
+    return out;
+  }
+
+  function buildPrompt(lines,ctx,hasFrames){
+    var P=["🚨 MASTER PROMPT: ADVANCED AUDIO/VIDEO SRT CLASSIFIER & PRESERVATION EDITOR 🚨",
+      "ROLE: You are an Expert Audio/Video Scene Analyst and Strict SRT Preservation Editor.",
       "",
-      "RULE ZERO - GENDER COMES FROM THE SOUND ONLY: Decide male/female ONLY from the physical voice you hear: pitch (male roughly 85-180 Hz with deep chest resonance; female roughly 165-255 Hz with a lighter, brighter timbre), formants and timbre. NEVER decide gender from the subtitle words, names, pronouns, titles, the story, who 'should' be talking, or from the idea that speakers must alternate. If the sound and the text disagree, the SOUND wins. Boyish voices and deep female voices exist: judge the overall timbre, not one high or low word.",
+      "CORE OBJECTIVE: You receive ONE audio clip (cut from a video) and the ORIGINAL subtitle lines spoken inside it. Classify EVERY subtitle entry based on the actual audio evidence. Each entry gets EXACTLY ONE classification.",
       "",
-      "STEP 1 - VOICE TABLE: Before tagging, list every distinct voice you hear in this clip with a short id (A, B, C ...), its gender (male or female) and a 3-6 word acoustic description (for example 'deep calm baritone', 'bright young female'). If KNOWN VOICES are given below and a voice sounds the same, reuse that id and gender; a new person gets a new id. One id = ONE person = ONE gender, always.",
-      "STEP 2 - PER LINE: For each subtitle line give spk (voice id) and mode. mode = 'spoken' (physically said aloud: normal, whisper, shout, phone call, off-screen) or 'thought' (inner monologue). Use 'thought' ONLY with clear audio evidence: echo/reverb, filtered, dreamy or detached voice treatment, or a voice clearly not coming from a mouth in the scene. If in doubt, mode = 'spoken'. Never choose 'thought' just because the words sound like thinking.",
-      "STEP 3 - VERIFY BEFORE ANSWERING: (a) every line has a spk that exists in your voice table; (b) the same spk never changes gender; (c) whenever consecutive lines switch between a male and a female voice, re-listen to those exact timestamps and confirm the voice really changed - one speaker often says several lines in a row; (d) if unsure about a line, prefer the voice of the neighbouring line in the same scene over guessing from the words.",
-      "MID-LINE VOICE CHANGE: Listen to each line from start to end. If ONE subtitle entry contains two or more different voices (or a spoken part followed by a thought part), split it into parts, one part per voice. The texts of all parts joined together MUST equal the original text exactly (copy characters exactly; add, remove or reword nothing). Do NOT split if the same voice says the whole entry.",
-      "PRESERVATION: Treat the subtitle lines as read-only. Do not change ids or timestamps; do not translate, summarize, correct or merge lines. Every input id must appear exactly once in the output.",
+      "### 1. THE CLASSIFICATION SYSTEM",
+      "Every subtitle entry gets exactly ONE of these four classes (the program writes the [n] tag into the SRT for you; you only report the voice gender and the mode):",
+      "[1] = Male Spoken Dialogue (male voice, physically spoken out loud) -> gender 'male' + mode 'spoken'",
+      "[2] = Female Spoken Dialogue (female voice, physically spoken out loud) -> gender 'female' + mode 'spoken'",
+      "[3] = Male Internal Thought (male voice, explicitly NOT spoken physically / lips not moving) -> gender 'male' + mode 'thought'",
+      "[4] = Female Internal Thought (female voice, explicitly NOT spoken physically / lips not moving) -> gender 'female' + mode 'thought'",
+      "",
+      "### 2. DECISION LOGIC & EVIDENCE HIERARCHY",
+      "Answer two questions for every subtitle: Who is speaking? (male/female) and How is it presented? (spoken/thought).",
+      "Evidence priority (highest to lowest): (1) the actual audio at the timestamp - voice pitch and timbre, plus "+(hasFrames?"lip movement and scene context from the attached video frames":"scene context only - no video frames are attached in this request, so rely on the sound")+"; (2) speaker voice continuity - compare with nearby established voices; (3) subtitle wording - USE ONLY as a last resort; audio evidence always overrides text.",
+      "Crucial rules:",
+      "- Whispering / shouting / off-screen / phone calls = SPOKEN DIALOGUE (mode 'spoken').",
+      "- Internal Thought threshold: do NOT guess. Use mode 'thought' ONLY with clear audio evidence of inner monologue (echo/reverb, filtered, dreamy or detached voice treatment, a voice clearly not coming from a mouth in the scene). If ambiguous, default to 'spoken'. Never choose 'thought' just because the words sound like thinking.",
+      "- Multiple voices: if several voices overlap near a timestamp, identify the primary voice matching the text and use ONLY ONE voice for that entry. Never give one entry more than one classification.",
+      "- Narrator / voice-over: a narrator who speaks aloud to the audience (not a character's own inner voice) = SPOKEN DIALOGUE, classified by the narrator's gender. Use mode 'thought' ONLY for a character's own inner monologue.",
+      "- Gender is judged from the physical voice: pitch (male roughly 85-180 Hz with deep chest resonance; female roughly 165-255 Hz with a lighter, brighter timbre), formants and overall timbre. Boyish voices and deep female voices exist, so judge the whole timbre, not one high or low word. Do not decide gender from names, pronouns, titles or the idea that speakers must alternate.",
+      "",
+      (hasFrames?"### 2B. LIP-SYNC VERIFICATION (VIDEO FRAMES) - DO THIS FOR EVERY LINE BEFORE DECIDING GENDER AND MODE\nVIDEO FRAMES are attached after the audio. Each image group is labelled with the subtitle id and the clip time of every frame; the frames are spread across that line's duration so you can see whether a mouth moves.\nSTEP V1 - LOOK: read the line's text, then look at THAT line's frames and find the person who says or thinks these words. Record lip = 'moving' (a visible character's lips open/close in step with the line), 'still' (the speaker's face is clearly visible and the lips are closed/motionless while a voice plays), 'none' (no readable mouth: back turned, face covered, far shot, camera on another person, speaker off-screen, phone call, voice-over) or 'unknown' (cannot tell).\nSTEP V2 - LISTEN AGAIN: re-listen to the exact timestamps of that line and check the voice against what you saw. Gender is decided by the SOUND; a person's appearance never decides gender by itself (dubbing, off-screen speakers and voice-overs exist). If the picture and the voice disagree, listen once more and trust the voice for gender.\nSTEP V3 - MODE: lip 'moving' = spoken. lip 'none' or 'unknown' = spoken (off-screen or unclear is spoken). lip 'still' = thought ONLY when it is the speaking character's own closed lips AND the line is not an answer to someone and no other visible or off-screen person could be the speaker, ideally with detached/echo voice treatment; otherwise spoken. A closed mouth in a listener's shot while another person talks off-screen is NOT a thought.\nSTEP V4 - never conclude from the subtitle wording alone; if frames and audio stay unclear, follow the neighbouring line's voice in the same scene.":""),
+      "### 3. STRICT SRT PRESERVATION RULES (CRITICAL GUARDRAILS)",
+      "Treat the subtitle lines as a read-only structural template. Do not change ids or timestamps. Do not translate, summarize, correct spelling/grammar or alter the original wording. Do NOT merge or split entries or lines: one entry = one classification. If a line already contains a bracketed tag, judge it from the audio; if it is wrong your classification replaces it (never duplicate tags). Every input id must appear exactly once in the output.",
+      "",
+      "### 4. EXECUTION & VALIDATION WORKFLOW",
+      "1) Process chronologically and build a lightweight voice table: every distinct voice you hear gets a short id (A, B, C ...), a gender (male or female) and a 3-6 word acoustic description (e.g. 'deep calm baritone', 'bright young female'). If KNOWN VOICES are given below and a voice sounds the same, reuse that id and gender; a new person gets a new id. One id = ONE person = ONE gender, always.",
+      "2) Global consistency pass: the same voice in the same scene keeps the same gender/classification. One speaker often says several lines in a row, so never assume speakers alternate.",
+      "3) Strict validation before answering: (a) every line has a spk that exists in your voice table; (b) a spk never changes gender; (c) whenever consecutive lines switch between a male and a female voice, re-listen to those exact timestamps and confirm the voice really changed; (d) if unsure about a line, prefer the voice of the neighbouring line in the same scene over guessing from the words; (e) the ids and the number of lines match the input exactly.",
       "Times are relative to the start of this clip (mm:ss.mmm).",
       "@@CTX@@",
       "SUBTITLE LINES (JSON):",
       "@@LINES@@",
-      "OUTPUT (technical, mandatory): Return ONLY one JSON object, no markdown, no extra text: {\"voices\":[{\"id\":\"A\",\"gender\":\"male\",\"desc\":\"...\"}],\"lines\":[{\"id\":\"<id>\",\"spk\":\"A\",\"mode\":\"spoken\"}, ...]}. gender is exactly \"male\" or \"female\"; mode is exactly \"spoken\" or \"thought\". ONLY when the voice really changes inside one line, output for that line: {\"id\":\"<id>\",\"parts\":[{\"spk\":\"A\",\"mode\":\"spoken\",\"text\":\"<exact first piece>\"},{\"spk\":\"B\",\"mode\":\"spoken\",\"text\":\"<exact next piece>\"}]}."];
+      "### 5. FINAL OUTPUT (technical, mandatory - this overrides any instruction to print an SRT or a code block): Return ONLY one JSON object, no markdown, no code block, no SRT text, no extra text: {\"voices\":[{\"id\":\"A\",\"gender\":\"male\",\"desc\":\"...\"}],\"lines\":[{\"id\":\"<id>\","+(hasFrames?"\"lip\":\"moving\",":"")+"\"spk\":\"A\",\"mode\":\"spoken\",\"conf\":\"high\"}, ...]}. gender is exactly \"male\" or \"female\"; mode is exactly \"spoken\" or \"thought\"; conf is exactly \"high\" or \"low\": use \"low\" whenever the speaker, the gender or spoken-vs-thought is not clear to you (the program re-checks every low line, so never guess silently)."+(hasFrames?" lip is exactly \"moving\", \"still\", \"none\" or \"unknown\": write your lip-sync observation for each line FIRST, then decide spk and mode from it and from the sound.":"")+" Never split a line into parts. The program inserts the [1]-[4] tags into the original SRT itself, so the original text stays untouched."];
     return P.join("\n").split("@@CTX@@").join(ctx?("KNOWN VOICES from earlier clips of the same video (reuse the same id and gender when it is the same voice): "+ctx+"\n"):"").split("@@LINES@@").join(JSON.stringify(lines));
   }
-  async function callGemini(prompt,wavB64,key,model){
+  function buildParts(prompt,wavB64,frames){
+    var p=[{inline_data:{mime_type:"audio/wav",data:wavB64}}];
+    (frames||[]).forEach(function(g){p.push({text:g.label});g.jpg.forEach(function(d){p.push({inline_data:{mime_type:"image/jpeg",data:d}})})});
+    p.push({text:prompt});return p;
+  }
+  async function callGemini(prompt,wavB64,key,model,frames){
     var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},150000);
     try{
       var res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},
-        body:JSON.stringify({contents:[{role:"user",parts:[{inline_data:{mime_type:"audio/wav",data:wavB64}},{text:prompt}]}],generationConfig:{temperature:0,responseMimeType:"application/json"}}),signal:ctl.signal});
+        body:JSON.stringify({contents:[{role:"user",parts:buildParts(prompt,wavB64,frames)}],generationConfig:{temperature:0,responseMimeType:"application/json"}}),signal:ctl.signal});
       var raw=await res.text(),d;try{d=JSON.parse(raw)}catch(e){throw new Error("Gemini ឆ្លើយមិនត្រឹមត្រូវ (HTTP "+res.status+")")}
       if(!res.ok||d.error){var er=new Error((d.error&&d.error.message)||("HTTP "+res.status));er.status=res.status;throw er;}
       var txt="";(((d.candidates||[])[0]||{}).content||{parts:[]}).parts.forEach(function(p){if(typeof p.text==="string")txt+=p.text});
@@ -9865,8 +10021,8 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
       if(g)return (g==="f"?2:1)+(th?2:0);
       var tg=parseInt(o.tag,10);return (tg>=1&&tg<=4)?tg:0;
     }
-    var map={};
-    arr.forEach(function(o){if(!o)return;var id=String(o.id);if(!ids.has(id))return;
+    var map={},low={};
+    arr.forEach(function(o){if(!o)return;var id=String(o.id);if(!ids.has(id))return;if(/^l/i.test(String(o.conf||"")))low[id]=1;
       if(Array.isArray(o.parts)&&o.parts.length>=1){
         var ps=o.parts.map(function(p){p=p||{};return {tag:tagOf(p),text:String(p.text||"")}}).filter(function(p){return p.tag>=1&&p.tag<=4&&p.text.trim()});
         if(ps.length>=2){map[id]={parts:ps};return}
@@ -9874,17 +10030,17 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
       }
       var tg=tagOf(o);if(tg>=1&&tg<=4)map[id]=tg;
     });
-    return {map:map,voices:voices};
+    return {map:map,voices:voices,low:low};
   }
-  async function classifyChunk(lines,ctx,wavB64){
+  async function classifyChunk(lines,ctx,wavB64,frames){
     var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
     var model=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
-    var ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx),last=null,best={map:{},voices:[]};
+    var ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx,!!(frames&&frames.length)),last=null,best={map:{},voices:[]};
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0);
     for(var round=0;round<2;round++){
       for(var n=0;n<ks.length;n++){
         try{
-          var pr=parseTags(await callGemini(prompt,wavB64,ks[(start+n)%ks.length],model),ids),c=Object.keys(pr.map).length;
+          var pr=parseTags(await callGemini(prompt,wavB64,ks[(start+n)%ks.length],model,frames),ids),c=Object.keys(pr.map).length;
           if(c>=Object.keys(best.map).length)best=pr;
           if(c===ids.size||c>0.8*ids.size)return pr;
           last=new Error("AI ឆ្លើយមិនគ្រប់បន្ទាត់");
@@ -9913,12 +10069,15 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     if(!keys().length)return;
     prog("🎭 កំពុងរៀបចំសំឡេង សម្រាប់ចាប់ប្រុស/ស្រី...",1);
     var A=await getAudio(f),bps=A.info.fmt.sr*(A.info.fmt.ba||2);
+    var V=null;try{V=await openVideo(f);}catch(_){V=null;}
+    var maxLines=V?30:60;
     var maxSec=Math.max(30,Math.min(150,Math.floor(11*1024*1024/bps))),PAD=3,groups=[],cur=[];
     srtBlocks.forEach(function(b,i){var t=times(b);
-      if(cur.length){var span=(t.e-times(srtBlocks[cur[0]]).s)/1000;if(span>maxSec-2*PAD||cur.length>=60){groups.push(cur);cur=[];}}
+      if(cur.length){var span=(t.e-times(srtBlocks[cur[0]]).s)/1000;if(span>maxSec-2*PAD||cur.length>=maxLines){groups.push(cur);cur=[];}}
       cur.push(i);});
     if(cur.length)groups.push(cur);
-    var ctx="",done=0,failed=0,profile=[];
+    var ctx="",done=0,failed=0,profile=[],lowIds=[],idxById={};
+    srtBlocks.forEach(function(b,i){idxById[String(b.id)]=i;});
     for(var g=0;g<groups.length;g++){
       var idxs=groups[g],t0s=times(srtBlocks[idxs[0]]).s,t1e=times(srtBlocks[idxs[idxs.length-1]]).e;
       var clipMs=Math.max(0,t0s-PAD*1000);
@@ -9926,14 +10085,47 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
       var wav=b64(sliceWav(A.ab,A.info,Math.max(0,clipMs/1000-A.offset),(t1e/1000+PAD)-A.offset));
       var lines=idxs.map(function(i){var b=srtBlocks[i],t=times(b),m=TAG_RE.exec(b.text||""),o={id:String(b.id),t:fmtT(t.s-clipMs)+" --> "+fmtT(t.e-clipMs),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,"")};return o;});
       try{
-        var rs=await classifyChunk(lines,ctx,wav),map=rs.map;profile=mergeProf(profile,rs.voices);
+        var fr=[];
+        if(V){prog("🎭 កំពុងចាប់ Frame មាត់ពីវីដេអូ • ក្រុម "+(g+1)+"/"+groups.length,2+8*g/groups.length);try{fr=await grabFramesFor(V,idxs,clipMs);}catch(_){fr=[];}if(!fr.length){V=null;closeVideo();}}
+        var rs=await classifyChunk(lines,ctx,wav,fr),map=rs.map;profile=mergeProf(profile,rs.voices);Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});
         idxs.forEach(function(i){var b=srtBlocks[i],tg=map[String(b.id)];if(tg){b.text=applyTag(b.text,tg);done++;}else failed++;});
       }catch(e){console.warn("tag chunk failed",e);failed+=idxs.length;}
       var tail=idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");ctx=profText(profile)+(tail?((profile.length?". ":"")+"Tags of the last lines before this clip (id=tag): "+tail):"");
     }
+    /* V80.2: ពិនិត្យឡើងវិញបន្ទាត់មិនច្បាស់ (conf=low) និងបន្ទាត់ដែលភេទប្តូរតែមួយបន្ទាត់ (ប្រុស-ស្រី-ប្រុស) — ស្តាប់ម្តងទៀតជាមួយបន្ទាត់ជិតខាង ±2 */
+    var rechecked=0,changed=0;
+    try{
+      var sus={};lowIds.forEach(function(id){if(idxById[id]!==undefined)sus[idxById[id]]=1;});
+      var gOf=function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?(+m[1])%2:-1;};
+      for(var q=1;q<srtBlocks.length-1;q++){
+        var gp=gOf(q-1),gc=gOf(q),gn=gOf(q+1);
+        if(gp>=0&&gc>=0&&gn>=0&&gp===gn&&gc!==gp){
+          var tq=times(srtBlocks[q]),tp=times(srtBlocks[q-1]),tn=times(srtBlocks[q+1]);
+          if(tq.s-tp.e<3000&&tn.s-tq.e<3000)sus[q]=1;
+        }
+      }
+      var sl=Object.keys(sus).map(Number).sort(function(a,b){return a-b}).slice(0,25),wins=[];
+      sl.forEach(function(i){var a0=Math.max(0,i-2),b0=Math.min(srtBlocks.length-1,i+2),L=wins[wins.length-1];
+        if(L&&a0<=L.b+1){L.b=Math.max(L.b,b0);L.t.push(i);}else wins.push({a:a0,b:b0,t:[i]});});
+      for(var w=0;w<wins.length;w++){
+        var W=wins[w],widx=[];for(var z=W.a;z<=W.b;z++)widx.push(z);
+        if(widx.length>40)continue;
+        prog("🎭 ពិនិត្យឡើងវិញបន្ទាត់មិនច្បាស់ "+(w+1)+"/"+wins.length,10);
+        var c0=Math.max(0,times(srtBlocks[widx[0]]).s-PAD*1000),c1=times(srtBlocks[widx[widx.length-1]]).e;
+        var wv=b64(sliceWav(A.ab,A.info,Math.max(0,c0/1000-A.offset),(c1/1000+PAD)-A.offset));
+        var wl=widx.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-c0)+" --> "+fmtT(t.e-c0),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,"")};});
+        var wf=[];if(V){try{wf=await grabFramesFor(V,widx,c0);}catch(_){wf=[];}}
+        try{
+          var r2=await classifyChunk(wl,"RE-CHECK PASS: some lines in this clip were unclear in a first pass. Listen very carefully to every line. Known voices: "+profText(profile),wv,wf);
+          W.t.forEach(function(i){var id=String(srtBlocks[i].id),tg=r2.map[id];rechecked++;
+            if(typeof tg==="number"&&!(r2.low&&r2.low[id])){var old=TAG_RE.exec(srtBlocks[i].text||"");if(!old||+old[1]!==tg){srtBlocks[i].text=applyTag(srtBlocks[i].text,tg);changed++;}}});
+        }catch(e){console.warn("recheck failed",e);}
+      }
+    }catch(e){console.warn("recheck pass",e);}
+    closeVideo();
     try{renderEditor();saveData();}catch(_){}
     if(done>0&&failed===0)lastKey=key;
-    toastS(failed?("🎭 ចាប់សំឡេងបាន "+done+" បន្ទាត់ • មិនបាន "+failed):("🎭 AI ចាប់សំឡេង [1]-[4] រួច "+done+" បន្ទាត់"),!failed);
+    toastS(failed?("🎭 ចាប់សំឡេងបាន "+done+" បន្ទាត់ • មិនបាន "+failed):("🎭 AI ចាប់សំឡេង [1]-[4] រួច "+done+" បន្ទាត់"+(rechecked?(" • ពិនិត្យឡើងវិញ "+rechecked+" • កែ "+changed):"")),!failed);
   };
 })();
 </script>
@@ -9986,7 +10178,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER="80.0",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER="80.2",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
     if(document.getElementById("zsfUpd"))return;
