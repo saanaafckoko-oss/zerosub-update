@@ -2708,7 +2708,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 <button class="workspace-upload-btn" onclick="document.getElementById('fileInput').click()" type="button">📄 បញ្ចូល SRT ថ្មី</button>
 <button class="workspace-clear-btn" id="btn_clear_file_workspace" onclick="clearFileData()" type="button">🗑️ លុប SRT នេះ</button>
 </div>
-<label id="zsfAutoClearRow" style="display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:10px 12px;border-radius:14px;border:1px solid var(--border-color);background:rgba(0,0,0,.25);font-size:13px;font-weight:700;color:var(--text-white);cursor:pointer"><input checked="" id="zsfAutoClear" onchange="try{localStorage.setItem('zsf_autoclear',this.checked?'1':'0')}catch(e){}" style="width:20px;height:20px;flex:none" type="checkbox"/><span>🧹 លុប SRT និងកំណត់ត្រាបកប្រែស្វ័យប្រវត្តិ ក្រោយទាញយករួច (ចាប់ផ្តើមថ្មី)</span></label>
+<label id="zsfAutoClearRow" style="display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:10px 12px;border-radius:14px;border:1px solid var(--border-color);background:rgba(0,0,0,.25);font-size:13px;font-weight:700;color:var(--text-white);cursor:pointer"><input checked="" id="zsfAutoClear" onchange="try{localStorage.setItem('zsf_autoclear',this.checked?'1':'0')}catch(e){}" style="width:20px;height:20px;flex:none" type="checkbox"/><span>🧹 លុប SRT និងកំណត់ត្រាបកប្រែស្វ័យប្រវត្តិ ក្រោយនាំចេញវីដេអូរួច (ចាប់ផ្តើមថ្មី)</span></label>
 <button class="btn-3d btn-full" id="btn_download" onclick="downloadSRT()" style="background:linear-gradient(180deg, #10b981 0%, #047857 100%); border-color:#059669; padding:16px; font-size:15px; color:white; text-shadow: var(--text-shadow-strong); box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 10px rgba(5, 150, 105, 0.4);">
             📥 ទាញយកឯកសារ (Download)
         </button>
@@ -4005,6 +4005,7 @@ async function exportAll(){
   var a=$("zkt_vdl");a.href=u;a.download=String(r.name).replace(/\.[^.]+$/,"")+"_khmer."+ext;a.style.display="block";
   /* V72: ទាញយកស្វ័យប្រវត្តិ (គ្មាន preview) */
   try{setTimeout(function(){try{a.click()}catch(_){}},300)}catch(_){}
+  try{window.__zsfLastVidUrl=u;if(window.zsfAfterVideoExport)window.zsfAfterVideoExport(u)}catch(_){}
   var fin="✅ នាំចេញវីដេអូរួចរាល់ • "+(Math.round(r.blob.size/1048576*10)/10)+" MB • "+ext.toUpperCase()+(r.fast?" • ⚡ ផ្លូវលឿន (វីដេអូដើម គុណភាពដដែល)":"")+(mute?" • សំឡេងដើមបិទ":" • សំឡេងដើម "+ov+"%")+(r.incomplete?" • ⚠️ វីដេអូអាចខ្លីជាងដើម (កុំចាកចេញពីទំព័រពេលនាំចេញ)":"");
   st(fin,100);
   window.__zsfVidMode=true;try{window.zsfTtsFinish&&window.zsfTtsFinish(true,fin)}catch(_){}window.__zsfVidMode=false;
@@ -4094,6 +4095,7 @@ function init(){
   if(!confirm("លុបសំឡេងដែលបានបង្កើតមែនទេ?"))return;
   clearAudio();
  };
+ window.__zsfClearAudio=function(){try{clearAudio()}catch(_){}};
  $("zkt_redo").onclick=async function(){
   if(busy)await stopAndWait();
   clearAudio();
@@ -5370,10 +5372,9 @@ async function downloadSRT(){
   }
   if(saved){
     showToast("✅ បានរក្សាទុក "+name+" ក្នុងថត «"+saved+"»",true);
-    try{zsfAfterKhmerDownload();}catch(_){}
     return;
   }
-  try{downloadBlobFile(blob,name);try{zsfAfterKhmerDownload();}catch(_){}}
+  try{downloadBlobFile(blob,name);}
   catch(e){console.error(e);alert("មិនអាចចាប់ផ្ដើមទាញយកបានទេ។ សូមសាកល្បងបើកក្នុង Chrome ហើយអនុញ្ញាត Downloads។");}
 }
 function updateTagSwitch(){$("keepTags").value=$("keepTagsToggle").checked?"true":"false";saveData()}
@@ -6221,8 +6222,33 @@ function zsfResetAllRecords(){
     const dg=$("v32diag"); if(dg){ dg.style.display="none"; dg.textContent=""; }
     const w=document.querySelector(".progress-wrap"); if(w) w.removeAttribute("data-stage");
   }catch(_){}
+  /* V72.7: លុបវីដេអូ/សំឡេងចាស់ + SRT ក្នុងផ្ទាំងអានសំឡេង ឱ្យត្រឡប់ដូចដើម */
+  try{
+    mediaFile=null; mediaDuration=0;
+    if(mediaObjectUrl){ try{URL.revokeObjectURL(mediaObjectUrl);}catch(_){} mediaObjectUrl=""; }
+    ["video","audio","audioCapture","videoCapture"].forEach(function(id){
+      const m=$(id); if(!m) return;
+      try{m.pause();}catch(_){}
+      try{m.removeAttribute("src"); m.load();}catch(_){}
+    });
+    if($("video")) $("video").style.display="none";
+    if($("audio")) $("audio").style.display="none";
+    if($("mediaInput")) $("mediaInput").value="";
+    if($("fileInfo")) $("fileInfo").style.display="none";
+    if($("mediaBox")) $("mediaBox").style.display="none";
+    if($("transcribeBtn")) $("transcribeBtn").disabled=true;
+  }catch(_){}
+  try{
+    if(typeof window.__zsfClearAudio==="function") window.__zsfClearAudio();
+    window.__zsfPipeFile=null;
+    const ta=$("zkt_srt_txt"); if(ta){ ta.value=""; ta.dispatchEvent(new Event("input",{bubbles:true})); }
+    const zf=$("zkt_file"); if(zf) zf.value="";
+    const zn=$("zkt_fname"); if(zn) zn.textContent="";
+    if(typeof setSrcTab==="function") setSrcTab("cur");
+  }catch(_){}
   try{ renderEditor(); updateLineCounts(); }catch(_){}
   try{ if(typeof updateWorkflowButtons==="function") updateWorkflowButtons(); }catch(_){}
+  try{ window.scrollTo({top:0,behavior:"smooth"}); }catch(_){}
 }
 function zsfSetPending(v){ try{ if(v) localStorage.setItem("zsf_pending_clear","1"); else localStorage.removeItem("zsf_pending_clear"); }catch(_){} }
 function zsfPendingClear(){ try{ return localStorage.getItem("zsf_pending_clear")==="1"; }catch(_){ return false; } }
@@ -6235,19 +6261,21 @@ function zsfRunPendingClear(silent){
   if(!silent) showToast("🧹 បានលុប SRT និងកំណត់ត្រាបកប្រែរួចរាល់ — ត្រៀមចាប់ផ្តើមថ្មី",true);
   return true;
 }
-function zsfAfterKhmerDownload(){
+function zsfAfterKhmerDownload(){ /* V72.7: មិនប្រើទៀត — សម្អាតធ្វើក្រោយនាំចេញវីដេអូ (zsfAfterVideoExport) */ }
+/* V72.7: បន្ទាប់ពីនាំចេញ/ទាញយកវីដេអូរួច → លុប SRT ចាស់ + កំណត់ត្រា + ឯកសារចាស់ទាំងអស់ ឱ្យត្រឡប់ដូចដើម */
+function zsfAfterVideoExport(vidUrl){
   if(!zsfAutoClearOn()) return;
-  if(isTranslating) return;
-  const total=srtBlocks.length, done=srtBlocks.filter(b=>b.trans&&b.trans.trim()).length;
-  if(total && done<total){
-    if(!confirm("នៅមាន "+(total-done)+" បន្ទាត់មិនទាន់បកប្រែ។\n\nលុប SRT និងកំណត់ត្រាឥឡូវនេះមែនទេ? (ឯកសារដែលទាញយករួចមិនបាត់ទេ)")) return;
-  }
-  /* កត់ទុកថា "ត្រូវលុប" — ទោះបិទ/ចាកចេញ/ចាក់សោ មុន ៥ វិនាទី ក៏នៅតែលុបពេលចាកចេញ ឬបើកចូលម្តងទៀត */
   zsfSetPending(true);
-  showToast("📥 កំពុងទាញយក… SRT និងកំណត់ត្រានឹងលុបស្វ័យប្រវត្តិក្នុង ៥ វិនាទី",true);
+  showToast("🎬 វីដេអូកំពុងទាញយក… SRT និងឯកសារចាស់នឹងលុបស្វ័យប្រវត្តិក្នុង ១០ វិនាទី",true);
   clearTimeout(window.__zsfAutoClearTimer);
-  window.__zsfAutoClearTimer=setTimeout(function(){ zsfRunPendingClear(false); },5000);
+  window.__zsfAutoClearTimer=setTimeout(function wait(){
+    if(isTranslating||window.__zsfTtsChain){ window.__zsfAutoClearTimer=setTimeout(wait,3000); return; }
+    zsfRunPendingClear(false);
+    /* លុប Blob វីដេអូដែលនាំចេញ ចេញពី Memory បន្ទាប់ពីទាញយកចាប់ផ្តើមហើយ */
+    if(vidUrl) setTimeout(function(){ try{URL.revokeObjectURL(vidUrl);}catch(_){} },120000);
+  },10000);
 }
+try{window.zsfAfterVideoExport=zsfAfterVideoExport;}catch(_){}
 try{
   document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="hidden") zsfRunPendingClear(true); });
   window.addEventListener("pagehide",function(){ zsfRunPendingClear(true); });
@@ -9643,12 +9671,12 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER="72.6",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER="72.7",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
     if(document.getElementById("zsfUpd"))return;
     var css=document.createElement("style");
-    css.textContent="#zsfUpd{display:flex;flex-direction:column;align-items:center;gap:7px;margin:22px auto calc(30px + env(safe-area-inset-bottom,0px));width:100%;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:inherit;color:#fff;text-align:center}"+
+    css.textContent="#mainApp.app-container{padding-bottom:0!important}body>.watermark{margin-top:6px!important;margin-bottom:0!important}#zsfUpd{display:flex;flex-direction:column;align-items:center;gap:7px;margin:20px auto calc(20px + env(safe-area-inset-bottom,0px));width:100%;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:inherit;color:#fff;text-align:center}"+
     "#zsfUpd .zu-sq{width:92px;height:92px;border-radius:24px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#2a2140,#150f24);border:2.5px solid #888;box-shadow:0 6px 18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12);position:relative;transition:transform .15s}"+
     "#zsfUpd:active .zu-sq{transform:scale(.94)}"+
     "#zsfUpd .zu-gear{font-size:44px;line-height:1;display:inline-block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}"+
