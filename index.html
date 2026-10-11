@@ -9637,35 +9637,43 @@ h.addEventListener("click",t);h.addEventListener("keydown",function(e){if(e.key=
 }catch(e){}}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();setTimeout(run,1500)})();</script>
 <script id="zsf-v71-reason">window.zsfPipeReason=function(){try{var g=function(i){var e=document.getElementById(i);return e?String(e.textContent||"").replace(/\s+/g," ").trim():""};var d=g("v32diag"),p=g("progressStatus"),r=(/ERROR|FAIL|❌|បរាជ័យ/i.test(d)?d:"")||(/❌|បរាជ័យ|FAIL/i.test(p)?p:"")||d||p||"មិនមានសារកំហុស";return r.length>300?r.slice(0,300)+"…":r}catch(e){return "មិនស្គាល់មូលហេតុ"}};</script>
-<script id="zsf-v724-updbtn">
-/* V72.4: ប៊ូតុង Update តូច — ខៀវ = កំណែថ្មីបំផុត • ក្រហម = មានកំណែថ្មី (ចុចដើម្បី Update) • ប្រផេះ = មិនអាចពិនិត្យបាន
+<script id="zsf-v725-updbtn">
+/* V72.5: ផ្ទាំង «ធ្វើបច្ចុប្បន្នភាព» នៅខាងក្រោមបំផុតនៃទំព័រ (រូប ⚙️)
+   ខៀវ = កំណែថ្មីបំផុត • ក្រហម = មានកំណែថ្មី (ចុចដើម្បី Update) • ប្រផេះ = មិនអាចពិនិត្យបាន
+   ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER="72.4",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER="72.5",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
     if(document.getElementById("zsfUpd"))return;
     var css=document.createElement("style");
-    css.textContent="#zsfUpd{position:fixed;left:6px;bottom:calc(6px + env(safe-area-inset-bottom,0px));z-index:2147483000;display:flex;flex-direction:column;align-items:flex-start;gap:2px;pointer-events:none}"+
-    "#zsfUpdBtn{pointer-events:auto;width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.85);padding:0;cursor:pointer;background:#888;box-shadow:0 0 6px rgba(0,0,0,.5);-webkit-tap-highlight-color:transparent}"+
-    "#zsfUpdBtn.ok{background:#1e90ff}#zsfUpdBtn.new{background:#ff2d2d;animation:zsfUpdP 1.4s infinite}#zsfUpdBtn.off{background:#888}"+
-    "#zsfUpdMsg{font-size:10px;line-height:1.1;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000;opacity:.9;max-width:60vw}"+
-    "@keyframes zsfUpdP{0%,100%{box-shadow:0 0 0 0 rgba(255,45,45,.7)}50%{box-shadow:0 0 0 6px rgba(255,45,45,0)}}";
+    css.textContent="#zsfUpd{display:block;width:calc(100% - 24px);max-width:720px;margin:18px auto calc(28px + env(safe-area-inset-bottom,0px));box-sizing:border-box;border-radius:16px;border:2px solid #888;background:rgba(20,16,30,.92);color:#fff;padding:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:left;font-family:inherit}"+
+    "#zsfUpd .zu-row{display:flex;align-items:center;gap:12px;padding:10px 14px;min-height:52px}"+
+    "#zsfUpd .zu-gear{font-size:26px;line-height:1;display:inline-block}"+
+    "#zsfUpd .zu-t{font-size:15px;font-weight:800;line-height:1.25}"+
+    "#zsfUpd .zu-m{font-size:10px;line-height:1.2;opacity:.85;margin-top:2px}"+
+    "#zsfUpd .zu-bar{height:6px;background:#888}"+
+    "#zsfUpd.ok{border-color:#1e90ff}#zsfUpd.ok .zu-bar{background:#1e90ff}"+
+    "#zsfUpd.new{border-color:#ff2d2d;animation:zsfUpdP 1.4s infinite}#zsfUpd.new .zu-bar{background:#ff2d2d}#zsfUpd.new .zu-gear{animation:zsfUpdR 2.4s linear infinite}"+
+    "#zsfUpd.off{border-color:#888}#zsfUpd.off .zu-bar{background:#888}"+
+    "@keyframes zsfUpdP{0%,100%{box-shadow:0 0 0 0 rgba(255,45,45,.6)}50%{box-shadow:0 0 0 7px rgba(255,45,45,0)}}"+
+    "@keyframes zsfUpdR{to{transform:rotate(360deg)}}";
     document.head.appendChild(css);
-    var w=document.createElement("div");w.id="zsfUpd";
-    w.innerHTML='<button id="zsfUpdBtn" class="off" aria-label="Update"></button><span id="zsfUpdMsg"></span>';
+    var w=document.createElement("div");w.id="zsfUpd";w.className="off";w.setAttribute("role","button");
+    w.innerHTML='<div class="zu-row"><span class="zu-gear">⚙️</span><div><div class="zu-t">កន្លែងធ្វើបច្ចុប្បន្នភាព</div><div class="zu-m" id="zsfUpdMsg"></div></div></div><div class="zu-bar"></div>';
     document.body.appendChild(w);
-    document.getElementById("zsfUpdBtn").addEventListener("click",onTap);
+    w.addEventListener("click",onTap);
     render();
   }
   function render(msg){
-    var b=document.getElementById("zsfUpdBtn"),m=document.getElementById("zsfUpdMsg");if(!b||!m)return;
-    b.className=st;
-    m.textContent=msg||(st==="ok"?("កំណែ "+ZSF_VER+" ថ្មីបំផុត"):st==="new"?(ss("zsfUpdTried")?"បិទ App រួចបើកម្តងទៀត":"មានកំណែថ្មី • ចុចដើម្បី Update"):"មិនអាចពិនិត្យ Update");
+    var w=document.getElementById("zsfUpd"),m=document.getElementById("zsfUpdMsg");if(!w||!m)return;
+    w.className=st;
+    m.textContent=msg||(st==="ok"?("កំណែ "+ZSF_VER+" ថ្មីបំផុត"):st==="new"?(ss("zsfUpdTried")?"បិទ App រួចបើកម្តងទៀត":"មានកំណែថ្មី • ចុចទីនេះដើម្បី Update"):"មិនអាចពិនិត្យ Update (ចុចដើម្បីសាកម្តងទៀត)");
   }
   function check(cb){
     var done=false;
-    function fin(x){if(done)return;done=true;st=x;render();if(cb)cb(x);}
+    function fin(x){if(done)return;done=true;st=x;render();if(x==="new"&&!ss("zsfUpdScrolled")){ss("zsfUpdScrolled","1");setTimeout(function(){try{document.getElementById("zsfUpd").scrollIntoView({behavior:"smooth",block:"center"});}catch(e){}},700);}if(cb)cb(x);}
     try{
       fetch(VURL+"?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.text():""}).then(function(t){
         t=String(t||"").trim();
