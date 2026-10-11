@@ -2667,7 +2667,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 </div>
 </div>
 </div>
-<input accept=".srt" id="fileInput" onchange="handleFileUpload(event)" type="file"/>
+<input accept="*/*" id="fileInput" onchange="handleFileUpload(event)" type="file"/>
 <!-- Section 2: Editor Box -->
 
 <div class="neon-card vrs-pane-translate" id="workspaceSection" style="display:none;">
@@ -2877,7 +2877,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 <div class="zkt-pane" id="zkt_pane_cur"><div id="zkt_curinfo"></div></div>
 <div class="zkt-pane" id="zkt_pane_file" style="display:none">
 <label class="zkt-pick" for="zkt_file"><span>📂 ចុចជ្រើសឯកសារ SRT ខ្មែរពីទូរស័ព្ទ</span></label>
-<input id="zkt_file" type="file" accept=".srt,.txt,text/plain" class="zkt-hidefile"/>
+<input id="zkt_file" type="file" accept="*/*" class="zkt-hidefile"/>
 <div id="zkt_fname">មិនទាន់ជ្រើសឯកសារ (.srt / .txt)</div>
 <div class="zkt-prevbox" id="zkt_prevbox">
 <div class="zkt-prevhead"><b>👁️ Preview / កែ SRT</b><span id="zkt_srt_info">មិនទាន់មានអត្ថបទ SRT</span></div>
@@ -4183,7 +4183,9 @@ function init(){
  $("zkt_save").onclick=function(){persist();st("💾 បានរក្សាទុក Preset សំឡេងតួ",null);toastP("✅ បានរក្សាទុក Preset សំឡេងតួ")};
  $("zkt_reset").onclick=function(){S[cur]=defS(cur);draw();persist();toastP("↺ បានកំណត់ "+TAGN[cur]+" ជាលំនាំដើម")};
  $("zkt_test").onclick=test;$("zkt_run").onclick=exportAll;$("zkt_ext_run").onclick=extExport;$("zkt_audio_run").onclick=audioOnly;
- $("zkt_file").onchange=async function(){var inp=$("zkt_file"),f=inp.files[0];if(f){setSrcTab("file");$("zkt_fname").textContent="✅ "+f.name+" • "+(Math.round(f.size/102.4)/10)+" KB";try{$("zkt_srt_txt").value=await f.text()}catch(e){$("zkt_fname").textContent="❌ អានឯកសារមិនបាន"}srtInfo();try{inp.value=""}catch(_){}}};
+ function zktReadText(f){return new Promise(function(res,rej){try{var r=new FileReader();r.onload=function(){res(String(r.result||"").replace(/^\uFEFF/,""))};r.onerror=function(){rej(r.error||new Error("read"))};r.readAsText(f,"UTF-8")}catch(e){rej(e)}})}
+  $("zkt_file").onchange=async function(){var inp=$("zkt_file"),f=inp.files&&inp.files[0];if(f){setSrcTab("file");$("zkt_fname").textContent="✅ "+f.name+" • "+(Math.round(f.size/102.4)/10)+" KB";try{$("zkt_srt_txt").value=await zktReadText(f)}catch(e){$("zkt_fname").textContent="❌ អានឯកសារមិនបាន"}srtInfo();try{inp.value=""}catch(_){}}};
+  (function(){var lb=document.querySelector('label[for="zkt_file"]'),inp=$("zkt_file");if(lb&&inp)lb.addEventListener("click",function(e){e.preventDefault();try{inp.value=""}catch(_){}try{inp.click()}catch(_){}})})();
   (function(){
    var ta=$("zkt_srt_txt"),tm=null;if(!ta)return;
    ta.addEventListener("input",function(){clearTimeout(tm);tm=setTimeout(srtInfo,250)});
@@ -10178,7 +10180,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER="80.5",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER="80.6",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
     if(document.getElementById("zsfUpd"))return;
