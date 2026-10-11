@@ -4046,6 +4046,22 @@ function zsfDownloadSrtQuiet(delayMs){
  }catch(e){try{console.warn("srt dl",e)}catch(_){}}
  return false;
 }
+/* V76: ប៊ូតុងបម្រុង «រក្សាទុក/ចែករំលែក» — ប្រើបានពេល browser រារាំងការទាញយកស្វ័យប្រវត្តិ */
+function zsfShareBtn(blob,name){
+ try{
+  var dl=$("zkt_vdl");if(!dl||!dl.parentNode)return;
+  var b=$("zkt_vshare");
+  if(!b){b=document.createElement("button");b.id="zkt_vshare";b.type="button";b.className="btn-3d btn-full";b.style.cssText="margin-top:8px;text-align:center;display:none";b.textContent="📤 រក្សាទុក / ចែករំលែកវីដេអូ";dl.parentNode.insertBefore(b,dl.nextSibling)}
+  window.__zsfShare={blob:blob,name:name};
+  var can=false;
+  try{var f0=new File([blob],name,{type:blob.type||"video/mp4"});can=!!(navigator.canShare&&navigator.share&&navigator.canShare({files:[f0]}))}catch(_){}
+  b.style.display=can?"block":"none";
+  b.onclick=async function(){
+   try{var sh=window.__zsfShare;if(!sh)return;await navigator.share({files:[new File([sh.blob],sh.name,{type:sh.blob.type||"video/mp4"})]})}
+   catch(e){if(e&&e.name!=="AbortError"){try{if(typeof showToast==="function")showToast("❌ "+((e&&e.message)||e),false)}catch(_){}}}
+  };
+ }catch(_){}
+}
 async function exportAll(){
  if(busy)return;
  var btn=$("zkt_run"),label=btn?btn.textContent:"";
@@ -4115,6 +4131,20 @@ async function exportAll(){
    st("⚠️ ផ្លូវលឿនមិនដំណើរការ ("+((fe&&fe.message)||fe)+") — ប្តូរទៅផ្លូវធម្មតា…",3);
   }
   if(!r)r=await exportVideo(lastMaster,lastSr,mute,ov);
+  /* V76: ចម្លងវីដេអូចុងក្រោយជា Blob តែមួយ (មិនពឹងលើឯកសារវីដេអូដើម ដែលអាចត្រូវបានលុប/ដោះចេញ ពេលសម្អាតស្វ័យប្រវត្តិ ហើយធ្វើឱ្យការទាញយកដាច់កណ្តាលទី) */
+  try{
+   if(r&&r.blob&&r.blob.size>0&&r.blob.size<=629145600){
+    st("📦 កំពុងរៀបវីដេអូចុងក្រោយ…",97);
+    var fb0=await r.blob.arrayBuffer();
+    r.blob=new Blob([fb0],{type:r.blob.type||"video/mp4"});fb0=null;
+   }
+  }catch(ce){try{console.warn("materialize",ce)}catch(_){}}
+  /* V76: ពិនិត្យរចនាសម្ព័ន្ធ MP4 មុនទាញយក — បើខូច ប្រាប់ច្បាស់ ជាជាងទាញយកឯកសារខូច */
+  if(r&&r.fast){
+   var ftop=await zfTopBoxes(r.blob);
+   var fok=ftop.length>0&&ftop[ftop.length-1].end===r.blob.size&&["ftyp","moov","mdat"].every(function(t){return ftop.some(function(x){return x.type===t})});
+   if(!fok)throw new Error("វីដេអូដែលបង្កើតមិនត្រឹមត្រូវ (រចនាសម្ព័ន្ធ MP4 ខូច) — សូមព្យាយាមម្តងទៀត");
+  }
   try{if(window.__zsfLastVidUrl)URL.revokeObjectURL(window.__zsfLastVidUrl)}catch(_){}
   var u=URL.createObjectURL(r.blob),ext=/mp4/.test(r.type)?"mp4":"webm";
   var vd=$("zkt_vid");
@@ -4122,8 +4152,9 @@ async function exportAll(){
   /* V72: ទាញយកស្វ័យប្រវត្តិ (គ្មាន preview) */
   try{setTimeout(function(){try{a.click()}catch(_){}},300)}catch(_){}
   try{window.__zsfLastVidName=a.download}catch(_){}
+  try{zsfShareBtn(r.blob,a.download)}catch(_){}
   if(optSub&&$("zkt_src").value!=="file")srtSent=zsfDownloadSrtQuiet(9000)||srtSent;
-  try{setTimeout(function(){try{if(typeof showToast==="function")showToast("⬇️ បើវីដេអូមិនទាញយក សូមចុចប៊ូតុង «ទាញយកវីដេអូ» នៅក្នុងកាត 05",true)}catch(_){}},4000)}catch(_){}
+  try{setTimeout(function(){try{if(typeof showToast==="function")showToast("⬇️ ពិនិត្យថត Download — បើគ្មានវីដេអូ សូមចុចប៊ូតុង «ទាញយកវីដេអូ» ឬ «📤 រក្សាទុក/ចែករំលែក»",true)}catch(_){}},4000)}catch(_){}
   try{window.__zsfLastVidUrl=u;if(window.zsfAfterVideoExport)window.zsfAfterVideoExport(u)}catch(_){}
   var fin="✅ នាំចេញវីដេអូរួចរាល់ • "+(Math.round(r.blob.size/1048576*10)/10)+" MB • "+ext.toUpperCase()+(r.fast?" • ⚡ ផ្លូវលឿន (វីដេអូដើម គុណភាពដដែល)":"")+(mute?" • សំឡេងដើមបិទ":" • សំឡេងដើម "+ov+"%")+(r.incomplete?" • ⚠️ វីដេអូអាចខ្លីជាងដើម (កុំចាកចេញពីទំព័រពេលនាំចេញ)":"");
   st(fin,100);
@@ -4197,7 +4228,7 @@ function init(){
   })();
   (function(){
    var v=$("zkt_x_video"),m=$("zkt_x_mute"),o=$("zkt_x_origvol"),row=$("zkt_x_origrow");if(!v||!m||!o||!row)return;
-   try{var a=localStorage.getItem("zsf_x_video"),b=localStorage.getItem("zsf_x_mute"),c=localStorage.getItem("zsf_x_bg");if(a!=null)v.checked=a==="1";if(b!=null)m.checked=b==="1";if(c!=null&&c!=="")o.value=c;var dk0=$("zkt_x_duck"),d0=localStorage.getItem("zsf_x_duck");if(dk0&&d0!=null&&d0!=="")dk0.value=d0}catch(_){}
+   try{var a=localStorage.getItem("zsf_x_video"),b=localStorage.getItem("zsf_x_mute"),c=localStorage.getItem("zsf_x_bg");v.checked=true;/* V76: ប្រអប់នេះលាក់ — Voice ត្រូវផ្គុំជាវីដេអូជានិច្ច */if(b!=null)m.checked=b==="1";if(c!=null&&c!=="")o.value=c;var dk0=$("zkt_x_duck"),d0=localStorage.getItem("zsf_x_duck");if(dk0&&d0!=null&&d0!=="")dk0.value=d0}catch(_){}
    function sync(){row.style.display=m.checked?"none":"flex";try{localStorage.setItem("zsf_x_video",v.checked?"1":"0");localStorage.setItem("zsf_x_mute",m.checked?"1":"0");localStorage.setItem("zsf_x_bg",String(o.value));var dk=$("zkt_x_duck");if(dk)localStorage.setItem("zsf_x_duck",String(dk.value))}catch(_){}var t1=$("zkt_x_ovt"),t2=$("zkt_x_duckt"),dk2=$("zkt_x_duck");if(t1)t1.textContent=o.value+"%";if(t2&&dk2)t2.textContent=dk2.value+"%"}
    v.onchange=sync;m.onchange=sync;o.oninput=sync;o.onchange=sync;var dk3=$("zkt_x_duck");if(dk3){dk3.oninput=sync;dk3.onchange=sync}sync();
    var dt0=$("zkt_deftag");if(dt0)dt0.addEventListener("change",function(){pvRender()});
@@ -6386,15 +6417,16 @@ function zsfAfterKhmerDownload(){ /* V72.7: មិនប្រើទៀត — �
 function zsfAfterVideoExport(vidUrl){
   if(!zsfAutoClearOn()) return;
   zsfSetPending(true);
-  showToast("🎬 វីដេអូកំពុងទាញយក… SRT និងឯកសារចាស់នឹងលុបស្វ័យប្រវត្តិក្នុង ១០ វិនាទី",true);
+  window.__zsfHoldClearUntil=Date.now()+150000;
+  showToast("🎬 វីដេអូកំពុងទាញយក… SRT និងឯកសារចាស់នឹងលុបស្វ័យប្រវត្តិក្នុង ២ នាទី កន្លះ",true);
   clearTimeout(window.__zsfAutoClearTimer);
   window.__zsfAutoClearTimer=setTimeout(function wait(){
     if(isTranslating||window.__zsfTtsChain){ window.__zsfAutoClearTimer=setTimeout(wait,3000); return; }
     zsfRunPendingClear(false);
     /* V75: ទុកប៊ូតុង «ទាញយកវីដេអូ» + Blob ឱ្យនៅ ៣០ នាទី ដើម្បីចុចទាញយកដោយដៃបាន (ការសម្អាតមុននេះបិទវាភ្លាម) */
     try{ window.zsfRestoreVidLink(vidUrl); }catch(_){}
-    if(vidUrl) setTimeout(function(){ try{URL.revokeObjectURL(vidUrl);}catch(_){} try{ if(window.__zsfLastVidUrl===vidUrl){ window.__zsfLastVidUrl=null; const d2=document.getElementById("zkt_vdl"); if(d2){ d2.style.display="none"; d2.removeAttribute("href"); } } }catch(_){} },1800000);
-  },10000);
+    if(vidUrl) setTimeout(function(){ try{URL.revokeObjectURL(vidUrl);}catch(_){} try{ if(window.__zsfLastVidUrl===vidUrl){ window.__zsfLastVidUrl=null; window.__zsfShare=null; const sb2=document.getElementById("zkt_vshare"); if(sb2) sb2.style.display="none"; const d2=document.getElementById("zkt_vdl"); if(d2){ d2.style.display="none"; d2.removeAttribute("href"); } } }catch(_){} },1800000);
+  },150000);
 }
 try{window.zsfAfterVideoExport=zsfAfterVideoExport;}catch(_){}
 window.zsfRestoreVidLink=function(u){
@@ -6406,7 +6438,7 @@ window.zsfRestoreVidLink=function(u){
 };
 try{ document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible"&&window.__zsfLastVidUrl){ setTimeout(function(){ try{window.zsfRestoreVidLink();}catch(_){} },12000); } }); }catch(_){}
 try{
-  document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="hidden") zsfRunPendingClear(true); });
+  document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="hidden"&&!(window.__zsfHoldClearUntil>Date.now())) zsfRunPendingClear(true); });
   window.addEventListener("pagehide",function(){ zsfRunPendingClear(true); });
 }catch(_){}
 /* V43: នាឡិកាកំពុងរត់ ដើម្បីបង្ហាញថាកំពុងដំណើរការ */
@@ -9800,7 +9832,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER="75.0",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER="76.0",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
     if(document.getElementById("zsfUpd"))return;
