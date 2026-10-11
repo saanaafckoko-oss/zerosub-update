@@ -2,6 +2,25 @@
 
 <html lang="km">
 <head>
+<script id="zsf-boot">
+/* V1.02 boot: បើមានកំណែថ្មីដែលបានទាញទុក (localStorage) ហើយថ្មីជាង file នេះ → ប្តូរមកប្រើកំណែថ្មីភ្លាម មុន App ចាប់ផ្តើម */
+(function(){
+  window.__ZSF_VER="1.02";
+  try{
+    var V=window.__ZSF_VER;
+    function cmp(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q?1:-1}return 0}
+    if(window.__zsfBooted)return;
+    var pv=localStorage.getItem("zsf_pkg_ver");
+    if(!pv||cmp(pv,V)<=0)return;
+    if(sessionStorage.getItem("zsf_boot_try")===pv)return;
+    var ph=localStorage.getItem("zsf_pkg_html");
+    if(!ph||ph.length<100000)return;
+    sessionStorage.setItem("zsf_boot_try",pv);
+    window.__zsfBooted=1;
+    document.open();document.write(ph);document.close();
+  }catch(e){}
+})();
+</script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <script>try{var __zf=localStorage.getItem("zsf_font")||"neon";document.documentElement.setAttribute("data-zfont",__zf)}catch(e){document.documentElement.setAttribute("data-zfont","neon")}</script>
@@ -10180,7 +10199,8 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER="1.01",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"1.02",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  IURL=VURL.replace(/version\.txt$/,"index.html");
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
     if(document.getElementById("zsfUpd"))return;
@@ -10215,12 +10235,12 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   }
   function check(cb){
     var done=false;
-    function fin(x){if(done)return;done=true;st=x;render();if(x==="new"&&!ss("zsfUpdScrolled")){ss("zsfUpdScrolled","1");setTimeout(function(){try{document.getElementById("zsfUpd").scrollIntoView({behavior:"smooth",block:"center"});}catch(e){}},700);}if(cb)cb(x);}
+    function fin(x){if(done)return;done=true;st=x;render();if(x==="new"&&!ss("zsfUpdScrolled")){ss("zsfUpdScrolled","1");[700,2500,5000].forEach(function(d){setTimeout(function(){try{var c=document.getElementById("zsfUpd");if(c&&c.offsetParent!==null&&!window.__zsfUpdBusy)c.scrollIntoView({behavior:"smooth",block:"center"});}catch(e){}},d)});}if(cb)cb(x);}
     try{
       fetch(VURL+"?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.text():""}).then(function(t){
         t=String(t||"").trim();
         if(!t||t.length>20){fin("off");return;}
-        if(t===ZSF_VER){ss("zsfUpdTried",null);fin("ok");}else fin("new");
+        REMV=t;if(t===ZSF_VER){ss("zsfUpdTried",null);fin("ok");}else fin("new");
       }).catch(function(){fin("off");});
     }catch(e){fin("off");}
     setTimeout(function(){fin("off");},9000);
@@ -10240,12 +10260,63 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
     };
     if(web){try{fetch(location.href.split("#")[0],{cache:"reload"}).then(go,go)}catch(e){go()}setTimeout(go,4000)}else go();
   }
+  function clearCaches(){
+    try{if(window.caches&&caches.keys)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}catch(e){}
+    try{if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})})}catch(e){}
+  }
+  function overlay(icon,title,msg,btn){
+    var o=document.getElementById("zsfUpdOv");
+    if(!o){
+      o=document.createElement("div");o.id="zsfUpdOv";
+      o.style.cssText="position:fixed;inset:0;z-index:2147483647;background:rgba(5,6,20,.94);display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;font-family:inherit";
+      document.body.appendChild(o);
+    }
+    o.innerHTML='<div style="max-width:380px;width:100%;text-align:center;color:#fff;background:#1f2440;border:1.5px solid #f59e0b;border-radius:22px;padding:26px 20px">'+
+      '<div style="font-size:46px;line-height:1">'+icon+'</div>'+
+      '<div style="font-size:18px;font-weight:800;margin:12px 0 6px">'+title+'</div>'+
+      '<div style="font-size:13px;line-height:1.6;color:#c7cdea">'+msg+'</div>'+
+      (btn?'<button id="zsfUpdOvBtn" style="margin-top:18px;width:100%;border:0;border-radius:14px;padding:13px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,#10b981,#059669);font-family:inherit">'+btn+'</button>':'')+
+      '</div>';
+    var b=document.getElementById("zsfUpdOvBtn");
+    if(b)b.onclick=function(){try{location.reload()}catch(e){}};
+  }
+  function tryExit(){
+    try{window.close()}catch(e){}
+    try{["Android","AndroidApp","AndroidInterface","app","ZSF"].forEach(function(n){var b=window[n];if(b){["exitApp","closeApp","finish","exit"].forEach(function(m){try{if(typeof b[m]==="function")b[m]()}catch(e){}})}})}catch(e){}
+  }
+  /* ចុចម្តងតែរួច: ទាញកំណែថ្មី → រក្សាទុក → ព្យាយាមចេញទៅផ្ទៃទូរសព្ទ → បើក App ម្តងទៀត = កំណែថ្មី */
   function onTap(){
-    if(st==="new"){
+    if(st!=="new"){ render("កំពុងពិនិត្យ..."); check(); return; }
+    if(window.__zsfUpdBusy)return;
+    window.__zsfUpdBusy=1;
+    ss("zsfUpdTried","1");
+    render("កំពុងទាញកំណែថ្មី...");
+    overlay("⏳","កំពុងធ្វើបច្ចុប្បន្នភាព...","សូមរង់ចាំ កុំបិទ App","");
+    var fail=function(){
+      /* បើទាញមិនបាន → ប្រើវិធីចាស់ (លុប cache រួច reload) */
+      window.__zsfUpdBusy=0;
+      var o=document.getElementById("zsfUpdOv");if(o&&o.parentNode)o.parentNode.removeChild(o);
       render("កំពុងធ្វើបច្ចុប្បន្នភាព...");
-      ss("zsfUpdTried","1");
-      setTimeout(zsfHardReload,1500);
-    }else{ render("កំពុងពិនិត្យ..."); check(); }
+      setTimeout(zsfHardReload,800);
+    };
+    try{
+      fetch(IURL+"?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.text():""}).then(function(h){
+        var m=/window\.__ZSF_VER\s*=\s*"([^"]+)"/.exec(h||"");
+        if(!h||h.length<100000||!m||(REMV&&m[1]!==REMV)){fail();return;}
+        try{
+          localStorage.setItem("zsf_pkg_html",h);
+          localStorage.setItem("zsf_pkg_ver",m[1]);
+        }catch(e){
+          try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(_){}
+          fail();return;
+        }
+        ss("zsf_boot_try",null);ss("zsfUpdScrolled",null);
+        clearCaches();
+        overlay("✅","Update រួចរាល់!","កំណែ "+m[1]+" ត្រូវបានរក្សាទុកក្នុងទូរសព្ទ។<br>App នឹងចេញទៅផ្ទៃទូរសព្ទ ហើយអ្នកបើក App ម្តងទៀត។<br>បើមិនចេញ សូមចុចប៊ូតុងខាងក្រោម។","🔄 បើកកំណែថ្មីឥឡូវ");
+        setTimeout(tryExit,1500);
+      }).catch(fail);
+    }catch(e){fail();}
+    setTimeout(function(){if(window.__zsfUpdBusy&&!document.getElementById("zsfUpdOvBtn"))fail();},20000);
   }
   function init(){build();check();}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
