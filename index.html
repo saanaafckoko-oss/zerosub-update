@@ -3347,16 +3347,20 @@ async function renderSeg(text,s,targetSec){
 /* V69: កម្មវិធីបង្កើតសំឡេងដកដង្ហើម (ខ្យល់) ស្រាលៗ — noise ត្រងកណ្តាល-ខ្ពស់ + envelope ទន់ */
 function zsfRand(seed){var x=(seed>>>0)||1;return function(){x^=x<<13;x>>>=0;x^=x>>>17;x^=x<<5;x>>>=0;return x/4294967296}}
 function zsfBreath(sr,dur,rnd){
- var n=Math.max(1,Math.floor(dur*sr)),o=new Float32Array(n),lp=0,hp=0,prev=0,pk=0.0001;
+ /* V72.2: ខ្យល់ទន់ៗ គ្មានសំឡេងរ៉ែ — pink noise + lowpass ២ជាន់ (~1kHz) + envelope រលោង */
+ var n=Math.max(1,Math.floor(dur*sr)),o=new Float32Array(n),b0=0,b1=0,b2=0,l1=0,l2=0,hp=0,prev=0,pk=0.0001;
  for(var i=0;i<n;i++){
-  var w=rnd()*2-1;lp+=0.42*(w-lp);          /* lowpass ~ 3-4kHz */
-  hp=0.93*(hp+lp-prev);prev=lp;             /* highpass ~ 300-400Hz */
-  var t=i/n,env=t<0.28?Math.sin(t/0.28*Math.PI/2):Math.pow(Math.cos((t-0.28)/0.72*Math.PI/2),1.6);
+  var w=rnd()*2-1;
+  b0=0.99765*b0+w*0.0990460;b1=0.96300*b1+w*0.2965164;b2=0.57000*b2+w*1.0526913;
+  var pink=b0+b1+b2+w*0.1848;
+  l1+=0.26*(pink-l1);l2+=0.30*(l1-l2);
+  hp=0.97*(hp+l2-prev);prev=l2;
+  var t=i/n,sn=Math.sin(Math.PI*Math.pow(t,0.75)),env=sn*sn;
   var v=hp*env;o[i]=v;var a=v<0?-v:v;if(a>pk)pk=a;
  }
  for(var j=0;j<n;j++)o[j]/=pk;return o;
 }
-var BREATH=0.07;try{var bv=localStorage.getItem("zsf_breath");if(bv!==null&&bv!==""){var bn=parseFloat(bv);if(bn>=0&&bn<=0.3)BREATH=bn}}catch(_){}
+var BREATH=0.04;try{var bv=localStorage.getItem("zsf_breath");if(bv!==null&&bv!==""){var bn=parseFloat(bv);if(bn>=0&&bn<=0.3)BREATH=bn}}catch(_){}
 /* ពេលដែលឃ្លាអាចប្រើបាន = រយៈពេលឃ្លា + ចន្លោះស្ងាត់មុនឃ្លាបន្ទាប់ (អតិបរមា 1.5 វិនាទី) */
 function availFor(arr,i){
  var c=arr[i],dur=Math.max(0.2,(c.end-c.start)/1000),nx=arr[i+1];
@@ -4675,6 +4679,39 @@ function validateTranslations(extracted,items){
   if(new Set(expected).size!==expected.length)return false;
   return expected.every(id=>got.includes(id));
 }
+function zsfUserPrompt(genre){
+  return `You are a professional subtitle translator (Subtitle Translator) and an expert movie story adapter.
+Your task is to translate the provided subtitle text into natural, conversational, and highly engaging Khmer ("ភាសាខ្មែរ") following these extremely strict guidelines:
+
+១. ប្រើប្រាស់ភាសានិយាយប្រចាំថ្ងៃ (Natural & Conversational)៖
+- Translate using conversational words that Khmer people naturally use in daily life.
+- Avoid word-for-word translation that sounds rigid or violates natural Khmer grammar.
+
+២. កែសម្រួល និងសង្ខេបឱ្យទាក់ទាញ (Adaptation & Conciseness)៖
+- If the original sentences are long, or use complex/difficult idioms, adapt and condense them into shorter, easy-to-read Khmer that remains synced to subtitle reading speeds while fully retaining the original intent and essence.
+- Make the dialogue punchy, smooth, dramatic, and captivating to keep the audience hooked.
+
+៣. ប្រើប្រាស់សព្វនាមឱ្យស័ក្តិសម (Appropriate Pronouns)៖
+- Based on the context of the dialogue, use Khmer pronouns that represent the character's status, age, power dynamics, and relationship (e.g., ខ្ញុំ/ឯង, បង/អូន, កូន/ម៉ែ, លោកម្ចាស់/ឯកឧត្ដម...).
+- Reflect the character's exact emotions in the context (anger, pleading, teasing, respect, sarcasm, etc.).
+
+៤. ហាមប្រើប្រាស់សញ្ញា 'ៗ' (No Repetition Symbol)៖
+- ABSOLUTE STRICT RULE: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the translation. Instead, you MUST spell out the repeated words directly. For example, write "ទេទេ" instead of "ទេៗ"; write "លឿនលឿន" instead of "លឿនៗ"; write "ទេទេទេទេ" instead of "ទេៗៗៗ"; write "យឺតយឺត" instead of "យឺតៗ". This is extremely critical because the Text-to-Speech (TTS) program cannot read or understand the 'ៗ' symbol and will fail to announce it.
+
+Atmosphere/Genre Context: ${genre}
+
+Rules:
+1. Maintain the emotional tone and context of the conversation according to the specified atmosphere.
+2. Keep the translation natural and fluent in Khmer.
+3. Preserve the meaning of each block exactly.
+4. STRICT RULE: Do not attempt to modify, suggest, or return any changes to timestamps or subtitle indices.
+5. TAG PRESERVATION: If you see tags like [1], [2], [3], [4] (any number enclosed in square brackets) in the source text, you MUST preserve them exactly in the Khmer translation. Do not translate or modify these tags.
+6. NAME TRANSLITERATION: All proper names (people, places, brands) MUST be translated or transliterated into Khmer script. DO NOT leave any names in English or Latin characters. (Only common Latin abbreviations/technical terms that appear in the source, such as VIP, AI, WiFi, OK, may stay as they are.)
+7. Return the translations mapped to their original IDs in the FORMAT given below (not JSON).
+8. The output must be concise enough for subtitle reading speeds.
+9. GENDER IDENTIFICATION: [1] = male voice speaking aloud, [2] = female voice speaking aloud, [3] = male inner thought, [4] = female inner thought. Use this to understand the dialogue context and choose appropriate gender-based language in Khmer. If ONE line contains several tags (for example [1] ... [2] ...), the voice changes in the middle of that line: keep ALL tags in the same order and the same count, each placed right before its own Khmer part.
+10. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write "ទេទេ" instead of "ទេៗ").`;
+}
 function buildPrompt(items){
   const keep=$("keepTags")?.value==="true";
   const src=selections.languageFrom;
@@ -4689,7 +4726,25 @@ function buildPrompt(items){
     }
   });
   const context=contextLines.map(x=>`[${x.id}] ${x.target?"TARGET":"CONTEXT ONLY"}\n${x.text}`).join("\n\n");
-  return `អ្នកគឺជា "អ្នកបកប្រែ subtitle ភាពយន្តចិន -> ខ្មែរ" កម្រិតវិជ្ជាជីវៈ សម្រាប់រឿងខ្លី/Drama។\n\nប្រភពភាសា: ${src}\nបរិយាកាស/ប្រភេទរឿងដែលអ្នកត្រូវគោរព: ${genre}\n\nគោលដៅសំខាន់:\nបកប្រែឱ្យស្តាប់ទៅដូចមនុស្សខ្មែរនិយាយសន្ទនាគ្នាពិតៗ រស់រវើក មានអារម្មណ៍ និងសមនឹងស្ថានការណ៍។ កុំបកប្រែតាមពាក្យមួយៗដោយរឹងៗ ប្រសិនបើវាធ្វើឱ្យសន្ទនាមិនធម្មជាតិ។ ប៉ុន្តែហាមបន្ថែមព័ត៌មានដែលមិនមានក្នុងប្រភព។\n\nច្បាប់បរិបទសាច់រឿង:\n1. គោរពបរិយាកាស ${genre} ជានិច្ច។ ប្រសិនបើជាបុរាណចិន/រាជវាំង ប្រើពាក្យសម័យបុរាណសមរម្យ។ ប្រសិនបើសម័យទំនើប ប្រើភាសាសម័យថ្មីធម្មជាតិ។ ប្រសិនបើឆ្លងភព/ត្រឡប់អតីតកាល ត្រូវរក្សាភាពខុសគ្នារវាងសម័យ និងវាក្យសព្ទ។ ប្រសិនបើ System/Billionaire ប្រើពាក្យសមនឹងប្រព័ន្ធ ជំនាញ រង្វាន់ ទ្រព្យសម្បត្តិ និងស្ថានការណ៍ដោយមិនបង្កើតព័ត៌មានថ្មី។ ប្រសិនបើ Wuxia/Xianxia/Fantasy ប្រើពាក្យក្បាច់គុន ថាមពល និងឋានៈឱ្យសមនឹងបរិបទ។\n2. សិក្សាបរិបទពីបន្ទាត់ជុំវិញទាំងមុននិងក្រោយ (រហូតដល់ ៨ បន្ទាត់ក្នុងមួយទិស) ដើម្បីយល់ពីលំដាប់ព្រឹត្តិការណ៍ ការឆ្លើយតប សព្វនាម ឈ្មោះ និងទំនាក់ទំនងរវាងតួអង្គ មិនបកប្រែឃ្លាដាច់ៗ។ ប្រើបរិបទសម្រាប់ជ្រើសន័យដែលសមបំផុត ប៉ុន្តែកុំបន្ថែមព័ត៌មានដែលប្រភពមិនបាននិយាយ។ ប្រសិនបើប្រយោគដើមមិនច្បាស់ កុំបង្កើតការពិតថ្មីដើម្បីបំពេញចន្លោះ។\n3. សញ្ញាសម្គាល់អ្នកនិយាយ [1]-[4] ក្នុង SRT មានន័យជាក់លាក់ ហើយត្រូវគោរពជាដាច់ខាត៖ [1] = សំឡេងសន្ទនារបស់តួប្រុស, [2] = សំឡេងសន្ទនារបស់តួស្រី, [3] = សំឡេង/គំនិតក្នុងចិត្តរបស់តួប្រុស, [4] = សំឡេង/គំនិតក្នុងចិត្តរបស់តួស្រី។ សញ្ញាទាំងនេះមិនមែនជាពាក្យធម្មតាដែលត្រូវបកស្រាយឡើយ។ ប្រើព័ត៌មាននេះដើម្បីជ្រើសរើសពាក្យសព្ទ របៀបហៅគ្នា សព្វនាម និងអារម្មណ៍ឱ្យត្រូវនឹងអ្នកនិយាយ។ [3] និង [4] ត្រូវសរសេរឱ្យមានអារម្មណ៍ដូចជាគំនិតខាងក្នុង មិនមែនសន្ទនាផ្ទាល់ជាមួយមនុស្សម្នាក់ទៀត។\n4. កំណត់ទំនាក់ទំនងរវាងតួអង្គតាម context និងសញ្ញា [1]-[4]៖ ប្រុស/ស្រី ក្មេង/ចាស់ បង/ប្អូន អូន/បង ឪពុក/ម្តាយ កូន/ឪពុក ពូ/មីង លោក/លោកស្រី ម្ចាស់/អ្នកបម្រើ អ្នកគ្រប់គ្រង/បុគ្គលិក ជាដើម។ ប្រើពាក្យហៅគ្នាឱ្យស៊ីសង្វាក់ជាមួយបរិបទ។\n5. រក្សាអារម្មណ៍៖ ខឹង គំរាម សោកសៅ ភ័យ ភ្ញាក់ផ្អើល សើច ចំអក សុភាព អំណរ អំណួត ឬបន្ទាន់ តាមស្ថានការណ៍។ កុំធ្វើឱ្យគ្រប់ប្រយោគមានសម្លេងដូចគ្នា។\n6. ឈ្មោះមនុស្ស ទីកន្លែង និងពាក្យចិនដែលចាំបាច់ ត្រូវបម្លែងជាសំឡេង/ពាក្យខ្មែរដែលអានបានធម្មជាតិ (ប្រើតាមតារាងឈ្មោះក្នុងសៀវភៅរឿង)។ កុំទុកអក្សរចិន ជប៉ុន កូរ៉េ ថៃ ក្នុងលទ្ធផលបកប្រែ។ ប៉ុន្តែពាក្យអង់គ្លេស/ពាក្យបច្ចេកទេស/ម៉ាកយីហោ ដែលមានជាអក្សរឡាតាំងក្នុងប្រភព (ឧ. VIP, iPhone, WiFi, AI, OK) ត្រូវរក្សាជាអក្សរឡាតាំងដដែល មិនបកប្រែ ហើយហាមបន្ថែមអក្សរឡាតាំងដែលប្រភពគ្មាន លើកលែងតែ tag/ID ដែលត្រូវរក្សាតាម format។\n7. អក្ខរាវិរុទ្ធខ្មែរ និងការប្រើពាក្យត្រូវតែត្រឹមត្រូវ។ មុនឆ្លើយ ត្រូវអានលទ្ធផលម្តងទៀត និងកែពាក្យខ្មែរ ឱ្យស្អាត។\n8. កុំបកប្រែសញ្ញា timestamp។ កុំប្តូរ ID។\n9. ${keep?"គ្រប់បន្ទាត់នៃលទ្ធផលខ្មែរ ត្រូវចាប់ផ្តើមដោយសញ្ញា [1], [2], [3] ឬ [4] មួយ និងមានតែមួយ (ដូចនិយមន័យក្នុងចំណុច ៣)។ បើ TARGET មានសញ្ញានៅដើមបន្ទាត់រួចហើយ ត្រូវចម្លងសញ្ញាដដែលនោះមកដាក់ដើមបន្ទាត់ខ្មែរ ហាមលុប ហាមប្តូរលេខ ហាមផ្លាស់ទីទៅកណ្តាលប្រយោគ។ បើ TARGET ណាគ្មានសញ្ញា ត្រូវកំណត់សញ្ញាខ្លួនឯងតាមបរិបទ និងមាតិកា (ប្រុស/ស្រី និយាយ ឬគិតក្នុងចិត្ត) ហើយដាក់នៅដើមបន្ទាត់។ ហាមទុកបន្ទាត់ណាគ្មានសញ្ញា។":"កុំបង្កើតសញ្ញា [1]-[4] ថ្មី និងកុំប្តូរឬបាត់សញ្ញាដើម។"}\n10. ត្រូវបញ្ជូនតែ TARGET IDs ប៉ុណ្ណោះ មួយ ID ម្តង និងមិនអាចបាត់ ID ណាមួយបានទេ។\n11. ហាមសរសេរការពន្យល់ ហាម markdown code fence ហាមចំណងជើងបន្ថែម។\n\nសេចក្តីរំលឹកសំខាន់អំពី [1]-[4]: [1] = តួប្រុសនិយាយ, [2] = តួស្រីនិយាយ, [3] = តួប្រុសគិតក្នុងចិត្ត, [4] = តួស្រីគិតក្នុងចិត្ត។ សូមប្រើសញ្ញាទាំងនេះដើម្បីកំណត់សំឡេង និងស្ទីលសន្ទនា/គំនិត ហើយរក្សាសញ្ញាដើមឱ្យបានត្រឹមត្រូវ។\n\nFORMAT ត្រូវតែជា:\n[ID]\n${keep?"[n] អត្ថបទខ្មែរ (n = 1, 2, 3 ឬ 4 ត្រូវមានគ្រប់បន្ទាត់)":"អត្ថបទខ្មែរ"}\n\nបន្ទាប់មក TARGET ID បន្ទាប់។${zsfStoryBlock()}\n\nCONTEXT ជុំវិញសាច់រឿង (អានសម្រាប់យល់បរិបទ; មិនត្រូវបញ្ចេញក្នុងចម្លើយ):\n${context}\n\nTARGET INPUT ដែលត្រូវបកប្រែ:\n${items.map(x=>`[${x.id}]\n${x.text}`).join("\n\n")}`;
+  return zsfUserPrompt(genre)+`
+
+Source language: ${src}
+
+OUTPUT FORMAT (technical, mandatory):
+- Translate ONLY the lines marked TARGET. Return every TARGET ID exactly once; never skip an ID. Lines marked CONTEXT ONLY are for understanding the story and must NOT be output.
+- ${keep?"Every output line must start with the tag [1], [2], [3] or [4] copied from the TARGET line (never delete it, change its number, or move it). If a TARGET line has several tags, keep ALL of them in the same order and count, each placed right before its own Khmer part. If a TARGET line has no tag, choose one from the context: [1]=male speaking, [2]=female speaking, [3]=male inner thought, [4]=female inner thought.":"Do not create new [1]-[4] tags and do not remove or change the original ones."}
+- No explanations, no markdown code fences, no extra titles.
+- Use exactly this format:
+[ID]
+${keep?"[n] Khmer text (n = 1, 2, 3 or 4)":"Khmer text"}
+
+then the next TARGET ID.${zsfStoryBlock()}
+
+STORY CONTEXT (read it to understand the scene; do not output it):
+${context}
+
+TARGET INPUT TO TRANSLATE:
+${items.map(x=>`[${x.id}]\n${x.text}`).join("\n\n")}`;
 }
 /* ===== V37: ក្បួនគុណភាពបកប្រែ (រៀនពីស្ទីល CapCut/Tools មិត្តភក្តិ) ===== */
 const ZSF_TAG_RULES=`
@@ -4708,7 +4763,7 @@ const ZSF_TAG_RULES=`
 • បន្ទាត់ដែលជាផ្នែកបន្តនៃប្រយោគតែមួយ (កាត់ជាច្រើនបន្ទាត់) ត្រូវប្រើសញ្ញាដូចគ្នា។ ក្នុងការគិត [3]/[4] ភេទត្រូវតាមតួដែលកំពុងគិត។
 • បើមិនអាចដឹងភេទបានពិតប្រាកដ ត្រូវប្រើភេទដូចបន្ទាត់មុន ហើយកុំប្តូរភេទដោយគ្មានភស្តុតាង។ បើមានសញ្ញាក្នុង TARGET រួចហើយ ត្រូវរក្សាដដែល មិនត្រូវកែ។
 
-ត្រួតពិនិត្យមុនឆ្លើយ: (១) គ្រប់បន្ទាត់មានសញ្ញាតែមួយ (២) បន្ទាត់ណាដាក់ [3]/[4] ត្រូវមានភស្តុតាងច្បាស់ បើគ្មាន ប្តូរទៅ [1]/[2] (៣) ភេទសមនឹងតួ។
+ត្រួតពិនិត្យមុនឆ្លើយ: (១) គ្រប់បន្ទាត់មានសញ្ញា (ច្រើនបានតែបន្ទាត់ដែល TARGET មានសញ្ញាច្រើនស្រាប់) (២) បន្ទាត់ណាដាក់ [3]/[4] ត្រូវមានភស្តុតាងច្បាស់ បើគ្មាន ប្តូរទៅ [1]/[2] (៣) ភេទសមនឹងតួ។
 `;
 const ZSF_STYLE_GUIDE=`
 
@@ -4734,8 +4789,7 @@ const ZSF_TR_BATCH=50;   // V37: បកប្រែម្តង ៥០ បន្
 const ZSF_TR_TAIL="\n\nសេចក្តីរំលឹកចុងក្រោយ (តឹងរឹង): ឆ្លើយតាម FORMAT [ID] ហើយបន្ទាត់បន្ទាប់ជាអត្ថបទខ្មែរសុទ្ធ។ ហាមទុកអក្សរចិន/ជប៉ុន/កូរ៉េ/ថៃ ក្នុងលទ្ធផល ហើយអក្សរឡាតាំងរក្សាបានតែពាក្យអង់គ្លេស/បច្ចេកទេសដែលមានក្នុងប្រភពប៉ុណ្ណោះ។ ត្រូវបកប្រែគ្រប់ TARGET ID។";
 function zsfTrTail(){
   const keep=$("keepTags")?.value==="true";
-  if(!keep)return ZSF_TR_TAIL;
-  return ZSF_TAG_RULES+"\n\nសេចក្តីរំលឹកចុងក្រោយ (តឹងរឹង): ឆ្លើយតាម FORMAT [ID] ហើយបន្ទាត់បន្ទាប់ត្រូវចាប់ផ្តើមដោយសញ្ញា [1] ឬ [2] ឬ [3] ឬ [4] ដែលមានតែមួយ រួចដកឃ្លា ហើយតាមដោយអត្ថបទខ្មែរ។ ឧទាហរណ៍៖\n[12]\n[2] អត្ថបទខ្មែរនៅទីនេះ\n\n[13]\n[3] អត្ថបទខ្មែរនៅទីនេះ\n\nហាមបាត់សញ្ញា [1]-[4] ហាមដាក់សញ្ញាលើបន្ទាត់ដាច់ដោយឡែក ហាមប្តូរលេខសញ្ញាដែលមានស្រាប់ក្នុង TARGET។ ([1]=ប្រុសនិយាយ [2]=ស្រីនិយាយ [3]=ប្រុសគិតក្នុងចិត្ត [4]=ស្រីគិតក្នុងចិត្ត)។ ហាមទុកអក្សរចិន/ជប៉ុន/កូរ៉េ/ថៃ ក្នុងលទ្ធផល ហើយអក្សរឡាតាំងរក្សាបានតែពាក្យអង់គ្លេស/បច្ចេកទេសដែលមានក្នុងប្រភពប៉ុណ្ណោះ។ ត្រូវបកប្រែគ្រប់ TARGET ID។";
+  return "\n\nFINAL REMINDER: answer ONLY in the format [ID] then the Khmer text, for every TARGET ID. "+(keep?"Keep the [1]-[4] tags exactly as in the TARGET (all of them, same order). ":"")+"Never use the symbol ៗ (write the repeated word out). No Chinese/Japanese/Korean/Thai characters in the output.";
 }
 function zsfHasKhmer(t){return /[\u1780-\u17FF]/.test(String(t||""));}
 function zsfLineOk(t){const c=normalizeTranslationForCheck(t);return !!c&&zsfHasKhmer(c)&&!containsForeignChars(c);}
@@ -4802,7 +4856,20 @@ function zsfNameBlock(){
   const ks=Object.keys(zsfNameMap);if(!ks.length)return "";
   return "\n\nឈ្មោះថេរ (ត្រូវសរសេរដូចគ្នាបេះបិទគ្រប់បន្ទាត់ ហាមប្តូរ): "+ks.map(k=>k+" = "+zsfNameMap[k]).join(" ; ");
 }
+function zsfNoRepeatSign(t){
+  return String(t||"").replace(/([\u1780-\u17D3\u17DD]+)(\u17D7+)/g,function(m,w,k){
+    let pre="",word=w;
+    if(w.length>6){let i=w.length-6;while(i<w.length&&!(w.charCodeAt(i)>=0x1780&&w.charCodeAt(i)<=0x17A2&&w.charCodeAt(i-1)!==0x17D2))i++;if(i>=w.length)i=w.length-4;pre=w.slice(0,i);word=w.slice(i);}
+    return pre+word.repeat(1+k.length);
+  });
+}
 function zsfSanitizeTrans(src,txt){
+  let s=String(txt||"");
+  if($("keepTags")?.value==="true"){const a=String(src||"").match(/\[[1-4]\]/g)||[],c=s.match(/\[[1-4]\]/g)||[];
+    if(a.length>=2&&c.length===a.length){let k=0;s=s.replace(/\[[1-4]\]\s*/g,()=>a[k++]+" ").replace(/[«»“”]/g,"").replace(/[ \t]{2,}/g," ").replace(/\s*[,，]\s*$/,"").trim();if(!/^\[[1-4]\]/.test(s))s=a[0]+" "+s;return zsfNoRepeatSign(s);}}
+  return zsfNoRepeatSign(zsfSanitizeTrans0(src,txt));
+}
+function zsfSanitizeTrans0(src,txt){
   let s=String(txt||"");
   if($("keepTags")?.value!=="true"){s=s.replace(/\[[1-4]\]\s*/g,"");}
   else{
@@ -4821,6 +4888,8 @@ function zsfEnforceTag(b){
   if(!b||$("keepTags")?.value!=="true")return 0;
   const T=/^\s*\[([1-4])\]/;
   let tr=String(b.trans||"").trim();if(!tr)return 0;
+  {const a=String(b.text||"").match(/\[[1-4]\]/g)||[],c=tr.match(/\[[1-4]\]/g)||[];
+   if(a.length>=2&&c.length===a.length){let k=0;tr=tr.replace(/\[[1-4]\]\s*/g,()=>a[k++]+" ").replace(/[ \t]{2,}/g," ").trim();if(!/^\[[1-4]\]/.test(tr))tr=a[0]+" "+tr;b.trans=tr;delete b._tagGuess;return 0;}}
   const sm=T.exec(String(b.text||"")),tm=T.exec(tr);
   let n=1,guessed=0;
   if(sm){n=+sm[1];delete b._tagGuess;}                       /* ១) សញ្ញាពី Audio AI */
@@ -4880,7 +4949,7 @@ async function zsfRequestTranslate(items,repairMode,pref){
   for(let n=0;n<tries;n++){
     const idx=((pref==null?currentApiIndex:pref)+n)%keys.length,key=keys[idx];
     try{
-      const prompt=(repairMode?buildRepairPrompt(items):buildPrompt(items)+ZSF_STYLE_GUIDE+zsfTrTail());   // V32.72: សៀវភៅរឿង (រួមទាំងឈ្មោះថេរ) ដាក់ក្នុង prompt រួចហើយ
+      const prompt=(repairMode?buildRepairPrompt(items):buildPrompt(items)+zsfTrTail());   // V32.72: សៀវភៅរឿង (រួមទាំងឈ្មោះថេរ) ដាក់ក្នុង prompt រួចហើយ
       const raw=await requestGemini(prompt,key,selections.geminiModel);
       if(pref==null){currentApiIndex=(idx+1)%keys.length;safeSet("zero_current_api_index",String(currentApiIndex));}
       return extractRepairTranslations(raw,items).map((x,i)=>({id:x.id,text:zsfSanitizeTrans(items[i]&&items[i].text,x.text)}));
@@ -5146,7 +5215,26 @@ function buildRepairPrompt(items){
   });
   const context=contextLines.map(x=>`[${x.id}] ${x.target?"TARGET":"CONTEXT ONLY"}\n${x.text}`).join("\n\n");
   const targets=items.map(x=>`[${x.id}]\nប្រភព: ${x.text}\nការបកប្រែបច្ចុប្បន្នដែលត្រូវជួសជុល: ${x.trans||"(ទទេ)"}`).join("\n\n");
-  return `អ្នកគឺជា Senior Khmer Subtitle Editor។ នេះជាការជួសជុល subtitle មិនមែនការបកប្រែធម្មតាទេ។\n\nភាសាប្រភព: ${src}\nប្រភេទ/បរិយាកាសរឿង: ${genre}\n\nភារកិច្ចសំខាន់:\nសម្រាប់ TARGET នីមួយៗ សូមពិនិត្យប្រភព និងការបកប្រែបច្ចុប្បន្ន។ កែសម្រួលឡើងវិញទាំងស្រុង ប្រសិនបើវាទទេ បកប្រែមិនទាន់ចប់ មានអក្សរចិន/ជប៉ុន/កូរ៉េ/ថៃ/អក្សរឡាតាំងនៅសល់ ឬមានអក្ខរាវិរុទ្ធ/វេយ្យាករណ៍ខ្មែរមិនល្អ។\n\nច្បាប់តឹងរឹង:\n1. លទ្ធផលត្រូវជាភាសាខ្មែរ ធម្មជាតិ ដូចមនុស្សខ្មែរនិយាយពិតៗ។\n2. កុំទុកអក្សរចិន ជប៉ុន កូរ៉េ ថៃ ឬស៊ីរីលីកនៅក្នុងអត្ថបទបកប្រែ។ បើឈ្មោះមនុស្ស/ទីកន្លែងជាភាសាបរទេស ត្រូវបម្លែងជាអក្សរខ្មែរដែលអានបានធម្មជាតិ។ ប៉ុន្តែពាក្យអង់គ្លេស/ពាក្យបច្ចេកទេសដែលមានជាអក្សរឡាតាំងក្នុងប្រភព ត្រូវរក្សាជាអក្សរឡាតាំងដដែល ហើយហាមបន្ថែមអក្សរឡាតាំងដែលប្រភពគ្មាន។\n3. សញ្ញា [1]-[4] គឺជាសញ្ញាសម្គាល់សំឡេង ហើយត្រូវរក្សាតាមប្រភព៖ [1] = សំឡេងតួប្រុស, [2] = សំឡេងតួស្រី, [3] = គំនិតក្នុងចិត្តតួប្រុស, [4] = គំនិតក្នុងចិត្តតួស្រី។ កុំប្តូរ លុប ឬបង្កើតសញ្ញាទាំងនេះ។ លេខ និងសញ្ញាវណ្ណយុត្តិផ្សេងៗអាចរក្សាតាមប្រភព។\n4. កុំបន្ថែមព័ត៌មានដែលមិនមានក្នុងប្រភព។\n5. រក្សាអត្ថន័យ និងអារម្មណ៍៖ ខឹង គំរាម សោកសៅ ភ័យ សើច ចំអក សុភាព ជាដើម។\n6. សញ្ញា [1]-[4] ត្រូវយកមកប្រើជាសញ្ញាសម្គាល់អ្នកនិយាយ/គំនិតជាមូលដ្ឋាន៖ [1] ប្រុសនិយាយ, [2] ស្រីនិយាយ, [3] ប្រុសគិតក្នុងចិត្ត, [4] ស្រីគិតក្នុងចិត្ត។ រួមជាមួយ context ដើម្បីកំណត់ទំនាក់ទំនង និងរបៀបហៅគ្នា ហើយប្រើ បង/ប្អូន/អូន/ពូ/មីង/ម៉ែ/ប៉ា/លោក/លោកស្រី ជាដើមតែពេល context គាំទ្រ។ កុំសន្មត់ទំនាក់ទំនងលើសពីអ្វីដែលប្រភពអាចគាំទ្រ។\n7. សម្រាប់រឿងបុរាណ/រាជវាំង ប្រើពាក្យសម័យបុរាណសមរម្យ។ សម្រាប់សម័យទំនើប ប្រើភាសាទំនើប។ សម្រាប់ឆ្លងភព/System/Wuxia/Xianxia/Fantasy/CEO/Billionaire/Comedy សម្របពាក្យ និងអារម្មណ៍ឱ្យសមនឹង genre។\n8. អាន context មុនសម្រេចន័យ។\n9. មុនឆ្លើយ ត្រូវ proofread អក្ខរាវិរុទ្ធខ្មែរម្តងទៀត។\n10. ត្រូវបញ្ជូន TARGET IDs ទាំងអស់ មិនបាត់ មិនស្ទួន និងមិនបន្ថែម ID ផ្សេង។\n${keep?"11. គ្រប់បន្ទាត់ខ្មែរត្រូវចាប់ផ្តើមដោយសញ្ញា [1], [2], [3] ឬ [4] មួយ។ បើប្រភពមានសញ្ញា ត្រូវចម្លងសញ្ញាដដែល (ហាមលុប ហាមប្តូរលេខ)។ បើគ្មាន ត្រូវកំណត់តាមបរិបទ ([1]=ប្រុសនិយាយ [2]=ស្រីនិយាយ [3]=ប្រុសគិតក្នុងចិត្ត [4]=ស្រីគិតក្នុងចិត្ត)។":"11. កុំបង្កើត tag ថ្មី។"}${keep?ZSF_TAG_RULES:""}\n\nសេចក្តីរំលឹកសំខាន់អំពី [1]-[4]: [1] = តួប្រុសនិយាយ, [2] = តួស្រីនិយាយ, [3] = តួប្រុសគិតក្នុងចិត្ត, [4] = តួស្រីគិតក្នុងចិត្ត។ សូមប្រើសញ្ញាទាំងនេះដើម្បីកំណត់សំឡេង និងស្ទីលសន្ទនា/គំនិត ហើយរក្សាសញ្ញាដើមឱ្យបានត្រឹមត្រូវ។\n\nFORMAT តែប៉ុណ្ណោះ:\n[ID]\n${keep?"[n] ":""}អត្ថបទខ្មែរ${zsfStoryBlock()}\n\nCONTEXT:\n${context}\n\nTARGETS:\n${targets}`;
+  return zsfUserPrompt(genre)+`
+
+REPAIR TASK: this is a repair, not a first translation. For each TARGET, check the source and the current translation. Translate it again completely if it is empty, unfinished, still contains Chinese/Japanese/Korean/Thai letters or Latin letters (except common abbreviations such as VIP, AI, WiFi, OK), or has bad Khmer spelling or grammar.
+
+Source language: ${src}
+
+OUTPUT FORMAT (technical, mandatory):
+- Return every TARGET ID exactly once. No explanations, no markdown code fences, no extra titles.
+- ${keep?"Keep the [1]-[4] tags exactly as in the source (all of them, same order and count, each before its own Khmer part). Never delete or change their numbers.":"Do not create new [1]-[4] tags and do not remove or change the original ones."}
+- Use exactly this format:
+[ID]
+${keep?"[n] Khmer text (n = 1, 2, 3 or 4)":"Khmer text"}
+
+then the next TARGET ID.${zsfStoryBlock()}
+
+STORY CONTEXT (read it to understand the scene; do not output it):
+${context}
+
+TARGETS TO REPAIR:
+${targets}`;
 }
 function validateKhmerOutput(out,items){
   if(!validateTranslations(out,items))return false;
@@ -9434,18 +9522,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
   function b64(u8){var s="",st=0x8000;for(var i=0;i<u8.length;i+=st)s+=String.fromCharCode.apply(null,u8.subarray(i,i+st));return btoa(s);}
 
   function buildPrompt(lines,ctx){
-    return "ROLE: You are an Expert Audio/Video Scene Analyst and Strict SRT Preservation Editor.\n\n"+
-"CORE OBJECTIVE: You receive ONE audio clip and the ORIGINAL subtitle lines (do NOT translate or change them) that occur inside it. Classify EVERY subtitle line based on the actual audio evidence with EXACTLY ONE tag:\n"+
-"1 = Male Spoken Dialogue (male voice, physically spoken out loud)\n"+
-"2 = Female Spoken Dialogue (female voice, physically spoken out loud)\n"+
-"3 = Male Internal Thought (male voice, explicitly NOT spoken physically)\n"+
-"4 = Female Internal Thought (female voice, explicitly NOT spoken physically)\n\n"+
-"Answer two questions for every line: Who is speaking? (male/female) and How is it presented? (spoken/thought).\n"+
-"EVIDENCE PRIORITY (highest to lowest): (1) the actual audio at the timestamp: voice, tone, and sound treatment such as echo, reverb or a filtered/dreamy voice that marks inner monologue; (2) speaker voice continuity with nearby established voices; (3) subtitle wording ONLY as a last resort - audio evidence overrides text.\n"+
-"CRUCIAL RULES:\n- Whispering, shouting, off-screen voices and phone calls = SPOKEN dialogue (1 or 2).\n- Internal thought threshold: do NOT guess. Use 3 or 4 ONLY if there is clear evidence of inner monologue. If ambiguous, default to spoken (1 or 2).\n- If multiple voices overlap, identify the primary voice that matches the text and use ONLY ONE tag. Never use multiple tags.\n- Global consistency: the same voice in the same scene keeps the same gender.\n- If 'cur' (an existing tag) is given, evaluate it: keep it if correct, replace it if incorrect.\n- Never change timestamps, ids or wording. Never merge or split lines.\n\n"+
-"Times are relative to the start of this clip (mm:ss.mmm).\n"+(ctx?("Voice continuity from the previous lines: "+ctx+"\n"):"")+
-"\nSUBTITLE LINES (JSON):\n"+JSON.stringify(lines)+"\n\n"+
-"OUTPUT: ONLY a JSON array with one object for EVERY line, same ids, no other text: [{\"id\":\"<id>\",\"tag\":1}, ...] where tag is the integer 1, 2, 3 or 4.";
+    return "🚨 MASTER PROMPT: ADVANCED AUDIO/VIDEO SRT CLASSIFIER & PRESERVATION EDITOR 🚨\n\nROLE: You are an Expert Audio/Video Scene Analyst and Strict SRT Preservation Editor.\n\nCORE OBJECTIVE:\nYou receive ONE audio clip and the ORIGINAL subtitle lines that occur inside it. You must classify EVERY subtitle entry (and every PART of an entry when the voice changes inside it) based on the actual audio evidence. LISTEN to the voice itself to decide male or female, and spoken or inner thought.\n\n1. THE CLASSIFICATION SYSTEM\nEvery voice receives exactly ONE of these four tags:\n1 = Male Spoken Dialogue (male voice, physically spoken out loud)\n2 = Female Spoken Dialogue (female voice, physically spoken out loud)\n3 = Male Internal Thought (male voice, explicitly NOT spoken physically; usually echo, reverb or a filtered/dreamy voice)\n4 = Female Internal Thought (female voice, explicitly NOT spoken physically; usually echo, reverb or a filtered/dreamy voice)\n\n2. DECISION LOGIC & EVIDENCE HIERARCHY\nAnswer two questions for every subtitle: Who is speaking? (Male/Female) and How is it presented? (Spoken/Thought).\nEvidence priority (highest to lowest):\n(1) The actual audio at the timestamp: voice pitch, male vs female voice, tone, and sound treatment.\n(2) Speaker voice continuity (compare with nearby established voices).\n(3) Subtitle wording - ONLY as a last resort. Audio evidence overrides text.\nCrucial rules:\n- Whispering, shouting, off-screen voices and phone calls = SPOKEN dialogue (1 or 2).\n- Internal thought threshold: do NOT guess. Use 3 or 4 ONLY if there is clear evidence of inner monologue. If ambiguous, default to spoken (1 or 2).\n- If multiple voices overlap near a timestamp, identify the primary voice matching the text.\n- MID-LINE SPEAKER CHANGE (very important): listen to the WHOLE line from start to end. If ONE subtitle entry contains two or more different voices (for example the first half is a man speaking and the second half is a woman speaking, or a spoken part followed by an inner-thought part), you MUST split that entry into parts, one part per voice, each with its own tag. Decide every part from the real audio, never from the text alone. Do NOT split when the same voice says the whole entry.\n- Global consistency pass: the same voice in the same scene keeps the same gender/classification.\n- If \"cur\" (an existing tag) is given, evaluate it: keep it if correct, replace it if incorrect. Do not duplicate tags.\n\n3. STRICT PRESERVATION RULES (CRITICAL)\nTreat the original lines as read-only. The ONLY modification allowed is choosing the tag(s).\n- DO NOT change timestamps or ids.\n- DO NOT translate, summarize, correct spelling/grammar, or alter the original wording.\n- DO NOT merge lines. The ONLY allowed split is the mid-line speaker-change split above, and the texts of the parts joined together MUST equal the original line text exactly (copy the characters exactly; add, remove or reword nothing).\n- Every line in the input must appear in the output.\n\n4. EXECUTION\nProcess chronologically and build a lightweight internal profile of the speaker voices to maintain continuity. Before finalizing, check consistency and that every id is present.\n\nTimes are relative to the start of this clip (mm:ss.mmm).\n@@CTX@@\nSUBTITLE LINES (JSON):\n@@LINES@@\n\n5. OUTPUT (technical, mandatory)\nReturn ONLY a JSON array with one object for EVERY line, same ids, no other text, no markdown: [{\"id\":\"<id>\",\"tag\":1}, ...] where tag is the integer 1, 2, 3 or 4.\nONLY when the voice really changes inside one line, return this shape for that line instead: {\"id\":\"<id>\",\"parts\":[{\"tag\":1,\"text\":\"<exact first piece>\"},{\"tag\":2,\"text\":\"<exact next piece>\"}]}.".split("@@CTX@@").join(ctx?("Voice continuity from the previous lines: "+ctx+"\n"):"").split("@@LINES@@").join(JSON.stringify(lines));
   }
   async function callGemini(prompt,wavB64,key,model){
     var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},150000);
@@ -9461,7 +9538,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
   function parseTags(txt,ids){
     var t=String(txt).replace(/```json|```/g,"").trim(),arr=null;
     try{arr=JSON.parse(t)}catch(e){var m=t.match(/\[[\s\S]*\]/);if(m){try{arr=JSON.parse(m[0])}catch(_){}}}
-    var map={};if(Array.isArray(arr))arr.forEach(function(o){if(!o)return;var id=String(o.id),tg=parseInt(o.tag,10);if(ids.has(id)&&tg>=1&&tg<=4)map[id]=tg;});return map;
+    var map={};if(Array.isArray(arr))arr.forEach(function(o){if(!o)return;var id=String(o.id);if(!ids.has(id))return;var tg=parseInt(o.tag,10);if(Array.isArray(o.parts)&&o.parts.length>=1){var ps=o.parts.map(function(p){return {tag:parseInt(p&&p.tag,10),text:String((p&&p.text)||"")}}).filter(function(p){return p.tag>=1&&p.tag<=4&&p.text.trim()});if(ps.length>=2){map[id]={parts:ps};return;}if(ps.length===1){map[id]=ps[0].tag;return;}}if(tg>=1&&tg<=4)map[id]=tg;});return map;
   }
   async function classifyChunk(lines,ctx,wavB64){
     var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
@@ -9482,6 +9559,8 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     if(Object.keys(best).length)return best;throw last||new Error("ចាត់ថ្នាក់មិនបាន");
   }
 
+  function applyTag(text,tg){var base=String(text||"").replace(/\[[1-4]\]\s*/g,"").trim();if(typeof tg==="number")return "["+tg+"] "+base;var ps=tg.parts,flat=base.replace(/\s+/g,""),joined=ps.map(function(p){return p.text}).join("").replace(/\s+/g,"");if(joined!==flat)return "["+ps[0].tag+"] "+base;var out=[];ps.forEach(function(p){var l=out.length?out[out.length-1]:null;if(l&&l.tag===p.tag)l.text+=p.text;else out.push({tag:p.tag,text:p.text});});return out.map(function(p){return "["+p.tag+"] "+p.text.trim()}).join(" ");}
+  window.__zsfApplyTag=applyTag;
   window.zsfAutoClassifyTags=async function(){
     if(!Array.isArray(srtBlocks)||!srtBlocks.length)return;
     var f=(typeof mediaFile!=="undefined")?mediaFile:null;
@@ -9502,10 +9581,10 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
       var clipMs=Math.max(0,t0s-PAD*1000);
       prog("🎭 AI កំពុងស្តាប់សំឡេង ប្រុស/ស្រី • ក្រុម "+(g+1)+"/"+groups.length,2+8*g/groups.length);
       var wav=b64(sliceWav(A.ab,A.info,Math.max(0,clipMs/1000-A.offset),(t1e/1000+PAD)-A.offset));
-      var lines=idxs.map(function(i){var b=srtBlocks[i],t=times(b),m=TAG_RE.exec(b.text||""),o={id:String(b.id),t:fmtT(t.s-clipMs)+" --> "+fmtT(t.e-clipMs),text:String(b.text||"").replace(TAG_RE,"")};if(m)o.cur=parseInt(m[1],10);return o;});
+      var lines=idxs.map(function(i){var b=srtBlocks[i],t=times(b),m=TAG_RE.exec(b.text||""),o={id:String(b.id),t:fmtT(t.s-clipMs)+" --> "+fmtT(t.e-clipMs),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,"")};if(m)o.cur=parseInt(m[1],10);return o;});
       try{
         var map=await classifyChunk(lines,ctx,wav);
-        idxs.forEach(function(i){var b=srtBlocks[i],tg=map[String(b.id)];if(tg){b.text="["+tg+"] "+String(b.text||"").replace(TAG_RE,"");done++;}else failed++;});
+        idxs.forEach(function(i){var b=srtBlocks[i],tg=map[String(b.id)];if(tg){b.text=applyTag(b.text,tg);done++;}else failed++;});
       }catch(e){console.warn("tag chunk failed",e);failed+=idxs.length;}
       var tail=idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");if(tail)ctx=tail;
     }
