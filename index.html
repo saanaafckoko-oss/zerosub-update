@@ -5,7 +5,7 @@
 <script id="zsf-boot">
 /* V1.02 boot: បើមានកំណែថ្មីដែលបានទាញទុក (localStorage) ហើយថ្មីជាង file នេះ → ប្តូរមកប្រើកំណែថ្មីភ្លាម មុន App ចាប់ផ្តើម */
 (function(){
-  window.__ZSF_VER="1.02";
+  window.__ZSF_VER="1.05";
   try{
     var V=window.__ZSF_VER;
     function cmp(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q?1:-1}return 0}
@@ -2924,6 +2924,15 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 <div class="zkt-abarw"><i id="zkt_abar"></i></div>
 <audio id="zkt_aaudio" controls style="width:100%;margin-top:10px;display:none"></audio>
 <a id="zkt_adl" class="btn-3d btn-full" style="display:none;margin-top:8px;text-align:center;text-decoration:none">⬇️ ទាញយក WAV</a>
+<div id="zkt_pv2" style="display:none;margin-top:12px;padding:12px;border-radius:18px;border:1.5px solid #7c3aed;background:rgba(124,58,237,.10)">
+<div style="font-size:14px;font-weight:800;margin-bottom:4px">🎬 ពិនិត្យសំឡេង ជាមួយវីដេអូ (មិនផ្គុំចូលគ្នា)</div>
+<div style="font-size:12px;line-height:1.5;opacity:.85;margin-bottom:8px">ចុចចាក់វីដេអូ សំឡេងខ្មែរចាក់តាមស្វ័យប្រវត្តិ។ អូសរំកិលវីដេអូ សំឡេងរំកិលតាម។ បើត្រូវមាត់ហើយ ទើបចុចប៊ូតុងទាញយកខាងក្រោម។</div>
+<video id="zkt_pvv" controls playsinline muted style="width:100%;max-height:55vh;border-radius:14px;background:#000"></video>
+<div id="zkt_pvcap" style="min-height:44px;margin-top:8px;padding:8px 10px;border-radius:12px;background:rgba(0,0,0,.35);font-size:14px;line-height:1.5;font-weight:600">▶️ ចុចចាក់ដើម្បីមើល</div>
+<label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px"><input type="checkbox" id="zkt_pvorig"/><span>🔈 ស្តាប់សំឡេងដើមតិចៗ ជាមួយ</span></label>
+<button type="button" id="zkt_pvdl" class="btn-3d btn-full" style="margin-top:10px;text-align:center;background:linear-gradient(135deg,#10b981,#059669)!important;color:#fff!important">✅ ត្រូវមាត់ហើយ — ទាញយក WAV ទៅទូរសព្ទ</button>
+<button type="button" id="zkt_pvshare" class="btn-3d btn-full" style="display:none;margin-top:8px;text-align:center">📤 រក្សាទុក / ចែករំលែក (បើ Download មិនដំណើរការ)</button>
+</div>
 </div>
 <div class="zkt-vsec">🎬 ឬ ចុចតែម្តង ធ្វើទាំងអស់៖ Video → SRT → ខ្មែរ → សំឡេង → វីដេអូ</div>
 <div class="zkt-xopt" id="zkt_xopt">
@@ -3351,20 +3360,59 @@ async function getCues(){
 }
 
 /* V60: បង្កើតសំឡេងមួយឃ្លា — បើវែងជាងពេល ឱ្យ TTS អានលឿនឡើង (រក្សា pitch) ជំនួសការបង្កើនល្បឿនសំឡេងដែលបំបែកសំឡេង */
+/* V1.03 FORCE FIT: បង្ហាប់ពេលវេលាសំឡេង (pitch មិនប្រែ) ដោយ WSOLA — ប្រើពេលឃ្លានៅតែវែងជាងពេលមាត់ បន្ទាប់ពី Auto Speed រួច */
+function zsfWsola(x,sr,ratio){
+ var n=x.length;if(!(ratio>1.01)||n<4000)return x;
+ var N=Math.round(sr*0.032);N-=N%2;var Hs=N>>1,D=Math.round(sr*0.012),ha=Hs*ratio;
+ var outLen=Math.max(N,Math.round(n/ratio)),out=new Float32Array(outLen+N*2),ws=new Float32Array(outLen+N*2);
+ var win=new Float32Array(N);for(var i=0;i<N;i++)win[i]=0.5-0.5*Math.cos(2*Math.PI*i/N);
+ var prev=0,o=0,k=0,last=n-N;if(last<1)return x;
+ function add(pos,off){for(var j=0;j<N;j++){var w=win[j];out[off+j]+=x[pos+j]*w;ws[off+j]+=w}}
+ add(0,0);o=Hs;
+ while(o<outLen){
+  k++;var nom=Math.round(k*ha);if(nom-D>last)break;
+  var tgt=prev+Hs,lo=Math.max(0,nom-D),hi=Math.min(last,nom+D),best=Math.min(last,Math.max(0,nom)),bc=-1e30;
+  if(tgt+N<=n){
+   for(var c=lo;c<=hi;c++){var sc=0;for(var j=0;j<N;j+=2)sc+=x[c+j]*x[tgt+j];if(sc>bc){bc=sc;best=c}}
+  }
+  add(best,o);prev=best;o+=Hs;
+ }
+ var res=new Float32Array(Math.min(o+Hs,outLen+N));
+ for(var q=0;q<res.length;q++){var w2=ws[q];res[q]=w2>0.02?out[q]/w2:0}
+ return res;
+}
+/* V60: បង្កើតសំឡេងមួយឃ្លា — បើវែងជាងពេល ឱ្យ TTS អានលឿនឡើង (រក្សា pitch) ជំនួសការបង្កើនល្បឿនសំឡេងដែលបំបែកសំឡេង */
 async function renderSeg(text,s,targetSec){
  /* V61: Speed = ល្បឿនធម្មតា (ឃ្លាខ្លីអានតាមនេះ) • Auto Speed = កម្រិតលឿនបន្ថែមអតិបរមា
     ឃ្លាវែងជាងពេលដែលមាន → គណនាល្បឿនឱ្យសមស្រប (មិនលើសកម្រិត Auto) ហើយឱ្យ TTS អានលឿនផ្ទាល់ (pitch មិនប្រែ) */
  var r=await process(await synth(text,s),s,0);r.fin=s.speed;
- if(!(targetSec>0)||!(s.auto>0))return r;
+ if(!(targetSec>0))return r;
  var base=1+s.speed/100,cap=Math.min(base*(1+s.auto/100),2.0),cur=base;
- for(var it=0;it<2;it++){
-  var d=r.data.length/24000;
-  if(d<=targetSec*1.02)break;
-  var tot=Math.min(cur*(d/targetSec)*1.02,cap);
-  if(tot<=cur*1.015)break;
-  var ns=Math.round((tot-1)*100);
-  try{r=await process(await synth(text,Object.assign({},s,{speed:ns})),s,0);r.fin=ns;cur=tot}catch(e){break}
+ if(s.auto>0){
+  for(var it=0;it<3;it++){
+   var d=r.data.length/24000;
+   if(d<=targetSec*1.02)break;
+   var tot=Math.min(cur*(d/targetSec)*1.02,cap);
+   if(tot<=cur*1.015)break;
+   var ns=Math.round((tot-1)*100);
+   try{r=await process(await synth(text,Object.assign({},s,{speed:ns})),s,0);r.fin=ns;cur=tot}catch(e){break}
+  }
  }
+ /* V1.03 FORCE FIT: នៅតែវែងជាងពេល → បង្ហាប់ពេលវេលាបង្ខំឱ្យចប់ក្នុងពេលមាត់ (រក្សាសំឡេង មិនកាត់ចុងឃ្លា) */
+ try{
+  var FORCE=true,FMAX=3.0;
+  try{if(localStorage.getItem("zsf_tts_force")==="0")FORCE=false;var fm=parseFloat(localStorage.getItem("zsf_tts_fmax"));if(fm>=1.5&&fm<=4)FMAX=fm}catch(_){}
+  var dd=r.data.length/24000;
+  if(FORCE&&dd>targetSec){
+   var allow=Math.max(1,FMAX/Math.max(cur,1)),need=Math.min(dd/(targetSec*0.97),allow);
+   for(var f=0;f<2&&need>1.01;f++){
+    var nd=zsfWsola(r.data,24000,need),nlen=nd.length/24000;
+    r.data=nd;r.forced=(r.forced||1)*need;
+    if(nlen<=targetSec)break;
+    need=Math.min(nlen/(targetSec*0.97),Math.max(1,allow/need));
+   }
+  }
+ }catch(e){console.warn("force-fit",e)}
  return r;
 }
 /* V69: កម្មវិធីបង្កើតសំឡេងដកដង្ហើម (ខ្យល់) ស្រាលៗ — noise ត្រងកណ្តាល-ខ្ពស់ + envelope ទន់ */
@@ -3387,8 +3435,9 @@ var BREATH=0.04;try{var bv=localStorage.getItem("zsf_breath");if(bv!==null&&bv!=
 /* ពេលដែលឃ្លាអាចប្រើបាន = រយៈពេលឃ្លា + ចន្លោះស្ងាត់មុនឃ្លាបន្ទាប់ (អតិបរមា 1.5 វិនាទី) */
 function availFor(arr,i){
  var c=arr[i],dur=Math.max(0.2,(c.end-c.start)/1000),nx=arr[i+1];
- var gap=nx?(nx.start-c.end)/1000:1.0;
- return dur+Math.max(0,Math.min(gap-0.06,1.5));
+ var gap=nx?(nx.start-c.end)/1000:1.0,tail=0.15;
+ try{var tv=parseFloat(localStorage.getItem("zsf_tts_tail"));if(tv>=0.1&&tv<=2)tail=tv}catch(_){}
+ return dur+Math.max(0,Math.min(gap-0.06,tail));
 }
 var busy=false,lastMaster=null,lastSr=24000,lastSig="",lastSegs=[],segsTmp=null;
 function cueSig(cues){return JSON.stringify([cues.map(function(c){return[c.start,c.end,c.tag,c.text]}),S,inc])}
@@ -3406,8 +3455,8 @@ async function runAll(quiet){
   var place=function(i){
    var r=results[i];results[i]=null;if(!r)return;
    var c=cues[i],s=S[c.tag-1],av=r.av,d=r.data;
-   if(r.fin>s.speed)fastN++;if(d.length/sr>av+0.1){over++;if(longIds.length<30)longIds.push(c.id)}
-   var o0=c.start/1000;if(cursor>o0&&cursor-o0<=1.2)o0=cursor;
+   if(r.fin>s.speed||r.forced)fastN++;if(d.length/sr>av+0.1||(r.forced&&r.forced>1.5)){over++;if(longIds.length<30)longIds.push(c.id)}
+   var o0=c.start/1000;if(cursor>o0&&cursor-o0<=0.15)o0=cursor;
    var o=Math.floor(o0*sr);
    for(var k=0;k<d.length&&o+k<total;k++)master[o+k]+=d[k];
    cursor=o0+d.length/sr+0.04;
@@ -4156,6 +4205,7 @@ async function extExport(){
  finally{if(eb)eb.disabled=false;setSrcTab(prev)}
 }
 function hideAudBox(){
+ try{window.zsfPvClose&&window.zsfPvClose()}catch(_){}
  var aa=$("zkt_aaudio"),ad=$("zkt_adl");
  if(aa){try{aa.pause()}catch(e){}aa.removeAttribute("src");try{aa.load()}catch(e){}aa.style.display="none"}
  if(ad){ad.style.display="none";ad.removeAttribute("href")}
@@ -4165,6 +4215,8 @@ function syncAudBox(){
  if(!a||!d||!aa||!ad||!a.getAttribute("src"))return;
  aa.src=a.getAttribute("src");aa.style.display="block";
  ad.href=d.getAttribute("href")||a.getAttribute("src");ad.download="khmer_tts.wav";ad.style.display="block";
+ /* V1.05: មានវីដេអូ → បង្ហាញប្រអប់ពិនិត្យសិន ហើយលាក់ប៊ូតុងទាញយកភ្លាមៗ */
+ try{if(window.zsfPvOpen&&window.zsfPvOpen()){ad.style.display="none";aa.style.display="none"}}catch(_){}
  try{a.pause()}catch(e){}a.style.display="none";d.style.display="none";
 }
 async function audioOnly(){
@@ -4176,7 +4228,7 @@ async function audioOnly(){
   hideAudBox();
   var ab0=$("zkt_abar");if(ab0)ab0.style.width="0%";
   var cues=await getCues();if(!cues.length)throw new Error("គ្មានអត្ថបទសម្រាប់អាន");
-  var sig=cueSig(cues);
+  var sig=cueSig(cues);try{window.zsfPvSetCues&&window.zsfPvSetCues(cues)}catch(_){}
   if(lastMaster&&sig===lastSig&&hasAudio()){st("♻️ ប្រើសំឡេងដែលបានបង្កើតរួច — ស្តាប់ ឬទាញយកបានភ្លាម",100)}
   else{var ok=await runAll(false);if(!ok)return}
   syncAudBox();
@@ -10193,13 +10245,97 @@ h.addEventListener("click",t);h.addEventListener("keydown",function(e){if(e.key=
 }catch(e){}}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();setTimeout(run,1500)})();</script>
 <script id="zsf-v71-reason">window.zsfPipeReason=function(){try{var g=function(i){var e=document.getElementById(i);return e?String(e.textContent||"").replace(/\s+/g," ").trim():""};var d=g("v32diag"),p=g("progressStatus"),r=(/ERROR|FAIL|❌|បរាជ័យ/i.test(d)?d:"")||(/❌|បរាជ័យ|FAIL/i.test(p)?p:"")||d||p||"មិនមានសារកំហុស";return r.length>300?r.slice(0,300)+"…":r}catch(e){return "មិនស្គាល់មូលហេតុ"}};</script>
+<script id="zsf-v105-preview">
+/* V1.05: ពិនិត្យសំឡេង TTS ជាមួយវីដេអូ (មិនផ្គុំចូលគ្នា) រួចទើបទាញយក WAV */
+(function(){
+  var A=null,V=null,cues=[],tm=0,bound=false;
+  function g(i){return document.getElementById(i)}
+  function toast(m,ok){try{if(typeof showToast==="function")showToast(m,ok!==false)}catch(_){}}
+  function capAt(t){var ms=t*1000;for(var i=0;i<cues.length;i++){var c=cues[i];if(ms>=c.start&&ms<c.end)return c}return null}
+  function fmt(ms){return (Math.max(0,Math.round(ms/100)/10)).toFixed(1)+"s"}
+  function caption(){
+    var el=g("zkt_pvcap");if(!el||!V)return;
+    var c=capAt(V.currentTime);
+    if(c)el.textContent=String(c.text||"").replace(/\[[1-4]\]\s*/g,"").trim()+"  ("+fmt(c.start)+" → "+fmt(c.end)+")";
+    else if(V.paused&&V.currentTime<0.05)el.textContent="▶️ ចុចចាក់ដើម្បីមើល";
+  }
+  function sync(force){
+    if(!A||!V)return;
+    try{var d=A.currentTime-V.currentTime;if(force||Math.abs(d)>0.15)A.currentTime=V.currentTime}catch(_){}
+  }
+  function origVol(){if(!V)return;var o=g("zkt_pvorig"),on=!!(o&&o.checked);V.muted=!on;if(on)try{V.volume=0.25}catch(_){}}
+  function fname(){var m=window.__zsfMedia||{},n=(m.file&&m.file.name)||"khmer_tts";return String(n).replace(/\.[^.]+$/,"")+"_khmer_tts.wav"}
+  function href(){var ad=g("zkt_adl");return ad?(ad.getAttribute("href")||""):""}
+  function download(){
+    var h=href();if(!h){toast("⚠️ មិនទាន់មានសំឡេងសម្រាប់ទាញយក",false);return}
+    var a=document.createElement("a");a.href=h;a.download=fname();a.style.display="none";document.body.appendChild(a);
+    try{a.click()}catch(_){}
+    setTimeout(function(){try{a.remove()}catch(_){}},1000);
+    toast("⬇️ កំពុងទាញយក — ពិនិត្យថត Download។ បើគ្មាន សូមចុច «📤 រក្សាទុក / ចែករំលែក»",true);
+    var sb=g("zkt_pvshare");if(sb&&navigator.share)sb.style.display="block";
+  }
+  function share(){
+    var h=href();if(!h)return;
+    fetch(h).then(function(r){return r.blob()}).then(function(b){
+      var f=new File([b],fname(),{type:"audio/wav"});
+      if(navigator.canShare&&navigator.canShare({files:[f]}))return navigator.share({files:[f],title:fname()});
+      toast("⚠️ ឧបករណ៍នេះមិនគាំទ្រការចែករំលែក file",false);
+    }).catch(function(e){if(e&&e.name==="AbortError")return;toast("⚠️ ចែករំលែកមិនបាន",false)});
+  }
+  function bind(){
+    if(bound)return;bound=true;
+    V.addEventListener("play",function(){
+      try{var m=g("video");if(m&&!m.paused)m.pause()}catch(_){}
+      try{var aa=g("zkt_aaudio");if(aa&&!aa.paused)aa.pause()}catch(_){}
+      if(!A)return;sync(true);try{A.playbackRate=V.playbackRate;A.play()}catch(_){}
+      clearInterval(tm);tm=setInterval(function(){sync(false);caption()},200);
+    });
+    V.addEventListener("pause",function(){try{A&&A.pause()}catch(_){}clearInterval(tm);caption()});
+    V.addEventListener("ended",function(){try{A&&A.pause()}catch(_){}clearInterval(tm)});
+    V.addEventListener("seeking",function(){sync(true);caption()});
+    V.addEventListener("seeked",function(){sync(true);caption();if(A&&!V.paused)try{A.play()}catch(_){}});
+    V.addEventListener("waiting",function(){try{A&&A.pause()}catch(_){}});
+    V.addEventListener("playing",function(){sync(true);if(A&&!V.paused)try{A.play()}catch(_){}});
+    V.addEventListener("ratechange",function(){try{A&&(A.playbackRate=V.playbackRate)}catch(_){}});
+    V.addEventListener("timeupdate",caption);
+    g("zkt_pvorig").addEventListener("change",origVol);
+    g("zkt_pvdl").addEventListener("click",download);
+    g("zkt_pvshare").addEventListener("click",share);
+  }
+  window.zsfPvSetCues=function(c){cues=Array.isArray(c)?c:[]};
+  window.zsfPvClose=function(){
+    clearInterval(tm);
+    try{A&&A.pause()}catch(_){}A=null;
+    var box=g("zkt_pv2");
+    if(V){try{V.pause()}catch(_){}try{V.removeAttribute("src");V.load()}catch(_){}}
+    if(box)box.style.display="none";
+    var sb=g("zkt_pvshare");if(sb)sb.style.display="none";
+  };
+  /* ត្រឡប់ true បើមានវីដេអូ ហើយបានបើកប្រអប់ពិនិត្យ */
+  window.zsfPvOpen=function(){
+    var box=g("zkt_pv2"),aa=g("zkt_aaudio");if(!box||!aa)return false;
+    var m=window.__zsfMedia||{},f=m.file,url=m.url,src=aa.getAttribute("src");
+    var isVid=!!f&&(/^video\//.test(f.type||"")||/\.(mp4|mov|m4v|webm)$/i.test(f.name||""));
+    if(!isVid||!url||!src){box.style.display="none";return false}
+    V=g("zkt_pvv");bind();
+    try{clearInterval(tm);A&&A.pause()}catch(_){}
+    A=new Audio();A.preload="auto";A.src=src;
+    try{V.pause()}catch(_){}
+    V.src=url;try{V.currentTime=0}catch(_){}origVol();
+    box.style.display="block";
+    var el=g("zkt_pvcap");if(el)el.textContent="▶️ ចុចចាក់ដើម្បីមើល";
+    try{box.scrollIntoView({behavior:"smooth",block:"center"})}catch(_){}
+    return true;
+  };
+})();
+</script>
 <script id="zsf-v725-updbtn">
 /* V72.6: ប៊ូតុងការ៉េ ផ្ទាំង «ធ្វើបច្ចុប្បន្នភាព» នៅខាងក្រោមបំផុតនៃទំព័រ (រូប ⚙️)
    ខៀវ = កំណែថ្មីបំផុត • ក្រហម = មានកំណែថ្មី (ចុចដើម្បី Update) • ប្រផេះ = មិនអាចពិនិត្យបាន
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"1.02",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"1.05",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
