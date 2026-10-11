@@ -9714,18 +9714,18 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER="72.9",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER="72.8",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
     if(document.getElementById("zsfUpd"))return;
     var css=document.createElement("style");
-    css.textContent="#mainApp.app-container{padding-bottom:0!important}body>.watermark{margin-top:6px!important;margin-bottom:0!important}#zsfUpd{display:flex;flex-direction:column;align-items:center;gap:4px;margin:14px auto calc(16px + env(safe-area-inset-bottom,0px));width:100%;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:inherit;color:#fff;text-align:center}"+
-    "#zsfUpd .zu-sq{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#2a2140,#150f24);border:2.5px solid #888;box-shadow:0 6px 18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12);position:relative;transition:transform .15s}"+
+    css.textContent="#mainApp.app-container{padding-bottom:0!important}body>.watermark{margin-top:6px!important;margin-bottom:0!important}#zsfUpd{display:flex;flex-direction:column;align-items:center;gap:7px;margin:20px auto calc(20px + env(safe-area-inset-bottom,0px));width:100%;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:inherit;color:#fff;text-align:center}"+
+    "#zsfUpd .zu-sq{width:92px;height:92px;border-radius:24px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#2a2140,#150f24);border:2.5px solid #888;box-shadow:0 6px 18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12);position:relative;transition:transform .15s}"+
     "#zsfUpd:active .zu-sq{transform:scale(.94)}"+
-    "#zsfUpd .zu-gear{font-size:26px;line-height:1;display:inline-block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}"+
-    "#zsfUpd .zu-dot{position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;background:#888;border:2px solid #150f24}"+
-    "#zsfUpd .zu-t{font-size:12px;font-weight:800;line-height:1.2}"+
-    "#zsfUpd .zu-m{font-size:11px;font-weight:700;line-height:1.25;opacity:.85;max-width:80%}"+
+    "#zsfUpd .zu-gear{font-size:44px;line-height:1;display:inline-block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}"+
+    "#zsfUpd .zu-dot{position:absolute;top:8px;right:8px;width:12px;height:12px;border-radius:50%;background:#888;border:2px solid #150f24}"+
+    "#zsfUpd .zu-t{font-size:14px;font-weight:800;line-height:1.2}"+
+    "#zsfUpd .zu-m{font-size:10px;line-height:1.25;opacity:.85;max-width:80%}"+
     "#zsfUpd.ok .zu-sq{border-color:#1e90ff;box-shadow:0 6px 18px rgba(0,0,0,.55),0 0 16px rgba(30,144,255,.55)}#zsfUpd.ok .zu-dot{background:#1e90ff}"+
     "#zsfUpd.new .zu-sq{border-color:#ff2d2d;animation:zsfUpdP 1.4s infinite}#zsfUpd.new .zu-dot{background:#ff2d2d}#zsfUpd.new .zu-gear{animation:zsfUpdR 2.4s linear infinite}"+
     "#zsfUpd.off .zu-sq{border-color:#888}#zsfUpd.off .zu-dot{background:#888}"+
@@ -9741,7 +9741,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   function render(msg){
     var w=document.getElementById("zsfUpd"),m=document.getElementById("zsfUpdMsg");if(!w||!m)return;
     w.className=st;
-    m.textContent=msg||(st==="ok"?("កំណែ "+ZSF_VER+" ថ្មីបំផុត"):st==="new"?(ss("zsfUpdTried")?"បិទ App រួចបើកម្តងទៀត":"ចុចត្រង់នេះនឹងធ្វើបច្ចុប្បន្នភាព"):"មិនអាចពិនិត្យ Update (ចុចដើម្បីសាកម្តងទៀត)");
+    m.textContent=msg||(st==="ok"?("កំណែ "+ZSF_VER+" ថ្មីបំផុត"):st==="new"?(ss("zsfUpdTried")?"បិទ App រួចបើកម្តងទៀត":"មានកំណែថ្មី • ចុចទីនេះដើម្បី Update"):"មិនអាចពិនិត្យ Update (ចុចដើម្បីសាកម្តងទៀត)");
   }
   function check(cb){
     var done=false;
