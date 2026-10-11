@@ -5,7 +5,7 @@
 <script id="zsf-boot">
 /* V1.06: ដកការប្តូរទំព័រ (document.write) ចេញ — វាធ្វើឱ្យ script មេខូច។ គ្រាន់តែសម្អាតកំណែដែលបានទុកពីមុន */
 (function(){
-  window.__ZSF_VER="1.06";
+  window.__ZSF_VER="1.07";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 </script>
@@ -2775,6 +2775,11 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer"><input type="checkbox" id="zsfProofread" checked style="width:auto;margin-top:3px"><span>✨ កែអក្សរចិនខុសតាមបរិបទដោយ Gemini (ត្រូវការ Gemini Key — មិនប៉ះពេលវេលា មិនប្តូរលេខបន្ទាត់)</span></label>
 <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer"><input type="checkbox" id="zsfSnapTiming" checked style="width:auto;margin-top:3px"><span>🎯 កែពេលវេលា៖ កាត់ចំណុចស្ងាត់ចេញពីដើម/ចុងបន្ទាត់ តាមសំឡេងពិត</span></label>
 <label style="display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.4"><span>⏱️ ទាញពេលវេលាទាំងអស់មកមុន (វិនាទី)៖</span><input type="number" id="zsfTimeShift" value="0.4" min="0" max="1.5" step="0.05" style="width:72px"><span style="opacity:.7;font-size:12px">(0.4 = ត្រូវនឹងអក្សរដុតក្នុងវីដេអូសាកល្បង · បើបិទ 🎯 ប្រើ ~0.2 · 0 = មិនប្តូរ)</span></label>
+<div class="zpg" id="zsfPauseBox">
+<div class="zpg-top"><span class="zpg-ico">⏱️</span><span class="zpg-ttl"><b>ចន្លោះដង្ហើមកាត់ឃ្លា</b><small>បើ​ស្ងាត់​យូរ​ជាង​នេះ​ក្នុង​ឃ្លា​តែ​មួយ → កាត់​ជា​បន្ទាត់​ថ្មី</small></span><output class="zpg-val" id="zsfPauseVal">0.60s</output></div>
+<input type="range" id="zsfPauseGap" min="0.1" max="1.5" step="0.05" value="0.6" aria-label="ចន្លោះដង្ហើមកាត់ឃ្លា">
+<div class="zpg-scale"><span>0.1s · កាត់ញឹក</span><button type="button" id="zsfPauseReset">↺ លំនាំដើម 0.60s</button><span>កាត់តិច · 1.5s</span></div>
+</div>
 </div></details>
 <div class="media" id="mediaBox">
 <video controls="" id="video" playsinline=""></video>
@@ -2866,6 +2871,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 <div class="zpv-hint" id="zkt_pillhint"></div>
 <div class="zkt-vpanel" id="zkt_vpanel"><div class="zkt-vinner">
 <div id="zkt_ctl" class="zpv-grid"></div>
+<div id="zkt_fit" class="zfit"></div>
 </div></div>
 <div class="zpv-btns">
 <button type="button" class="zpv-b zpv-test" id="zkt_test"><svg class="zpv-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6A1.4 1.4 0 0 1 5.4 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.4 18.4a9 9 0 0 0 0-12.8"/></svg>សាកល្បងសំឡេង</button>
@@ -3164,9 +3170,9 @@ var EQMIG={bright:"phone",deep:"warm"};   /* Preset ចាស់ → Preset ថ�
 /* ការកំណត់លំនាំដើម (ដូចរូបភាពគំរូ) */
 function defS(i){return{voice:i%2?"km-KH-SreymomNeural":"km-KH-PisethNeural",hm:0,pitch:-2,bass:0,speed:15,vol:20,echo:0,auto:35,eq:"studio"}}
 var CFG=[{k:"hm",t:"Volume High+Mid %",s:5,a:-50,b:100,u:"%"},{k:"pitch",t:"Pitch",s:1,a:-50,b:50,u:"Hz"},
-{k:"bass",t:"Bass dB",s:1,a:-10,b:15,u:"dB"},{k:"speed",t:"Speed",s:5,a:-50,b:100,u:"%"},
+{k:"bass",t:"Bass dB",s:1,a:-10,b:15,u:"dB"},{k:"speed",t:"Speed",s:1,a:-50,b:100,u:"%"},
 {k:"vol",t:"Volume",s:5,a:-80,b:100,u:"%"},{k:"echo",t:"Echo",s:0.1,a:0,b:1,u:""},
-{k:"auto",t:"Auto Speed %",s:5,a:0,b:60,u:"%"}];
+{k:"auto",t:"Auto Speed %",s:1,a:0,b:100,u:"%"}];
 /* ដាក់ Worker URL លំនាំដើមនៅទីនេះ ដើម្បីឱ្យអ្នកប្រើទូទៅប្រើ TTS បានដោយមិនបាច់ដាក់ Key (ទុកទទេបើមិនចង់) */
 var DEFAULT_WURL="https://little-unit-043f.saanaafckoko.workers.dev";
 var S,cur=0,inc=[true,true,true,true],stopReq=false;
@@ -3210,12 +3216,26 @@ function drawCtl(){
  var s=S[cur],h="";
  CFG.forEach(function(c){
   var v=Math.round(s[c.k]*10)/10;
-  h+='<div class="zpv-f"><label>'+LBL[c.k]+'</label><div class="zpv-st"><button type="button" data-k="'+c.k+'" data-d="-1"'+(v<=c.a?" disabled":"")+'>−</button><span class="zpv-v">'+ICO[c.k]+'<b>'+fmt(c.k,v)+'</b></span><button type="button" data-k="'+c.k+'" data-d="1"'+(v>=c.b?" disabled":"")+'>+</button></div></div>';
+  var dv=defS(cur)[c.k],rs=(Math.round(dv*10)/10!==v)?'<button type="button" class="zpv-rs" data-k="'+c.k+'" data-d="0" title="ត្រឡប់ទៅលំនាំដើម">↺ '+fmt(c.k,dv)+'</button>':'';
+  h+='<div class="zpv-f"><div class="zpv-lh"><label>'+LBL[c.k]+'</label>'+rs+'</div><div class="zpv-st"><button type="button" data-k="'+c.k+'" data-d="-1"'+(v<=c.a?" disabled":"")+'>−</button><span class="zpv-v">'+ICO[c.k]+'<b>'+fmt(c.k,v)+'</b></span><button type="button" data-k="'+c.k+'" data-d="1"'+(v>=c.b?" disabled":"")+'>+</button></div></div>';
  });
  h+='<div class="zpv-f"><label>EQ Preset</label><div class="zpv-sel"><select id="zkt_eq">'+Object.keys(EQN).map(function(k){return '<option value="'+k+'"'+(k===s.eq?" selected":"")+'>'+EQN[k]+'</option>'}).join("")+'</select></div></div>';
  $("zkt_ctl").innerHTML=h;
- drawSum();
+ drawSum();drawFit();
 }
+/* V1.07: ការកំណត់ "បង្ខំអានឱ្យទាន់ឃ្លា" — ប្រើ key localStorage ដែល renderSeg/availFor អានស្រាប់ */
+var FITD={fmax:2.5,tail:1.0,margin:0.20},FITR={fmax:[1.5,4,0.25],tail:[0.1,3,0.1],margin:[0,0.6,0.05]},FITK={fmax:"zsf_tts_fmax",tail:"zsf_tts_tail",margin:"zsf_tts_margin"};
+function fitGet(k){try{var v=parseFloat(localStorage.getItem(FITK[k]));if(v>=FITR[k][0]&&v<=FITR[k][1])return v}catch(_){}return FITD[k]}
+function fitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch(_){return true}}
+function drawFit(){
+ var el=$("zkt_fit");if(!el)return;
+ var on=fitOn(),fm=fitGet("fmax"),tl=fitGet("tail"),mg=fitGet("margin");
+ function row(g,label,v,txt){var r=FITR[g],rs=(Math.abs(v-FITD[g])>1e-6)?'<button type="button" class="zpv-rs" data-g="'+g+'" data-d="0">↺ '+(g==="fmax"?"×"+FITD[g].toFixed(1):FITD[g].toFixed(2)+"s")+'</button>':'';
+  return '<div class="zpv-f"><div class="zpv-lh"><label>'+label+'</label>'+rs+'</div><div class="zpv-st"><button type="button" data-g="'+g+'" data-d="-1"'+(v<=r[0]+1e-6?" disabled":"")+'>−</button><span class="zpv-v"><b>'+txt+'</b></span><button type="button" data-g="'+g+'" data-d="1"'+(v>=r[1]-1e-6?" disabled":"")+'>+</button></div></div>'}
+ el.innerHTML='<label class="zfit-sw"><input type="checkbox" id="zkt_force"'+(on?" checked":"")+'><span><b>🎯 បង្ខំអានឱ្យទាន់ឃ្លា</b><small>បើ Auto Speed នៅតែមិនទាន់ → បង្ហាប់ពេលសំឡេង (សំឡេងមិនប្រែ) ឱ្យចប់មុនតួបន្ទាប់និយាយ</small></span></label>'
+ +(on?row("fmax","ល្បឿនសរុបអតិបរមា (Speed × Auto × បង្ខំ)",fm,"×"+fm.toFixed(2))+row("margin","ចន្លោះសុវត្ថិភាពមុនចុងឃ្លា (ឃ្លាជាប់គ្នា)",mg,mg.toFixed(2)+"s")+row("tail","ខ្ចីពេលស្ងាត់ក្រោយឃ្លា (មិនលើសចន្លោះពិត)",tl,tl.toFixed(2)+"s"):"");
+}
+function fitStep(g,d){var r=FITR[g];var v=d===0?FITD[g]:Math.max(r[0],Math.min(r[1],Math.round((fitGet(g)+d*r[2])*100)/100));try{localStorage.setItem(FITK[g],String(v))}catch(_){}drawFit()}
 function draw(){drawPills();drawCtl();drawSum()}
 function toastP(m){try{if(typeof showToast==="function")showToast(m,true)}catch(e){}}
 function esc(t){return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
@@ -3388,7 +3408,7 @@ async function renderSeg(text,s,targetSec){
  }
  /* V1.03 FORCE FIT: នៅតែវែងជាងពេល → បង្ហាប់ពេលវេលាបង្ខំឱ្យចប់ក្នុងពេលមាត់ (រក្សាសំឡេង មិនកាត់ចុងឃ្លា) */
  try{
-  var FORCE=true,FMAX=3.0;
+  var FORCE=true,FMAX=2.5;
   try{if(localStorage.getItem("zsf_tts_force")==="0")FORCE=false;var fm=parseFloat(localStorage.getItem("zsf_tts_fmax"));if(fm>=1.5&&fm<=4)FMAX=fm}catch(_){}
   var dd=r.data.length/24000;
   if(FORCE&&dd>targetSec){
@@ -3422,10 +3442,12 @@ function zsfBreath(sr,dur,rnd){
 var BREATH=0.04;try{var bv=localStorage.getItem("zsf_breath");if(bv!==null&&bv!==""){var bn=parseFloat(bv);if(bn>=0&&bn<=0.3)BREATH=bn}}catch(_){}
 /* ពេលដែលឃ្លាអាចប្រើបាន = រយៈពេលឃ្លា + ចន្លោះស្ងាត់មុនឃ្លាបន្ទាប់ (អតិបរមា 1.5 វិនាទី) */
 function availFor(arr,i){
+ /* V1.07: ឃ្លាជាប់គ្នា → ទុកចន្លោះសុវត្ថិភាពមុនចុងឃ្លា • មានចន្លោះស្ងាត់ពិត → ខ្ចីចន្លោះនោះ (ដូចគំរូវិភាគ ៦៧៥ ឃ្លា) */
  var c=arr[i],dur=Math.max(0.2,(c.end-c.start)/1000),nx=arr[i+1];
- var gap=nx?(nx.start-c.end)/1000:1.0,tail=0.15;
- try{var tv=parseFloat(localStorage.getItem("zsf_tts_tail"));if(tv>=0.1&&tv<=2)tail=tv}catch(_){}
- return dur+Math.max(0,Math.min(gap-0.06,tail));
+ var gap=nx?(nx.start-c.end)/1000:1.0,tail=fitGet("tail"),mg=fitGet("margin");
+ var room=gap-0.10;
+ if(room>0)return dur+Math.min(room,tail);
+ return Math.max(dur*0.6,0.3,dur-mg);
 }
 var busy=false,lastMaster=null,lastSr=24000,lastSig="",lastSegs=[],segsTmp=null;
 function cueSig(cues){return JSON.stringify([cues.map(function(c){return[c.start,c.end,c.tag,c.text]}),S,inc])}
@@ -4235,9 +4257,22 @@ function init(){
   ["pointerdown","touchstart","focusin","click"].forEach(function(ev){sl.addEventListener(ev,function(e){var p=e.target&&e.target.closest?e.target.closest("[data-i]"):null;if(p)activate(+p.getAttribute("data-i"))},{passive:true})});
   sl.addEventListener("change",function(e){var el=e.target;if(el&&el.tagName==="SELECT"){var i=+el.getAttribute("data-i");cur=i;S[i].voice=el.value;persist();drawPills();drawCtl();pvRender()}});
  })();
+ function stepK(k,d){var c=CFG.filter(function(x){return x.k===k})[0];if(!c)return;
+  S[cur][k]=d===0?defS(cur)[k]:Math.max(c.a,Math.min(c.b,Math.round((S[cur][k]+d*c.s)*10)/10));drawCtl();persist()}
+ /* V1.07: ចុចសង្កត់ប៊ូតុង − / + ឱ្យរត់ជាបន្តបន្ទាប់ */
+ var hT=null,hI=null,hFired=false;
+ function hStop(){clearTimeout(hT);clearInterval(hI);hT=hI=null}
+ function hStart(fn){hFired=false;hStop();hT=setTimeout(function(){hFired=true;hI=setInterval(fn,70)},420)}
+ ["pointerup","pointercancel","touchend","blur"].forEach(function(ev){document.addEventListener(ev,hStop,true)});
+ $("zkt_ctl").addEventListener("pointerdown",function(e){var b=e.target&&e.target.closest?e.target.closest("button[data-k]"):null;if(!b||b.disabled)return;var k=b.getAttribute("data-k"),d=+b.getAttribute("data-d");if(!d)return;hStart(function(){stepK(k,d)})});
  $("zkt_ctl").onclick=function(e){var b=e.target&&e.target.closest?e.target.closest("button[data-k]"):null;if(!b||b.disabled)return;
-  var k=b.getAttribute("data-k"),d=+b.getAttribute("data-d"),c=CFG.filter(function(x){return x.k===k})[0];
-  S[cur][k]=Math.max(c.a,Math.min(c.b,Math.round((S[cur][k]+d*c.s)*10)/10));drawCtl();persist()};
+  if(hFired){hFired=false;return}
+  stepK(b.getAttribute("data-k"),+b.getAttribute("data-d"))};
+ (function(){var f=$("zkt_fit");if(!f)return;
+  f.addEventListener("pointerdown",function(e){var b=e.target&&e.target.closest?e.target.closest("button[data-g]"):null;if(!b||b.disabled)return;var g=b.getAttribute("data-g"),d=+b.getAttribute("data-d");if(!d)return;hStart(function(){fitStep(g,d)})});
+  f.addEventListener("click",function(e){var b=e.target&&e.target.closest?e.target.closest("button[data-g]"):null;if(!b||b.disabled)return;if(hFired){hFired=false;return}fitStep(b.getAttribute("data-g"),+b.getAttribute("data-d"))});
+  f.addEventListener("change",function(e){if(e.target.id==="zkt_force"){try{localStorage.setItem("zsf_tts_force",e.target.checked?"1":"0")}catch(_){}drawFit()}});
+ })();
  $("zkt_ctl").onchange=function(e){if(e.target.id==="zkt_eq"){S[cur].eq=e.target.value;persist()}};
  $("zkt_save").onclick=function(){persist();st("💾 បានរក្សាទុក Preset សំឡេងតួ",null);toastP("✅ បានរក្សាទុក Preset សំឡេងតួ")};
  $("zkt_reset").onclick=function(){S[cur]=defS(cur);draw();persist();toastP("↺ បានកំណត់ "+TAGN[cur]+" ជាលំនាំដើម")};
@@ -8389,8 +8424,9 @@ function buildDubbingSafeSegments(rawSegments, allWords, hints) {
   const SOFT_MAX_CHARS = 15;
   const HARD_MAX_CHARS = 20;
   const MIN_CHARS = 3;
-  const PAUSE_MS = 600;
-  const STRONG_PAUSE_MS = 900;
+  /* V1.07: ចន្លោះដង្ហើមកាត់ឃ្លា — អ្នកប្រើកំណត់ស្លាយឌ័រ (0.10–1.50s, លំនាំដើម 0.60s) */
+  const PAUSE_MS = (function(){try{var v=parseFloat(localStorage.getItem('zsf_pause_gap'));if(v>=0.1&&v<=1.5)return Math.round(v*1000)}catch(e){}return 600})();
+  const STRONG_PAUSE_MS = Math.round(PAUSE_MS*1.5);
   const MAX_DURATION_MS = 4500;
   const sentencePunctuation = /[。！？!?]$/;
   const commaPunctuation = /[，、,；：;:]$/;
@@ -8540,7 +8576,7 @@ function buildDubbingSafeSegments(rawSegments, allWords, hints) {
       const combinedDur = weMs(p.words[p.words.length-1]) - wsMs(line.words[0]);
       const tinyPrev = cCount(textOf(line.words)) < MIN_CHARS;
       /* V80: ការផ្អាក 0.6–1.0 វិនាទី ដែលមិនមានសញ្ញាចប់ប្រយោគ (kind 'P') គឺនៅកណ្តាលប្រយោគ → អាចភ្ជាប់បាន បើមិនលើសចំនួនអក្សរ/ពេល */
-      const softGap = (line.kind === 'P') ? 1000 : PAUSE_MS;
+      const softGap = (line.kind === 'P') ? Math.round(PAUSE_MS*5/3) : PAUSE_MS;
       const canJoin = p.whole && line.whole && line.kind !== 'S' && line.kind !== 'H' && line.gapAfter < softGap &&
                       combinedChars <= MERGE_MAX_CHARS && combinedDur <= MAX_DURATION_MS;
       /* V80: បំណែកខ្លីខ្លាំង (<3 អក្សរ) ដែលនៅចុងឃ្លា ត្រូវភ្ជាប់ទៅបន្ទាត់មុន (មិនទាមទារ whole) ដើម្បីកុំបំបែកន័យ */
@@ -10403,5 +10439,39 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   document.addEventListener("visibilitychange",function(){if(!document.hidden)check();});
 })();
 </script>
+<style id="zsf-v107-pause">
+#zsfPauseBox.zpg{border:1px solid color-mix(in srgb,var(--accent-glow) 35%,transparent);border-radius:16px;padding:12px 14px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent-glow) 8%,var(--card-bg)),var(--card-bg));box-shadow:0 0 14px color-mix(in srgb,var(--accent-glow) 14%,transparent)}
+#zsfPauseBox .zpg-top{display:flex;align-items:center;gap:10px}
+#zsfPauseBox .zpg-ico{font-size:20px}
+#zsfPauseBox .zpg-ttl{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#zsfPauseBox .zpg-ttl b{font-size:14px;font-weight:800;color:var(--text-white)}
+#zsfPauseBox .zpg-ttl small{font-size:11.5px;line-height:1.4;color:var(--text-gray)}
+#zsfPauseBox .zpg-val{flex:none;min-width:62px;text-align:center;font-weight:900;font-size:15px;font-variant-numeric:tabular-nums;color:var(--accent-glow);padding:5px 10px;border-radius:12px;border:1px solid color-mix(in srgb,var(--accent-glow) 45%,transparent);background:color-mix(in srgb,var(--accent-glow) 12%,transparent)}
+#zsfPauseBox input[type=range]{width:100%;margin:14px 0 6px;accent-color:var(--accent-glow);height:6px;cursor:pointer}
+#zsfPauseBox .zpg-scale{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:10.5px;color:var(--text-gray)}
+#zsfPauseBox .zpg-scale button{border:1px solid var(--border-color);background:transparent;color:var(--text-gray);border-radius:999px;padding:3px 9px;font-size:10.5px;font-family:inherit;cursor:pointer}
+</style>
+<script id="zsf-v107-pause-js">
+(function(){
+  var r=document.getElementById('zsfPauseGap'),o=document.getElementById('zsfPauseVal'),b=document.getElementById('zsfPauseReset');
+  if(!r||!o)return;
+  function show(){o.textContent=(+r.value).toFixed(2)+'s'}
+  try{var v=parseFloat(localStorage.getItem('zsf_pause_gap'));if(v>=0.1&&v<=1.5)r.value=v}catch(e){}
+  show();
+  r.addEventListener('input',function(){show();try{localStorage.setItem('zsf_pause_gap',r.value)}catch(e){}});
+  if(b)b.addEventListener('click',function(){r.value=0.6;show();try{localStorage.setItem('zsf_pause_gap','0.6')}catch(e){}});
+})();
+</script>
+<style id="zsf-v107-steppers">
+#zkt_card .zpv-lh{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:22px}
+#zkt_card .zpv-lh label{margin:0;min-width:0}
+html body #zkt_card .zpv-rs{flex:none;margin:0;padding:2px 9px;border-radius:999px;border:1px solid rgba(250,204,21,.5)!important;background:rgba(250,204,21,.1)!important;color:#fcd34d;font-family:inherit;font-size:11px;font-weight:800;line-height:1.5;cursor:pointer;box-shadow:none!important}
+#zkt_card .zfit{margin-top:10px;padding:12px 14px;border-radius:16px;border:1px solid rgba(34,211,238,.35);background:linear-gradient(145deg,rgba(34,211,238,.07),rgba(17,24,39,.4))}
+#zkt_card .zfit-sw{display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:6px}
+#zkt_card .zfit-sw input{width:auto;margin-top:4px;flex:none}
+#zkt_card .zfit-sw span{display:flex;flex-direction:column;gap:2px}
+#zkt_card .zfit-sw b{font-size:14px;font-weight:800;color:#fff}
+#zkt_card .zfit-sw small{font-size:11.5px;line-height:1.4;color:#9ca3af}
+</style>
 </body>
 </html>
