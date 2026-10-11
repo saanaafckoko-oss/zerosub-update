@@ -2914,6 +2914,8 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 <div class="zkt-xorig" id="zkt_x_origrow" style="display:none"><div class="zkt-xr"><label for="zkt_x_origvol">🎼 សំឡេង Background (ពេលមិនអាន)</label><b id="zkt_x_ovt">100%</b></div><input type="range" id="zkt_x_origvol" min="0" max="100" step="5" value="100"/><div class="zkt-xr"><label for="zkt_x_duck">🗣️ Background ពេល TTS កំពុងអាន</label><b id="zkt_x_duckt">8%</b></div><input type="range" id="zkt_x_duck" min="0" max="100" step="1" value="8"/></div>
 <div class="zkt-xnote">💡 ធីក «ផ្គុំជាវីដេអូ» = យកវីដេអូដែលដាក់នៅប្រអប់ខាងលើ ផ្គុំជាមួយសំឡេងខ្មែរ។ ធីក «បិទសំឡេងដើម» = សំឡេងចិនដើមនឹងមិនលាយចូលទេ។ ការនាំចេញចំណាយពេលស្មើនឹងប្រវែងវីដេអូ — កុំចាកចេញពីទំព័រ ឬបិទអេក្រង់។</div>
 </div>
+<button class="btn-3d btn-full zkt-run" id="zkt_ext_run" type="button" style="margin-bottom:8px;background:linear-gradient(135deg,#7c3aed,#2563eb)!important;color:#fff!important">📥🎬 Export ជាមួយ SRT ខ្មែរពីខាងក្រៅ</button>
+<div class="zkt-extnote" style="margin:0 2px 10px;font-size:12px;line-height:1.5;color:#9fb0cc">វីដេអូ (ប្រអប់ខាងលើ) + SRT ខ្មែរដែលអ្នកនាំចូល → អានជាសំឡេងខ្មែរ → ផ្គុំជាវីដេអូ → ទាញយក។ មិនទាញ SRT ពីវីដេអូ ហើយមិនបកប្រែទេ។</div>
 <button class="btn-3d btn-full zkt-run zkt-export" id="zkt_run" type="button">🎬 នាំចេញវីដេអូ Export 1 Click</button>
 <div id="zkt_stat" class="zkt-stat"></div>
 <div class="zkt-bar"><i id="zkt_bar"></i></div>
@@ -4117,6 +4119,21 @@ async function exportAll(){
   busy=false;if(btn){btn.disabled=false;btn.textContent=label}
  }
 }
+async function extExport(){
+ if(busy)return;
+ var prev=$("zkt_src").value||"cur",txt=$("zkt_srt_txt");
+ if(!txt||!txt.value.trim()){
+  setSrcTab("file");
+  try{var sec=$("zkt_sec_src");if(sec){sec.classList.remove("zsf-closed");sec.scrollIntoView({behavior:"smooth",block:"start"})}}catch(_){}
+  st("❌ សូមនាំចូល ឬបិទភ្ជាប់ SRT ខ្មែរជាមុន (ក្នុងប្រអប់ «📱 នាំចូល / បិទភ្ជាប់ SRT» ខាងលើ)",0);return;
+ }
+ var mf=null;try{mf=(window.__zsfMedia||{}).file||null}catch(e){}
+ if(!mf){st("❌ មិនទាន់មានវីដេអូ — សូមដាក់វីដេអូនៅប្រអប់ខាងលើជាមុន",0);return}
+ var eb=$("zkt_ext_run");
+ setSrcTab("file");
+ try{if(eb)eb.disabled=true;await exportAll()}
+ finally{if(eb)eb.disabled=false;setSrcTab(prev)}
+}
 function hideAudBox(){
  var aa=$("zkt_aaudio"),ad=$("zkt_adl");
  if(aa){try{aa.pause()}catch(e){}aa.removeAttribute("src");try{aa.load()}catch(e){}aa.style.display="none"}
@@ -4163,7 +4180,7 @@ function init(){
  $("zkt_ctl").onchange=function(e){if(e.target.id==="zkt_eq"){S[cur].eq=e.target.value;persist()}};
  $("zkt_save").onclick=function(){persist();st("💾 បានរក្សាទុក Preset សំឡេងតួ",null);toastP("✅ បានរក្សាទុក Preset សំឡេងតួ")};
  $("zkt_reset").onclick=function(){S[cur]=defS(cur);draw();persist();toastP("↺ បានកំណត់ "+TAGN[cur]+" ជាលំនាំដើម")};
- $("zkt_test").onclick=test;$("zkt_run").onclick=exportAll;$("zkt_audio_run").onclick=audioOnly;
+ $("zkt_test").onclick=test;$("zkt_run").onclick=exportAll;$("zkt_ext_run").onclick=extExport;$("zkt_audio_run").onclick=audioOnly;
  $("zkt_file").onchange=async function(){var inp=$("zkt_file"),f=inp.files[0];if(f){setSrcTab("file");$("zkt_fname").textContent="✅ "+f.name+" • "+(Math.round(f.size/102.4)/10)+" KB";try{$("zkt_srt_txt").value=await f.text()}catch(e){$("zkt_fname").textContent="❌ អានឯកសារមិនបាន"}srtInfo();try{inp.value=""}catch(_){}}};
   (function(){
    var ta=$("zkt_srt_txt"),tm=null;if(!ta)return;
@@ -4790,7 +4807,7 @@ Your task is to translate the provided subtitle text into natural, conversationa
 - Avoid word-for-word translation that sounds rigid or violates natural Khmer grammar.
 
 ២. កែសម្រួល និងសង្ខេបឱ្យទាក់ទាញ (Adaptation & Conciseness)៖
-- If the original sentences are long, or use complex/difficult idioms, adapt and condense them into shorter, easy-to-read Khmer that remains synced to subtitle reading speeds while fully retaining the original intent and essence.
+- If the original sentences are long, or use complex/difficult idioms, adapt and condense them into shorter, easy-to-read Khmer that remains synced to subtitle reading speeds while fully retaining the original intent and essence. Condense ONLY by choosing shorter Khmer wording - NEVER delete a fact, name, number, negation, question or action from the source line.
 - Make the dialogue punchy, smooth, dramatic, and captivating to keep the audience hooked.
 
 ៣. ប្រើប្រាស់សព្វនាមឱ្យស័ក្តិសម (Appropriate Pronouns)៖
@@ -4805,7 +4822,7 @@ Atmosphere/Genre Context: ${genre}
 Rules:
 1. Maintain the emotional tone and context of the conversation according to the specified atmosphere.
 2. Keep the translation natural and fluent in Khmer.
-3. Preserve the meaning of each block exactly.
+3. NO OMISSION: Preserve the meaning of each block exactly. Translate EVERY word that carries meaning: subjects, verbs, negations (不/没/别/无), numbers, names, question words and emotional particles. If a source line is only a fragment of a longer sentence (see the SENTENCE markers in STORY CONTEXT), translate just that fragment faithfully: do NOT add words that belong to the neighbouring line, do NOT repeat words already translated in the previous line, and do NOT move words from one line to another.
 4. STRICT RULE: Do not attempt to modify, suggest, or return any changes to timestamps or subtitle indices.
 5. TAG PRESERVATION: If you see tags like [1], [2], [3], [4] (any number enclosed in square brackets) in the source text, you MUST preserve them exactly in the Khmer translation. Do not translate or modify these tags.
 6. NAME TRANSLITERATION: All proper names (people, places, brands) MUST be translated or transliterated into Khmer script. DO NOT leave any names in English or Latin characters. (Only common Latin abbreviations/technical terms that appear in the source, such as VIP, AI, WiFi, OK, may stay as they are.)
@@ -4827,7 +4844,20 @@ function buildPrompt(items){
       if(!contextLines.some(x=>x.id===String(srtBlocks[j].id)))contextLines.push({id:String(srtBlocks[j].id),text:String(srtBlocks[j].text||""),target:ids.has(String(srtBlocks[j].id))});
     }
   });
-  const context=contextLines.map(x=>`[${x.id}] ${x.target?"TARGET":"CONTEXT ONLY"}\n${x.text}`).join("\n\n");
+  const endsS=tx=>/[。！？!?…~]["”’』」)）]*\s*$/.test(String(tx||"").replace(/\[[1-4]\]\s*/g,"").trim());
+  const context=contextLines.map(x=>{
+    let mk="";
+    try{
+      const p=srtBlocks.findIndex(b=>String(b.id)===x.id);
+      if(p>=0){
+        const cn=!endsS(x.text)&&p<srtBlocks.length-1, cp=p>0&&!endsS(srtBlocks[p-1].text);
+        if(cp&&cn)mk=" • MIDDLE of a sentence (continues from the previous line AND into the next line)";
+        else if(cn)mk=" • START of a sentence that CONTINUES in the next line";
+        else if(cp)mk=" • END of a sentence that started in the previous line";
+      }
+    }catch(_){}
+    return `[${x.id}] ${x.target?"TARGET":"CONTEXT ONLY"}${mk}\n${x.text}`;
+  }).join("\n\n");
   return zsfUserPrompt(genre)+`
 
 Source language: ${src}
@@ -5021,7 +5051,7 @@ async function zsfFillGuessedTags(){
     lines.sort((a,b)=>a.i-b.i);
     const rows=lines.map(x=>{const b=srtBlocks[x.i];const known=/^\s*\[([1-4])\]/.exec(String(b.text||""));const cur=(!b._tagGuess&&known)?+known[1]:null;
       return {id:String(b.id),zh:String(b.text||"").replace(TG,""),km:String(b.trans||"").replace(TG,""),target:part.includes(x.i),known_tag:cur};});
-    const prompt="You are a subtitle voice-tag classifier for short dramas (source subtitles + Khmer translation).\nFor EVERY row with target=true choose EXACTLY ONE tag:\n1 = male character speaking aloud\n2 = female character speaking aloud\n3 = male character's inner thought (not spoken aloud)\n4 = female character's inner thought (not spoken aloud)\nUse the dialogue flow, pronouns, forms of address, who is being spoken to, and the known_tag of neighbouring rows (same scene keeps the same speaker gender unless the dialogue switches). Use 3 or 4 only when the line is clearly an inner monologue; otherwise use 1 or 2. Never skip a target row.\nOUTPUT: ONLY a JSON array [{\"id\":\"<id>\",\"tag\":1}, ...] covering every target row, no other text.\n\nROWS (JSON):\n"+JSON.stringify(rows);
+    const prompt="You are a subtitle voice-tag classifier for short dramas (source subtitles + Khmer translation).\nFor EVERY row with target=true choose EXACTLY ONE tag:\n1 = male character speaking aloud\n2 = female character speaking aloud\n3 = male character's inner thought (not spoken aloud)\n4 = female character's inner thought (not spoken aloud)\nUse the dialogue flow, pronouns, forms of address, who is being spoken to, and the known_tag of neighbouring rows (same scene keeps the same speaker gender unless the dialogue switches). This is TEXT ONLY, so be conservative: decide gender from explicit clues (pronouns, titles such as 先生/小姐/哥/姐/妈/爸, gendered self-reference and polite words, who is being addressed) and keep the same speaker for a continuing conversation. Do NOT flip between male and female without textual evidence, and do NOT assume speakers alternate on every line. If there is no clue, copy the gender of the nearest known_tag row. Use 3 or 4 only when the line is clearly an inner monologue; otherwise use 1 or 2. Never skip a target row.\nOUTPUT: ONLY a JSON array [{\"id\":\"<id>\",\"tag\":1}, ...] covering every target row, no other text.\n\nROWS (JSON):\n"+JSON.stringify(rows);
     let map=null;
     for(let t=0;t<Math.min(keys.length,3)&&!map;t++){
       try{
@@ -5315,7 +5345,20 @@ function buildRepairPrompt(items){
       if(!contextLines.some(x=>x.id===String(srtBlocks[j].id)))contextLines.push({id:String(srtBlocks[j].id),text:String(srtBlocks[j].text||""),target:ids.has(String(srtBlocks[j].id))});
     }
   });
-  const context=contextLines.map(x=>`[${x.id}] ${x.target?"TARGET":"CONTEXT ONLY"}\n${x.text}`).join("\n\n");
+  const endsS=tx=>/[。！？!?…~]["”’』」)）]*\s*$/.test(String(tx||"").replace(/\[[1-4]\]\s*/g,"").trim());
+  const context=contextLines.map(x=>{
+    let mk="";
+    try{
+      const p=srtBlocks.findIndex(b=>String(b.id)===x.id);
+      if(p>=0){
+        const cn=!endsS(x.text)&&p<srtBlocks.length-1, cp=p>0&&!endsS(srtBlocks[p-1].text);
+        if(cp&&cn)mk=" • MIDDLE of a sentence (continues from the previous line AND into the next line)";
+        else if(cn)mk=" • START of a sentence that CONTINUES in the next line";
+        else if(cp)mk=" • END of a sentence that started in the previous line";
+      }
+    }catch(_){}
+    return `[${x.id}] ${x.target?"TARGET":"CONTEXT ONLY"}${mk}\n${x.text}`;
+  }).join("\n\n");
   const targets=items.map(x=>`[${x.id}]\nប្រភព: ${x.text}\nការបកប្រែបច្ចុប្បន្នដែលត្រូវជួសជុល: ${x.trans||"(ទទេ)"}`).join("\n\n");
   return zsfUserPrompt(genre)+`
 
@@ -5821,7 +5864,7 @@ async function zsfAiSegmentHints(words){
   const runChunk=async(idxs,ci)=>{
     const text=idxs.map(i=>T[i]).join("");
     const starts=new Map();let o=0;idxs.forEach(i=>{starts.set(o,i);o+=T[i].length;});
-    const prompt="You are a subtitle line-breaker for Chinese short-drama videos. Produce line breaks like CapCut auto-captions.\nInsert the character | at every subtitle line break inside the TEXT below.\nSTRICT RULES:\n1. Do NOT change, add, delete, reorder or translate any character. Keep every punctuation mark, digit and Latin letter exactly as given. Output ONLY the text with | inserted (no explanation, no code fence, no numbering).\n2. Each line should be about 4-12 Chinese characters (hard maximum 15). Very short interjections (e.g. 哎, 啊, 店家) may be their own line.\n3. Break at natural phrase / clause / breathing points: after a complete phrase, before a conjunction, a new subject or a new verb phrase, and after sentence-final particles (了 吗 呢 吧 啊) or punctuation.\n4. NEVER break inside a word, a name, a number or a number+unit (wrong examples: 竟|然, 爸|妈, 铜|币, 20|万, 陈|凡). Never leave a lone function character (的 了 在 把 和) at the start or end of a line.\n5. Do not put | at the very start or very end.\n\nTEXT:\n"+text;
+    const prompt="You are a subtitle line-breaker for Chinese short-drama videos. Produce line breaks like CapCut auto-captions.\nInsert the character | at every subtitle line break inside the TEXT below.\nSTRICT RULES:\n1. Do NOT change, add, delete, reorder or translate any character. Keep every punctuation mark, digit and Latin letter exactly as given. Output ONLY the text with | inserted (no explanation, no code fence, no numbering).\n2. Each line should be about 4-12 Chinese characters (hard maximum 15). Very short interjections (e.g. 哎, 啊, 店家) may be their own line.\n3. Break at natural phrase / clause / breathing points: after a complete phrase, before a conjunction, a new subject or a new verb phrase, and after sentence-final particles (了 吗 呢 吧 啊) or punctuation.\n4. NEVER break inside a word, a name, a number or a number+unit (wrong examples: 竟|然, 爸|妈, 铜|币, 20|万, 陈|凡). Never leave a lone function character (的 了 在 把 和) at the start or end of a line.\n5. Do not put | at the very start or very end.\n6. COMPLETE MEANING FIRST: every line must be a complete meaning unit. Never separate a subject from its predicate, a verb from its object, a 把/被/对/给/向/跟 phrase from its verb, a modifier from the word it modifies, or a condition/cause (如果 因为 虽然 既然) from its result when they fit together in 15 characters or less.\n7. Do NOT break just because of a pause or because the sentence is long. Break ONLY at a real phrase boundary. If a whole sentence is 15 characters or less, keep it as ONE line (insert no | in it).\n8. Prefer fewer, slightly longer lines over many fragments. Never create a line shorter than 3 characters, except a standalone interjection or a name that is followed by punctuation.\n\nTEXT:\n"+text;
     for(let attempt=0;attempt<2;attempt++){
       const key=keys[(ci+attempt)%keys.length];
       try{
@@ -7938,11 +7981,22 @@ async function zsfKhmerFitOnce(){
 
 // ===== ជំហានថ្មី៖ Gemini កែអក្សរខុសតាមបរិបទ (មិនប៉ះពេលវេលា មិនប្តូរលេខបន្ទាត់) =====
 function zsfStripP(s){ return String(s||"").replace(ZSF_PUNCT_RE,""); }
+function zsfOnlyDupDeleted(a,b){
+  const d=a.length-b.length; if(d<1||d>2) return false;
+  let j=0,del=0;
+  for(let i=0;i<a.length;i++){
+    if(j<b.length&&a[i]===b[j]){ j++; continue; }
+    if((i>0&&a[i]===a[i-1])||(i+1<a.length&&a[i]===a[i+1])){ del++; continue; }
+    return false;
+  }
+  return j===b.length&&del===d;
+}
 function zsfAcceptFix(oldT,newT){
   const a=zsfStripP(oldT), b=zsfStripP(newT);
   if(!b) return false;
   if(a===b) return String(oldT).trim()!==String(newT).trim();      // ប្តូរតែវណ្ណយុត្តិ
-  if(b.length<a.length*0.6||b.length>a.length*1.5+1) return false;    // សរសេរឡើងវិញច្រើនពេក
+  if(b.length<a.length) return zsfOnlyDupDeleted(a,b);    /* V79: ហាមលុបអក្សរ លើកលែងតែអក្សរស្ទួនជាប់គ្នា */
+  if(b.length>a.length*1.5+1) return false;    // សរសេរឡើងវិញច្រើនពេក
   const cnt={}; for(const ch of a) cnt[ch]=(cnt[ch]||0)+1;
   let shared=0; for(const ch of b){ if(cnt[ch]>0){shared++;cnt[ch]--;} }
   if(shared/Math.max(a.length,b.length)>=0.5) return true;
@@ -7961,6 +8015,7 @@ function zsfBuildProofPrompt(batch,before,after,glossary){
 严格规则：
 1. 不要翻译、不要改写句子、不要润色、不要增加或删除剧情内容。
 2. 一行一行改，行与行之间不要移动文字；字幕可能在词语中间断开，只改本行出现的字。
+2b. 严禁删减文字：修正后的行字数必须和原行相同（只有识别造成的紧挨着的重复字可以删除）；不要把句子缩短，不要漏掉任何词。
 3a. 如果整句明显不通顺(例如 以功待针)，请根据读音和上下文改成最通顺、读音最接近的原句(以工代赈)；错别字改成正确的词，不要只改一个字。
 3b. 如果有繁体字，改成简体字(例如 蝗蟲→蝗虫)。如果同一个字因识别重复而连着出现(例如 亩,亩,)，删掉多余的重复。
 3. 不确定的不要改；没有错误的行不要输出。同一个错别字如果在多行都出现(如 殿家)，每一行都要改。
@@ -8266,7 +8321,7 @@ function buildDubbingSafeSegments(rawSegments, allWords, hints) {
       if(sentencePunctuation.test(t) || /…$/.test(t)) kind = 'S';
       else if(commaPunctuation.test(t) && !numComma) kind = 'C';
       else if(gap >= PAUSE_MS) kind = 'P';
-      else if(hints && nxt && hints.has(nxt)) kind = 'H';   // V32.72: AI ស្នើកាត់ត្រង់នេះ
+      else if(hints && nxt && hints.has(nxt) && cCount(textOf(cur)) >= 4) kind = 'H';   // V32.72: AI ស្នើកាត់ត្រង់នេះ (V80: ត្រូវមានយ៉ាងតិច ៤ អក្សរមុន ដើម្បីកុំកាត់ជាបំណែកតូចៗ)
       if(kind){ clauses.push({words:cur, kind, gapAfter:gap}); cur = []; }
     }
     if(cur.length) clauses.push({words:cur, kind:'S', gapAfter:1e9});
@@ -8276,6 +8331,8 @@ function buildDubbingSafeSegments(rawSegments, allWords, hints) {
       const total = cCount(textOf(ws));
       const dur = weMs(ws[ws.length-1]) - wsMs(ws[0]);
       if(ws.length < 2 || (total <= MAX_CLAUSE_CHARS && dur <= MAX_DURATION_MS)) return [ws];
+      /* V80: ឃ្លាលើសកំណត់តែបន្តិច (≤ +2 អក្សរ, ≤ +0.6 វិនាទី) → រក្សាក្នុងបន្ទាត់តែមួយ កុំកាត់កណ្តាលឃ្លា */
+      if(total <= MAX_CLAUSE_CHARS+2 && dur <= MAX_DURATION_MS+600) return [ws];
       let best = -1, bestScore = -1e12, leftChars = 0;
       // V32.72: ព្រំដែនពាក្យពីវចនានុក្រម (ហាមកាត់កណ្តាលពាក្យ)
       let wb = null, offs = [0];
@@ -8295,6 +8352,7 @@ function buildDubbingSafeSegments(rawSegments, allWords, hints) {
         if(/\d$/.test(lt) && /^[,.]\d/.test(rt)) safe = false;
         const leftT = textOf(ws.slice(0,k)), rightT = textOf(ws.slice(k));
         let bonus = 0;
+        if(/[，、,；;：:]$/.test(wText(ws[k-1])) && !/\d[,.]$/.test(wText(ws[k-1]))) bonus += 1800;   /* V80: កាត់ត្រង់សញ្ញាក្បៀសដែលមានស្រាប់ជាអាទិភាព */
         if(/^(但是|但|而且|而|所以|因为|如果|可是|然后|并且|不过|不然|就是|还是|只要|只有|于是|结果|难道|既然|虽然|要是|那么|这样|现在|今天|昨天|明天|和|与|跟|并|或|以及|还|又|就|却|才|都|也|再|我|你|他|她|它|咱|您|陛下|大哥|大人|这|那)/.test(rightT)) bonus += 450;
         if(/[了吗呢吧啊呀哦嘛啦]$/.test(leftT)) bonus += 300;
         if(/\d$/.test(lt) && /^[万千百亿元块个人年月日岁点户亩斤里米]/.test(rt)) bonus -= 3000;   // V32.72: លេខ+ឯកតា
@@ -8306,6 +8364,7 @@ function buildDubbingSafeSegments(rawSegments, allWords, hints) {
         if(score > bestScore){ bestScore = score; best = k; }
       }
       if(best < 0) return [ws];
+      if(bestScore < 0 && total <= MAX_CLAUSE_CHARS+4 && dur <= MAX_DURATION_MS+1500) return [ws];   /* V79: គ្មានចំណុចកាត់ល្អ + ឃ្លាមិនវែងពេក → រក្សាទាំងមូល កុំកាត់កណ្តាលឃ្លា */
       return [...splitLong(ws.slice(0,best)), ...splitLong(ws.slice(best))];
     };
     const pieces = [];
@@ -8325,10 +8384,18 @@ function buildDubbingSafeSegments(rawSegments, allWords, hints) {
       const combinedChars = cCount(textOf(line.words)) + cCount(textOf(p.words));
       const combinedDur = weMs(p.words[p.words.length-1]) - wsMs(line.words[0]);
       const tinyPrev = cCount(textOf(line.words)) < MIN_CHARS;
-      const canJoin = p.whole && line.whole && line.kind !== 'S' && line.kind !== 'H' && line.gapAfter < PAUSE_MS &&
+      /* V80: ការផ្អាក 0.6–1.0 វិនាទី ដែលមិនមានសញ្ញាចប់ប្រយោគ (kind 'P') គឺនៅកណ្តាលប្រយោគ → អាចភ្ជាប់បាន បើមិនលើសចំនួនអក្សរ/ពេល */
+      const softGap = (line.kind === 'P') ? 1000 : PAUSE_MS;
+      const canJoin = p.whole && line.whole && line.kind !== 'S' && line.kind !== 'H' && line.gapAfter < softGap &&
                       combinedChars <= MERGE_MAX_CHARS && combinedDur <= MAX_DURATION_MS;
+      /* V80: បំណែកខ្លីខ្លាំង (<3 អក្សរ) ដែលនៅចុងឃ្លា ត្រូវភ្ជាប់ទៅបន្ទាត់មុន (មិនទាមទារ whole) ដើម្បីកុំបំបែកន័យ */
+      const tinyNext = cCount(textOf(p.words)) < MIN_CHARS && line.kind !== 'S' && line.kind !== 'H' && line.gapAfter < 1000 &&
+                       combinedChars <= MAX_CLAUSE_CHARS+2 && combinedDur <= MAX_DURATION_MS+600;
       const tinyJoin = p.whole && line.whole && tinyPrev && line.gapAfter < PAUSE_MS && combinedChars <= MAX_CLAUSE_CHARS && combinedDur <= MAX_DURATION_MS;
-      if(canJoin || tinyJoin){ line.words.push(...p.words); line.kind = p.kind; line.gapAfter = p.gapAfter; }
+      const prevTxt = textOf(line.words);
+      const shortJoin = p.whole && line.whole && line.kind === 'P' && cCount(prevTxt) <= 4 && !/^[哈啊呵嘿哎嗯呀哦哇唉喂]+$/.test(prevTxt.replace(/[，、,。！？!?；：;:…\s]/g,'')) &&
+                        line.gapAfter < 1100 && combinedChars <= MAX_CLAUSE_CHARS && combinedDur <= MAX_DURATION_MS;   /* V79: ឃ្លាខ្លីខ្លាំង (≤៤អក្សរ) ដែលផ្អាកបន្តិច → ភ្ជាប់ទៅឃ្លាបន្ទាប់ */
+      if(canJoin || tinyJoin || shortJoin || tinyNext){ line.words.push(...p.words); line.kind = p.kind; line.gapAfter = p.gapAfter; }
       else { flushLine(); line = {words:[...p.words], kind:p.kind, whole:p.whole, gapAfter:p.gapAfter}; }
     }
     flushLine();
@@ -8397,6 +8464,96 @@ function validateNoPromptLeak(segments){
   if(bad.length) throw new Error(`Accuracy Guard: 检测到 ${bad.length} 条疑似提示词泄漏/非对白字幕，已停止导出，避免生成错误 SRT。请重试转写；不要把提示词文字当成剧情对白。`);
 }
 
+/* V79: ការពារអក្សរបាត់ — ប្រៀបធៀបអក្សរក្នុង segment របស់ Whisper ជាមួយបញ្ជី word ហើយបំពេញអក្សរដែលបាត់ត្រឡប់មកវិញ (មិនបន្ថែមអ្វីផ្សេង មិនហៅ API) */
+function zsfReconcileWords(data){
+  const rep={added:0,skipped:0,segs:0,fixed:0,rebuilt:0};
+  const segs=(Array.isArray(data&&data.segments)?data.segments:[]).filter(g=>Number.isFinite(Number(g.start))&&Number.isFinite(Number(g.end))&&Number(g.end)>Number(g.start)).slice().sort((a,b)=>Number(a.start)-Number(b.start));
+  if(!segs.length||!Array.isArray(data.words)||!data.words.length) return rep;
+  const wt=(w)=>String(w.word!==undefined?w.word:(w.text||""));
+  const nz=(s)=>{ try{ s=zsfToSimplified(s); }catch(_){} return Array.from(String(s||"").replace(ZSF_PUNCT_RE,"")); };
+  const words=data.words.map(w=>({...w,start:Number(w.start),end:Number(w.end)})).filter(w=>wt(w).trim()&&Number.isFinite(w.start)&&Number.isFinite(w.end)).sort((a,b)=>a.start-b.start);
+  words.forEach(w=>{ if(!(w.end>w.start)){ w.end=w.start+0.04; rep.fixed++; } else if(w.end-w.start>2.5){ w.end=w.start+0.8; rep.fixed++; } });
+  const ins=[]; let wi0=0;
+  const dropW=new Set();   /* V80: word ដែលត្រូវជំនួសដោយអក្សរពី segment (ពេលតម្រឹមមិនបាន) */
+  const wLoop=(txt)=>{ try{ return zsfHasPhraseLoop(txt)||zsfHasLoop(txt)||zsfIsHalluc(txt); }catch(_){ return false; } };
+  /* V80: segment text ជា transcript ពេញលេញបំផុតរបស់ Whisper។ បើបញ្ជី word បាត់អក្សរច្រើនពេកមិនអាចតម្រឹមបាន
+     → សង់ word ឡើងវិញពីអក្សរក្នុង segment (ពេលវេលាចែកតាមសមាមាត្រ) ជំនួសការ "រំលង" ដែលធ្វើឱ្យបាត់ពាក្យ។ មិនហៅ API។ */
+  const unitsOf=(txt)=>{ const U=[]; const cs=Array.from(zsfToSimplified(String(txt||"")));
+    for(let i=0;i<cs.length;i++){ const c=cs[i];
+      if(c.replace(ZSF_PUNCT_RE,"")===""){ if(/[，。！？、；：,.!?;:…]/.test(c)&&U.length&&!(/[,.]/.test(c)&&/\d/.test(U[U.length-1].c)&&/\d/.test(cs[i+1]||""))) U[U.length-1].p+=c; continue; }
+      U.push({c,p:""}); }
+    return U; };
+  const rebuild=(S,A,idx,sS,sE)=>{
+    if(!A.length||wLoop(A.join(""))) return false;
+    const U=unitsOf(S.text), useU=(U.length===A.length);
+    const t0=sS, t1=Math.max(sS+0.2,sE);   /* ពេលវេលា segment ជាប្រភពគោល */
+    const dc=(t1-t0)/A.length;
+    idx.forEach(k=>dropW.add(k));
+    A.forEach((ch,q)=>ins.push({word:ch+(useU?U[q].p:""),start:t0+q*dc,end:t0+(q+1)*dc,__recon:1,__rebuilt:1}));
+    rep.rebuilt=(rep.rebuilt||0)+1; rep.added+=A.length; return true;
+  };
+  for(const S of segs){
+    const sS=Number(S.start), sE=Number(S.end);
+    while(wi0<words.length&&(words[wi0].start+words[wi0].end)/2<sS-0.05) wi0++;
+    const idx=[]; for(let k=wi0;k<words.length&&(words[k].start+words[k].end)/2<=sE+0.05;k++) idx.push(k);
+    const A=nz(S.text); if(!A.length) continue;
+    const B=[],own=[]; idx.forEach(wi=>{ nz(wt(words[wi])).forEach(ch=>{ B.push(ch); own.push(wi); }); });
+    if(A.join("")===B.join("")) continue;
+    rep.segs++;
+    if(!B.length){
+      /* V80: ឃ្លាវែង (>80) ក៏បំពេញដែរ ចែកពេលតាមសមាមាត្រ (មុននេះរំលង = បាត់ទាំងឃ្លា) */
+      if(A.length>80){ if(!rebuild(S,A,idx,sS,sE)) rep.skipped+=A.length; continue; }
+      const dc=Math.min(sE-sS,A.length*0.45)/A.length;
+      A.forEach((ch,q)=>ins.push({word:ch,start:sS+q*dc,end:sS+(q+1)*dc,__recon:1}));
+      rep.added+=A.length; continue;
+    }
+    if(A.length>220||B.length>260){
+      /* V80: segment វែងពេកសម្រាប់ DP → ប្រៀបធៀបបែបសាមញ្ញ៖ បើ word បាត់អក្សរ ≥ 3% សង់ឡើងវិញ (កុំរំលង) */
+      if(B.length<A.length*0.97&&B.length>=A.length*0.5){ if(!rebuild(S,A,idx,sS,sE)) rep.skipped+=Math.max(0,A.length-B.length); }
+      else rep.skipped+=Math.max(0,A.length-B.length);
+      continue;
+    }
+    const n=A.length,m=B.length,W=m+1,dp=new Uint16Array((n+1)*W);
+    for(let i=1;i<=n;i++){ for(let j=1;j<=m;j++){ dp[i*W+j]=A[i-1]===B[j-1]?dp[(i-1)*W+j-1]+1:Math.max(dp[(i-1)*W+j],dp[i*W+j-1]); } }
+    const lcs=dp[n*W+m], miss=n-lcs;
+    if(miss<=0) continue;
+    if(lcs<n*0.85||miss>Math.max(4,Math.floor(n*0.2))){
+      /* V80: តម្រឹមមិនបាន ប៉ុន្តែ segment មានអក្សរច្រើនជាង word ពិតមែន → សង់ឡើងវិញពី segment (មិនរំលងទៀតទេ)
+         លើកលែងតែ word វែងជាង segment ច្រើន (សង្ស័យ word មានអក្សរហួស = មិនប៉ះ) */
+      if(B.length<=A.length*1.35&&lcs>=Math.min(n,m)*0.3){ if(rebuild(S,A,idx,sS,sE)) continue; }
+      rep.skipped+=miss; continue;
+    }
+    const matchA=new Array(n).fill(-1);
+    for(let i=n,j=m;i>0&&j>0;){ if(A[i-1]===B[j-1]){ matchA[i-1]=j-1; i--; j--; } else if(dp[(i-1)*W+j]>=dp[i*W+j-1]) i--; else j--; }
+    let i=0;
+    while(i<n){
+      if(matchA[i]>=0){ i++; continue; }
+      let j=i; while(j<n&&matchA[j]<0) j++;
+      const run=A.slice(i,j);
+      let pw=-1,nw=-1;
+      for(let q=i-1;q>=0;q--) if(matchA[q]>=0){ pw=own[matchA[q]]; break; }
+      for(let q=j;q<n;q++) if(matchA[q]>=0){ nw=own[matchA[q]]; break; }
+      const prevW=pw>=0?words[pw]:null, nextW=nw>=0?words[nw]:null;
+      if((prevW&&nextW&&pw===nw)||(!prevW&&!nextW)){ rep.skipped+=run.length; i=j; continue; }
+      let st0=prevW?prevW.end:sS, en0=nextW?nextW.start:sE;
+      const needTot=run.length*0.04;
+      if(en0-st0<needTot){
+        let need=needTot-Math.max(0,en0-st0);
+        if(prevW&&!prevW.__recon){ const room=Math.max(0,(prevW.end-prevW.start)*0.5-0.02), take=Math.min(need,room); prevW.end-=take; need-=take; }
+        if(need>1e-6&&nextW&&!nextW.__recon){ const room=Math.max(0,(nextW.end-nextW.start)*0.5-0.02), take=Math.min(need,room); nextW.start+=take; need-=take; }
+        if(need>1e-6){ rep.skipped+=run.length; i=j; continue; }
+        st0=prevW?prevW.end:sS; en0=nextW?nextW.start:sE;
+      }
+      const dc=Math.min(0.3,(en0-st0)/run.length);
+      run.forEach((ch,q)=>ins.push({word:ch,start:st0+q*dc,end:st0+(q+1)*dc,__recon:1}));
+      rep.added+=run.length; i=j;
+    }
+  }
+  if(dropW.size){ for(let k=words.length-1;k>=0;k--) if(dropW.has(k)) words.splice(k,1); }
+  if(ins.length){ words.push(...ins); words.sort((a,b)=>a.start-b.start); }
+  data.words=words;
+  return rep;
+}
 function validateGroqWordTimeline(data){
   const words=Array.isArray(data?.words)?data.words:[];
   if(!words.length){
@@ -8645,6 +8802,7 @@ async function transcribe(){
       // IMPORTANT: Build the final SRT from Groq word timestamps when available.
       // This keeps the original Chinese wording, but splits long speech into
       // dubbing-safe chunks without inventing, translating, or deleting content.
+      try{ data.__recon=zsfReconcileWords(data); }catch(re){ console.warn("reconcile",re); }
       const wordCheck=validateGroqWordTimeline(data);
       let usedWordTimeline = wordCheck.ok;
       if(usedWordTimeline){
@@ -8740,12 +8898,19 @@ async function transcribe(){
 
       // ===== V32.58: ជំហានក្រោយ (មិនប៉ះ validate ខាងលើ) =====
       let extraNotes=[];
+      /* V80: ពិនិត្យអក្សរសរុប Whisper segment ធៀប SRT (គ្មានការហៅ API) — បង្ហាញក្នុង diag ថាមានបាត់ឬអត់ */
+      try{
+        const cc=(x)=>{ try{ x=zsfToSimplified(x); }catch(_){} return Array.from(String(x||"").replace(ZSF_PUNCT_RE,"")).length; };
+        const segC=rawSegments.reduce((a,g)=>a+cc(g&&g.text),0), subC=subtitles.reduce((a,x)=>a+cc(x&&x.text),0);
+        if(segC>0) extraNotes.push(subC>=segC*0.995?`🔒 ពិនិត្យអក្សរ៖ Whisper ${segC} → SRT ${subC} (មិនបាត់)`:`⚠️ អក្សរអាចបាត់៖ Whisper ${segC} → SRT ${subC} (ខ្វះ ${segC-subC})`);
+      }catch(_){}
       if(window.__zsfAiSegNote){ extraNotes.push(window.__zsfAiSegNote); window.__zsfAiSegNote=null; }
       try{
         const gr=data.__gapReport;
         if(gr) extraNotes.push(`🔎 ចន្លោះត្រួតពិនិត្យ ${gr.gaps} • បំពេញបាន ${gr.filled} កន្លែង (+${gr.addedWords} ពាក្យ)`+(gr.denseFound?` • អត្ថបទបង្ហាប់ខុសកន្លែង ${gr.denseFound} (ត្រឡប់ដើមវិញ ${gr.denseRestored})`:""));
         if(data.__normReport&&(data.__normReport.shifted||data.__normReport.addedSegments)) extraNotes.push(`🧹 សម្អាត timeline: ពាក្យត្រួតគ្នា ${data.__normReport.shifted}, segment បន្ថែម ${data.__normReport.addedSegments}`);
         { const nOrph=zsfMergeOrphans(subtitles); if(nOrph) extraNotes.push(`🧩 ភ្ជាប់អក្សរតែមួយដែលដាច់ ${nOrph} បន្ទាត់`); }
+        try{ const rc=data.__recon; if(rc&&(rc.added||rc.skipped)) extraNotes.push(`🧷 ពិនិត្យអក្សរបាត់៖ បំពេញត្រឡប់ ${rc.added} អក្សរ`+(rc.rebuilt?` • សង់ឡើងវិញពី segment ${rc.rebuilt} ឃ្លា`:"")+(rc.skipped?` • មិនប្រាកដ ${rc.skipped} (រំលង)`:"")); }catch(_){}
         if($("zsfSnapTiming")&&$("zsfSnapTiming").checked&&data.__profile&&Math.abs((Number(uploadFile.__captureRate)||1)-1)<0.03){
           const nSnap=zsfSnapToSpeech(subtitles,data.__profile,Number(uploadFile.__sourceStartTimeSec)||0);
           extraNotes.push(`🎯 កែពេលវេលា ${nSnap} បន្ទាត់`);
@@ -9660,13 +9825,28 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
   function b64(u8){var s="",st=0x8000;for(var i=0;i<u8.length;i+=st)s+=String.fromCharCode.apply(null,u8.subarray(i,i+st));return btoa(s);}
 
   function buildPrompt(lines,ctx){
-    return "🚨 MASTER PROMPT: ADVANCED AUDIO/VIDEO SRT CLASSIFIER & PRESERVATION EDITOR 🚨\n\nROLE: You are an Expert Audio/Video Scene Analyst and Strict SRT Preservation Editor.\n\nCORE OBJECTIVE:\nYou receive ONE audio clip and the ORIGINAL subtitle lines that occur inside it. You must classify EVERY subtitle entry (and every PART of an entry when the voice changes inside it) based on the actual audio evidence. LISTEN to the voice itself to decide male or female, and spoken or inner thought.\n\n1. THE CLASSIFICATION SYSTEM\nEvery voice receives exactly ONE of these four tags:\n1 = Male Spoken Dialogue (male voice, physically spoken out loud)\n2 = Female Spoken Dialogue (female voice, physically spoken out loud)\n3 = Male Internal Thought (male voice, explicitly NOT spoken physically; usually echo, reverb or a filtered/dreamy voice)\n4 = Female Internal Thought (female voice, explicitly NOT spoken physically; usually echo, reverb or a filtered/dreamy voice)\n\n2. DECISION LOGIC & EVIDENCE HIERARCHY\nAnswer two questions for every subtitle: Who is speaking? (Male/Female) and How is it presented? (Spoken/Thought).\nEvidence priority (highest to lowest):\n(1) The actual audio at the timestamp: voice pitch, male vs female voice, tone, and sound treatment.\n(2) Speaker voice continuity (compare with nearby established voices).\n(3) Subtitle wording - ONLY as a last resort. Audio evidence overrides text.\nCrucial rules:\n- Whispering, shouting, off-screen voices and phone calls = SPOKEN dialogue (1 or 2).\n- Internal thought threshold: do NOT guess. Use 3 or 4 ONLY if there is clear evidence of inner monologue. If ambiguous, default to spoken (1 or 2).\n- If multiple voices overlap near a timestamp, identify the primary voice matching the text.\n- MID-LINE SPEAKER CHANGE (very important): listen to the WHOLE line from start to end. If ONE subtitle entry contains two or more different voices (for example the first half is a man speaking and the second half is a woman speaking, or a spoken part followed by an inner-thought part), you MUST split that entry into parts, one part per voice, each with its own tag. Decide every part from the real audio, never from the text alone. Do NOT split when the same voice says the whole entry.\n- Global consistency pass: the same voice in the same scene keeps the same gender/classification.\n- If \"cur\" (an existing tag) is given, evaluate it: keep it if correct, replace it if incorrect. Do not duplicate tags.\n\n3. STRICT PRESERVATION RULES (CRITICAL)\nTreat the original lines as read-only. The ONLY modification allowed is choosing the tag(s).\n- DO NOT change timestamps or ids.\n- DO NOT translate, summarize, correct spelling/grammar, or alter the original wording.\n- DO NOT merge lines. The ONLY allowed split is the mid-line speaker-change split above, and the texts of the parts joined together MUST equal the original line text exactly (copy the characters exactly; add, remove or reword nothing).\n- Every line in the input must appear in the output.\n\n4. EXECUTION\nProcess chronologically and build a lightweight internal profile of the speaker voices to maintain continuity. Before finalizing, check consistency and that every id is present.\n\nTimes are relative to the start of this clip (mm:ss.mmm).\n@@CTX@@\nSUBTITLE LINES (JSON):\n@@LINES@@\n\n5. OUTPUT (technical, mandatory)\nReturn ONLY a JSON array with one object for EVERY line, same ids, no other text, no markdown: [{\"id\":\"<id>\",\"tag\":1}, ...] where tag is the integer 1, 2, 3 or 4.\nONLY when the voice really changes inside one line, return this shape for that line instead: {\"id\":\"<id>\",\"parts\":[{\"tag\":1,\"text\":\"<exact first piece>\"},{\"tag\":2,\"text\":\"<exact next piece>\"}]}.".split("@@CTX@@").join(ctx?("Voice continuity from the previous lines: "+ctx+"\n"):"").split("@@LINES@@").join(JSON.stringify(lines));
+    var P=["🚨 STRICT VOICE CLASSIFIER FOR SHORT-DRAMA AUDIO 🚨",
+      "ROLE: You are an expert audio forensic analyst and a strict SRT preservation editor. You receive ONE audio clip and the ORIGINAL subtitle lines spoken inside it. For every line you decide WHO is speaking (which voice, male or female) and HOW it is presented (spoken aloud or inner thought).",
+      "",
+      "RULE ZERO - GENDER COMES FROM THE SOUND ONLY: Decide male/female ONLY from the physical voice you hear: pitch (male roughly 85-180 Hz with deep chest resonance; female roughly 165-255 Hz with a lighter, brighter timbre), formants and timbre. NEVER decide gender from the subtitle words, names, pronouns, titles, the story, who 'should' be talking, or from the idea that speakers must alternate. If the sound and the text disagree, the SOUND wins. Boyish voices and deep female voices exist: judge the overall timbre, not one high or low word.",
+      "",
+      "STEP 1 - VOICE TABLE: Before tagging, list every distinct voice you hear in this clip with a short id (A, B, C ...), its gender (male or female) and a 3-6 word acoustic description (for example 'deep calm baritone', 'bright young female'). If KNOWN VOICES are given below and a voice sounds the same, reuse that id and gender; a new person gets a new id. One id = ONE person = ONE gender, always.",
+      "STEP 2 - PER LINE: For each subtitle line give spk (voice id) and mode. mode = 'spoken' (physically said aloud: normal, whisper, shout, phone call, off-screen) or 'thought' (inner monologue). Use 'thought' ONLY with clear audio evidence: echo/reverb, filtered, dreamy or detached voice treatment, or a voice clearly not coming from a mouth in the scene. If in doubt, mode = 'spoken'. Never choose 'thought' just because the words sound like thinking.",
+      "STEP 3 - VERIFY BEFORE ANSWERING: (a) every line has a spk that exists in your voice table; (b) the same spk never changes gender; (c) whenever consecutive lines switch between a male and a female voice, re-listen to those exact timestamps and confirm the voice really changed - one speaker often says several lines in a row; (d) if unsure about a line, prefer the voice of the neighbouring line in the same scene over guessing from the words.",
+      "MID-LINE VOICE CHANGE: Listen to each line from start to end. If ONE subtitle entry contains two or more different voices (or a spoken part followed by a thought part), split it into parts, one part per voice. The texts of all parts joined together MUST equal the original text exactly (copy characters exactly; add, remove or reword nothing). Do NOT split if the same voice says the whole entry.",
+      "PRESERVATION: Treat the subtitle lines as read-only. Do not change ids or timestamps; do not translate, summarize, correct or merge lines. Every input id must appear exactly once in the output.",
+      "Times are relative to the start of this clip (mm:ss.mmm).",
+      "@@CTX@@",
+      "SUBTITLE LINES (JSON):",
+      "@@LINES@@",
+      "OUTPUT (technical, mandatory): Return ONLY one JSON object, no markdown, no extra text: {\"voices\":[{\"id\":\"A\",\"gender\":\"male\",\"desc\":\"...\"}],\"lines\":[{\"id\":\"<id>\",\"spk\":\"A\",\"mode\":\"spoken\"}, ...]}. gender is exactly \"male\" or \"female\"; mode is exactly \"spoken\" or \"thought\". ONLY when the voice really changes inside one line, output for that line: {\"id\":\"<id>\",\"parts\":[{\"spk\":\"A\",\"mode\":\"spoken\",\"text\":\"<exact first piece>\"},{\"spk\":\"B\",\"mode\":\"spoken\",\"text\":\"<exact next piece>\"}]}."];
+    return P.join("\n").split("@@CTX@@").join(ctx?("KNOWN VOICES from earlier clips of the same video (reuse the same id and gender when it is the same voice): "+ctx+"\n"):"").split("@@LINES@@").join(JSON.stringify(lines));
   }
   async function callGemini(prompt,wavB64,key,model){
     var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},150000);
     try{
       var res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},
-        body:JSON.stringify({contents:[{role:"user",parts:[{inline_data:{mime_type:"audio/wav",data:wavB64}},{text:prompt}]}],generationConfig:{temperature:0.1,responseMimeType:"application/json"}}),signal:ctl.signal});
+        body:JSON.stringify({contents:[{role:"user",parts:[{inline_data:{mime_type:"audio/wav",data:wavB64}},{text:prompt}]}],generationConfig:{temperature:0,responseMimeType:"application/json"}}),signal:ctl.signal});
       var raw=await res.text(),d;try{d=JSON.parse(raw)}catch(e){throw new Error("Gemini ឆ្លើយមិនត្រឹមត្រូវ (HTTP "+res.status+")")}
       if(!res.ok||d.error){var er=new Error((d.error&&d.error.message)||("HTTP "+res.status));er.status=res.status;throw er;}
       var txt="";(((d.candidates||[])[0]||{}).content||{parts:[]}).parts.forEach(function(p){if(typeof p.text==="string")txt+=p.text});
@@ -9674,28 +9854,53 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     }catch(e){if(e&&e.name==="AbortError")throw new Error("Gemini យឺតពេក");throw e;}finally{clearTimeout(tm);}
   }
   function parseTags(txt,ids){
-    var t=String(txt).replace(/```json|```/g,"").trim(),arr=null;
-    try{arr=JSON.parse(t)}catch(e){var m=t.match(/\[[\s\S]*\]/);if(m){try{arr=JSON.parse(m[0])}catch(_){}}}
-    var map={};if(Array.isArray(arr))arr.forEach(function(o){if(!o)return;var id=String(o.id);if(!ids.has(id))return;var tg=parseInt(o.tag,10);if(Array.isArray(o.parts)&&o.parts.length>=1){var ps=o.parts.map(function(p){return {tag:parseInt(p&&p.tag,10),text:String((p&&p.text)||"")}}).filter(function(p){return p.tag>=1&&p.tag<=4&&p.text.trim()});if(ps.length>=2){map[id]={parts:ps};return;}if(ps.length===1){map[id]=ps[0].tag;return;}}if(tg>=1&&tg<=4)map[id]=tg;});return map;
+    var t=String(txt).replace(/```json|```/g,"").trim(),obj=null;
+    try{obj=JSON.parse(t)}catch(e){var m1=t.match(/\{[\s\S]*\}/),m2=t.match(/\[[\s\S]*\]/);if(m1){try{obj=JSON.parse(m1[0])}catch(_){}}if(!obj&&m2){try{obj=JSON.parse(m2[0])}catch(_){}}}
+    var arr=Array.isArray(obj)?obj:(obj&&Array.isArray(obj.lines)?obj.lines:[]);
+    var voices=(obj&&!Array.isArray(obj)&&Array.isArray(obj.voices))?obj.voices.filter(function(v){return v&&v.id}):[];
+    var G={};voices.forEach(function(v){var g=String(v.gender||"").toLowerCase();G[String(v.id)]=/^f/.test(g)?"f":(/^m/.test(g)?"m":"")});
+    function tagOf(o){
+      var th=/^t/.test(String(o.mode||"").toLowerCase()),g=G[String(o.spk)];
+      if(!g&&o.gender){var gg=String(o.gender).toLowerCase();g=/^f/.test(gg)?"f":(/^m/.test(gg)?"m":"")}
+      if(g)return (g==="f"?2:1)+(th?2:0);
+      var tg=parseInt(o.tag,10);return (tg>=1&&tg<=4)?tg:0;
+    }
+    var map={};
+    arr.forEach(function(o){if(!o)return;var id=String(o.id);if(!ids.has(id))return;
+      if(Array.isArray(o.parts)&&o.parts.length>=1){
+        var ps=o.parts.map(function(p){p=p||{};return {tag:tagOf(p),text:String(p.text||"")}}).filter(function(p){return p.tag>=1&&p.tag<=4&&p.text.trim()});
+        if(ps.length>=2){map[id]={parts:ps};return}
+        if(ps.length===1){map[id]=ps[0].tag;return}
+      }
+      var tg=tagOf(o);if(tg>=1&&tg<=4)map[id]=tg;
+    });
+    return {map:map,voices:voices};
   }
   async function classifyChunk(lines,ctx,wavB64){
     var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
     var model=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
-    var ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx),last=null,best={};
+    var ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx),last=null,best={map:{},voices:[]};
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0);
     for(var round=0;round<2;round++){
       for(var n=0;n<ks.length;n++){
         try{
-          var map=parseTags(await callGemini(prompt,wavB64,ks[(start+n)%ks.length],model),ids),c=Object.keys(map).length;
-          if(c>=Object.keys(best).length)best=map;
-          if(c===ids.size||c>0.8*ids.size)return map;
+          var pr=parseTags(await callGemini(prompt,wavB64,ks[(start+n)%ks.length],model),ids),c=Object.keys(pr.map).length;
+          if(c>=Object.keys(best.map).length)best=pr;
+          if(c===ids.size||c>0.8*ids.size)return pr;
           last=new Error("AI ឆ្លើយមិនគ្រប់បន្ទាត់");
         }catch(e){last=e;}
       }
       await new Promise(function(r){setTimeout(r,1500)});
     }
-    if(Object.keys(best).length)return best;throw last||new Error("ចាត់ថ្នាក់មិនបាន");
+    if(Object.keys(best.map).length)return best;throw last||new Error("ចាត់ថ្នាក់មិនបាន");
   }
+  function mergeProf(prof,voices){
+    var out=prof.slice();
+    (voices||[]).forEach(function(v){var g=/^f/i.test(String(v.gender||""))?"female":(/^m/i.test(String(v.gender||""))?"male":"");if(!g)return;
+      out=out.filter(function(x){return x.id!==String(v.id)});out.push({id:String(v.id),gender:g,desc:String(v.desc||"").slice(0,60)});});
+    return out.slice(-8);
+  }
+  function profText(prof){return prof.map(function(v){return v.id+"="+v.gender+(v.desc?(" ("+v.desc+")"):"")}).join("; ")}
 
   function applyTag(text,tg){var base=String(text||"").replace(/\[[1-4]\]\s*/g,"").trim();if(typeof tg==="number")return "["+tg+"] "+base;var ps=tg.parts,flat=base.replace(/\s+/g,""),joined=ps.map(function(p){return p.text}).join("").replace(/\s+/g,"");if(joined!==flat)return "["+ps[0].tag+"] "+base;var out=[];ps.forEach(function(p){var l=out.length?out[out.length-1]:null;if(l&&l.tag===p.tag)l.text+=p.text;else out.push({tag:p.tag,text:p.text});});return out.map(function(p){return "["+p.tag+"] "+p.text.trim()}).join(" ");}
   window.__zsfApplyTag=applyTag;
@@ -9713,18 +9918,18 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
       if(cur.length){var span=(t.e-times(srtBlocks[cur[0]]).s)/1000;if(span>maxSec-2*PAD||cur.length>=60){groups.push(cur);cur=[];}}
       cur.push(i);});
     if(cur.length)groups.push(cur);
-    var ctx="",done=0,failed=0;
+    var ctx="",done=0,failed=0,profile=[];
     for(var g=0;g<groups.length;g++){
       var idxs=groups[g],t0s=times(srtBlocks[idxs[0]]).s,t1e=times(srtBlocks[idxs[idxs.length-1]]).e;
       var clipMs=Math.max(0,t0s-PAD*1000);
       prog("🎭 AI កំពុងស្តាប់សំឡេង ប្រុស/ស្រី • ក្រុម "+(g+1)+"/"+groups.length,2+8*g/groups.length);
       var wav=b64(sliceWav(A.ab,A.info,Math.max(0,clipMs/1000-A.offset),(t1e/1000+PAD)-A.offset));
-      var lines=idxs.map(function(i){var b=srtBlocks[i],t=times(b),m=TAG_RE.exec(b.text||""),o={id:String(b.id),t:fmtT(t.s-clipMs)+" --> "+fmtT(t.e-clipMs),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,"")};if(m)o.cur=parseInt(m[1],10);return o;});
+      var lines=idxs.map(function(i){var b=srtBlocks[i],t=times(b),m=TAG_RE.exec(b.text||""),o={id:String(b.id),t:fmtT(t.s-clipMs)+" --> "+fmtT(t.e-clipMs),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,"")};return o;});
       try{
-        var map=await classifyChunk(lines,ctx,wav);
+        var rs=await classifyChunk(lines,ctx,wav),map=rs.map;profile=mergeProf(profile,rs.voices);
         idxs.forEach(function(i){var b=srtBlocks[i],tg=map[String(b.id)];if(tg){b.text=applyTag(b.text,tg);done++;}else failed++;});
       }catch(e){console.warn("tag chunk failed",e);failed+=idxs.length;}
-      var tail=idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");if(tail)ctx=tail;
+      var tail=idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");ctx=profText(profile)+(tail?((profile.length?". ":"")+"Tags of the last lines before this clip (id=tag): "+tail):"");
     }
     try{renderEditor();saveData();}catch(_){}
     if(done>0&&failed===0)lastKey=key;
@@ -9781,7 +9986,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER="77.0",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER="80.0",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
     if(document.getElementById("zsfUpd"))return;
