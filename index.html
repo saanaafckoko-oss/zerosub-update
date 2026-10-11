@@ -10178,34 +10178,38 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER="80.2",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER="80.5",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
     if(document.getElementById("zsfUpd"))return;
     var css=document.createElement("style");
-    css.textContent="#mainApp.app-container{padding-bottom:0!important}body>.watermark{margin-top:6px!important;margin-bottom:0!important}#zsfUpd{display:flex;flex-direction:column;align-items:center;gap:4px;margin:14px auto calc(16px + env(safe-area-inset-bottom,0px));width:100%;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:inherit;color:#fff;text-align:center}"+
-    "#zsfUpd .zu-sq{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#2a2140,#150f24);border:2.5px solid #888;box-shadow:0 6px 18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12);position:relative;transition:transform .15s}"+
-    "#zsfUpd:active .zu-sq{transform:scale(.94)}"+
-    "#zsfUpd .zu-gear{font-size:26px;line-height:1;display:inline-block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}"+
-    "#zsfUpd .zu-dot{position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;background:#888;border:2px solid #150f24}"+
-    "#zsfUpd .zu-t{font-size:12px;font-weight:800;line-height:1.2}"+
-    "#zsfUpd .zu-m{font-size:11px;font-weight:700;line-height:1.25;opacity:.85;max-width:80%}"+
-    "#zsfUpd.ok .zu-sq{border-color:#1e90ff;box-shadow:0 6px 18px rgba(0,0,0,.55),0 0 16px rgba(30,144,255,.55)}#zsfUpd.ok .zu-dot{background:#1e90ff}"+
-    "#zsfUpd.new .zu-sq{border-color:#ff2d2d;animation:zsfUpdP 1.4s infinite}#zsfUpd.new .zu-dot{background:#ff2d2d}#zsfUpd.new .zu-gear{animation:zsfUpdR 2.4s linear infinite}"+
-    "#zsfUpd.off .zu-sq{border-color:#888}#zsfUpd.off .zu-dot{background:#888}"+
-    "@keyframes zsfUpdP{0%,100%{box-shadow:0 6px 18px rgba(0,0,0,.55),0 0 0 0 rgba(255,45,45,.65)}50%{box-shadow:0 6px 18px rgba(0,0,0,.55),0 0 0 9px rgba(255,45,45,0)}}"+
+    css.textContent="#mainApp.app-container{padding-bottom:0!important}body>.watermark{margin-top:6px!important;margin-bottom:0!important}"+
+    "#zsfUpd{display:flex;align-items:center;gap:12px;box-sizing:border-box;width:calc(100% - 28px);max-width:532px;margin:16px auto calc(18px + env(safe-area-inset-bottom,0px));padding:12px 14px;border-radius:var(--vrs-radius,20px);background:var(--vrs-soft,#1f2440);border:1.5px solid var(--vrs-line,#272d4a);box-shadow:var(--vrs-shadow,0 6px 22px rgba(0,0,0,.35));cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:inherit;color:var(--text-white,#fff);text-align:left;position:relative;overflow:hidden;transition:transform .15s,border-color .25s}"+
+    "#zsfUpd:active{transform:scale(.98)}"+
+    "#zsfUpd .zu-sq{flex:0 0 auto;width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,var(--btn-grad-1,#818cf8),var(--btn-grad-2,#4f46e5));box-shadow:0 4px 12px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.3)}"+
+    "#zsfUpd .zu-gear{font-size:22px;line-height:1;display:inline-block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}"+
+    "#zsfUpd .zu-body{flex:1 1 auto;min-width:0}"+
+    "#zsfUpd .zu-t{font-size:14px;font-weight:800;line-height:1.25}"+
+    "#zsfUpd .zu-m{font-size:11.5px;font-weight:600;line-height:1.35;margin-top:2px;color:var(--text-gray,#98a1c4)}"+
+    "#zsfUpd .zu-b{flex:0 0 auto;font-size:11.5px;font-weight:800;padding:6px 11px;border-radius:999px;white-space:nowrap;color:#fff;background:#6b7280}"+
+    "#zsfUpd.ok{border-color:var(--success,#10b981)}#zsfUpd.ok .zu-b{background:var(--success,#10b981)}"+
+    "#zsfUpd.new{border-color:var(--warning,#f59e0b);animation:zsfUpdP 1.8s infinite}#zsfUpd.new .zu-b{background:var(--warning,#f59e0b)}#zsfUpd.new .zu-gear{animation:zsfUpdR 2.6s linear infinite}"+
+    "#zsfUpd.off .zu-b{background:#6b7280}"+
+    "@keyframes zsfUpdP{0%,100%{box-shadow:var(--vrs-shadow,0 6px 22px rgba(0,0,0,.35)),0 0 0 0 rgba(245,158,11,.5)}50%{box-shadow:var(--vrs-shadow,0 6px 22px rgba(0,0,0,.35)),0 0 0 8px rgba(245,158,11,0)}}"+
     "@keyframes zsfUpdR{to{transform:rotate(360deg)}}";
     document.head.appendChild(css);
     var w=document.createElement("div");w.id="zsfUpd";w.className="off";w.setAttribute("role","button");
-    w.innerHTML='<div class="zu-sq"><span class="zu-gear">⚙️</span><span class="zu-dot"></span></div><div class="zu-t">ធ្វើបច្ចុប្បន្នភាព</div><div class="zu-m" id="zsfUpdMsg"></div>';
+    w.innerHTML='<div class="zu-sq"><span class="zu-gear">⚙️</span></div><div class="zu-body"><div class="zu-t">ធ្វើបច្ចុប្បន្នភាព</div><div class="zu-m" id="zsfUpdMsg"></div></div><div class="zu-b" id="zsfUpdBadge"></div>';
     document.body.appendChild(w);
     w.addEventListener("click",onTap);
     render();
   }
   function render(msg){
-    var w=document.getElementById("zsfUpd"),m=document.getElementById("zsfUpdMsg");if(!w||!m)return;
+    var w=document.getElementById("zsfUpd"),m=document.getElementById("zsfUpdMsg"),bd=document.getElementById("zsfUpdBadge");if(!w||!m)return;
     w.className=st;
-    m.textContent=msg||(st==="ok"?("កំណែ "+ZSF_VER+" ថ្មីបំផុត"):st==="new"?(ss("zsfUpdTried")?"បិទ App រួចបើកម្តងទៀត":"ចុចត្រង់នេះនឹងធ្វើបច្ចុប្បន្នភាព"):"មិនអាចពិនិត្យ Update (ចុចដើម្បីសាកម្តងទៀត)");
+    var tried=!!ss("zsfUpdTried");
+    m.textContent=msg||(st==="ok"?("កំណែ "+ZSF_VER+" • ថ្មីបំផុតហើយ"):st==="new"?(tried?"កំណែថ្មីមិនទាន់នៅក្នុងឧបករណ៍ — សូមជំនួស file index.html ក្នុងថត Download ដោយកំណែថ្មី រួចបើក App ម្តងទៀត":"មានកំណែថ្មីជាងនេះ — ចុចដើម្បីធ្វើបច្ចុប្បន្នភាព"):"មិនអាចពិនិត្យបាន — ពិនិត្យអ៊ីនធឺណិត រួចចុចដើម្បីសាកម្តងទៀត");
+    if(bd)bd.textContent=(st==="ok"?"✓ ថ្មីបំផុត":st==="new"?(tried?"ត្រូវជំនួស file":"មានកំណែថ្មី"):"សាកម្តងទៀត");
   }
   function check(cb){
     var done=false;
