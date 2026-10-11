@@ -9637,5 +9637,55 @@ h.addEventListener("click",t);h.addEventListener("keydown",function(e){if(e.key=
 }catch(e){}}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();setTimeout(run,1500)})();</script>
 <script id="zsf-v71-reason">window.zsfPipeReason=function(){try{var g=function(i){var e=document.getElementById(i);return e?String(e.textContent||"").replace(/\s+/g," ").trim():""};var d=g("v32diag"),p=g("progressStatus"),r=(/ERROR|FAIL|❌|បរាជ័យ/i.test(d)?d:"")||(/❌|បរាជ័យ|FAIL/i.test(p)?p:"")||d||p||"មិនមានសារកំហុស";return r.length>300?r.slice(0,300)+"…":r}catch(e){return "មិនស្គាល់មូលហេតុ"}};</script>
+<script id="zsf-v724-updbtn">
+/* V72.4: ប៊ូតុង Update តូច — ខៀវ = កំណែថ្មីបំផុត • ក្រហម = មានកំណែថ្មី (ចុចដើម្បី Update) • ប្រផេះ = មិនអាចពិនិត្យបាន
+   ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
+(function(){
+  var ZSF_VER="72.4",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
+  function build(){
+    if(document.getElementById("zsfUpd"))return;
+    var css=document.createElement("style");
+    css.textContent="#zsfUpd{position:fixed;left:6px;bottom:calc(6px + env(safe-area-inset-bottom,0px));z-index:2147483000;display:flex;flex-direction:column;align-items:flex-start;gap:2px;pointer-events:none}"+
+    "#zsfUpdBtn{pointer-events:auto;width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.85);padding:0;cursor:pointer;background:#888;box-shadow:0 0 6px rgba(0,0,0,.5);-webkit-tap-highlight-color:transparent}"+
+    "#zsfUpdBtn.ok{background:#1e90ff}#zsfUpdBtn.new{background:#ff2d2d;animation:zsfUpdP 1.4s infinite}#zsfUpdBtn.off{background:#888}"+
+    "#zsfUpdMsg{font-size:10px;line-height:1.1;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000;opacity:.9;max-width:60vw}"+
+    "@keyframes zsfUpdP{0%,100%{box-shadow:0 0 0 0 rgba(255,45,45,.7)}50%{box-shadow:0 0 0 6px rgba(255,45,45,0)}}";
+    document.head.appendChild(css);
+    var w=document.createElement("div");w.id="zsfUpd";
+    w.innerHTML='<button id="zsfUpdBtn" class="off" aria-label="Update"></button><span id="zsfUpdMsg"></span>';
+    document.body.appendChild(w);
+    document.getElementById("zsfUpdBtn").addEventListener("click",onTap);
+    render();
+  }
+  function render(msg){
+    var b=document.getElementById("zsfUpdBtn"),m=document.getElementById("zsfUpdMsg");if(!b||!m)return;
+    b.className=st;
+    m.textContent=msg||(st==="ok"?("កំណែ "+ZSF_VER+" ថ្មីបំផុត"):st==="new"?(ss("zsfUpdTried")?"បិទ App រួចបើកម្តងទៀត":"មានកំណែថ្មី • ចុចដើម្បី Update"):"មិនអាចពិនិត្យ Update");
+  }
+  function check(cb){
+    var done=false;
+    function fin(x){if(done)return;done=true;st=x;render();if(cb)cb(x);}
+    try{
+      fetch(VURL+"?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.text():""}).then(function(t){
+        t=String(t||"").trim();
+        if(!t||t.length>20){fin("off");return;}
+        if(t===ZSF_VER){ss("zsfUpdTried",null);fin("ok");}else fin("new");
+      }).catch(function(){fin("off");});
+    }catch(e){fin("off");}
+    setTimeout(function(){fin("off");},9000);
+  }
+  function onTap(){
+    if(st==="new"){
+      render("កំពុងធ្វើបច្ចុប្បន្នភាព...");
+      ss("zsfUpdTried","1");
+      setTimeout(function(){try{location.reload();}catch(e){}},2500);
+    }else{ render("កំពុងពិនិត្យ..."); check(); }
+  }
+  function init(){build();check();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)check();});
+})();
+</script>
 </body>
 </html>
