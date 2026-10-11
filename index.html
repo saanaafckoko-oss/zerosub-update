@@ -9638,30 +9638,31 @@ h.addEventListener("click",t);h.addEventListener("keydown",function(e){if(e.key=
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();setTimeout(run,1500)})();</script>
 <script id="zsf-v71-reason">window.zsfPipeReason=function(){try{var g=function(i){var e=document.getElementById(i);return e?String(e.textContent||"").replace(/\s+/g," ").trim():""};var d=g("v32diag"),p=g("progressStatus"),r=(/ERROR|FAIL|❌|បរាជ័យ/i.test(d)?d:"")||(/❌|បរាជ័យ|FAIL/i.test(p)?p:"")||d||p||"មិនមានសារកំហុស";return r.length>300?r.slice(0,300)+"…":r}catch(e){return "មិនស្គាល់មូលហេតុ"}};</script>
 <script id="zsf-v725-updbtn">
-/* V72.5: ផ្ទាំង «ធ្វើបច្ចុប្បន្នភាព» នៅខាងក្រោមបំផុតនៃទំព័រ (រូប ⚙️)
+/* V72.6: ប៊ូតុងការ៉េ ផ្ទាំង «ធ្វើបច្ចុប្បន្នភាព» នៅខាងក្រោមបំផុតនៃទំព័រ (រូប ⚙️)
    ខៀវ = កំណែថ្មីបំផុត • ក្រហម = មានកំណែថ្មី (ចុចដើម្បី Update) • ប្រផេះ = មិនអាចពិនិត្យបាន
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER="72.5",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER="72.6",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
     if(document.getElementById("zsfUpd"))return;
     var css=document.createElement("style");
-    css.textContent="#zsfUpd{display:block;width:calc(100% - 24px);max-width:720px;margin:18px auto calc(28px + env(safe-area-inset-bottom,0px));box-sizing:border-box;border-radius:16px;border:2px solid #888;background:rgba(20,16,30,.92);color:#fff;padding:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:left;font-family:inherit}"+
-    "#zsfUpd .zu-row{display:flex;align-items:center;gap:12px;padding:10px 14px;min-height:52px}"+
-    "#zsfUpd .zu-gear{font-size:26px;line-height:1;display:inline-block}"+
-    "#zsfUpd .zu-t{font-size:15px;font-weight:800;line-height:1.25}"+
-    "#zsfUpd .zu-m{font-size:10px;line-height:1.2;opacity:.85;margin-top:2px}"+
-    "#zsfUpd .zu-bar{height:6px;background:#888}"+
-    "#zsfUpd.ok{border-color:#1e90ff}#zsfUpd.ok .zu-bar{background:#1e90ff}"+
-    "#zsfUpd.new{border-color:#ff2d2d;animation:zsfUpdP 1.4s infinite}#zsfUpd.new .zu-bar{background:#ff2d2d}#zsfUpd.new .zu-gear{animation:zsfUpdR 2.4s linear infinite}"+
-    "#zsfUpd.off{border-color:#888}#zsfUpd.off .zu-bar{background:#888}"+
-    "@keyframes zsfUpdP{0%,100%{box-shadow:0 0 0 0 rgba(255,45,45,.6)}50%{box-shadow:0 0 0 7px rgba(255,45,45,0)}}"+
+    css.textContent="#zsfUpd{display:flex;flex-direction:column;align-items:center;gap:7px;margin:22px auto calc(30px + env(safe-area-inset-bottom,0px));width:100%;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:inherit;color:#fff;text-align:center}"+
+    "#zsfUpd .zu-sq{width:92px;height:92px;border-radius:24px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#2a2140,#150f24);border:2.5px solid #888;box-shadow:0 6px 18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12);position:relative;transition:transform .15s}"+
+    "#zsfUpd:active .zu-sq{transform:scale(.94)}"+
+    "#zsfUpd .zu-gear{font-size:44px;line-height:1;display:inline-block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}"+
+    "#zsfUpd .zu-dot{position:absolute;top:8px;right:8px;width:12px;height:12px;border-radius:50%;background:#888;border:2px solid #150f24}"+
+    "#zsfUpd .zu-t{font-size:14px;font-weight:800;line-height:1.2}"+
+    "#zsfUpd .zu-m{font-size:10px;line-height:1.25;opacity:.85;max-width:80%}"+
+    "#zsfUpd.ok .zu-sq{border-color:#1e90ff;box-shadow:0 6px 18px rgba(0,0,0,.55),0 0 16px rgba(30,144,255,.55)}#zsfUpd.ok .zu-dot{background:#1e90ff}"+
+    "#zsfUpd.new .zu-sq{border-color:#ff2d2d;animation:zsfUpdP 1.4s infinite}#zsfUpd.new .zu-dot{background:#ff2d2d}#zsfUpd.new .zu-gear{animation:zsfUpdR 2.4s linear infinite}"+
+    "#zsfUpd.off .zu-sq{border-color:#888}#zsfUpd.off .zu-dot{background:#888}"+
+    "@keyframes zsfUpdP{0%,100%{box-shadow:0 6px 18px rgba(0,0,0,.55),0 0 0 0 rgba(255,45,45,.65)}50%{box-shadow:0 6px 18px rgba(0,0,0,.55),0 0 0 9px rgba(255,45,45,0)}}"+
     "@keyframes zsfUpdR{to{transform:rotate(360deg)}}";
     document.head.appendChild(css);
     var w=document.createElement("div");w.id="zsfUpd";w.className="off";w.setAttribute("role","button");
-    w.innerHTML='<div class="zu-row"><span class="zu-gear">⚙️</span><div><div class="zu-t">កន្លែងធ្វើបច្ចុប្បន្នភាព</div><div class="zu-m" id="zsfUpdMsg"></div></div></div><div class="zu-bar"></div>';
+    w.innerHTML='<div class="zu-sq"><span class="zu-gear">⚙️</span><span class="zu-dot"></span></div><div class="zu-t">ធ្វើបច្ចុប្បន្នភាព</div><div class="zu-m" id="zsfUpdMsg"></div>';
     document.body.appendChild(w);
     w.addEventListener("click",onTap);
     render();
