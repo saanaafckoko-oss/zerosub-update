@@ -2907,14 +2907,8 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 <div class="zkt-vsec">🎬 ឬ ចុចតែម្តង ធ្វើទាំងអស់៖ Video → SRT → ខ្មែរ → សំឡេង → វីដេអូ</div>
 <div class="zkt-xopt" id="zkt_xopt">
 <div class="zkt-xopt-h" id="zkt_xopt_h" role="button" tabindex="0"><span>⚙️ ជ្រើសរើសកំណត់ (1-Click Auto Export)</span><i class="zkt-xarr">▲</i></div>
-<div class="zkt-xopt-row zkt-xopt-3" id="zkt_xo_chips">
-<label class="zkt-xc"><input type="checkbox" id="zkt_o_sub" checked/><span>📝 Subtitle</span></label>
-<label class="zkt-xc"><input type="checkbox" id="zkt_o_voice" checked/><span>🎙️ Voice</span></label>
-<label class="zkt-xc"><input type="checkbox" id="zkt_o_fx" checked/><span>🎼 Effect</span></label>
-</div>
-<div class="zkt-xo-hint">📝 Subtitle = ទាញអក្សរចេញពីវីដេអូ → SRT ចិន → បកប្រែខ្មែរ ហើយទាញយក SRT • 🎙️ Voice = អានសំឡេងខ្មែរ ហើយផ្គុំជាវីដេអូ • 🎼 Effect = រក្សាសំឡេង Background ដើម។ មិនចង់ប្រើមួយណា ដកសញ្ញា ✓ ចេញ។</div>
-<div class="zkt-xopt-row" style="display:none">
-<label class="zkt-xc"><input type="checkbox" id="zkt_x_video" checked/><span>🎬 ផ្គុំជាវីដេអូ</span></label>
+<div class="zkt-xopt-row" style="grid-template-columns:1fr">
+<label class="zkt-xc" style="display:none"><input type="checkbox" id="zkt_x_video" checked/><span>🎬 ផ្គុំជាវីដេអូ</span></label>
 <label class="zkt-xc"><input type="checkbox" id="zkt_x_mute" checked/><span>🔇 បិទសំឡេងដើម</span></label>
 </div>
 <div class="zkt-xorig" id="zkt_x_origrow" style="display:none"><div class="zkt-xr"><label for="zkt_x_origvol">🎼 សំឡេង Background (ពេលមិនអាន)</label><b id="zkt_x_ovt">100%</b></div><input type="range" id="zkt_x_origvol" min="0" max="100" step="5" value="100"/><div class="zkt-xr"><label for="zkt_x_duck">🗣️ Background ពេល TTS កំពុងអាន</label><b id="zkt_x_duckt">8%</b></div><input type="range" id="zkt_x_duck" min="0" max="100" step="1" value="8"/></div>
@@ -3075,7 +3069,7 @@ html body #zkt_card .zpv-gbred{color:#fecaca;background:rgba(220,38,38,.16)!impo
 /* ===== V59: ប៊ូតុង Export 1 Click + Preview SRT ===== */
 #zkt_card .zkt-xopt{margin:0 0 12px;padding:12px;border-radius:20px;background:linear-gradient(180deg,#0f1a30,#0a1322);border:1.5px solid color-mix(in srgb,var(--accent-glow,#00e5ff) 45%,#0b3a4a)}
 #zkt_card .zkt-xopt-h{font-size:14px;font-weight:900;color:#fff;margin:0 0 10px}
-#zkt_card .zkt-xopt-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}#zkt_card .zkt-xopt-3{display:flex;flex-wrap:wrap;gap:6px}html body #zkt_card .zkt-xopt-3 .zkt-xc{flex:1 1 auto;min-width:0;padding:10px 8px;gap:6px;font-size:12.5px;justify-content:center;white-space:nowrap}html body #zkt_card .zkt-xopt-3 .zkt-xc input{width:20px!important;height:20px!important}#zkt_card .zkt-xo-hint{margin:9px 2px 4px;font-size:11px;line-height:1.5;color:#9fb0cc}
+#zkt_card .zkt-xopt-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 html body #zkt_card .zkt-xc{display:flex;align-items:center;gap:8px;margin:0;padding:11px 10px;border-radius:14px;background:#1a2438;border:1.5px solid #2c3956;color:#cfd8ea;font-size:13px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent}
 html body #zkt_card .zkt-xc input{width:22px!important;height:22px!important;flex:none;margin:0;padding:0;accent-color:var(--accent-glow,#00e5ff)}
 html body #zkt_card .zkt-xc:has(input:checked){border-color:var(--accent-glow,#00e5ff);background:color-mix(in srgb,var(--accent-glow,#00e5ff) 18%,#1a2438);color:#fff}
@@ -4022,30 +4016,6 @@ async function pvPlay(i,btn){
   clearTimeout(pvTm);pvTm=setTimeout(pvSync,400);
  });
 })();
-function zsfXoInit(){
- var sub=$("zkt_o_sub"),vo=$("zkt_o_voice"),fx=$("zkt_o_fx"),mu=$("zkt_x_mute");
- if(!sub||!vo||!fx||sub.__f)return;sub.__f=1;
- var K={zkt_o_sub:"zsf_xo_sub",zkt_o_voice:"zsf_xo_voice",zkt_o_fx:"zsf_xo_fx"};
- [sub,vo,fx].forEach(function(el){
-  try{var v=localStorage.getItem(K[el.id]);if(v==="0")el.checked=false;else if(v==="1")el.checked=true}catch(_){}
-  el.addEventListener("change",function(){try{localStorage.setItem(K[el.id],el.checked?"1":"0")}catch(_){}syncFx()});
- });
- function syncFx(){if(!mu)return;var want=!fx.checked;if(mu.checked!==want){mu.checked=want;mu.dispatchEvent(new Event("change",{bubbles:true}))}}
- syncFx();
-}
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",zsfXoInit);else zsfXoInit();
-function zsfDownloadSrtQuiet(delayMs){
- try{
-  if(typeof srtBlocks==="undefined"||!srtBlocks.length||typeof zsfSrtOut!=="function")return false;
-  var nm="khmer_subtitle";try{var f=(window.__zsfMedia||{}).file;if(f&&f.name)nm=String(f.name).replace(/\.[^.]+$/,"")+"_khmer"}catch(_){}
-  /* V75: បង្កើតឯកសារ SRT ភ្លាម (មុនការសម្អាតស្វ័យប្រវត្តិ) ហើយទាញយកក្រោយ — ដើម្បីកុំឱ្យជាន់ការទាញយកវីដេអូ */
-  var sb=new Blob(["\uFEFF"+zsfSrtOut()],{type:"application/x-subrip;charset=utf-8"});
-  if(delayMs>0)setTimeout(function(){try{downloadBlobFile(sb,nm+".srt")}catch(_){}},delayMs);
-  else downloadBlobFile(sb,nm+".srt");
-  return true;
- }catch(e){try{console.warn("srt dl",e)}catch(_){}}
- return false;
-}
 /* V76: ប៊ូតុងបម្រុង «រក្សាទុក/ចែករំលែក» — ប្រើបានពេល browser រារាំងការទាញយកស្វ័យប្រវត្តិ */
 function zsfShareBtn(blob,name){
  try{
@@ -4065,26 +4035,11 @@ function zsfShareBtn(blob,name){
 async function exportAll(){
  if(busy)return;
  var btn=$("zkt_run"),label=btn?btn.textContent:"";
- var wantVid=$("zkt_x_video").checked,mute=$("zkt_x_mute").checked,srtSent=false;
+ var wantVid=$("zkt_x_video").checked,mute=$("zkt_x_mute").checked;
  var ov=Math.max(0,Math.min(100,+$("zkt_x_origvol").value||0));
  persist();
- try{zsfXoInit()}catch(_){}
- var optSub=!$("zkt_o_sub")||$("zkt_o_sub").checked,optVoice=!$("zkt_o_voice")||$("zkt_o_voice").checked;
  try{
   if(btn){btn.disabled=true;btn.textContent="⏳ កំពុងដំណើរការ…"}
-  if(!optSub&&!optVoice)throw new Error("សូមធីកយ៉ាងហោចណាស់មួយ៖ Subtitle ឬ Voice");
-  if(!optVoice){
-   /* មានតែ Subtitle: Video → SRT ចិន → ខ្មែរ → ទាញយក SRT (មិនអានសំឡេង មិនផ្គុំវីដេអូ) */
-   if($("zkt_src").value==="file")throw new Error("សូមធីក Voice ដើម្បីប្រើ SRT ពីខាងក្រៅ");
-   if(!(window.__zsfMedia||{}).file)throw new Error("មិនទាន់មាន Video/MP3 — សូមដាក់ Video នៅប្រអប់ខាងលើជាមុន");
-   window.__zsfWithTts=false;window.__zsfTtsChain=false;
-   st("ដំណាក់កាល ១-២៖ Video → SRT → បកប្រែខ្មែរ…",0);
-   await runOneClickPipeline();
-   if(typeof srtBlocks==="undefined"||!srtBlocks.length)throw new Error("មិនបានចប់ — "+(window.zsfPipeReason?window.zsfPipeReason():"សូមមើលសារកំហុសខាងលើ"));
-   zsfDownloadSrtQuiet();
-   st("✅ Subtitle រួចរាល់ — ទាញយក SRT ខ្មែរហើយ",100);
-   return;
-  }
   if(wantVid){
    var mf=null,mu="";try{var __m=window.__zsfMedia||{};mf=__m.file||null;mu=__m.url||""}catch(e){}
    if(!mf||!mu)throw new Error("មិនទាន់មានវីដេអូ — សូមដាក់វីដេអូនៅប្រអប់ខាងលើជាមុន (ឬដោះធីក «ផ្គុំជាវីដេអូ»)");
@@ -4095,9 +4050,7 @@ async function exportAll(){
    try{mf2=(window.__zsfMedia||{}).file||null}catch(e){}
    var trMiss=function(){return typeof translationNeedsRepair==="function"?srtBlocks.some(translationNeedsRepair):srtBlocks.some(function(x){return !(x.trans&&String(x.trans).trim())})};
    try{trOk=typeof srtBlocks!=="undefined"&&srtBlocks.length>0&&!trMiss()}catch(e){}
-   if(!optSub){
-    if(!trOk)throw new Error("មិនទាន់មាន SRT ខ្មែរបកប្រែរួច — សូមធីក Subtitle ដើម្បីបង្កើតពីវីដេអូ (ឬបញ្ចូល SRT ជាមុន)");
-   }else if(!(trOk&&mf2&&window.__zsfPipeFile===mf2)){
+   if(!(trOk&&mf2&&window.__zsfPipeFile===mf2)){
     if(!mf2){if(!trOk)throw new Error("មិនទាន់មាន Video/MP3 — សូមដាក់ Video នៅប្រអប់ខាងលើ (ឬបិទភ្ជាប់ SRT ក្នុងផ្ទាំង «📱 នាំចូល / បិទភ្ជាប់ SRT»)")}
     else{
      if(!ready())throw new Error("សូមបញ្ចូល Worker URL (ឬ Azure Key+Region) ក្នុងកាត 05 ជាមុន");
@@ -4112,8 +4065,6 @@ async function exportAll(){
     }
    }
   }
-  /* V75: បើនាំចេញវីដេអូ → វីដេអូទាញយកមុនគេ (កុំឱ្យ SRT ប្រជែងទាញយក) ហើយ SRT ទាញយកក្រោយ */
-  if(optSub&&!wantVid&&$("zkt_src").value!=="file")srtSent=zsfDownloadSrtQuiet()||srtSent;
   var cues=await getCues();if(!cues.length)throw new Error("គ្មានអត្ថបទសម្រាប់អាន");
   var sig=cueSig(cues),reused=false;
   if(lastMaster&&sig===lastSig){reused=true;st("♻️ ប្រើសំឡេងដែលបានបង្កើតរួច",100)}
@@ -4153,7 +4104,6 @@ async function exportAll(){
   try{setTimeout(function(){try{a.click()}catch(_){}},300)}catch(_){}
   try{window.__zsfLastVidName=a.download}catch(_){}
   try{zsfShareBtn(r.blob,a.download)}catch(_){}
-  if(optSub&&$("zkt_src").value!=="file")srtSent=zsfDownloadSrtQuiet(9000)||srtSent;
   try{setTimeout(function(){try{if(typeof showToast==="function")showToast("⬇️ ពិនិត្យថត Download — បើគ្មានវីដេអូ សូមចុចប៊ូតុង «ទាញយកវីដេអូ» ឬ «📤 រក្សាទុក/ចែករំលែក»",true)}catch(_){}},4000)}catch(_){}
   try{window.__zsfLastVidUrl=u;if(window.zsfAfterVideoExport)window.zsfAfterVideoExport(u)}catch(_){}
   var fin="✅ នាំចេញវីដេអូរួចរាល់ • "+(Math.round(r.blob.size/1048576*10)/10)+" MB • "+ext.toUpperCase()+(r.fast?" • ⚡ ផ្លូវលឿន (វីដេអូដើម គុណភាពដដែល)":"")+(mute?" • សំឡេងដើមបិទ":" • សំឡេងដើម "+ov+"%")+(r.incomplete?" • ⚠️ វីដេអូអាចខ្លីជាងដើម (កុំចាកចេញពីទំព័រពេលនាំចេញ)":"");
@@ -4162,7 +4112,6 @@ async function exportAll(){
   try{vd.scrollIntoView({behavior:"smooth",block:"center"})}catch(_){}
  }catch(e){
   var m=(e&&e.message)||String(e);st("❌ "+m,0);try{window.zsfTtsFinish&&window.zsfTtsFinish(false,"❌ "+m)}catch(_){}
-  try{if(wantVid&&!srtSent&&optSub&&$("zkt_src").value!=="file")srtSent=zsfDownloadSrtQuiet()||srtSent}catch(_){}
  }finally{
   window.__zsfTtsChain=false;window.__zsfWithTts=false;
   busy=false;if(btn){btn.disabled=false;btn.textContent=label}
@@ -9832,7 +9781,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER="76.0",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER="77.0",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
     if(document.getElementById("zsfUpd"))return;
