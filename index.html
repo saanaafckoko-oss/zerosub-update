@@ -5,7 +5,7 @@
 <script id="zsf-boot">
 /* V1.06: ដកការប្តូរទំព័រ (document.write) ចេញ — វាធ្វើឱ្យ script មេខូច។ គ្រាន់តែសម្អាតកំណែដែលបានទុកពីមុន */
 (function(){
-  window.__ZSF_VER="1.08";
+  window.__ZSF_VER="1.09";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 </script>
@@ -2769,6 +2769,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 <details id="zsfAdvOpts" style="margin-top:10px;border:1px solid var(--border-color);border-radius:12px;padding:8px 12px">
 <summary style="cursor:pointer;font-size:13px;font-weight:600;list-style-position:inside">⚙️ ជម្រើសកែ SRT កម្រិតខ្ពស់ (បើកទាំងអស់ស្រាប់ — ចុចដើម្បីកែ)</summary>
 <div style="margin-top:10px;display:grid;gap:8px">
+<label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer"><input type="checkbox" id="zsfSuperSpeed" checked style="width:auto;margin-top:3px"><span>⚡ <b>Super Speed</b> — ផ្ញើសំឡេងជាផ្នែកធំជាង ស្របគ្នាច្រើនជាង ហើយរំលងជំហានយឺតៗ (ស្តាប់ឡើងវិញ + Gemini កាត់ឃ្លា + Gemini កែអក្សរ)។ បិទវាបើចង់បានគុណភាពពេញលេញ តែយឺតជាង</span></label>
 <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer"><input type="checkbox" id="zsfGapFill" checked style="width:auto;margin-top:3px"><span>🔎 ស្វែងរក និងបំពេញអត្ថបទដែលបាត់ (ស្តាប់ឡើងវិញត្រង់កន្លែងស្ងាត់ពីរវិនាទីឡើង)</span></label>
 <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer"><input type="checkbox" id="zsfAiSeg" checked style="width:auto;margin-top:3px"><span>✂️ ឱ្យ Gemini ជួយកាត់ឃ្លាតាមបែប CapCut (ត្រូវការ Gemini Key — បើមិនបានលទ្ធផល កម្មវិធីប្រើវចនានុក្រមចិនជំនួសដោយស្វ័យប្រវត្តិ)</span></label>
 <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer"><input type="checkbox" id="zsfArabicNum" checked style="width:auto;margin-top:3px"><span>🔢 ប្តូរលេខចិន (二十, 三十万) ជាលេខឡាតាំង (20, 30万) ដូច CapCut</span></label>
@@ -7416,7 +7417,7 @@ async function extractVideoAudioV32Prototype(file){
    បញ្ហាដើម៖ សំឡេង ~10 នាទីត្រូវផ្ញើទៅ Whisper ក្នុង request តែមួយ (ឯកសារ <20MB មិនត្រូវបានកាត់)
    ហើយ prompt ជាប្រយោគបញ្ជាវែង ធ្វើឱ្យ Whisper រំលងអត្ថបទជាច្រើនវិនាទី។
    ដំណោះស្រាយ៖ កាត់សំឡេងជាផ្នែក ~28 វិនាទី នៅចំណុចស្ងាត់បំផុត + ពិនិត្យអត្ថបទតិច + សាកម្តងទៀត។ */
-const ZSF_CHUNK_SEC = 24;        // ប្រវែងផ្នែកគោលដៅ (+ padding 3s ×2 = ~30s = 1 window របស់ Whisper)
+let ZSF_CHUNK_SEC = 24;        // ប្រវែងផ្នែកគោលដៅ (+ padding 3s ×2 = ~30s = 1 window របស់ Whisper)
 const ZSF_PAD_SEC = 3;           // ត្រួតគ្នា 3s ខាងចុងទាំងពីរ (Whisper ស្តាប់ 2–3s ដំបូងមិនសូវច្បាស់)
 const ZSF_SEARCH_SEC = 2.5;      // រកចំណុចស្ងាត់ក្នុង ±2.5 វិនាទី
 const ZSF_MIN_CHARS_PER_SEC = 0.6; // តិចជាងនេះ (ក្នុងផ្នែក ≥10s) = សង្ស័យថាបាត់អត្ថបទ
@@ -8381,7 +8382,7 @@ async function transcribeWithKey(key,idx,uploadFile){
       }
       partResults.forEach(x=>{ if(x) zsfMergeChunk(merged,x.result,x.r.shift,x.r.ownFrom,x.r.ownTo); });
       skipped.sort((a,b)=>a-b);
-      if(!skipped.length && ($("zsfGapFill")?$("zsfGapFill").checked:true)){
+      if(!skipped.length && !window.__zsfSuper && ($("zsfGapFill")?$("zsfGapFill").checked:true)){
         let dropped=[];
         try{
           dropped=zsfDropDense(merged);
@@ -8410,7 +8411,7 @@ let __zsfRR=0;
 function zsfInitKeyPool(keys){
   const pool=(keys||[]).map((k,i)=>({key:k,idx:i,bad:false})).filter(p=>p.key);
   window.__zsfKeyPool=pool;
-  ZSF_PARALLEL=Math.max(3,Math.min(9,pool.length*3));
+  ZSF_PARALLEL=Math.max(window.__zsfSuper?6:3,Math.min(10,pool.length*3));
 }
 async function transcribeWithKeySingle(key,idx,uploadFile,opts){
   const P=window.__zsfKeyPool;
@@ -8990,6 +8991,8 @@ async function transcribe(){
     return false;
   }
   $("transcribeBtn").disabled=true;
+  window.__zsfSuper=!($("zsfSuperSpeed")&&!$("zsfSuperSpeed").checked);   /* V1.09 Super Speed (លំនាំដើម បើក) */
+  ZSF_CHUNK_SEC=window.__zsfSuper?48:24;
   window.__zsfProofChanges=[];
   stopProgressTimers();
   const pipelineWallStart=performance.now();
@@ -9055,8 +9058,8 @@ async function transcribe(){
       if(usedWordTimeline){
         let aiHints=null;
         try{ zsfLexAddUser(zsfGlossaryTerms()); }catch(_){}
-        if($("zsfAiSeg")&&$("zsfAiSeg").checked){
-          try{ setProgress(90,"✂️ Gemini កំពុងជួយកាត់ឃ្លាតាមបែប CapCut…"); const ah=await zsfAiSegmentHints(data.words); aiHints=ah.hints; window.__zsfAiSegNote="✂️ "+ah.note; }
+        if($("zsfAiSeg")&&$("zsfAiSeg").checked&&!window.__zsfSuper){
+          try{ setProgress(90,"✂️ Gemini កំពុងជួយកាត់ឃ្លាតាមបែប CapCut…"); const ah=await Promise.race([zsfAiSegmentHints(data.words),new Promise((_,rj)=>setTimeout(()=>rj(new Error("AI seg timeout")),30000))]); aiHints=ah.hints; window.__zsfAiSegNote="✂️ "+ah.note; }
           catch(e){ console.warn("AI seg",e); window.__zsfAiSegNote="✂️ AI កាត់ឃ្លាមិនដំណើរការ — ប្រើវចនានុក្រមចិនជំនួស"; }
         }
         subtitles=buildDubbingSafeSegments(rawSegments,data.words,aiHints);
@@ -9169,14 +9172,16 @@ async function transcribe(){
           let nNum=0; subtitles.forEach(s=>{ const t=zsfArabicNumbers(s.text); if(t!==s.text){ s.text=t; nNum++; } });
           extraNotes.push(`🔢 ប្តូរលេខជាលេខឡាតាំង ${nNum} បន្ទាត់`);
         }
-        if($("zsfProofread")&&$("zsfProofread").checked){
+        if(window.__zsfSuper){ extraNotes.push("⚡ Super Speed៖ រំលងការស្តាប់ឡើងវិញ + Gemini កាត់ឃ្លា/កែអក្សរ (បិទ Super Speed ក្នុងជម្រើសកម្រិតខ្ពស់ បើចង់បាន)"); }
+        else if($("zsfProofread")&&$("zsfProofread").checked){
           let gkeys=[]; try{ gkeys=JSON.parse(safeGet("zero_user_api_keys")||"null")||[]; }catch(_){}
           if(!Array.isArray(gkeys)||!gkeys.some(Boolean)) gkeys=(typeof userApiKeys!=="undefined"?userApiKeys:[]);
           gkeys=gkeys.filter(Boolean);
           if(!gkeys.length){ extraNotes.push("✨ រំលងការកែអក្សរ (គ្មាន Gemini Key)"); }
           else{
-            const pr=await zsfProofreadSubtitles(subtitles,{keys:gkeys,model:zsfProofModel(),glossary:zsfGlossaryTerms(),
-              onProgress:(i,n)=>setProgress(95,`✨ Gemini កំពុងកែអក្សរ ${i}/${n}…`)});
+            setProgress(95,"✨ Gemini កំពុងកែអក្សរ…");
+            const pr=await Promise.race([zsfProofreadSubtitles(subtitles,{keys:gkeys,model:zsfProofModel(),glossary:zsfGlossaryTerms(),
+              onProgress:(i,n)=>setProgress(95,`✨ Gemini កំពុងកែអក្សរ ${i}/${n}…`)}),new Promise((_,rj)=>setTimeout(()=>rj(new Error("Gemini កែអក្សរយូរពេក (>60s) — រំលង")),60000))]);
             extraNotes.push(`✨ Gemini (${gkeys.length} Key, ${zsfProofModel()}) កែអក្សរ ${pr.changes.length} បន្ទាត់ (Gemini ស្នើ ${pr.proposed||0}, បដិសេធដោយច្បាប់ការពារ ${pr.rejected||0})`+(pr.propagated?` • 🔁 កែពាក្យខុសដូចគ្នាបន្ថែម ${pr.propagated} បន្ទាត់`:"")+(pr.failed?` ⚠️ បរាជ័យ ${pr.failed}/${pr.batches} ផ្នែក: ${pr.lastError}`:""));
             window.__zsfProofChanges=pr.changes;
             if(pr.changes.length) console.log("Gemini fixes:",pr.changes.map(c=>`#${c.n} ${c.old} → ${c.new}`).join("\n"));
@@ -9226,7 +9231,7 @@ async function transcribe(){
   const g=$("zsfGlossary"); if(!g) return;
   try{ const saved=safeGet("zsf_glossary"); if(saved) g.value=saved; }catch(_){}
   g.addEventListener("input",()=>safeSet("zsf_glossary",g.value));
-  [["zsfGapFill"],["zsfProofread"],["zsfSnapTiming"],["zsfAiSeg"]].forEach(([id])=>{
+  [["zsfSuperSpeed"],["zsfGapFill"],["zsfProofread"],["zsfSnapTiming"],["zsfAiSeg"]].forEach(([id])=>{
     const c=$(id); if(!c) return;
     const v=safeGet("zsf_opt_"+id); if(v==="0") c.checked=false; else if(v==="1") c.checked=true;
     c.addEventListener("change",()=>safeSet("zsf_opt_"+id,c.checked?"1":"0"));
@@ -10415,7 +10420,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"1.08",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"1.09",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
