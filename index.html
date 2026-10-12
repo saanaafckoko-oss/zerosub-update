@@ -2746,8 +2746,8 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfAiSeg" checked style="width:auto;margin-top:3px">span>✂️ ឱ្យ Gemini ជួយកាត់ឃ្លាតាមបែប CapCut (ត្រូវការ Gemini Key — បើមិនបានលទ្ធផល កម្មវិធីប្រើវចនានុក្រមចិនជំនួសដោយស្វ័យប្រវត្តិ)/span>/label>
 label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfArabicNum" checked style="width:auto;margin-top:3px">span>🔢 ប្តូរលេខចិន (二十, 三十万) ជាលេខឡាតាំង (20, 30万) ដូច CapCut/span>/label>
 label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfProofread" checked style="width:auto;margin-top:3px">span>✨ កែអក្សរចិនខុសតាមបរិបទដោយ Gemini (ត្រូវការ Gemini Key — មិនប៉ះពេលវេលា មិនប្តូរលេខបន្ទាត់)/span>/label>
-label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfSnapTiming" checked style="width:auto;margin-top:3px">span>🎯 កែពេលវេលា៖ កាត់ចំណុចស្ងាត់ចេញពីដើម/ចុងបន្ទាត់ តាមសំឡេងពិត/span>/label>
-label style="display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.4">span>⏱️ ទាញពេលវេលាទាំងអស់មកមុន (វិនាទី)៖/span>input type="number" id="zsfTimeShift" value="0.4" min="0" max="1.5" step="0.05" style="width:72px">span style="opacity:.7;font-size:12px">(0.4 = ត្រូវនឹងអក្សរដុតក្នុងវីដេអូសាកល្បង · បើបិទ 🎯 ប្រើ ~0.2 · 0 = មិនប្តូរ)/span>/label>
+label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfSnapTiming" style="width:auto;margin-top:3px">span>🎯 កែពេលវេលា៖ កាត់ចំណុចស្ងាត់ចេញពីដើម/ចុងបន្ទាត់ តាមសំឡេងពិត/span>/label>
+label style="display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.4">span>⏱️ ទាញពេលវេលាទាំងអស់មកមុន (វិនាទី)៖/span>input type="number" id="zsfTimeShift" value="0" min="0" max="1.5" step="0.05" style="width:72px">span style="opacity:.7;font-size:12px">(0.4 = ត្រូវនឹងអក្សរដុតក្នុងវីដេអូសាកល្បង · បើបិទ 🎯 ប្រើ ~0.2 · 0 = មិនប្តូរ)/span>/label>
 div class="zpg" id="zsfPauseBox">
 div class="zpg-top">span class="zpg-ico">⏱️/span>span class="zpg-ttl">b>ចន្លោះដង្ហើមកាត់ឃ្លា/b>small>បើ​ស្ងាត់​យូរ​ជាង​នេះ​ក្នុង​ឃ្លា​តែ​មួយ → កាត់​ជា​បន្ទាត់​ថ្មី/small>/span>output class="zpg-val" id="zsfPauseVal">0.60s/output>/div>
 input type="range" id="zsfPauseGap" min="0.1" max="1.5" step="0.05" value="0.6" aria-label="ចន្លោះដង្ហើមកាត់ឃ្លា">
@@ -3152,11 +3152,11 @@ html body #zkt_card .zkt-cc.on,html body #project1MediaToSrt #zkt_card .zkt-cc.o
 var $=function(i){return document.getElementById(i)};
 var VOICES={"km-KH-PisethNeural":"ពិសិដ្ឋ","km-KH-SreymomNeural":"ស្រីមុំ"};
 var TAGN=["[1] ប្រុសនិយាយ","[2] ស្រីនិយាយ","[3] ប្រុសគិត","[4] ស្រីគិត"];
-var EQ={studio:[1,1.5,2],phone:[-4,3,5],story:[1,2.5,3],warm:[3,0,-2],fairy:[2,1,3],podcast:[3,2,1],flat:[0,0,0]};
+var EQ={studio:[1.5,1,0],phone:[-4,3,5],story:[1,2.5,3],warm:[3,0,-2],fairy:[2,1,3],podcast:[3,2,1],flat:[0,0,0]};
 var EQN={studio:"✨ ស្ទូឌីយោ (ពិរោះ ស្រាល)",phone:"📱 ស្រួយភ្លឺ (ទូរសព្ទ)",story:"🎙️ និទានរឿង (ច្បាស់)",warm:"📻 បាសកក់ក្តៅ (សំឡេងវិទ្យុ)",fairy:"🧚 និទានរឿងព្រេង",podcast:"📻 ផតខាស្ត",flat:"🎚️ សំឡេងដើម (Flat)"};
 var EQMIG={bright:"phone",deep:"warm"};    
  
-function defS(i){return{voice:i%2?"km-KH-SreymomNeural":"km-KH-PisethNeural",hm:0,pitch:-2,bass:0,speed:15,vol:20,echo:0,auto:35,eq:"studio"}}
+function defS(i){return{voice:i%2?"km-KH-SreymomNeural":"km-KH-PisethNeural",hm:0,pitch:-2,bass:0,speed:10,vol:20,echo:0,auto:40,eq:"studio"}}
 var CFG=[{k:"hm",t:"Volume High+Mid %",s:5,a:-50,b:100,u:"%"},{k:"pitch",t:"Pitch",s:1,a:-50,b:50,u:"Hz"},
 {k:"bass",t:"Bass dB",s:1,a:-10,b:15,u:"dB"},{k:"speed",t:"Speed",s:1,a:-50,b:100,u:"%"},
 {k:"vol",t:"Volume",s:5,a:-80,b:100,u:"%"},{k:"echo",t:"Echo",s:0.1,a:0,b:1,u:""},
@@ -3212,7 +3212,7 @@ function drawCtl(){
  drawSum();drawFit();
 }
  
-var FITD={fmax:2.5,tail:1.0,margin:0.20},FITR={fmax:[1.5,4,0.25],tail:[0.1,3,0.1],margin:[0,0.6,0.05]},FITK={fmax:"zsf_tts_fmax",tail:"zsf_tts_tail",margin:"zsf_tts_margin"};
+var FITD={fmax:2.0,tail:1.0,margin:0.20},FITR={fmax:[1.5,4,0.25],tail:[0.1,3,0.1],margin:[0,0.6,0.05]},FITK={fmax:"zsf_tts_fmax",tail:"zsf_tts_tail",margin:"zsf_tts_margin"};
 function fitGet(k){try{var v=parseFloat(localStorage.getItem(FITK[k]));if(v>=FITR[k][0]&&v=FITR[k][1])return v}catch(_){}return FITD[k]}
 function fitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch(_){return true}}
 function drawFit(){
@@ -3265,14 +3265,16 @@ var AC=null;function ctx(){return AC||(AC=new (window.AudioContext||window.webki
 async function process(ab,s,targetSec){
  var buf=await ctx().decodeAudioData(ab.slice(0)),rate=1,sr=24000;
   
- var nrm=1;try{var cd=buf.getChannelData(0),sq=0,cnt=0;for(var q=0;qcd.length;q++){var a0=cd[q];if(a0>0.01||a0-0.01){sq+=a0*a0;cnt++}}if(cnt>200){var r0=Math.sqrt(sq/cnt);if(r0>0.001)nrm=Math.max(0.6,Math.min(2.5,0.15/r0))}}catch(e){}
+ var nrm=1;try{var cd=buf.getChannelData(0),sq=0,cnt=0;for(var q=0;qcd.length;q++){var a0=cd[q];if(a0>0.01||a0-0.01){sq+=a0*a0;cnt++}}if(cnt>200){var r0=Math.sqrt(sq/cnt);if(r0>0.001)nrm=Math.max(0.6,Math.min(1.8,0.15/r0))}}catch(e){}
  var tail=s.echo>0?0.9:0.05,len=Math.ceil((buf.duration/rate+tail)*sr);
  var oc=new OfflineAudioContext(1,len,sr),src=oc.createBufferSource();src.buffer=buf;src.playbackRate.value=rate;
  var e=EQ[s.eq]||EQ.flat;
  function bq(t,f,g,q){var b=oc.createBiquadFilter();b.type=t;b.frequency.value=f;b.gain.value=g;if(q)b.Q.value=q;return b}
  var f1=bq("lowshelf",200,s.bass+e[0]),f2=bq("peaking",1200,e[1]+s.hm/10,0.9),f3=bq("peaking",3500,e[2]+s.hm/10,0.9);
- var g=oc.createGain();g.gain.value=Math.max(0,1+s.vol/100)*nrm;
- src.connect(f1);f1.connect(f2);f2.connect(f3);f3.connect(g);g.connect(oc.destination);
+ var hpf=bq("highpass",75,0,0.7),dess=bq("peaking",6200,-3,2.2),lpf=bq("lowpass",9800,0,0.7);
+ var cp=oc.createDynamicsCompressor();cp.threshold.value=-20;cp.knee.value=14;cp.ratio.value=2.5;cp.attack.value=0.006;cp.release.value=0.14;
+ var g=oc.createGain();g.gain.value=Math.max(0,1+s.vol/100)*nrm*1.3;
+ src.connect(hpf);hpf.connect(f1);f1.connect(f2);f2.connect(f3);f3.connect(dess);dess.connect(lpf);lpf.connect(cp);cp.connect(g);g.connect(oc.destination);
  if(s.echo>0){var d=oc.createDelay(1);d.delayTime.value=0.22;var fb=oc.createGain();fb.gain.value=Math.min(0.6,s.echo*0.5);var wet=oc.createGain();wet.gain.value=Math.min(0.7,s.echo*0.6);
   g.connect(d);d.connect(fb);fb.connect(d);d.connect(wet);wet.connect(oc.destination)}
  src.start(0);
@@ -3395,7 +3397,7 @@ async function renderSeg(text,s,targetSec){
  }
   
  try{
-  var FORCE=true,FMAX=2.5;
+  var FORCE=true,FMAX=2.0;
   try{if(localStorage.getItem("zsf_tts_force")==="0")FORCE=false;var fm=parseFloat(localStorage.getItem("zsf_tts_fmax"));if(fm>=1.5&&fm=4)FMAX=fm}catch(_){}
   var dd=r.data.length/24000;
   if(FORCE&&dd>targetSec){
@@ -3413,20 +3415,20 @@ async function renderSeg(text,s,targetSec){
  
 function zsfRand(seed){var x=(seed>>>0)||1;return function(){x^=x13;x>>>=0;x^=x>>>17;x^=x5;x>>>=0;return x/4294967296}}
 function zsfBreath(sr,dur,rnd){
-  
- var n=Math.max(1,Math.floor(dur*sr)),o=new Float32Array(n),b0=0,b1=0,b2=0,l1=0,l2=0,hp=0,prev=0,pk=0.0001;
+ /* V1.49: ខ្យល់ដកដង្ហើមស្រាលៗ — noise បង្កើតជា band 1–6kHz, ចាប់ផ្តើមទន់ រួចរសាត់ចុះ, normalize ជា RMS=1 */
+ var n=Math.max(1,Math.floor(dur*sr)),o=new Float32Array(n);
+ var f0=2600,Q=0.55,w0=2*Math.PI*f0/sr,al=Math.sin(w0)/(2*Q),cw=Math.cos(w0),a0=1+al;
+ var b0=al/a0,b2=-al/a0,a1=-2*cw/a0,a2=(1-al)/a0,x1=0,x2=0,y1=0,y2=0,lp=0,sq=0;
  for(var i=0;in;i++){
-  var w=rnd()*2-1;
-  b0=0.99765*b0+w*0.0990460;b1=0.96300*b1+w*0.2965164;b2=0.57000*b2+w*1.0526913;
-  var pink=b0+b1+b2+w*0.1848;
-  l1+=0.26*(pink-l1);l2+=0.30*(l1-l2);
-  hp=0.97*(hp+l2-prev);prev=l2;
-  var t=i/n,sn=Math.sin(Math.PI*Math.pow(t,0.75)),env=sn*sn;
-  var v=hp*env;o[i]=v;var a=v0?-v:v;if(a>pk)pk=a;
+  var w=rnd()*2-1,y=b0*w+b2*x2-a1*y1-a2*y2;x2=x1;x1=w;y2=y1;y1=y;
+  lp+=0.8*(y-lp);
+  var t=i/n,env=t0.3?Math.pow(Math.sin(Math.PI/2*t/0.3),2):Math.exp(-3.5*(t-0.3)/0.7);
+  if(t>0.92)env*=(1-t)/0.08;
+  var v=lp*env;o[i]=v;sq+=v*v;
  }
- for(var j=0;jn;j++)o[j]/=pk;return o;
+ var k=1/Math.sqrt(Math.max(1e-12,sq/n));for(var j=0;jn;j++)o[j]*=k;return o;
 }
-var BREATH=0.04;try{var bv=localStorage.getItem("zsf_breath");if(bv!==null&&bv!==""){var bn=parseFloat(bv);if(bn>=0&&bn=0.3)BREATH=bn}}catch(_){}
+var BREATH=0.045;try{var bv=localStorage.getItem("zsf_breath2");if(bv!==null&&bv!==""){var bn=parseFloat(bv);if(bn>=0&&bn=0.3)BREATH=bn}}catch(_){}
  
 function availFor(arr,i){
   
@@ -3470,11 +3472,11 @@ async function runAll(quiet){
    cursor=o0+d.length/sr+0.04;
    if(segsTmp)segsTmp.push([o0,o0+d.length/sr]);
     
-   try{if(BREATH>0&&d.length/sr>0.45){
+   try{if(BREATH>0&&d.length/sr>0.3){
     var endT=o0+d.length/sr,nxS=cues[i+1]?cues[i+1].start/1000:1e9,rnd=zsfRand(i*7919+13);
-    var bl=0.24+rnd()*0.14,room=nxS-endT-0.05;
-    if(room>=0.2){bl=Math.min(bl,room-0.02);
-     var bd=zsfBreath(sr,bl,rnd),bo=Math.floor((endT+0.03)*sr),ba=BREATH*(c.tag>=3?0.7:1)*(0.85+rnd()*0.3);
+    var bl=0.22+rnd()*0.12,room=nxS-endT-0.04;
+    if(room>=0.12){bl=Math.min(bl,room-0.02);
+     var vr=rms(d),bd=zsfBreath(sr,bl,rnd),bo=Math.floor((endT+0.02)*sr),ba=BREATH*vr*(c.tag>=3?0.7:1)*(0.85+rnd()*0.3);
      for(var bk=0;bkbd.length&&bo+bktotal;bk++)master[bo+bk]+=bd[bk]*ba}
    }}catch(_){}
   };
@@ -4443,7 +4445,7 @@ const selectOptions={geminiModel:[
 {value:"សាច់រឿងសម័យទំនើប",text:"🏙️ សម័យទំនើប (Modern Life)"},
 {value:"បរិបទផ្សេងទៀត តាម SRT",text:"🎬 កំណត់តាមបរិបទក្នុង SRT (Auto Context)"}
 ]};
-let selections={geminiModel:"gemini-3.5-flash-lite",languageFrom:"ស្វ័យប្រវត្តិ",genre:"AUTO"};
+let selections={geminiModel:"gemini-3.8-flash",languageFrom:"ស្វ័យប្រវត្តិ",genre:"AUTO"};
 let userApiKeys=Array.isArray(JSON.parse(localStorage.getItem("zero_user_api_keys")||"null"))?JSON.parse(localStorage.getItem("zero_user_api_keys")):Array(10).fill("");
 userApiKeys=Array.from({length:10},(_,i)=>String(userApiKeys[i]||""));
 let currentApiIndex=Math.max(0,parseInt(localStorage.getItem("zero_current_api_index")||"0",10)||0),currentLang=localStorage.getItem("zero_ui_lang")||"km",srtBlocks=[],currentChunk=0,CHUNK_SIZE=30,isTranslating=false,currentModalType="",saveTimer=null;
@@ -4648,7 +4650,7 @@ function renderApiInputs(){let c=$("apiInputsContainer");if(!c)return;c.innerHTM
 function toggleApiVisibility(i,b){let x=$("apiKey_"+i);if(!x)return;x.type=x.type==="password"?"text":"password";b.textContent=x.type==="password"?"👁️":"🙈"}
 function clearApiInput(i){if($("apiKey_"+i))$("apiKey_"+i).value="";userApiKeys[i]="";safeSet("zero_user_api_keys",JSON.stringify(userApiKeys))}
 function saveUserApiKeys(){userApiKeys=Array.from({length:10},(_,i)=>($("apiKey_"+i)?.value||"").trim()).filter((v,i,a)=>v&&a.indexOf(v)===i);while(userApiKeys.length10)userApiKeys.push("");safeSet("zero_user_api_keys",JSON.stringify(userApiKeys));currentApiIndex=0;safeSet("zero_current_api_index","0");showToast("✅ រក្សាទុក API Key ជោគជ័យ!",true);toggleApiBox()}
-async function requestGeminiOnce(prompt,key,model,jsonMode){if(!key)throw new Error("API Key ទទេ");let controller=new AbortController(),timer=setTimeout(()=>controller.abort(),(String(prompt||"").length>9000?130000:50000));try{let url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;let res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:Object.assign({temperature:0.15,topP:0.9},jsonMode?{responseMimeType:"application/json"}:{})}),signal:controller.signal});let raw=await res.text(),data;try{data=JSON.parse(raw)}catch(e){throw new Error("Server returned invalid JSON (HTTP "+res.status+")")};if(!res.ok||data.error){let er=new Error(data?.error?.message||("HTTP "+res.status));er.status=res.status;throw er};let parts=[];(data.candidates||[]).forEach(c=>(c.content?.parts||[]).forEach(p=>{if(typeof p.text==="string")parts.push(p.text)}));let text=parts.join("\n").trim();if(!text)throw new Error(data.candidates?.[0]?.finishReason?"Empty response: "+data.candidates[0].finishReason:"Empty response");return text}finally{clearTimeout(timer)}}
+async function requestGeminiOnce(prompt,key,model,jsonMode){if(!key)throw new Error("API Key ទទេ");let controller=new AbortController(),timer=setTimeout(()=>controller.abort(),(String(prompt||"").length>9000?130000:50000));try{let url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;let res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:Object.assign({temperature:(String(prompt||"").indexOf("professional Khmer subtitle translator")>=0?0.45:0.15),topP:(String(prompt||"").indexOf("professional Khmer subtitle translator")>=0?0.95:0.9)},jsonMode?{responseMimeType:"application/json"}:{})}),signal:controller.signal});let raw=await res.text(),data;try{data=JSON.parse(raw)}catch(e){throw new Error("Server returned invalid JSON (HTTP "+res.status+")")};if(!res.ok||data.error){let er=new Error(data?.error?.message||("HTTP "+res.status));er.status=res.status;throw er};let parts=[];(data.candidates||[]).forEach(c=>(c.content?.parts||[]).forEach(p=>{if(typeof p.text==="string")parts.push(p.text)}));let text=parts.join("\n").trim();if(!text)throw new Error(data.candidates?.[0]?.finishReason?"Empty response: "+data.candidates[0].finishReason:"Empty response");return text}finally{clearTimeout(timer)}}
 async function testUserApiKey(index,btn){let key=($("apiKey_"+index)?.value||"").trim();if(!key)return showToast("⚠️ សូមបញ្ចូល API Key ជាមុនសិន!",false);let old=btn.textContent;btn.textContent="⏳";try{await requestGemini("Reply with only: OK",key,selections.geminiModel);btn.textContent="✅ OK";try{const ks=Array.from({length:10},(_,i)=>($("apiKey_"+i)?.value||"").trim()).filter((v,i,a)=>v&&a.indexOf(v)===i);while(ks.length10)ks.push("");userApiKeys=ks;safeSet("zero_user_api_keys",JSON.stringify(ks))}catch(_){}showToast(`🎉 API Key #${index+1} ដំណើរការល្អ! (បានរក្សាទុកស្វ័យប្រវត្តិ)`,true)}catch(e){btn.textContent="❌ Fail";console.warn("Gemini key test failed:",e);showToast(`❌ API Key #${index+1}: ${friendlyError(e)} • ${String((e&&e.message)||e).slice(0,140)}`,false)}finally{setTimeout(()=>btn.textContent=old,2500)}}
 function friendlyError(e){let m=String(e?.message||e||"");if(/401|403|api key|authentication|credential/i.test(m))return"API Key មិនត្រឹមត្រូវ ឬគ្មានសិទ្ធិ";if(/429|quota|resource exhausted/i.test(m))return"API Key អស់ quota ឬត្រូវបានកំណត់ល្បឿន";if(/404|not found/i.test(m))return"Model មិនមានសម្រាប់ Key នេះ";if(/abort|timeout/i.test(m))return"ការតភ្ជាប់អស់ពេល";return m.slice(0,180)}
 
@@ -4904,16 +4906,18 @@ function zsfUserPrompt(genre){
 Atmosphere/Genre Context: ${genre}
 
 TRANSLATION RULES (strict):
-1. SPOKEN & NATURAL: use everyday spoken Khmer that people really say. Meaning and natural tone matter more than word-for-word. Make the dialogue punchy, smooth and dramatic.
+1. LIVELY, NATURAL & CLEAR: first understand what the speaker really MEANS (read the surrounding STORY CONTEXT lines, who talks to whom, sarcasm, threats, jokes), then say it the way a real Khmer actor would say it on screen. Use everyday spoken Khmer with natural Khmer sentence rhythm and particles (ណា, ហ្នឹង, ទេតើ, អីចឹង, ហើយ, ផង, សោះ ...) where they fit. Make it vivid, emotional and dramatic, never stiff or robotic.
+1b. NO WORD-BY-WORD CHINESE: Chinese idioms, set phrases, slang and internet words (成语/俗语/网络用语) must be translated by their MEANING into a natural Khmer expression a viewer instantly understands. Never copy the Chinese sentence structure, and never produce a Khmer sentence whose meaning is unclear when heard once. If you are unsure of a word, choose the simplest common Khmer word that keeps the meaning.
 2. STORY CARD IS LAW: use the character names, forms of address and special terms from the STORY CARD exactly and identically on every line. Never invent a different Khmer spelling for a name.
 3. PRONOUNS: choose Khmer pronouns from the character's status, age, power and relationship (ខ្ញុំ/ឯង, បង/អូន, កូន/ម៉ែ, លោកម្ចាស់ ...) and show the exact emotion (anger, pleading, teasing, respect, sarcasm).
-4. SHORT ENOUGH TO SPEAK: each Khmer line must be speakable within its subtitle time (about 6-8 Khmer syllables per second). If the source is long, condense ONLY by choosing shorter Khmer wording. NEVER delete a fact, name, number, negation (不/没/别/无), question or action.
+4. SHORT ENOUGH TO SPEAK: each Khmer line must be speakable within its subtitle time (about 6-8 Khmer syllables per second). If the source is long, shorten ONLY by choosing shorter Khmer wording. NEVER delete a fact, name, number, negation (不/没/别/无), question or action. A complete, clear meaning is more important than being short (the voice program can speed up a little).
 5. FRAGMENTS: if a source line is only part of a longer sentence (see the SENTENCE markers in STORY CONTEXT), translate only that fragment faithfully. Do not add words from the neighbouring line, do not repeat the previous line, and do not move words between lines.
 6. STRICT: never modify, suggest or return any change to timestamps or subtitle indices.
 7. TAGS: [1] = male speaking aloud, [2] = female speaking aloud, [3] = male inner thought, [4] = female inner thought. Keep every tag exactly as in the source (same order and same count; if one line has several tags the voice changes in the middle, so place each tag right before its own Khmer part). The tag is the AUTHORITY for the speaker's gender: a male speaker ([1]/[3]) uses ខ្ញុំ / ខ្ញុំបាទ and the reply «បាទ»; a female speaker ([2]/[4]) uses ខ្ញុំ / នាងខ្ញុំ and the reply «ចាស». Never mix them. Inner thought ([3]/[4]) is a private first-person monologue: address nobody and add no polite reply particles.
 8. NAMES: write all proper names (people, places, brands) in Khmer script. Only common Latin abbreviations from the source (VIP, AI, WiFi, OK) may stay.
 9. NO 'ៗ': NEVER use the Khmer repetition symbol 'ៗ' (the TTS program cannot read it). Spell the word out: write "ទេទេ" not "ទេៗ", "លឿនលឿន" not "លឿនៗ", "យឺតយឺត" not "យឺតៗ".
-10. Return only what the OUTPUT FORMAT asks: no notes and no explanations in brackets.`;
+10. Return only what the OUTPUT FORMAT asks: no notes and no explanations in brackets.
+11. GENRE IS MANDATORY: the "Atmosphere/Genre Context" and the genre guidance (ការណែនាំតាមប្រភេទ) in the STORY CARD decide vocabulary, register, rhythm and emotion on EVERY line (e.g. revenge/face-slap = cold, sharp, proud; ancient = old-fashioned respectful words by rank; romance = soft and tender; comedy = quick and funny; horror = short and tense; modern = casual everyday talk). Never use a register that does not fit the genre or the speaker's era.`;
 }
 function buildPrompt(items){
   const keep=$("keepTags")?.value==="true";
@@ -5432,7 +5436,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
   const timer=setTimeout(()=>controller.abort(),timeoutMs);
   try{
     const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:0.12,topP:0.9}}),signal:controller.signal});
+    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:(String(prompt||"").indexOf("professional Khmer subtitle translator")>=0?0.4:0.12),topP:0.92}}),signal:controller.signal});
     const raw=await res.text();
     let data=null; try{data=JSON.parse(raw)}catch(e){throw new Error("Gemini បានបញ្ជូនទិន្នន័យមិនត្រឹមត្រូវ (HTTP "+res.status+")")}
     if(!res.ok||data?.error){const er=new Error(data?.error?.message||("HTTP "+res.status));er.status=res.status;throw er}
@@ -6195,7 +6199,7 @@ const ZSF_GENRES=[
  ["modern","សាច់រឿងសម័យទំនើប","modern daily life","សម័យទំនើប៖ ភាសាសន្ទនាខ្មែរសម័យទំនើប ធម្មជាតិ រហ័ស ដូចមនុស្សនិយាយពិតៗ; កុំប្រើពាក្យបុរាណ ឬផ្លូវការហួសហេតុ។"]
 ];
 const ZSF_ERA_RULE="ក្បួនសម័យ៖ បើរឿងមានតួអង្គច្រើនសម័យ (បុរាណ និងទំនើប) ត្រូវប្រើភាសាតាមសម័យរបស់អ្នកនិយាយនីមួយៗ — តួបុរាណ (ឃើញពាក្យដូចជា 朕 陛下 臣 咱 草民 在下 ឬឋានៈចាស់ៗ) ប្រើពាក្យបុរាណ/រាជសព្ទតាមឋានៈ; តួទំនើបប្រើភាសាសន្ទនាធម្មតា។ ពាក្យហៅគ្នា និងពាក្យខ្លួនឯងរបស់តួអង្គម្នាក់ៗត្រូវថេរ មិនប្តូរពាក់កណ្តាលរឿង។";
-let zsfBible=null,zsfBibleSig="",zsfBibleTriedSig="";
+let zsfBible=null,zsfBibleSig="",zsfBibleTriedSig="",zsfBibleFails={};
 function zsfGenreByCode(c){return ZSF_GENRES.find(g=>g[0]===c)||null;}
 function zsfGenreByValue(v){return ZSF_GENRES.find(g=>g[1]===v)||null;}
 function zsfActiveGenres(){
@@ -6346,7 +6350,7 @@ async function zsfPrepareStoryBible(){
   if(!all.trim())return null;
   const sig=all.length+":"+all.slice(0,60)+":"+all.slice(-60);
   if(zsfBible&&zsfBibleSig===sig)return zsfBible;
-  if(zsfBibleTriedSig===sig)return null;
+  if(zsfBibleTriedSig===sig&&(zsfBibleFails[sig]||0)>=2)return null;
   zsfBibleTriedSig=sig;
   zsfBible=null;zsfBibleSig=sig;
   const keys=(Array.isArray(userApiKeys)?userApiKeys:[]).filter(Boolean);
@@ -6373,7 +6377,7 @@ SUBTITLE TEXT:
   let videoPart=null;
   try{ videoPart=await zsfGetVideoPart(keys[0]); }catch(e){ console.warn("story video upload failed → text only",e); }
   let lastErr=null;
-  for(let n=0;nMath.min(2,keys.length||1);n++){
+  for(let n=0;n2;n++){
     try{
       let raw=null;
       if(videoPart){
@@ -6386,7 +6390,7 @@ SUBTITLE TEXT:
       lastErr=new Error("empty bible");
     }catch(e){lastErr=e;console.warn("story bible failed",e);}
   }
-  zsfBibleSig=sig;
+  zsfBibleSig=sig;zsfBibleFails[sig]=(zsfBibleFails[sig]||0)+1;
   return null;
 }
 function zsfRenderBibleInfo(){
@@ -7496,18 +7500,18 @@ async function extractVideoAudioV32Prototype(file){
 let ZSF_CHUNK_SEC = 24;        
 const ZSF_PAD_SEC = 3;           
 const ZSF_SEARCH_SEC = 2.5;      
-const ZSF_MIN_CHARS_PER_SEC = 0.6; 
-const ZSF_MAX_CHARS_PER_SEC = 9;   
+const ZSF_MIN_CHARS_PER_SEC = 1.5; 
+const ZSF_MAX_CHARS_PER_SEC = 12;   
 const ZSF_HALLUC = /请不吝点赞|字幕志愿者|字幕由|Amara\.org|感谢观看|谢谢观看|以下是普通话对白/;
  
 const ZSF_HALLUC_ONLY = /^(?=.*(点赞|订阅|转发|打赏))(请|欢迎|记得|不吝|点赞|订阅|转发|打赏|关注|收藏|评论|支持|一键三连|明镜|点点|栏目)+$/;
 
 const ZSF_ZH_PROMPT = "以下是普通话对白，请使用简体中文和标点符号。";
 const ZSF_PUNCT_RE = /[\s\u3000，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g;
-const ZSF_GAP_MIN_SEC = 2.0;     
+const ZSF_GAP_MIN_SEC = 1.2;     
 const ZSF_GAP_PAD_SEC = 1.5;     
 const ZSF_GAP_MAX_WINDOW = 10;   
-const ZSF_GAP_MAX_COUNT = 90;    
+const ZSF_GAP_MAX_COUNT = 160;    
 
 function zsfGlossaryTerms(){
   const el=document.getElementById("zsfGlossary");
@@ -7723,7 +7727,7 @@ function zsfUncoveredSpeech(merged,prof){
   const F=prof.frameSec,R=prof.rms,N=R.length,sm=new Float32Array(N);
   for(let i=0;iN;i++){let s=0,c=0;for(let k=-2;k=2;k++){const j=i+k;if(j>=0&&jN){s+=R[j];c++;}}sm[i]=s/c;}
   const sorted=Array.from(sm).sort((a,b)=>a-b);
-  const thr=Math.max(sorted[Math.floor(N*0.25)]*2.5,300);
+  const thr=Math.max(sorted[Math.floor(N*0.25)]*2.2,220);
   const w=merged.words.filter(x=>Number.isFinite(x.start)&&Number.isFinite(x.end)).slice().sort((a,b)=>a.start-b.start);
   const cov=[]; for(const x of w){ const s0=x.start-0.25,e0=x.end+0.25; if(cov.length&&s0=cov[cov.length-1][1]) cov[cov.length-1][1]=Math.max(cov[cov.length-1][1],e0); else cov.push([s0,e0]); }
   const out=[]; let ci=0,runS=-1,lastHot=-1;
@@ -8055,8 +8059,8 @@ function zsfMergeOrphans(subs){
 
 function zsfTimeShiftSec(){
   const el=document.getElementById("zsfTimeShift");
-  let v=el?parseFloat(el.value):0.4;
-  if(!isFinite(v)) v=0.4;
+  let v=el?parseFloat(el.value):0;
+  if(!isFinite(v)) v=0;
   return Math.min(1.5,Math.max(0,v));
 }
 function zsfShiftTimeline(subs,sec){
@@ -8074,6 +8078,7 @@ function zsfShiftTimeline(subs,sec){
 }
 
 function zsfBorrowGaps(){
+  try{ if(localStorage.getItem("zsf_borrow_on")!=="1") return {n:0,addedMs:0}; }catch(_){ return {n:0,addedMs:0}; }
   const P=/(\d+):(\d+):(\d+)[,.](\d+)/;
   const toMs=(s)=>{const m=String(s||"").match(P); return m?((+m[1])*3600000+(+m[2])*60000+(+m[3])*1000+Number(String(m[4]).padEnd(3,"0").slice(0,3))):NaN;};
   const rng=(b)=>{const parts=String(b&&b.time||"").split("-->"); return parts.length2?null:[toMs(parts[0]),toMs(parts[1])];};
@@ -8097,7 +8102,7 @@ function zsfBorrowGaps(){
   return {n,addedMs};
 }
 
-const ZSF_KM_MAX_CPS = 20;   
+const ZSF_KM_MAX_CPS = 26;   
 function zsfSrtDurSec(time){
   const m=String(time||"").match(/(\d+):(\d+):(\d+)[,.](\d+)\s*-->\s*(\d+):(\d+):(\d+)[,.](\d+)/);
   if(!m) return 0;
@@ -9050,7 +9055,7 @@ async function transcribe(){
   }
   $("transcribeBtn").disabled=true;
   window.__zsfSuper=!($("zsfSuperSpeed")&&!$("zsfSuperSpeed").checked);    
-  ZSF_CHUNK_SEC=window.__zsfSuper?48:24;
+  ZSF_CHUNK_SEC=window.__zsfSuper?30:22;
   window.__zsfProofChanges=[];
   stopProgressTimers();
   const pipelineWallStart=performance.now();
@@ -9291,11 +9296,12 @@ async function transcribe(){
   g.addEventListener("input",()=>safeSet("zsf_glossary",g.value));
   [["zsfSuperSpeed"],["zsfGapFill"],["zsfProofread"],["zsfSnapTiming"],["zsfAiSeg"]].forEach(([id])=>{
     const c=$(id); if(!c) return;
-    const v=safeGet("zsf_opt_"+id); if(v==="0") c.checked=false; else if(v==="1") c.checked=true;
-    c.addEventListener("change",()=>safeSet("zsf_opt_"+id,c.checked?"1":"0"));
+    const sk="zsf_opt_"+(id==="zsfSnapTiming"?"zsfSnapTiming2":id);
+    const v=safeGet(sk); if(v==="0") c.checked=false; else if(v==="1") c.checked=true;
+    c.addEventListener("change",()=>safeSet(sk,c.checked?"1":"0"));
   });
   const ts=$("zsfTimeShift"); if(ts){
-    try{ const sv=safeGet("zsf_opt_zsfTimeShift"); if(sv!==null&&sv!==undefined&&sv!==""&&isFinite(parseFloat(sv))) ts.value=sv; }catch(_){}
+    try{ const sv=safeGet("zsf_opt_zsfTimeShift"); if(sv!==null&&sv!==undefined&&sv!==""&&sv!=="0.4"&&isFinite(parseFloat(sv))) ts.value=sv; }catch(_){}
     ts.addEventListener("change",()=>safeSet("zsf_opt_zsfTimeShift",String(ts.value)));
   }
 })();
@@ -11087,7 +11093,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.48";
+  var EMB="1.52";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
@@ -11128,8 +11134,63 @@ window.zsfVideoPoster=function(v){
     if(c&&typeof c.html==="string"&&c.html.length>100000&&c.html.indexOf("zsf-boot")>0&&c.html.indexOf("ZERO SUB FLASH")>0&&c.ver&&newer(c.ver,EMB)){
       if(t>=2){dropCached();setTries(0);} else {use=true;setTries(t+1);}
     }
-    if(use)run(c.html,c.ver,true); else run(embedded(),EMB,false);
+    if(use){run(c.html,c.ver,true);return}
+    if(firstDone()){run(embedded(),EMB,false);return}
+    /* V1.52: ដំឡើងថ្មី/បើកលើកដំបូង → ពិនិត្យ និងទាញកំណែថ្មីបំផុតដោយស្វ័យប្រវត្តិ (គ្មានប៊ូតុង) */
+    var fired=false;
+    function go(r){
+      if(fired)return;fired=true;
+      if(r){setTries(1);run(r.html,r.ver,true)}else run(embedded(),EMB,false);
+    }
+    setTimeout(function(){go(null)},120000);
+    firstRun().then(go,function(){go(null)});
   });
+  var FIRST_BASE="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/";
+  function firstDone(){try{return localStorage.getItem("zsf_first_upd")==="1"}catch(e){return false}}
+  function firstMark(){try{localStorage.setItem("zsf_first_upd","1")}catch(e){}}
+  function splash(msg,pct){
+    try{
+      var d=document.getElementById("zsfFirst");
+      if(!d){
+        d=document.createElement("div");d.id="zsfFirst";
+        d.style.cssText="position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#0f0a1a;color:#fff;font-family:sans-serif;text-align:center;padding:24px";
+        d.innerHTML='<div style="font-size:22px;font-weight:800;letter-spacing:2px">ZERO SUB FLASH</div><div id="zsfFirstMsg" style="font-size:15px;line-height:1.7;opacity:.92;white-space:pre-line"></div><div style="width:210px;height:6px;border-radius:6px;background:rgba(255,255,255,.14);overflow:hidden"><div id="zsfFirstBar" style="width:10%;height:100%;border-radius:6px;background:linear-gradient(90deg,#c084fc,#7e22ce);transition:width .5s"></div></div>';
+        (document.body||document.documentElement).appendChild(d);
+      }
+      var m=document.getElementById("zsfFirstMsg");if(m)m.textContent=msg;
+      var b=document.getElementById("zsfFirstBar");if(b&&pct)b.style.width=pct+"%";
+    }catch(e){}
+  }
+  function fetchT(url,ms){
+    return new Promise(function(res,rej){
+      var done=false,ctl=window.AbortController?new AbortController():null;
+      var tm=setTimeout(function(){if(done)return;done=true;try{ctl&&ctl.abort()}catch(e){}rej(new Error("timeout"))},ms);
+      fetch(url,{cache:"no-store",signal:ctl?ctl.signal:undefined}).then(function(r){
+        if(!r.ok){if(done)return;done=true;clearTimeout(tm);rej(new Error("HTTP "+r.status));return}
+        return r.text().then(function(t){if(done)return;done=true;clearTimeout(tm);res(t)});
+      }).catch(function(e){if(done)return;done=true;clearTimeout(tm);rej(e)});
+    });
+  }
+  function idbPutObj(o){return new Promise(function(res,rej){try{var r=indexedDB.open("zsf_pkg",1);r.onupgradeneeded=function(){r.result.createObjectStore("kv")};r.onerror=function(){rej(r.error)};r.onsuccess=function(){try{var t=r.result.transaction("kv","readwrite");t.objectStore("kv").put(o,"html");t.oncomplete=function(){res()};t.onerror=function(){rej(t.error)}}catch(e){rej(e)}}}catch(e){rej(e)}})}
+  async function firstRun(){
+    splash("កំពុងពិនិត្យកំណែថ្មី…",15);
+    try{
+      var v=String(await fetchT(FIRST_BASE+"version.txt?t="+Date.now(),9000)).trim();
+      if(!v||v.length>20)throw new Error("bad version");
+      if(!newer(v,EMB)){firstMark();return null}
+      splash("កំពុងទាញយកកំណែថ្មី v"+v+"\nសូមរង់ចាំបន្តិច…",45);
+      var w=await fetchT(FIRST_BASE+"index.html?t="+Date.now(),90000);
+      var key='var EMB'+'="',k=w.lastIndexOf(key),nv=k<0?"":w.slice(k+key.length,w.indexOf('"',k+key.length));
+      var s0=w.indexOf('id="zsfApp">'),s1=s0<0?-1:w.indexOf("<"+"/script>",s0);
+      if(s0<0||s1<0||!nv||!newer(nv,EMB))throw new Error("bad package");
+      var html=w.slice(s0+12,s1).split("").join("<");
+      if(html.length<100000||html.indexOf("ZERO SUB FLASH")<0||html.indexOf("zsf-boot")<0)throw new Error("bad html");
+      splash("កំពុងរៀបចំកំណែ v"+nv+"…",90);
+      await idbPutObj({ver:nv,html:html});
+      firstMark();
+      return {ver:nv,html:html};
+    }catch(e){return null}
+  }
 })();
 </script>
 </body>
