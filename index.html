@@ -5690,6 +5690,7 @@ async function verifyKey(){
     if(saved){ try{localStorage.removeItem("zero_last_key_draft");}catch(e){} }
     if(!saved){ alert("⚠️ មិនអាចរក្សាទុកកូនសោបានទេ។ សូមបើកឯកសារនេះក្នុង Chrome ជាផ្ទាំង Browser ធម្មតា។"); return; }
     try{zsfMarkKeyUsed(k,now,exp)}catch(_){}
+    if(zsfWipeAdminKeys()){try{showToast("🔒 បានលុប API Key ចាស់ចេញពីឧបករណ៍នេះ — សូមដាក់ Key ផ្ទាល់ខ្លួនរបស់អ្នក",true)}catch(_){}setTimeout(function(){location.reload()},900);return;}
     unlockApp(exp);
   }else alert("❌ កូនសោមិនត្រឹមត្រូវ (Invalid Key)!");
 }
@@ -5701,6 +5702,7 @@ function unlockApp(exp){
   const expiryEl=$("keyExpiryDateDisplay");
   document.body.classList.toggle("zsf-admin",exp==="ADMIN");
   if(exp==="ADMIN"){
+    try{localStorage.setItem("zsf_keys_owner","admin")}catch(_){}
     $("keyStatusDisplay").textContent="👑 ADMIN VIP";
     if(expiryEl) expiryEl.textContent="📅 ផុតកំណត់: គ្មានកំណត់";
     $("adminPanel").style.display="block";
@@ -5780,6 +5782,15 @@ function zsfCopyKey(btn){
     if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(k).then(done).catch(fallback); }
     else fallback();
   }catch(_){ fallback(); }
+}
+function zsfWipeAdminKeys(){
+  try{
+    if(localStorage.getItem("zsf_keys_owner")!=="admin")return false;
+    localStorage.removeItem("zero_user_api_keys");localStorage.removeItem("zero_current_api_index");
+    for(let i=0;i10;i++)localStorage.removeItem("zsf_p1_groq_"+i);
+    localStorage.removeItem("zsf_keys_owner");
+    return true;
+  }catch(_){return false}
 }
 function zsfKeyMeta(){try{return JSON.parse(localStorage.getItem("zero_key_meta")||"{}")||{}}catch(e){return {}}}
 function zsfMarkKeyUsed(k,at,exp){if(!k)return;const m=zsfKeyMeta();m[k]={at:Number(at)||Date.now(),exp:Number(exp)||0,seen:Date.now()};safeSet("zero_key_meta",JSON.stringify(m))}
@@ -10589,6 +10600,7 @@ function base(){return((($("zsfGemUrl")&&$("zsfGemUrl").value)||DEF_URL)).trim()
 function hdr(h){h=h||{};var a=(($("zsfGemAcc")&&$("zsfGemAcc").value)||"").trim();if(a)h["X-Access"]=a;return h}
 async function call(path,opt){
   var r,j;
+  if(!document.body.classList.contains("zsf-admin"))throw new Error("Worker សម្រាប់ Admin ប៉ុណ្ណោះ — អតិថិជនត្រូវប្រើ Gemini API Key ផ្ទាល់ខ្លួន");
   try{r=await fetch(base()+path,opt)}catch(e){throw new Error("ភ្ជាប់ Worker មិនបាន ឬចាំយូរពេក (Failed to fetch)")}
   try{j=await r.json()}catch(e){j={error:"HTTP "+r.status}}
   if(!r.ok||j.error)throw new Error((j.error||("HTTP "+r.status))+(j.detail?" — "+j.detail:""));
@@ -10687,6 +10699,7 @@ async function core(P,srt,tok){tok=tok||{c:false};
   var ks=[];try{ks=(Array.isArray(userApiKeys)?userApiKeys:[]).filter(Boolean)}catch(e){}
   if(!ks.length){try{var sv=JSON.parse(localStorage.getItem("zero_user_api_keys")||"null");if(Array.isArray(sv))ks=sv.filter(Boolean)}catch(e){}}
   var direct=ks.length>0&&typeof window.__zsfDirectAnalyze==="function";
+  if(!direct&&!document.body.classList.contains("zsf-admin"))throw new Error("ត្រូវការ Gemini API Key ផ្ទាល់ខ្លួន — សូមបង្កើត Key ខ្លួនឯងពី Google AI Studio");
   if(!direct&&!base())throw new Error("សូមដាក់ Worker URL មុន (ផ្នែក 03B)");
   ls("zsf_gem_url",base());ls("zsf_gem_acc",(($("zsfGemAcc")&&$("zsfGemAcc").value)||"").trim());
   var ctx={f:f,file:null,up:0,direct:direct,tok:tok};
@@ -10894,7 +10907,7 @@ window.zsfSendToTts=async function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.41";
+  var EMB="1.42";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
