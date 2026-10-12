@@ -10627,7 +10627,7 @@ body.zsf-admin #zkt_card .zkt-titlebar .zkt-toggle{order:3;flex:1 1 100%;width:1
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.14";
+  var EMB="1.15";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
@@ -10637,6 +10637,29 @@ body.zsf-admin #zkt_card .zkt-titlebar .zkt-toggle{order:3;flex:1 1 100%;width:1
   function run(html,ver,fromCache){
     window.__ZSF_VER=ver;
     document.open();document.write(html);document.close();
+    /* V1.15: document.open() លុប listener ទាញយករបស់ APK — ដាក់វាវិញ */
+    try{
+      if(window.ZSFApp){
+        if(window.__zsfDlH)document.removeEventListener("click",window.__zsfDlH,true);
+        window.__zsfDlH=function(e){
+          var a=e.target&&e.target.closest?e.target.closest("a[download]"):null;
+          if(!a)return;var h=a.href||"";if(h.indexOf("blob:")!==0)return;
+          e.preventDefault();e.stopPropagation();
+          var name=a.getAttribute("download")||"file";
+          fetch(h).then(function(r){return r.blob()}).then(async function(b){
+            if(!ZSFApp.begin(name,b.type||"application/octet-stream"))return;
+            var CH=3*1024*1024;
+            for(var o=0;o<b.size;o+=CH){
+              var u=new Uint8Array(await b.slice(o,o+CH).arrayBuffer()),t="";
+              for(var i=0;i<u.length;i+=32768)t+=String.fromCharCode.apply(null,u.subarray(i,i+32768));
+              ZSFApp.chunk(btoa(t));
+            }
+            ZSFApp.end();
+          }).catch(function(err){try{ZSFApp.abort(String(err))}catch(_){}});
+        };
+        document.addEventListener("click",window.__zsfDlH,true);
+      }
+    }catch(_){}
     setTimeout(function(){ if(document.getElementById("authScreen")||document.getElementById("mainApp")) setTries(0); },8000);
   }
   function embedded(){return document.getElementById("zsfApp").textContent.split("\uE000").join("<")}
