@@ -5,7 +5,7 @@
 <script id="zsf-boot">
 /* V1.06: ដកការប្តូរទំព័រ (document.write) ចេញ — វាធ្វើឱ្យ script មេខូច។ គ្រាន់តែសម្អាតកំណែដែលបានទុកពីមុន */
 (function(){
-  window.__ZSF_VER="1.09";
+  window.__ZSF_VER="1.10";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 </script>
@@ -5544,7 +5544,7 @@ function downloadBlobFile(blob,name){
   // Keep the Blob URL alive longer: Android Chrome may start handling the download asynchronously.
   setTimeout(()=>{try{URL.revokeObjectURL(url);}catch(e){}try{a.remove();}catch(e){}},60000);
   // Visible fallback if the browser ignores the download attribute.
-  setTimeout(()=>{if(document.visibilityState==="visible"&&a.isConnected){a.style.display="block";a.removeAttribute("download");a.textContent="បើការទាញយកមិនចាប់ផ្ដើម សូមចុចទីនេះដើម្បីបើកឯកសារ SRT";a.target="_blank";}},1800);
+  /* V1.10: fallback ត្រូវបានជំនួសដោយ zsfDlHelp() (ប្រអប់ជម្រើសនៅខាងក្រោមអេក្រង់) */
   return true;
 }
 /* V47: ទាញយក SRT ខ្មែរ → សួរថតម្តងតែមួយ ហើយចងចាំ រក្សាទុកចូលថតនោះស្វ័យប្រវត្តិ */
@@ -5588,8 +5588,10 @@ async function downloadSRT(){
   let name=($("filename")?.value||"khmer_subtitle.srt").replace(/[\\/:*?"<>|]/g,"_");if(!/\.srt$/i.test(name))name+=".srt";
   const blob=new Blob(["\uFEFF"+out],{type:"application/x-subrip;charset=utf-8"});
   let saved=null;
+  /* V1.10: លើទូរសព្ទ រំលង folder picker (ធ្វើឱ្យបាត់ការចុច ហើយ browser ទូរសព្ទភាគច្រើនមិនគាំទ្រ) → ទាញយកតាមធម្មតាភ្លាមៗ */
+  const zsfMobileDl=/Android|iPhone|iPad|iPod|Mobile|HarmonyOS/i.test(navigator.userAgent||"")||(navigator.maxTouchPoints>1&&!window.matchMedia("(pointer:fine)").matches);
   try{
-    saved=await zsfSaveToFolder(blob,name);
+    if(!zsfMobileDl) saved=await zsfSaveToFolder(blob,name);
   }catch(e){
     if(e&&e.name==="AbortError"){showToast("ℹ️ អ្នកបានបោះបង់ការជ្រើសថត",false);return;}
     console.warn("Folder save failed",e);
@@ -5602,6 +5604,39 @@ async function downloadSRT(){
   }
   try{downloadBlobFile(blob,name);}
   catch(e){console.error(e);alert("មិនអាចចាប់ផ្ដើមទាញយកបានទេ។ សូមសាកល្បងបើកក្នុង Chrome ហើយអនុញ្ញាត Downloads។");}
+  /* V1.10: បើការទាញយកមិនដំណើរការ (WebView/browser ខ្លះមិនគាំទ្រ) → បង្ហាញជម្រើសបម្រុង */
+  try{ zsfDlHelp(blob,name,out); }catch(e){ console.warn("dlHelp",e); }
+}
+function zsfDlHelp(blob,name,text){
+  const old=document.getElementById("zsfDlHelp"); if(old) old.remove();
+  const bar=document.createElement("div"); bar.id="zsfDlHelp";
+  bar.style.cssText="position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;background:#111827;border:1.5px solid #10b981;border-radius:16px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.6);color:#fff;font-size:13px;line-height:1.45;font-family:inherit";
+  const msg=document.createElement("div"); msg.style.cssText="font-weight:700;margin-bottom:8px"; msg.textContent="📥 មិនឃើញឯកសារក្នុង Downloads? ជ្រើសវិធីមួយខាងក្រោម៖";
+  bar.appendChild(msg);
+  const row=document.createElement("div"); row.style.cssText="display:flex;flex-wrap:wrap;gap:8px";
+  const mk=(label,fn)=>{ const b=document.createElement("button"); b.type="button"; b.textContent=label; b.style.cssText="flex:1 1 140px;padding:10px;border-radius:12px;border:1px solid #059669;background:#064e3b;color:#fff;font-weight:700;font-size:13px;font-family:inherit"; b.onclick=fn; row.appendChild(b); return b; };
+  mk("📤 ចែករំលែក / រក្សាទុក",async()=>{
+    try{
+      const f=new File([text],name,{type:"text/plain"});
+      if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],title:name}); }
+      else if(navigator.share){ await navigator.share({title:name,text:text}); }
+      else showToast("⚠️ browser នេះមិនគាំទ្រ Share — សូមប្រើប៊ូតុង «ចម្លង SRT»",false);
+    }catch(e){ if(!e||e.name!=="AbortError") showToast("⚠️ Share មិនបាន — សូមប្រើ «ចម្លង SRT»",false); }
+  });
+  mk("📋 ចម្លង SRT",async()=>{
+    let ok=false;
+    try{ await navigator.clipboard.writeText(text); ok=true; }catch(_){}
+    if(!ok){ try{ const ta=document.createElement("textarea"); ta.value=text; ta.style.cssText="position:fixed;opacity:0;top:0;left:0"; document.body.appendChild(ta); ta.focus(); ta.select(); ok=document.execCommand("copy"); ta.remove(); }catch(_){} }
+    showToast(ok?"✅ បានចម្លង SRT — បិទភ្ជាប់ក្នុងកម្មវិធីកំណត់ចំណាំ រួចរក្សាទុកជា .srt":"❌ ចម្លងមិនបាន",ok);
+  });
+  mk("🔗 បើកក្នុងផ្ទាំងថ្មី",()=>{
+    try{ const u=URL.createObjectURL(new Blob(["\uFEFF"+text],{type:"text/plain;charset=utf-8"})); const w=window.open(u,"_blank"); if(!w) location.href=u; }
+    catch(e){ showToast("❌ បើកមិនបាន",false); }
+  });
+  mk("✕ បិទ",()=>bar.remove()).style.cssText+=";flex:0 0 auto;background:#1f2937;border-color:#374151";
+  bar.appendChild(row);
+  document.body.appendChild(bar);
+  setTimeout(()=>{ try{bar.remove()}catch(_){} },45000);
 }
 function updateTagSwitch(){$("keepTags").value=$("keepTagsToggle").checked?"true":"false";saveData()}
 function saveData(){safeSet("vrs_selections",JSON.stringify(selections));safeSet("vrs_tags",$("keepTags")?.value||"true");safeSet("vrs_fnd",$("fileNameDisplay")?.textContent||"");safeSet("vrs_fn",$("filename")?.value||"khmer_subtitle.srt");safeSet("vrs_currentChunk",String(currentChunk));if(srtBlocks.length<2000)safeSet("vrs_srtBlocks",JSON.stringify(srtBlocks))}
@@ -10420,7 +10455,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    ពេលបើក App ហើយមានកំណែថ្មី → រំកិលអេក្រង់ទៅរកផ្ទាំងនេះស្វ័យប្រវត្តិ
    ពេលចេញកំណែថ្មី ត្រូវប្តូរលេខ ZSF_VER ឱ្យដូច version.txt */
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"1.09",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"1.10",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
