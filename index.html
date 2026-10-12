@@ -4044,13 +4044,15 @@ function pvChips(i){var lead=pvLead(pv[i].text)||pvDef();return [0,1,2,3].map(fu
 function pvGrow(t){if(!t)return;t.style.height="auto";var h=t.scrollHeight;if(h>0)t.style.height=(h+2)+"px"}
 function pvGrowAll(){var l=document.querySelectorAll("#zkt_cuelist .zkt-ct");for(var q=0;ql.length;q++)l[q].style.height="auto";for(var q2=0;q2l.length;q2++){var h=l[q2].scrollHeight;if(h>0)l[q2].style.height=(h+2)+"px"}}
 function pvSet(cues){pv=cues.map(function(c){return{start:c.start,end:c.end,text:c.text}});pvRender()}
+function pvTs(ms){ms=Math.max(0,Math.round(ms||0));var p=function(n,w){return String(n).padStart(w,"0")};return p(Math.floor(ms/3600000),2)+":"+p(Math.floor(ms%3600000/60000),2)+":"+p(Math.floor(ms%60000/1000),2)+","+p(ms%1000,3)}
 function pvRender(){
  var el=$("zkt_cuelist");if(!el)return;
  pvStop();
  if(!pv.length){el.innerHTML="";el.style.display="none";return}
  el.style.display="block";
  el.innerHTML=pv.map(function(c,i){
-  return 'div class="zkt-cue" data-i="'+i+'">div class="zkt-cue-h">b>'+(i+1)+' ('+((c.end-c.start)/1000).toFixed(2)+'s)/b>button type="button" class="zkt-cp" data-p="'+i+'">▶/button>/div>textarea class="zkt-ct" data-i="'+i+'" rows="2" spellcheck="false">'+esc(c.text)+'/textarea>div class="zkt-cr">span>តួនិយាយ ៖/span>div class="zkt-cchips" data-i="'+i+'">'+pvChips(i)+'/div>/div>/div>';
+  var tsS=pvTs(c.start),tsE=pvTs(c.end);
+  return 'div class="zkt-cue" data-i="'+i+'">div class="zkt-cue-h">b>#'+(i+1)+'/b>span class="zkt-pvt" title="'+((c.end-c.start)/1000).toFixed(2)+'s">'+tsS+' --> '+tsE+'/span>/div>textarea class="zkt-ct" data-i="'+i+'" rows="2" spellcheck="false">'+esc(c.text)+'/textarea>div class="zkt-cr">button type="button" class="zkt-cp" data-p="'+i+'">▶/button>span>តួនិយាយ ៖/span>div class="zkt-cchips" data-i="'+i+'">'+pvChips(i)+'/div>/div>/div>';
  }).join("");
  setTimeout(pvGrowAll,0);
 }
@@ -10639,6 +10641,24 @@ body.zsf-admin #zkt_card .zkt-titlebar .zkt-toggle{order:3;flex:1 1 100%;width:1
 #zkt_card .zkt-tg-c{display:inline-block;font-size:22px;line-height:1;transition:transform .2s}
 #zkt_card .zkt-toggle[aria-expanded="true"] .zkt-tg-c{transform:rotate(90deg)}
 /style>
+
+style id="zsf-v116-cue">
+html body #zkt_card #zkt_cuelist .zkt-cue,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cue{display:flex!important;flex-direction:column!important;gap:10px!important;background:color-mix(in srgb,var(--card-bg,#181127) 80%,#000 20%)!important;border:1px solid rgba(255,255,255,.07)!important;border-left:4px solid #d97706!important;border-radius:18px!important;padding:14px 14px 12px!important;margin:0 0 14px!important}
+html body #zkt_card #zkt_cuelist .zkt-cue:last-child,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cue:last-child{border-bottom:1px solid rgba(255,255,255,.07)!important;margin-bottom:4px!important}
+html body #zkt_card #zkt_cuelist,html body #project1MediaToSrt #zkt_card #zkt_cuelist{background:transparent!important;border:0!important;padding:0 2px!important;border-radius:0!important}
+html body #zkt_card #zkt_cuelist .zkt-cue-h,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cue-h{display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;margin:0!important}
+html body #zkt_card #zkt_cuelist .zkt-cue-h b,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cue-h b{background:rgba(139,92,246,.18)!important;color:#a78bfa!important;padding:5px 14px!important;border-radius:12px!important;font-size:15px!important;font-weight:900!important}
+html body #zkt_card #zkt_cuelist .zkt-pvt,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-pvt{flex:1 1 auto!important;text-align:center!important;background:rgba(120,53,15,.28)!important;color:#f1e4d6!important;font-family:ui-monospace,Menlo,Consolas,monospace!important;font-size:12.5px!important;font-weight:700!important;padding:8px 10px!important;border-radius:12px!important;white-space:nowrap!important}
+html body #zkt_card #zkt_cuelist .zkt-ct,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-ct{background:#0a0612!important;border:1.5px solid #4c2a85!important;border-radius:16px!important;color:#f3f4f6!important;font-size:16px!important;line-height:1.6!important;padding:12px 14px!important;min-height:64px!important;box-shadow:inset 0 2px 6px rgba(0,0,0,.55)!important;outline:none!important}
+html body #zkt_card #zkt_cuelist .zkt-ct:focus,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-ct:focus{border-color:#8b5cf6!important;box-shadow:inset 0 2px 6px rgba(0,0,0,.55),0 0 10px rgba(139,92,246,.25)!important}
+html body #zkt_card #zkt_cuelist .zkt-cr,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cr{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:8px!important;margin:0!important}
+html body #zkt_card #zkt_cuelist .zkt-cr>span,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cr>span{font-size:13px!important;color:#a4b2cc!important;font-weight:800!important}
+html body #zkt_card #zkt_cuelist .zkt-cp,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cp{width:52px!important;height:38px!important;border-radius:12px!important;flex:none!important}
+html body #zkt_card #zkt_cuelist .zkt-cchips,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cchips{display:flex!important;flex-wrap:wrap!important;overflow:visible!important;gap:6px!important;flex:1 1 100%!important}
+html body #zkt_card #zkt_cuelist .zkt-cc,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cc{padding:6px 12px!important;font-size:14px!important;border-radius:12px!important;border:1px solid #3b2d63!important}
+html body #zkt_card #zkt_cuelist .zkt-cc.on,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cc.on{border:2px solid #3b82f6!important;padding:5px 11px!important}
+html body #zkt_card #zkt_cuelist .zkt-cue.zkt-warn,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cue.zkt-warn{border-left-color:#fbbf24!important}
+/style>
 /body>
 /html>
 </script>
@@ -10648,7 +10668,7 @@ body.zsf-admin #zkt_card .zkt-titlebar .zkt-toggle{order:3;flex:1 1 100%;width:1
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.16";
+  var EMB="1.17";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
