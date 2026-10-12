@@ -10369,11 +10369,46 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     var prompt=DIRECT_PROMPT+(gl?("\n\nGLOSSARY (Chinese names/terms - always use one consistent Khmer rendering):\n"+String(gl).slice(0,3000)):"")+"\n\n=== ORIGINAL SRT ===\n"+srt;
     var model=(typeof selections!=="undefined"&&selections&&selections.geminiModel)||"gemini-flash-latest";
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0)+(rr||0),txt=null,last=null;
-    for(var n=0;ks.length>n;n++){
-      try{txt=await directGen([{inline_data:{mime_type:"audio/wav",data:wav}},{text:prompt}],ks[(start+n)%ks.length],model);break;}
-      catch(e){last=e;if(!(e&&e.status))break;}
+    /* V1.30: បើ Model/Key អស់ quota (429) → សាក Key បន្ទាប់ → Model បម្រុង → រង់ចាំ quota ឡើងវិញ (មិនបោះបង់ភ្លាមៗ) */
+    var MODELS=[model,"gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-2.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
+    var gparts=[{inline_data:{mime_type:"audio/wav",data:wav}},{text:prompt}];
+    var DEAD=window.__zsfDeadModels=window.__zsfDeadModels||{},COOL=window.__zsfCoolModels=window.__zsfCoolModels||{};
+    var lastQuota=false,usedFb="";
+    for(var round=0;3>round&&txt===null;round++){
+      for(var mi=0;MODELS.length>mi&&txt===null;mi++){
+        var md=MODELS[mi],hard=0;
+        if(DEAD[md]&&DEAD[md]>Date.now())continue;
+        if(COOL[md]&&COOL[md]>Date.now())continue;
+        for(var n=0;ks.length>n;n++){
+          try{txt=await directGen(gparts,ks[(start+n)%ks.length],md);if(md!==model)usedFb=md;break;}
+          catch(e){
+            last=e;var sc=e&&e.status,msg=String((e&&e.message)||"");
+            lastQuota=(sc===429)||/quota|exceeded your current|resource.?exhausted|rate.?limit/i.test(msg);
+            if(lastQuota){
+              var dm=msg.match(/retry in ([0-9.]+)\s*s/i),dl=dm?Math.ceil(parseFloat(dm[1]))+1:20;
+              if(/limit:\s*0\b/i.test(msg)||dl>70){hard++;continue;}   /* Model នេះគ្មាន quota សម្រាប់ Key នេះ */
+              COOL[md]=Math.max(COOL[md]||0,Date.now()+dl*1000);continue; /* សាក Key បន្ទាប់ */
+            }
+            if(sc===404||/not found|is not supported|no longer available|does not exist|unknown model/i.test(msg)){DEAD[md]=Date.now()+3600000;break;}
+            if(sc===500||sc===502||sc===503||sc===504)continue;
+            if(!sc)break;
+          }
+        }
+        if(txt===null&&hard>0&&hard===ks.length)DEAD[md]=Date.now()+600000;
+      }
+      if(txt!==null)break;
+      var wake=0;
+      MODELS.forEach(function(m){if(DEAD[m]&&DEAD[m]>Date.now())return;var c=COOL[m]||0;if(c>Date.now()&&(!wake||wake>c))wake=c;});
+      if(!wake)break;
+      var ws=Math.min(65000,Math.max(1000,wake-Date.now()));
+      toastS("⏳ Gemini quota ពេញបណ្តោះអាសន្ន — រង់ចាំ "+Math.ceil(ws/1000)+" វិនាទី ហើយសាកម្តងទៀតស្វ័យប្រវត្តិ",true);
+      await new Promise(function(r){setTimeout(r,ws+500)});
     }
-    if(txt===null)throw last||new Error("Gemini មិនបានឆ្លើយ");
+    if(txt===null){
+      if(lastQuota){var qe=new Error("Gemini អស់ quota (Key និង Model បម្រុងទាំងអស់) — សូមរង់ចាំ ១ នាទី ឬថែម API Key ថ្មី ហើយចុចម្តងទៀត");qe.zsfQuota=true;throw qe;}
+      throw last||new Error("Gemini មិនបានឆ្លើយ");
+    }
+    if(usedFb)toastS("ℹ️ Model "+model+" អស់ quota — បានប្រើ "+usedFb+" ជំនួស",true);
     var fm=txt.match(/```(?:srt)?\s*([\s\S]*?)```/);if(fm)txt=fm[1];
     txt=txt.trim().replace(/\r\n?/g,"\n");
     var out=[],seen={};
@@ -10842,6 +10877,8 @@ async function analyzePart(ctx,lines,gl,P,tag,lo,hi,depth){
       }
     }finally{clearInterval(tmr)}
     if(re)continue;
+    /* V1.30: កំហុស quota → កុំកាត់ផ្នែកជា ២ (នឹងធ្វើឲ្យ request កាន់តែច្រើន) ហើយកុំសាកម្តងទៀតភ្លាមៗ */
+    if(err&&(err.zsfQuota||/quota|exceeded your current|resource.?exhausted/i.test(String(err.message||err))))throw err;
     if(canSplit)break;
     await sleep(3000*(at+1));
   }
@@ -11011,7 +11048,7 @@ setTimeout(installHook,2000);
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.29";
+  var EMB="1.30";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
