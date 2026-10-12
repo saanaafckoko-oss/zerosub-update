@@ -10423,24 +10423,30 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     prog("🎭 កំពុងរៀបចំសំឡេង សម្រាប់ចាប់ប្រុស/ស្រី...",1);
     var A=await getAudio(f),bps=A.info.fmt.sr*(A.info.fmt.ba||2);
     var V=null;try{V=await openVideo(f);}catch(_){V=null;}
-    var maxLines=V?30:60;
-    var maxSec=Math.max(30,Math.min(150,Math.floor(11*1024*1024/bps))),PAD=3,groups=[],cur=[];
+    var maxLines=V?16:24;
+    var maxSec=Math.max(20,Math.min(60,Math.floor(11*1024*1024/bps))),PAD=3,groups=[],cur=[];
     srtBlocks.forEach(function(b,i){var t=times(b);
       if(cur.length){var span=(t.e-times(srtBlocks[cur[0]]).s)/1000;if(span>maxSec-2*PAD||cur.length>=maxLines){groups.push(cur);cur=[];}}
       cur.push(i);});
     if(cur.length)groups.push(cur);
     var ctx="",done=0,failed=0,profile=[],lowIds=[],idxById={};
     srtBlocks.forEach(function(b,i){idxById[String(b.id)]=i;});
-    for(var g=0;ggroups.length;g++){
-      var idxs=groups[g],t0s=times(srtBlocks[idxs[0]]).s,t1e=times(srtBlocks[idxs[idxs.length-1]]).e;
-      var clipMs=Math.max(0,t0s-PAD*1000);
-      prog("🎭 AI កំពុងស្តាប់សំឡេង ប្រុស/ស្រី • ក្រុម "+(g+1)+"/"+groups.length,2+8*g/groups.length);
-      var wav=b64(sliceWav(A.ab,A.info,Math.max(0,clipMs/1000-A.offset),(t1e/1000+PAD)-A.offset));
-      var lines=idxs.map(function(i){var b=srtBlocks[i],t=times(b),m=TAG_RE.exec(b.text||""),o={id:String(b.id),t:fmtT(t.s-clipMs)+" --> "+fmtT(t.e-clipMs),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,"")};return o;});
-      try{
+var prep=function(g){return (async function(){try{
+        var idxs=groups[g],t0s=times(srtBlocks[idxs[0]]).s,t1e=times(srtBlocks[idxs[idxs.length-1]]).e,clipMs=Math.max(0,t0s-PAD*1000);
+        var wav=b64(sliceWav(A.ab,A.info,Math.max(0,clipMs/1000-A.offset),(t1e/1000+PAD)-A.offset));
+        var lines=idxs.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-clipMs)+" --> "+fmtT(t.e-clipMs),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,"")};});
         var fr=[];
-        if(V){prog("🎭 កំពុងចាប់ Frame មាត់ពីវីដេអូ • ក្រុម "+(g+1)+"/"+groups.length,2+8*g/groups.length);try{fr=await grabFramesFor(V,idxs,clipMs);}catch(_){fr=[];}if(!fr.length){V=null;closeVideo();}}
-        var rs=await classifyChunk(lines,ctx,wav,fr),map=rs.map;profile=mergeProf(profile,rs.voices);Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});
+        if(V){try{fr=await grabFramesFor(V,idxs,clipMs);}catch(_){fr=[];}if(!fr.length){V=null;closeVideo();}}
+        return {idxs:idxs,wav:wav,lines:lines,fr:fr};
+      }catch(e){console.warn("prep failed",e);return null;}})();};
+    var prepP=groups.length?prep(0):null;
+    for(var g=0;ggroups.length;g++){
+      var idxs=groups[g],P0=await prepP;
+      prepP=(g+1groups.length)?prep(g+1):null;
+      prog("🎭 AI កំពុងស្តាប់សំឡេង ប្រុស/ស្រី • ក្រុម "+(g+1)+"/"+groups.length,2+8*g/groups.length);
+      try{
+        if(!P0)throw new Error("prep");
+        var rs=await classifyChunk(P0.lines,ctx,P0.wav,P0.fr),map=rs.map;profile=mergeProf(profile,rs.voices);Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});
         idxs.forEach(function(i){var b=srtBlocks[i],tg=map[String(b.id)];if(tg){b.text=applyTag(b.text,tg);done++;}else failed++;});
       }catch(e){console.warn("tag chunk failed",e);failed+=idxs.length;}
       var tail=idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");ctx=profText(profile)+(tail?((profile.length?". ":"")+"Tags of the last lines before this clip (id=tag): "+tail):"");
@@ -11189,7 +11195,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.60";
+  var EMB="1.61";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
