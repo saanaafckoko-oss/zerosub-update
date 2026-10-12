@@ -6311,6 +6311,7 @@ let mediaFile = null, subtitles = [], activeIndex = -1, keyIndex = 0;
 let mediaDuration = 0;
 let mediaObjectUrl = "";
 try{Object.defineProperty(window,"__zsfMedia",{configurable:true,get:function(){return {file:mediaFile,url:mediaObjectUrl}}});}catch(_){}
+try{window.__zsfGetSrt=function(){try{return (subtitles&&subtitles.length)?buildSrt():""}catch(e){return ""}};}catch(_){}
 let progressTimer = null;
 let apiProgressTimer = null;
 
@@ -10306,7 +10307,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
   window.__zsfApplyTag=applyTag;
   window.zsfAutoClassifyTags=async function(){
     if(!Array.isArray(srtBlocks)||!srtBlocks.length)return;
-    var f=(typeof mediaFile!=="undefined")?mediaFile:null;
+    var f=(window.__zsfMedia&&window.__zsfMedia.file)||null;
     if(!f){toastS("ℹ️ គ្មានវីដេអូ/សំឡេង — AI នឹងកំណត់ [1]-[4] ពីអត្ថបទ និងបរិបទ (មិនច្បាស់ស្មើការស្តាប់សំឡេង)",true);return;}
     var key=(f.name||"")+"|"+f.size+"|"+srtBlocks.length;
     if(key===lastKey)return; /* ធ្វើរួចហើយសម្រាប់ Media + SRT នេះ */
@@ -10694,8 +10695,8 @@ async function callRetry(path,mk,tries){
 }
 async function run(){
   if(busy)return;
-  var f=null;try{f=mediaFile}catch(e){}
-  var srt="";try{if(subtitles&&subtitles.length)srt=buildSrt()}catch(e){}
+  var f=null;try{f=(window.__zsfMedia&&window.__zsfMedia.file)||null}catch(e){}
+  var srt="";try{if(window.__zsfGetSrt)srt=window.__zsfGetSrt()||""}catch(e){}
   if(!f){st("⚠️ សូមបញ្ចូល Video នៅផ្នែក 01 មុន",0);return}
   if(!srt){st("⚠️ មិនទាន់មាន SRT ចិន — សូមបង្កើត SRT ពីសំឡេងមុន",0);return}
   if(!base()){st("⚠️ សូមដាក់ Worker URL មុន",0);return}
@@ -10738,6 +10739,8 @@ function init(){
   var u=$("zsfGemUrl"),a=$("zsfGemAcc");
   if(u)u.value=ls("zsf_gem_url");if(a)a.value=ls("zsf_gem_acc");
   b.addEventListener("click",run);
+  if(u)u.addEventListener("input",function(){ls("zsf_gem_url",base())});
+  if(a)a.addEventListener("input",function(){ls("zsf_gem_acc",(a.value||"").trim())});
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 setTimeout(init,1500);
@@ -10752,7 +10755,7 @@ setTimeout(init,1500);
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.18";
+  var EMB="1.19";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
