@@ -14,7 +14,7 @@
 script id="zsf-boot">
 /* V1.13: កំណែត្រូវបានកំណត់ដោយ wrapper (index.html) មុនពេល App រត់ */
 (function(){
-  window.__ZSF_VER=window.__ZSF_VER||"1.13";
+  window.__ZSF_VER=window.__ZSF_VER||"1.14";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 /script>
@@ -4196,6 +4196,7 @@ async function exportAll(){
   try{setTimeout(function(){try{a.click()}catch(_){}},300)}catch(_){}
   try{window.__zsfLastVidName=a.download}catch(_){}
   try{zsfShareBtn(r.blob,a.download)}catch(_){}
+   try{setTimeout(function(){try{if(window.zsfDlHelp&&/Android|iPhone|iPad|iPod|Mobile|HarmonyOS/i.test(navigator.userAgent||""))window.zsfDlHelp(r.blob,a.download,null,window.zsfIsWebView?window.zsfIsWebView():false)}catch(_){}},2500)}catch(_){}
   try{setTimeout(function(){try{if(typeof showToast==="function")showToast("⬇️ ពិនិត្យថត Download — បើគ្មានវីដេអូ សូមចុចប៊ូតុង «ទាញយកវីដេអូ» ឬ «📤 រក្សាទុក/ចែករំលែក»",true)}catch(_){}},4000)}catch(_){}
   try{window.__zsfLastVidUrl=u;if(window.zsfAfterVideoExport)window.zsfAfterVideoExport(u)}catch(_){}
   var fin="✅ នាំចេញវីដេអូរួចរាល់ • "+(Math.round(r.blob.size/1048576*10)/10)+" MB • "+ext.toUpperCase()+(r.fast?" • ⚡ ផ្លូវលឿន (វីដេអូដើម គុណភាពដដែល)":"")+(mute?" • សំឡេងដើមបិទ":" • សំឡេងដើម "+ov+"%")+(r.incomplete?" • ⚠️ វីដេអូអាចខ្លីជាងដើម (កុំចាកចេញពីទំព័រពេលនាំចេញ)":"");
@@ -5614,12 +5615,12 @@ async function downloadSRT(){
   try{downloadBlobFile(blob,name);}
   catch(e){console.error(e);alert("មិនអាចចាប់ផ្ដើមទាញយកបានទេ។ សូមសាកល្បងបើកក្នុង Chrome ហើយអនុញ្ញាត Downloads។");}
   /* V1.10: បើការទាញយកមិនដំណើរការ (WebView/browser ខ្លះមិនគាំទ្រ) → បង្ហាញជម្រើសបម្រុង */
-  try{ if(zsfIsWebView()) zsfDlHelp(blob,name,out,true); }catch(e){ console.warn("dlHelp",e); }
+  try{ const zsfWv=zsfIsWebView(); if(zsfWv||zsfMobileDl) zsfDlHelp(blob,name,out,zsfWv); }catch(e){ console.warn("dlHelp",e); }
 }
 /* V1.13: WebView (App ក្នុង Telegram/Facebook/Claude viewer…) មិនអនុញ្ញាតទាញយកឯកសារ — រកឃើញហើយប្រាប់ត្រង់ៗ */
 function zsfIsWebView(){
   const ua=navigator.userAgent||"";
-  return /;\s*wv\)/.test(ua)||(/iPhone|iPad|iPod/.test(ua)&&!/Safari/.test(ua))||/FBAN|FBAV|Instagram|MicroMessenger|Line\//.test(ua);
+  return /;\s*wv\)/.test(ua)||(/iPhone|iPad|iPod/.test(ua)&&!/Safari/.test(ua))||/FBAN|FBAV|Instagram|MicroMessenger|Line\/|Telegram|TikTok|musical_ly|Snapchat|KAKAOTALK|Zalo|GSA\//.test(ua);
 }
 function zsfDlHelp(blob,name,text,webview){
   const old=document.getElementById("zsfDlHelp"); if(old) old.remove();
@@ -5629,29 +5630,31 @@ function zsfDlHelp(blob,name,text,webview){
   bar.appendChild(msg);
   const row=document.createElement("div"); row.style.cssText="display:flex;flex-wrap:wrap;gap:8px";
   const mk=(label,fn)=>{ const b=document.createElement("button"); b.type="button"; b.textContent=label; b.style.cssText="flex:1 1 140px;padding:10px;border-radius:12px;border:1px solid #059669;background:#064e3b;color:#fff;font-weight:700;font-size:13px;font-family:inherit"; b.onclick=fn; row.appendChild(b); return b; };
+  mk("⬇️ ទាញយកម្តងទៀត",()=>{ try{ const u2=URL.createObjectURL(blob); const a2=document.createElement("a"); a2.href=u2; a2.download=name; a2.rel="noopener"; a2.style.display="none"; document.body.appendChild(a2); a2.click(); setTimeout(()=>{try{URL.revokeObjectURL(u2);a2.remove()}catch(_){}},120000); showToast("⬇️ កំពុងទាញយក — ពិនិត្យ Downloads ឬប្រើ «ចែករំលែក / រក្សាទុក»",true); }catch(e){ showToast("❌ ទាញយកមិនបាន — សូមប្រើ «ចែករំលែក / រក្សាទុក»",false); } });
   mk("📤 ចែករំលែក / រក្សាទុក",async()=>{
     try{
-      const f=new File([text],name,{type:"text/plain"});
+      const ft=/\.mp4$/i.test(name)?"video/mp4":/\.webm$/i.test(name)?"video/webm":/\.wav$/i.test(name)?"audio/wav":"text/plain"; const f=new File([blob],name,{type:ft});
       if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],title:name}); }
-      else if(navigator.share){ await navigator.share({title:name,text:text}); }
+      else if(navigator.share&&text){ await navigator.share({title:name,text:text}); }
       else showToast("⚠️ browser នេះមិនគាំទ្រ Share — សូមប្រើប៊ូតុង «ចម្លង SRT»",false);
     }catch(e){ if(!e||e.name!=="AbortError") showToast("⚠️ Share មិនបាន — សូមប្រើ «ចម្លង SRT»",false); }
   });
-  mk("📋 ចម្លង SRT",async()=>{
+  if(text) mk("📋 ចម្លង SRT",async()=>{
     let ok=false;
     try{ await navigator.clipboard.writeText(text); ok=true; }catch(_){}
     if(!ok){ try{ const ta=document.createElement("textarea"); ta.value=text; ta.style.cssText="position:fixed;opacity:0;top:0;left:0"; document.body.appendChild(ta); ta.focus(); ta.select(); ok=document.execCommand("copy"); ta.remove(); }catch(_){} }
     showToast(ok?"✅ បានចម្លង SRT — បិទភ្ជាប់ក្នុងកម្មវិធីកំណត់ចំណាំ រួចរក្សាទុកជា .srt":"❌ ចម្លងមិនបាន",ok);
   });
   mk("🔗 បើកក្នុងផ្ទាំងថ្មី",()=>{
-    try{ const u=URL.createObjectURL(new Blob(["\uFEFF"+text],{type:"text/plain;charset=utf-8"})); const w=window.open(u,"_blank"); if(!w) location.href=u; }
+    try{ const u=URL.createObjectURL((text?new Blob(["\uFEFF"+text],{type:"text/plain;charset=utf-8"}):blob)); const w=window.open(u,"_blank"); if(!w) location.href=u; }
     catch(e){ showToast("❌ បើកមិនបាន",false); }
   });
   mk("✕ បិទ",()=>bar.remove()).style.cssText+=";flex:0 0 auto;background:#1f2937;border-color:#374151";
   bar.appendChild(row);
   document.body.appendChild(bar);
-  setTimeout(()=>{ try{bar.remove()}catch(_){} },45000);
+  setTimeout(()=>{ try{bar.remove()}catch(_){} },60000);
 }
+window.zsfDlHelp=zsfDlHelp; window.zsfIsWebView=zsfIsWebView;
 function updateTagSwitch(){$("keepTags").value=$("keepTagsToggle").checked?"true":"false";saveData()}
 function saveData(){safeSet("vrs_selections",JSON.stringify(selections));safeSet("vrs_tags",$("keepTags")?.value||"true");safeSet("vrs_fnd",$("fileNameDisplay")?.textContent||"");safeSet("vrs_fn",$("filename")?.value||"khmer_subtitle.srt");safeSet("vrs_currentChunk",String(currentChunk));if(srtBlocks.length2000)safeSet("vrs_srtBlocks",JSON.stringify(srtBlocks))}
 function loadSavedData(){try{ if(localStorage.getItem("zsf_pending_clear")==="1"){ localStorage.removeItem("zsf_pending_clear"); localStorage.setItem("vrs_srtBlocks","[]"); localStorage.setItem("vrs_currentChunk","0"); } }catch(_){}
@@ -10624,7 +10627,7 @@ body.zsf-admin #zkt_card .zkt-titlebar .zkt-toggle{order:3;flex:1 1 100%;width:1
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.13";
+  var EMB="1.14";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
