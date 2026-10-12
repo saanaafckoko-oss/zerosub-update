@@ -10763,6 +10763,7 @@ function installHook(){
     var P=function(m,p){try{toggleProgressBar(true,m,p)}catch(e){}try{st(m,p)}catch(e){}};
     busy=true;try{isTranslating=true}catch(e){}
     window.__zsfGemErr="";
+    var fell=false,self=this,args=arguments;
     try{
       var res=await core(P,bs.srt);
       var out=parseSRT(res.srt),by={};
@@ -10799,15 +10800,15 @@ function installHook(){
       setTimeout(function(){try{toggleProgressBar(false)}catch(e){}},1800);
       if(!remain){try{zsfScrollToDownload()}catch(e){}}
     }catch(e){
-      var m="❌ Gemini៖ "+((e&&e.message)||e);
+      var m="⚠️ Gemini Worker មិនបាន ("+String((e&&e.message)||e).slice(0,90)+") — ប្រើវិធីបកប្រែចាស់ជំនួស";
       window.__zsfGemErr=String((e&&e.message)||e);
       try{showToast(m,false)}catch(x){}
-      try{toggleProgressBar(true,m,0)}catch(x){}
       st(m,0);
-      setTimeout(function(){try{toggleProgressBar(false)}catch(x){}},5000);
+      fell=true;
     }finally{
       busy=false;try{isTranslating=false;updateLineCounts()}catch(e){}
     }
+    if(fell)return orig.apply(self,args);
   };
   w.__zsfGem=1;
   window.startAutoTranslateLoop=w;
@@ -10835,7 +10836,7 @@ setTimeout(installHook,2000);
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.23";
+  var EMB="1.24";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
