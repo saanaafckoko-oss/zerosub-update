@@ -3212,7 +3212,8 @@ function drawCtl(){
  drawSum();drawFit();
 }
  
-var FITD={fmax:2.0,tail:1.0,margin:0.20},FITR={fmax:[1.5,4,0.25],tail:[0.1,3,0.1],margin:[0,0.6,0.05]},FITK={fmax:"zsf_tts_fmax",tail:"zsf_tts_tail",margin:"zsf_tts_margin"};
+try{if(localStorage.getItem("zsf_tts_v153")!=="1"){["zsf_tts_tail","zsf_tts_spill","zsf_tts_margin"].forEach(function(k){localStorage.removeItem(k)});localStorage.setItem("zsf_tts_v153","1")}}catch(_){}
+var FITD={fmax:2.0,tail:0.30,margin:0.20},FITR={fmax:[1.5,4,0.25],tail:[0.1,3,0.1],margin:[0,0.6,0.05]},FITK={fmax:"zsf_tts_fmax",tail:"zsf_tts_tail",margin:"zsf_tts_margin"};
 function fitGet(k){try{var v=parseFloat(localStorage.getItem(FITK[k]));if(v>=FITR[k][0]&&v=FITR[k][1])return v}catch(_){}return FITD[k]}
 function fitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch(_){return true}}
 function drawFit(){
@@ -3438,7 +3439,7 @@ function availFor(arr,i){
  if(room>0)return dur+Math.min(room,tail)+sp;
  return Math.max(dur*0.6,0.3,dur-mg)+sp;
 }
-function spillGet(){try{var v=parseFloat(localStorage.getItem("zsf_tts_spill"));if(v>=0&&v=2)return v}catch(_){}return 0.6}
+function spillGet(){try{var v=parseFloat(localStorage.getItem("zsf_tts_spill"));if(v>=0&&v=2)return v}catch(_){}return 0.15}
 var busy=false,lastMaster=null,lastSr=24000,lastSig="",lastSegs=[],segsTmp=null;
 function cueSig(cues){return JSON.stringify([cues.map(function(c){return[c.start,c.end,c.tag,c.text]}),S,inc])}
 async function runAll(quiet){
@@ -3456,7 +3457,7 @@ async function runAll(quiet){
    var r=results[i];results[i]=null;if(!r)return;
    var c=cues[i],s=S[c.tag-1],av=r.av,d=r.data;
    if(r.fin>s.speed||r.forced)fastN++;if(d.length/sr>av+0.1||(r.forced&&r.forced>1.5)){over++;if(longIds.length30)longIds.push(c.id)}
-   var o0=c.start/1000,SPL=spillGet();if(cursor>o0&&cursor-o0=Math.max(0.15,SPL+0.4))o0=cursor;
+   var o0=c.start/1000,SPL=spillGet();if(cursor>o0&&cursor-o0=0.25)o0=cursor;
    try{
     var nxT=cues[i+1]?cues[i+1].start/1000:null;
     if(nxT!==null&&fitOn()){
@@ -3516,8 +3517,9 @@ async function runAll(quiet){
    var blob=toWav(master,sr),url=URL.createObjectURL(blob);
   $("zkt_audio").src=url;$("zkt_audio").style.display="block";
   var a2=$("zkt_dl");a2.href=url;a2.download="khmer_tts.wav";a2.style.display="block";
-  st("✅ ចប់រួចរាល់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:""),100);
-  try{if(!quiet)window.zsfTtsFinish&&window.zsfTtsFinish(true,"✅ អានអក្សរជាសំឡេងចប់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+(skipped?" • រំលង "+skipped:""))}catch(_){}
+  var fitNote=over?(" • ⚠️ ពិបាក fit "+over+" ឃ្លា"+(longIds.length?" (#"+longIds.slice(0,8).join(", #")+(longIds.length>8?"…":"")+")":"")):"";
+  st("✅ ចប់រួចរាល់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+fitNote,100);
+  try{if(!quiet)window.zsfTtsFinish&&window.zsfTtsFinish(true,"✅ អានអក្សរជាសំឡេងចប់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+(skipped?" • រំលង "+skipped:"")+fitNote)}catch(_){}
  }catch(e){st("❌ "+e.message,0);try{window.zsfTtsFinish&&window.zsfTtsFinish(false,"❌ "+e.message)}catch(_){}}
  busy=false;return okRun;
 }
@@ -11093,7 +11095,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.52";
+  var EMB="1.54";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
