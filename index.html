@@ -10776,19 +10776,26 @@ window.zsfSendToTts=async function(){
     var missFn=function(){return srtBlocks.filter(function(x){return typeof translationNeedsRepair==="function"?translationNeedsRepair(x):!(x.trans&&String(x.trans).trim())}).length};
     var miss=missFn();
     if(miss&&miss===srtBlocks.length){showToast("⚠️ មិនទាន់បានបកប្រែទេ — សូមចុច «បកប្រែដោយ AI» ជាមុន",false);return}
+    var goCard=function(){
+      try{var t=document.getElementById("zkt_tab_cur");if(t)t.click()}catch(e){}
+      try{var c=document.getElementById("zkt_card");if(c)c.scrollIntoView({behavior:"auto",block:"start"})}catch(e){}
+    };
+    goCard();
+    setTimeout(goCard,350);
     if(miss&&window.zsfAutoRepairAll){
       showToast("🧹 នៅសល់ "+miss+" បន្ទាត់មិនទាន់បកប្រែ — កំពុងជួសជុលស្វ័យប្រវត្តិ…",true);
       await window.zsfAutoRepairAll();
       miss=missFn();
+      goCard();
     }
     if(miss){showToast("⚠️ នៅសល់ "+miss+" បន្ទាត់មិនទាន់បកប្រែ — សូមចុចម្តងទៀត",false);return}
     var f=null;try{f=(window.__zsfMedia&&window.__zsfMedia.file)||null}catch(e){}
     if(f)window.__zsfPipeFile=f;
-    var t=document.getElementById("zkt_tab_cur");if(t)t.click();
-    var c=document.getElementById("zkt_card");if(c)c.scrollIntoView({behavior:"smooth",block:"start"});
+    goCard();
     showToast("✅ ផ្ញើ "+srtBlocks.length+" បន្ទាត់ខ្មែរទៅកាត 05 រួចរាល់ — កំពុងអានជាសំឡេង ផ្គុំវីដេអូ និងនាំចេញស្វ័យប្រវត្តិ…",true);
     setTimeout(function(){
       try{
+        goCard();
         var r=document.getElementById("zkt_run");
         if(r&&!r.disabled)r.click();
         else showToast("⚠️ ប៊ូតុង Export កំពុងរវល់ — សូមរង់ចាំ ឬចុច «នាំចេញវីដេអូ Export 1 Click»",false);
@@ -10806,7 +10813,7 @@ window.zsfSendToTts=async function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.35";
+  var EMB="1.36";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
