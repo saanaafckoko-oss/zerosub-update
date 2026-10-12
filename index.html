@@ -2596,10 +2596,9 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 button class="btn-fix-large" id="btn_fix_missing" onclick="fixMissingTranslations()">
                 🧹 ស្វែងរក និងជួសជុលបន្ទាត់មិនទាន់បកប្រែ (0)
             /button>
-button class="btn-auto-translate-large" id="btn_auto_translate" onclick="startAutoTranslateLoop()">
+button class="btn-auto-translate-large" id="btn_auto_translate" onclick="zsfAiClick()">
                 🚀 បកប្រែដោយ AI
             /button>
-button class="btn-auto-translate-large" id="btn_gem_translate" type="button" onclick="zsfGemClick()" style="display:none;font-size:15px;padding:12px;margin-top:8px">🤖 បកប្រែដោយ Gemini (វីដេអូ)/button>
 button class="btn-auto-translate-large" id="zsfSendTtsBtn" type="button" onclick="zsfSendToTts()" style="font-size:14px;padding:10px;margin-top:8px;background:linear-gradient(135deg,#10c98a,#0aa3b0);color:#fff;border:1.5px solid #3be0b0">🗣️ ផ្ញើទៅអានជាសំឡេង (មិនបាច់ទាញយក SRT)/button>
 div style="font-size:12px;line-height:1.5;color:#9fb0cc;margin:4px 2px 0">ផ្ញើ SRT ខ្មែរដែលបកប្រែរួច ទៅកាត 05 ដោយផ្ទាល់ រួចចុច «នាំចេញវីដេអូ Export 1 Click»/div>
 /div>
@@ -10692,6 +10691,20 @@ async function run(){
 }
  
 window.zsfGemClick=function(){window.__zsfGemStrict=true;window.startAutoTranslateLoop()};
+/* V1.39: ប៊ូតុង «បកប្រែដោយ AI» = Gemini (វីដេអូ)។ អតិថិជន៖ ត្រូវមាន API Key ផ្ទាល់ខ្លួន (ផ្ញើពីទូរស័ព្ទផ្ទាល់)។ Admin៖ ប្រើ Key ផ្ទាល់ខ្លួនបើមាន បើអត់ប្រើ Worker របស់ admin។ */
+window.zsfAiClick=function(){
+  var admin=false;try{admin=document.body.classList.contains("zsf-admin")}catch(e){}
+  var hasKeys=false;
+  try{var sv=JSON.parse(localStorage.getItem("zero_user_api_keys")||"null");if(Array.isArray(sv)&&sv.filter(Boolean).length>0)hasKeys=true}catch(e){}
+  try{if(Array.isArray(userApiKeys)&&userApiKeys.filter(Boolean).length>0)hasKeys=true}catch(e){}
+  if(!admin&&!hasKeys){
+    try{alert("⚠️ សូមបញ្ចូល Gemini API Key របស់អ្នកជាមុនសិន!")}catch(e){}
+    try{toggleApiBox()}catch(e){}
+    return;
+  }
+  var hasVid=false;try{hasVid=!!(window.__zsfMedia&&window.__zsfMedia.file)}catch(e){}
+  if(hasVid)window.zsfGemClick();else window.startAutoTranslateLoop();
+};
 function installHook(){
   var orig=window.startAutoTranslateLoop;
   if(typeof orig!=="function"||orig.__zsfGem)return;
@@ -10816,7 +10829,7 @@ window.zsfSendToTts=async function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.37";
+  var EMB="1.39";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
