@@ -2600,6 +2600,8 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
                 🚀 បកប្រែដោយ AI
             /button>
 button class="btn-auto-translate-large" id="btn_gem_translate" type="button" onclick="zsfGemClick()" style="display:none;font-size:15px;padding:12px;margin-top:8px">🤖 បកប្រែដោយ Gemini (វីដេអូ)/button>
+button class="btn-auto-translate-large" id="zsfSendTtsBtn" type="button" onclick="zsfSendToTts()" style="font-size:14px;padding:10px;margin-top:8px;background:linear-gradient(135deg,#10c98a,#0aa3b0);color:#fff;border:1.5px solid #3be0b0">🗣️ ផ្ញើទៅអានជាសំឡេង (មិនបាច់ទាញយក SRT)/button>
+div style="font-size:12px;line-height:1.5;color:#9fb0cc;margin:4px 2px 0">ផ្ញើ SRT ខ្មែរដែលបកប្រែរួច ទៅកាត 05 ដោយផ្ទាល់ រួចចុច «នាំចេញវីដេអូ Export 1 Click»/div>
 /div>
 div class="pagination-container">
 button class="arrow-btn" onclick="changeChunk(-1)">◀/button>
@@ -10698,6 +10700,21 @@ setTimeout(init,1500);
 setTimeout(installHook,2000);
 })();
 /script>
+script id="zsf-send-tts">
+/* V1.32: ផ្ញើ SRT ខ្មែរក្នុង Tools ទៅកាត 05 ដោយផ្ទាល់ (មិនបាច់ទាញយក/នាំចូលឯកសារ) ហើយកុំឲ្យ Export 1 Click រត់ Video→SRT→បកប្រែ ឡើងវិញ */
+window.zsfSendToTts=function(){
+  try{
+    if(typeof srtBlocks==="undefined"||!srtBlocks.length){showToast("⚠️ មិនទាន់មាន SRT ក្នុង Tools — សូមនាំចូល SRT ជាមុន",false);return}
+    var miss=srtBlocks.filter(function(x){return typeof translationNeedsRepair==="function"?translationNeedsRepair(x):!(x.trans&&String(x.trans).trim())}).length;
+    if(miss){showToast("⚠️ នៅសល់ "+miss+" បន្ទាត់មិនទាន់បកប្រែ — សូមបកប្រែឲ្យចប់ជាមុន",false);return}
+    var f=null;try{f=(window.__zsfMedia&&window.__zsfMedia.file)||null}catch(e){}
+    if(f)window.__zsfPipeFile=f;
+    var t=document.getElementById("zkt_tab_cur");if(t)t.click();
+    var c=document.getElementById("zkt_card");if(c)c.scrollIntoView({behavior:"smooth",block:"start"});
+    showToast("✅ ផ្ញើ "+srtBlocks.length+" បន្ទាត់ខ្មែរទៅកាត 05 រួចរាល់ — ឥឡូវចុច «នាំចេញវីដេអូ Export 1 Click»",true);
+  }catch(e){showToast("❌ "+((e&&e.message)||e),false)}
+};
+/script>
 /body>
 /html>
 </script>
@@ -10707,7 +10724,7 @@ setTimeout(installHook,2000);
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.31";
+  var EMB="1.32";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
