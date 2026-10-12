@@ -12,9 +12,9 @@
 html lang="km">
 head>
 script id="zsf-boot">
-/* V1.12: កំណែត្រូវបានកំណត់ដោយ wrapper (index.html) មុនពេល App រត់ */
+/* V1.13: កំណែត្រូវបានកំណត់ដោយ wrapper (index.html) មុនពេល App រត់ */
 (function(){
-  window.__ZSF_VER=window.__ZSF_VER||"1.12";
+  window.__ZSF_VER=window.__ZSF_VER||"1.13";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 /script>
@@ -5614,13 +5614,18 @@ async function downloadSRT(){
   try{downloadBlobFile(blob,name);}
   catch(e){console.error(e);alert("មិនអាចចាប់ផ្ដើមទាញយកបានទេ។ សូមសាកល្បងបើកក្នុង Chrome ហើយអនុញ្ញាត Downloads។");}
   /* V1.10: បើការទាញយកមិនដំណើរការ (WebView/browser ខ្លះមិនគាំទ្រ) → បង្ហាញជម្រើសបម្រុង */
-  try{ zsfDlHelp(blob,name,out); }catch(e){ console.warn("dlHelp",e); }
+  try{ if(zsfIsWebView()) zsfDlHelp(blob,name,out,true); }catch(e){ console.warn("dlHelp",e); }
 }
-function zsfDlHelp(blob,name,text){
+/* V1.13: WebView (App ក្នុង Telegram/Facebook/Claude viewer…) មិនអនុញ្ញាតទាញយកឯកសារ — រកឃើញហើយប្រាប់ត្រង់ៗ */
+function zsfIsWebView(){
+  const ua=navigator.userAgent||"";
+  return /;\s*wv\)/.test(ua)||(/iPhone|iPad|iPod/.test(ua)&&!/Safari/.test(ua))||/FBAN|FBAV|Instagram|MicroMessenger|Line\//.test(ua);
+}
+function zsfDlHelp(blob,name,text,webview){
   const old=document.getElementById("zsfDlHelp"); if(old) old.remove();
   const bar=document.createElement("div"); bar.id="zsfDlHelp";
   bar.style.cssText="position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;background:#111827;border:1.5px solid #10b981;border-radius:16px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.6);color:#fff;font-size:13px;line-height:1.45;font-family:inherit";
-  const msg=document.createElement("div"); msg.style.cssText="font-weight:700;margin-bottom:8px"; msg.textContent="📥 មិនឃើញឯកសារក្នុង Downloads? ជ្រើសវិធីមួយខាងក្រោម៖";
+  const msg=document.createElement("div"); msg.style.cssText="font-weight:700;margin-bottom:8px"; msg.textContent=webview?"⚠️ App កំពុងបើកក្នុងកម្មវិធីផ្សេង (WebView) ដែលមិនអនុញ្ញាតទាញយកឯកសារ។ សូមបើក App តាម Chrome ឬ Brave ដោយផ្ទាល់ — ឬប្រើជម្រើសខាងក្រោម៖":"📥 មិនឃើញឯកសារក្នុង Downloads? ជ្រើសវិធីមួយខាងក្រោម៖";
   bar.appendChild(msg);
   const row=document.createElement("div"); row.style.cssText="display:flex;flex-wrap:wrap;gap:8px";
   const mk=(label,fn)=>{ const b=document.createElement("button"); b.type="button"; b.textContent=label; b.style.cssText="flex:1 1 140px;padding:10px;border-radius:12px;border:1px solid #059669;background:#064e3b;color:#fff;font-weight:700;font-size:13px;font-family:inherit"; b.onclick=fn; row.appendChild(b); return b; };
@@ -10614,12 +10619,12 @@ body.zsf-admin #zkt_card .zkt-titlebar .zkt-toggle{order:3;flex:1 1 100%;width:1
 /html>
 </script>
 <script id="zsf-wrap">
-/* V1.12 — ZERO SUB FLASH wrapper.
+/* V1.13 — ZERO SUB FLASH wrapper.
    ឯកសារនេះផ្ទុក App ទាំងមូលនៅក្នុងខ្លួន (id="zsfApp") ហើយមុនពេល App រត់ វាពិនិត្យថាតើមានកំណែថ្មីជាងដែលបានទាញរក្សាទុក
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.12";
+  var EMB="1.13";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
