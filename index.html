@@ -4395,7 +4395,7 @@ let selections={geminiModel:"gemini-3.5-flash-lite",languageFrom:"ស្វ័�
 let userApiKeys=Array.isArray(JSON.parse(localStorage.getItem("zero_user_api_keys")||"null"))?JSON.parse(localStorage.getItem("zero_user_api_keys")):Array(10).fill("");
 userApiKeys=Array.from({length:10},(_,i)=>String(userApiKeys[i]||""));
 let currentApiIndex=Math.max(0,parseInt(localStorage.getItem("zero_current_api_index")||"0",10)||0),currentLang=localStorage.getItem("zero_ui_lang")||"km",srtBlocks=[],currentChunk=0,CHUNK_SIZE=30,isTranslating=false,currentModalType="",saveTimer=null;
-const ADMIN_KEY="ADMIN-ZERO-9999"; let generatedKeys={}; try{generatedKeys=JSON.parse(localStorage.getItem("zero_generated_keys")||"{}")}catch(e){generatedKeys={}};
+const ZSF_ADM_SALT="ZSF|adm|101d1934a6858838",ZSF_ADM_N=10000,ZSF_ADM_V="cd28274d009bd77624aa894e271eea19efb140ee91ff6a5ea42918bf90d06b65"; let generatedKeys={}; try{generatedKeys=JSON.parse(localStorage.getItem("zero_generated_keys")||"{}")}catch(e){generatedKeys={}};
 const $=id=>document.getElementById(id), esc=s=>String(s??"").replace(/[&>"']/g,c=>({"&":"&amp;","":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 function safeSet(k,v){try{localStorage.setItem(k,v);return true}catch(e){showToast("⚠️ Browser storage ពេញ។ ទិន្នន័យមិនអាចរក្សាទុកបានទាំងអស់ទេ។",false);return false}}
  
@@ -4473,7 +4473,7 @@ async function readIndexedLogin(){
 }
 async function persistLoginRecord(rec){
   await ensurePersistentBrowserStorage();
-  rec={id:ZERO_LOGIN_ID,key:normalizeLicenseKey(rec.key),activatedAt:Number(rec.activatedAt)||Date.now(),expiresAt:Number(rec.expiresAt)||0,admin:!!rec.admin};
+  rec={id:ZERO_LOGIN_ID,key:normalizeLicenseKey(rec.key),activatedAt:Number(rec.activatedAt)||Date.now(),expiresAt:Number(rec.expiresAt)||0,admin:!!rec.admin,tok:rec.admin?String(rec.tok||""):""};
   __zeroLoginCache=rec;
   const localOK=writeLocalLogin(rec);
   const dbOK=await writeIndexedLogin(rec);
@@ -4508,7 +4508,7 @@ async function getPersistentLogin(){
 function restoreSavedLoginKey(rec){
   try{
     const input=$("keyInput");
-    if(input && rec?.key) input.value=normalizeLicenseKey(rec.key);
+    if(input && rec?.key && !rec.admin) input.value=normalizeLicenseKey(rec.key);
   }catch(e){}
 }
 async function clearPersistentLogin(){
@@ -5640,8 +5640,13 @@ try{let x=JSON.parse(localStorage.getItem("vrs_selections")||"null");if(x){if(se
   renderEditor();
 }}}catch(e){console.warn(e)}}
 async function checkActivation(){
-  const rec=await getPersistentLogin();
-  if(rec?.admin){ unlockApp("ADMIN"); return true; }
+  let rec=await getPersistentLogin();
+  if(rec?.admin){
+    let good=false; try{good=!!rec.tok&&(await zsfSha256Hex(String(rec.tok)))===ZSF_ADM_V}catch(_){}
+    if(good){ unlockApp("ADMIN"); return true; }
+    try{await clearPersistentLogin()}catch(_){}
+    rec=null;
+  }
   let exp=Number(rec?.expiresAt||0);
   try{const d=Number(generatedKeys[rec?.key]);if(!rec?.admin&&d>0&&rec?.activatedAt){const ne=Number(rec.activatedAt)+d*86400000;if(ne>exp){exp=ne;rec.expiresAt=ne;await persistLoginRecord(rec);}}}catch(_){}
   if(exp && Date.now()exp){ try{zsfMarkKeyUsed(rec.key,rec.activatedAt,exp)}catch(_){} unlockApp(exp); return true; }
@@ -5689,26 +5694,74 @@ function zsfKeyErr(msg){
   try{navigator.vibrate&&navigator.vibrate(120)}catch(_){}
   try{b.animate([{transform:"translateX(0)"},{transform:"translateX(-7px)"},{transform:"translateX(7px)"},{transform:"translateX(0)"}],{duration:260})}catch(_){}
 }
+function zsfSha256(m){
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const l=m.length,nb=((l+9+63)>>6)6,p=new Uint8Array(nb);p.set(m);p[l]=0x80;
+  const dv=new DataView(p.buffer);dv.setUint32(nb-8,Math.floor(l/536870912),false);dv.setUint32(nb-4,(l3)>>>0,false);
+  const w=new Uint32Array(64),rr=(x,n)=>(x>>>n)|(x(32-n));
+  for(let o=0;onb;o+=64){
+    for(let i=0;i16;i++)w[i]=dv.getUint32(o+i*4,false);
+    for(let i=16;i64;i++){const a=w[i-15],b=w[i-2];w[i]=(w[i-16]+(rr(a,7)^rr(a,18)^(a>>>3))+w[i-7]+(rr(b,17)^rr(b,19)^(b>>>10)))>>>0}
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let i=0;i64;i++){
+      const t1=(h+(rr(e,6)^rr(e,11)^rr(e,25))+((e&f)^(~e&g))+K[i]+w[i])>>>0;
+      const t2=((rr(a,2)^rr(a,13)^rr(a,22))+((a&b)^(a&c)^(b&c)))>>>0;
+      h=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b;b=a;a=(t1+t2)>>>0;
+    }
+    H=[(H[0]+a)>>>0,(H[1]+b)>>>0,(H[2]+c)>>>0,(H[3]+d)>>>0,(H[4]+e)>>>0,(H[5]+f)>>>0,(H[6]+g)>>>0,(H[7]+h)>>>0];
+  }
+  const out=new Uint8Array(32),ov=new DataView(out.buffer);for(let i=0;i8;i++)ov.setUint32(i*4,H[i],false);return out;
+}
+function zsfHex(u){let s="";for(let i=0;iu.length;i++)s+=(u[i]+256).toString(16).slice(1);return s}
+async function zsfSha256Hex(str){return zsfHex(zsfSha256(new TextEncoder().encode(String(str))))}
+async function zsfDerive(key,salt,n){
+  const enc=new TextEncoder(),s=enc.encode(salt);let h=zsfSha256(enc.encode(salt+"|"+key));
+  for(let i=0;in;i++){const b=new Uint8Array(h.length+s.length);b.set(h);b.set(s,h.length);h=zsfSha256(b);if(i%2000===1999)await new Promise(r=>setTimeout(r,0));}
+  return zsfHex(h);
+}
+function zsfKA(){try{return JSON.parse(localStorage.getItem("zsf_ka")||"{}")||{}}catch(e){return {}}}
+function zsfKAset(o){try{localStorage.setItem("zsf_ka",JSON.stringify(o))}catch(e){}}
+let __zsfKeyBusy=false;
+const ZSF_KEY_FAIL='❌ ការផ្ទៀងផ្ទាត់មិនជោគជ័យbr>span style="font-weight:500;font-size:12.5px;opacity:.9">សូមព្យាយាមម្តងទៀត ឬទាក់ទងអ្នកលក់តាម Telegram/span>';
 async function verifyKey(){
+  if(__zsfKeyBusy)return;
   const k0=normalizeLicenseKey($("keyInput")?.value||"");
   if(!k0){zsfKeyErr("⚠️ សូមបញ្ចូលកូនសោជាមុនសិន");return;}
-  const k=(k0===ADMIN_KEY)?k0:(zsfFindKey(k0)||k0);
-  if(k===ADMIN_KEY){
-    await persistLoginRecord({key:k,activatedAt:Date.now(),expiresAt:0,admin:true});
-    try{localStorage.removeItem("zero_last_key_draft");}catch(e){}
-    unlockApp("ADMIN");
-    return;
-  }
-  const days=Number(generatedKeys[k]);
-  if(days>0){
-    const now=Date.now(), exp=now+days*86400000;
-    const saved=await persistLoginRecord({key:k,activatedAt:now,expiresAt:exp,admin:false});
-    if(saved){ try{localStorage.removeItem("zero_last_key_draft");}catch(e){} }
-    if(!saved){ alert("⚠️ មិនអាចរក្សាទុកកូនសោបានទេ។ សូមបើកឯកសារនេះក្នុង Chrome ជាផ្ទាំង Browser ធម្មតា។"); return; }
-    try{zsfMarkKeyUsed(k,now,exp)}catch(_){}
-    if(zsfWipeAdminKeys()){try{showToast("🔒 បានលុប API Key ចាស់ចេញពីឧបករណ៍នេះ — សូមដាក់ Key ផ្ទាល់ខ្លួនរបស់អ្នក",true)}catch(_){}setTimeout(function(){location.reload()},900);return;}
-    unlockApp(exp);
-  }else zsfKeyErr("❌ កូនសោនេះមិនត្រឹមត្រូវbr>span style=\"font-weight:500;font-size:12.5px;opacity:.9\">សូមពិនិត្យអក្សរម្តងទៀត (ឧ. 0 និង O, 1 និង I) ឬទាក់ទងអ្នកលក់តាម Telegram/span>");
+  const ka=zsfKA();
+  if(ka.until&&Date.now()ka.until){zsfKeyErr("⏳ សូមរង់ចាំ "+Math.ceil((ka.until-Date.now())/1000)+" វិនាទី ហើយសាកល្បងម្តងទៀត");return;}
+  __zsfKeyBusy=true;
+  try{
+    const t0=Date.now();
+    const tok=await zsfDerive(k0,ZSF_ADM_SALT,ZSF_ADM_N);
+    const isAdmin=(await zsfSha256Hex(tok))===ZSF_ADM_V;
+    const k=zsfFindKey(k0)||k0;
+    const days=Number(generatedKeys[k]);
+    const wait=700-(Date.now()-t0);if(wait>0)await new Promise(r=>setTimeout(r,wait));
+    if(isAdmin){
+      zsfKAset({});
+      await persistLoginRecord({key:"ADMIN",activatedAt:Date.now(),expiresAt:0,admin:true,tok:tok});
+      try{localStorage.removeItem("zero_last_key_draft");}catch(e){}
+      unlockApp("ADMIN");
+      return;
+    }
+    if(days>0){
+      const now=Date.now(), exp=now+days*86400000;
+      const saved=await persistLoginRecord({key:k,activatedAt:now,expiresAt:exp,admin:false});
+      if(!saved){zsfKeyErr(ZSF_KEY_FAIL);return;}
+      zsfKAset({});
+      try{localStorage.removeItem("zero_last_key_draft");}catch(e){}
+      try{zsfMarkKeyUsed(k,now,exp)}catch(_){}
+      if(zsfWipeAdminKeys()){try{showToast("🔒 បានលុប API Key ចាស់ចេញពីឧបករណ៍នេះ — សូមដាក់ Key ផ្ទាល់ខ្លួនរបស់អ្នក",true)}catch(_){}setTimeout(function(){location.reload()},900);return;}
+      unlockApp(exp);
+      return;
+    }
+    const n=(Number(ka.n)||0)+1;
+    const o={n:n};
+    if(n>=5)o.until=Date.now()+Math.min(3600,30*Math.pow(2,n-5))*1000;
+    zsfKAset(o);
+    zsfKeyErr(ZSF_KEY_FAIL);
+  }finally{__zsfKeyBusy=false}
 }
 function unlockApp(exp){
   document.body.classList.remove("auth-locked");
@@ -5748,7 +5801,7 @@ function logoutApp(){
     window.scrollTo(0,0);
   }
 }
-function generateNewKey(){let days=Math.max(1,parseInt($("newKeyDays")?.value||"0",10));const AL="ABCDEFGHJKMNPQRSTUVWXYZ23456789",rk=function(n){let o="";for(let i=0;in;i++)o+=AL[Math.floor(Math.random()*AL.length)];return o};let key;do{key="ZERO-"+rk(6)+"-"+rk(4)}while(generatedKeys[key]);generatedKeys[key]=days;safeSet("zero_generated_keys",JSON.stringify(generatedKeys));$("generatedKeyDisplay").textContent=key;renderAdminKeyList()}
+function generateNewKey(){let days=Math.max(1,parseInt($("newKeyDays")?.value||"0",10));const AL="ABCDEFGHJKMNPQRSTUVWXYZ23456789",rk=function(n){let o="";for(let i=0;in;i++)o+=AL[(window.crypto&&crypto.getRandomValues?crypto.getRandomValues(new Uint32Array(1))[0]:Math.floor(Math.random()*4294967296))%AL.length];return o};let key;do{key="ZERO-"+rk(6)+"-"+rk(4)}while(generatedKeys[key]);generatedKeys[key]=days;safeSet("zero_generated_keys",JSON.stringify(generatedKeys));$("generatedKeyDisplay").textContent=key;renderAdminKeyList()}
 function zsfToggleKeyList(force){
   const a=$("adminKeyListArea"); if(!a)return;
   const open=(typeof force==="boolean")?force:a.classList.contains("zk-closed");
@@ -10440,7 +10493,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   var ZSF_VER=window.__ZSF_VER||"1.12",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
-  function isLocal(){try{return /^(localhost$|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(location.hostname)}catch(e){return false}}
+  function isLocal(){return false}
   function localMsg(){return "កំពុងប្រើកំណែ "+ZSF_VER+" ពី localhost • GitHub មានកំណែ "+REMV+" — ប៊ូតុងនេះមិនអាចប្តូរឯកសារក្នុងទូរស័ព្ទបានទេ។ ដើម្បីដាក់កំណែថ្មី សូមជំនួស index.html និង version.txt ក្នុងថត Download"}
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
@@ -10533,8 +10586,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
     window.__zsfUpdBusy=1;
     ss("zsfUpdTried","1");window.__zsfUpdErr="";
     render("កំពុងទាញយកកំណែថ្មី...");
-    var web=/^https?:$/.test(location.protocol);
-    if(web){ clearCaches(); setTimeout(zsfHardReload,1200); return; }    
+    clearCaches();
     doUpdate().then(function(nv){
       render("✅ បានទាញកំណែ "+nv+" រួចរាល់ — កំពុងបើក App ឡើងវិញ...");
       setTimeout(function(){location.reload()},900);
@@ -10925,7 +10977,7 @@ window.zsfSendToTts=async function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.44";
+  var EMB="1.46";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
