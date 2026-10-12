@@ -2852,6 +2852,17 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 div style="display:flex;gap:8px;align-items:stretch">button class="btn green" disabled="" id="downloadBtn" style="flex:1">📥 ទាញយក SRT/button>button type="button" class="btn red" id="clearSrtBtn" title="លុប SRT" onclick="zsfClearSrt()" style="flex:0 0 52px;min-width:52px;padding:0 !important;font-size:20px !important">🗑️/button>/div>
 /div>
 /section>
+section class="card" id="zsfGemCard">
+h2>🤖 03B • Gemini៖ វិភាគវីដេអូ + បកប្រែខ្មែរ/h2>
+div class="notice">បញ្ជូន Video + SRT ចិន ទៅ Gemini តាម Worker ដើម្បីដាក់សញ្ញា [1]-[4] (ប្រុស/ស្រី/គិត) និងបកប្រែជាខ្មែរ រួចដាក់ចូលផ្នែក 05 ស្វ័យប្រវត្តិ។ បន្ទាប់មកចុច «Export ជាមួយ SRT ខ្មែរពីខាងក្រៅ»។/div>
+div class="row">
+div>label>Worker URL/label>input id="zsfGemUrl" type="text" spellcheck="false" placeholder="https://xxxx.workers.dev" style="width:100%;box-sizing:border-box">/div>
+div>label>លេខសម្ងាត់ (បើមាន)/label>input id="zsfGemAcc" type="password" style="width:100%;box-sizing:border-box">/div>
+/div>
+button class="btn" id="zsfGemBtn" type="button" style="margin-top:10px;width:100%">🤖 ចាប់ផ្តើម Gemini (វិភាគ + បកប្រែ)/button>
+div class="progress" style="margin-top:10px">i id="zsfGemBar" style="width:0%">/i>/div>
+div id="zsfGemStatus" style="margin-top:8px;font-size:13px;line-height:1.5;color:var(--text-gray)">រង់ចាំ…/div>
+/section>
 section class="card">
 h2>⚙️ 04 • SRT Options/h2>
 div class="row">
@@ -10659,6 +10670,79 @@ html body #zkt_card #zkt_cuelist .zkt-cc,html body #project1MediaToSrt #zkt_card
 html body #zkt_card #zkt_cuelist .zkt-cc.on,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cc.on{border:2px solid #3b82f6!important;padding:5px 11px!important}
 html body #zkt_card #zkt_cuelist .zkt-cue.zkt-warn,html body #project1MediaToSrt #zkt_card #zkt_cuelist .zkt-cue.zkt-warn{border-left-color:#fbbf24!important}
 /style>
+script id="zsf-gemini">
+(function(){
+"use strict";
+var $=function(i){return document.getElementById(i)};
+var CH=8*1024*1024,busy=false;
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k)||"";localStorage.setItem(k,v)}catch(e){return ""}}
+function st(m,p){var s=$("zsfGemStatus");if(s)s.textContent=m;if(p!=null){var b=$("zsfGemBar");if(b)b.style.width=Math.max(0,Math.min(100,p))+"%"}}
+function base(){return(($("zsfGemUrl")&&$("zsfGemUrl").value)||"").trim().replace(/\/+$/,"")}
+function hdr(h){h=h||{};var a=(($("zsfGemAcc")&&$("zsfGemAcc").value)||"").trim();if(a)h["X-Access"]=a;return h}
+async function call(path,opt){
+  var r=await fetch(base()+path,opt),j;
+  try{j=await r.json()}catch(e){j={error:"HTTP "+r.status}}
+  if(!r.ok||j.error)throw new Error((j.error||("HTTP "+r.status))+(j.detail?" — "+j.detail:""));
+  return j;
+}
+async function callRetry(path,mk,tries){
+  var e0;
+  for(var i=0;itries;i++){
+    try{return await call(path,mk())}catch(e){e0=e;await new Promise(function(r){setTimeout(r,1500*(i+1))})}
+  }
+  throw e0;
+}
+async function run(){
+  if(busy)return;
+  var f=null;try{f=mediaFile}catch(e){}
+  var srt="";try{if(subtitles&&subtitles.length)srt=buildSrt()}catch(e){}
+  if(!f){st("⚠️ សូមបញ្ចូល Video នៅផ្នែក 01 មុន",0);return}
+  if(!srt){st("⚠️ មិនទាន់មាន SRT ចិន — សូមបង្កើត SRT ពីសំឡេងមុន",0);return}
+  if(!base()){st("⚠️ សូមដាក់ Worker URL មុន",0);return}
+  ls("zsf_gem_url",base());ls("zsf_gem_acc",($("zsfGemAcc").value||"").trim());
+  busy=true;var btn=$("zsfGemBtn");if(btn)btn.disabled=true;
+  var tm=null;
+  try{
+    var mime=f.type||"video/mp4",size=f.size;
+    st("📡 កំពុងចាប់ផ្តើមផ្ញើ…",2);
+    var s0=await callRetry("/start",function(){return{method:"POST",headers:hdr({"Content-Type":"application/json"}),body:JSON.stringify({size:size,mime:mime,name:f.name||"video"})}},3);
+    var up=s0.uploadUrl,file=null;
+    for(var off=0;offsize;off+=CH){
+      var end=Math.min(off+CH,size),fin=end>=size,o=off;
+      st("⬆️ កំពុងផ្ញើវីដេអូ "+Math.round(end/1048576)+" / "+Math.round(size/1048576)+" MB",3+(end/size)*62);
+      var r=await callRetry("/chunk",function(){return{method:"POST",headers:hdr({"X-Upload-Url":up,"X-Offset":String(o),"X-Final":fin?"1":"0"}),body:f.slice(o,end)}},3);
+      if(fin)file=r.file;
+    }
+    if(!file)throw new Error("ផ្ញើវីដេអូមិនចប់");
+    var pc=68;st("🤖 Gemini កំពុងមើលវីដេអូ និងបកប្រែ… (អាចប្រើពេល 1-3 នាទី)",pc);
+    tm=setInterval(function(){pc=Math.min(96,pc+0.6);var b=$("zsfGemBar");if(b)b.style.width=pc+"%"},1000);
+    var gl="";try{gl=($("zsfGlossary")&&$("zsfGlossary").value||"").trim()}catch(e){}
+    var res=await call("/analyze",{method:"POST",headers:hdr({"Content-Type":"application/json"}),body:JSON.stringify({file:file,srt:srt,glossary:gl})});
+    if(!res.srt)throw new Error("Gemini មិនបានផ្ញើ SRT មកវិញ");
+    var ta=$("zkt_srt_txt");
+    if(!ta)throw new Error("រកមិនឃើញផ្នែក 05");
+    ta.value=res.srt;ta.dispatchEvent(new Event("input",{bubbles:true}));
+    var tab=$("zkt_tab_file");if(tab)tab.click();
+    var fn=$("zkt_fname");if(fn)fn.textContent="✅ SRT ពី Gemini • "+res.outCount+" បន្ទាត់";
+    st((res.ok?"✅ ចប់រួចរាល់ • ":"⚠️ ចប់ តែត្រូវពិនិត្យ (ចូល "+res.inCount+" / ចេញ "+res.outCount+(res.timeMismatch?" / ម៉ោងខុស "+res.timeMismatch:"")+(res.cut?" / ចុងខ្វះ":"")+") • ")+res.outCount+" បន្ទាត់ — ទៅផ្នែក 05 ហើយចុច «Export ជាមួយ SRT ខ្មែរពីខាងក្រៅ»",100);
+    try{var c=$("zkt_card");if(c&&c.scrollIntoView)c.scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}
+  }catch(e){
+    st("❌ "+((e&&e.message)||e),0);
+  }finally{
+    if(tm)clearInterval(tm);
+    busy=false;if(btn)btn.disabled=false;
+  }
+}
+function init(){
+  var b=$("zsfGemBtn");if(!b||b.__z)return;b.__z=1;
+  var u=$("zsfGemUrl"),a=$("zsfGemAcc");
+  if(u)u.value=ls("zsf_gem_url");if(a)a.value=ls("zsf_gem_acc");
+  b.addEventListener("click",run);
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+setTimeout(init,1500);
+})();
+/script>
 /body>
 /html>
 </script>
@@ -10668,7 +10752,7 @@ html body #zkt_card #zkt_cuelist .zkt-cue.zkt-warn,html body #project1MediaToSrt
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.17";
+  var EMB="1.18";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
