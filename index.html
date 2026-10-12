@@ -4165,7 +4165,7 @@ async function exportAll(){
      st("ដំណាក់កាល ១-២៖ Video → SRT → បកប្រែខ្មែរ…",0);
      await runOneClickPipeline();
      if(typeof srtBlocks==="undefined"||!srtBlocks.length)throw new Error("ដំណាក់កាល ១-២ មិនបានចប់ — "+(window.zsfPipeReason?window.zsfPipeReason():"សូមមើលសារកំហុសខាងលើ"));
-     if(trMiss())throw new Error("ការបកប្រែនៅមិនទាន់ចប់ទាំងអស់ — សូមចុច Export 1 Click ម្តងទៀត ដើម្បីបន្ត");
+     if(trMiss())throw new Error("ការបកប្រែនៅមិនទាន់ចប់ទាំងអស់"+(window.__zsfGemErr?(" — "+window.__zsfGemErr):" — សូមចុច Export 1 Click ម្តងទៀត ដើម្បីបន្ត"));
      window.__zsfPipeFile=mf2;
      setSrcTab("cur");
      st("ដំណាក់កាល ៣៖ បង្កើតសំឡេងខ្មែរ…",0);
@@ -10762,14 +10762,16 @@ function installHook(){
     try{if(isTranslating)return}catch(e){}
     var P=function(m,p){try{toggleProgressBar(true,m,p)}catch(e){}try{st(m,p)}catch(e){}};
     busy=true;try{isTranslating=true}catch(e){}
+    window.__zsfGemErr="";
     try{
       var res=await core(P,bs.srt);
       var out=parseSRT(res.srt),by={};
       out.forEach(function(o){by[normT(o.time)]=o});
       var keep=true;try{keep=($("keepTags")||{}).value!=="false"}catch(e){}
-      var same=out.length===bs.idx.length;
+      var same=out.length===bs.idx.length,byId={},filled=0;
+      out.forEach(function(o){var n=parseInt(String(o.id).replace(/\D/g,""),10);if(n>0&&!byId[n])byId[n]=o});
       bs.idx.forEach(function(bi,k){
-        var b=srtBlocks[bi],o=by[normT(b.time)]||(same?out[k]:null);
+        var b=srtBlocks[bi],o=(same?out[k]:null)||by[normT(b.time)]||byId[k+1]||null;
         if(!o)return;
         var tm=String(o.text).match(/^\s*\[([1-4])\]/);
         var tr=String(o.text).replace(/^\s*\[[1-4]\]\s*/,"").trim();
@@ -10778,7 +10780,9 @@ function installHook(){
           b.trans="["+tm[1]+"] "+tr;
           b.text="["+tm[1]+"] "+String(b.text||"").replace(/^\s*\[[1-4]\]\s*/,"");
         }else b.trans=tr;
+        filled++;
       });
+      window.__zsfGemErr=(filled===bs.idx.length)?"":("Gemini បានតែ "+filled+"/"+bs.idx.length+" បន្ទាត់ (Gemini ផ្ញើមកវិញ "+out.length+")");
       try{zsfEnforceAllTags()}catch(e){}
       try{renderEditor();saveData()}catch(e){}
       var remain=srtBlocks.filter(translationNeedsRepair).length;
@@ -10796,6 +10800,7 @@ function installHook(){
       if(!remain){try{zsfScrollToDownload()}catch(e){}}
     }catch(e){
       var m="❌ Gemini៖ "+((e&&e.message)||e);
+      window.__zsfGemErr=String((e&&e.message)||e);
       try{showToast(m,false)}catch(x){}
       try{toggleProgressBar(true,m,0)}catch(x){}
       st(m,0);
@@ -10830,7 +10835,7 @@ setTimeout(installHook,2000);
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.22";
+  var EMB="1.23";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
