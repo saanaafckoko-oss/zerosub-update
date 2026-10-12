@@ -10357,6 +10357,8 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 (function(){
   var ZSF_VER=window.__ZSF_VER||"1.12",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
+  function isLocal(){try{return /^(localhost$|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(location.hostname)}catch(e){return false}}
+  function localMsg(){return "កំពុងប្រើកំណែ "+ZSF_VER+" ពី localhost • GitHub មានកំណែ "+REMV+" — ប៊ូតុងនេះមិនអាចប្តូរឯកសារក្នុងទូរស័ព្ទបានទេ។ ដើម្បីដាក់កំណែថ្មី សូមជំនួស index.html និង version.txt ក្នុងថត Download"}
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   function build(){
     if(document.getElementById("zsfUpd"))return;
@@ -10386,8 +10388,8 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
     var w=document.getElementById("zsfUpd"),m=document.getElementById("zsfUpdMsg"),bd=document.getElementById("zsfUpdBadge");if(!w||!m)return;
     w.className=st;
     var tried=!!ss("zsfUpdTried");
-    m.textContent=msg||(st==="ok"?("កំណែ "+ZSF_VER+" • ថ្មីបំផុតហើយ"):st==="new"?(tried?"មានកំណែថ្មីជាងនេះ — ចុចដើម្បីធ្វើបច្ចុប្បន្នភាព":"មានកំណែថ្មីជាងនេះ — ចុចដើម្បីធ្វើបច្ចុប្បន្នភាព"):"មិនអាចពិនិត្យបាន — ពិនិត្យអ៊ីនធឺណិត រួចចុចដើម្បីសាកម្តងទៀត");
-    if(bd)bd.textContent=(st==="ok"?"✓ ថ្មីបំផុត":st==="new"?(tried?"សាកម្តងទៀត":"មានកំណែថ្មី"):"សាកម្តងទៀត");
+    m.textContent=msg||(st==="new"&&isLocal()?localMsg():st==="ok"?("កំណែ "+ZSF_VER+" • ថ្មីបំផុតហើយ"):st==="new"?(tried?"មានកំណែថ្មីជាងនេះ — ចុចដើម្បីធ្វើបច្ចុប្បន្នភាព":"មានកំណែថ្មីជាងនេះ — ចុចដើម្បីធ្វើបច្ចុប្បន្នភាព"):"មិនអាចពិនិត្យបាន — ពិនិត្យអ៊ីនធឺណិត រួចចុចដើម្បីសាកម្តងទៀត");
+    if(bd)bd.textContent=(st==="new"&&isLocal()?"ℹ️ ព័ត៌មាន":st==="ok"?"✓ ថ្មីបំផុត":st==="new"?(tried?"សាកម្តងទៀត":"មានកំណែថ្មី"):"សាកម្តងទៀត");
   }
   function check(cb){
     var done=false;
@@ -10442,6 +10444,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   }
   function onTap(){
     if(st!=="new"){ render("កំពុងពិនិត្យ..."); check(); return; }
+    if(isLocal()){render(localMsg());try{if(typeof showToast==="function")showToast("ℹ️ កំពុងប្រើ localhost — សូមជំនួស index.html និង version.txt ក្នុងថត Download ដើម្បីដាក់កំណែថ្មី",true)}catch(e){}return;}
     if(window.__zsfUpdBusy)return;
     window.__zsfUpdBusy=1;
     ss("zsfUpdTried","1");
@@ -10813,7 +10816,7 @@ window.zsfSendToTts=async function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.36";
+  var EMB="1.37";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
