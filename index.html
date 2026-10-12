@@ -4405,7 +4405,7 @@ const ZERO_LOGIN_ID = "current";
 let __zeroLoginCache = null;
 
 function normalizeLicenseKey(v){
-  return String(v || "").trim().replace(/\\s+/g, "").toUpperCase();
+  return String(v || "").trim().replace(/\s+/g, "").toUpperCase();
 }
 function readLocalLogin(){
   try{
@@ -5674,9 +5674,25 @@ function restoreEnteredLicenseKeyDraft(){
   }catch(e){}
 }
 
+function zsfCanonKey(v){return normalizeLicenseKey(v).replace(/[^A-Z0-9]/g,"").replace(/O/g,"0").replace(/[IL]/g,"1")}
+function zsfFindKey(v){const c=zsfCanonKey(v);if(!c)return "";return Object.keys(generatedKeys).find(function(g){return zsfCanonKey(g)===c})||""}
+function zsfKeyErr(msg){
+  let b=$("zsfKeyErr");
+  if(!b){
+    b=document.createElement("div");b.id="zsfKeyErr";b.setAttribute("role","alert");
+    b.style.cssText="margin:12px 0 0;padding:12px 14px;border-radius:14px;background:rgba(239,68,68,.14);border:1.5px solid rgba(239,68,68,.65);color:#fecaca;font-size:14px;font-weight:700;line-height:1.55;text-align:center";
+    const w=document.querySelector(".auth-key-wrap");
+    if(w&&w.parentNode)w.parentNode.insertBefore(b,w.nextSibling);else document.body.appendChild(b);
+    const inp=$("keyInput");if(inp)inp.addEventListener("input",function(){b.style.display="none"});
+  }
+  b.innerHTML=msg;b.style.display="block";
+  try{navigator.vibrate&&navigator.vibrate(120)}catch(_){}
+  try{b.animate([{transform:"translateX(0)"},{transform:"translateX(-7px)"},{transform:"translateX(7px)"},{transform:"translateX(0)"}],{duration:260})}catch(_){}
+}
 async function verifyKey(){
-  const k=normalizeLicenseKey($("keyInput")?.value||"");
-  if(!k) return;
+  const k0=normalizeLicenseKey($("keyInput")?.value||"");
+  if(!k0){zsfKeyErr("⚠️ សូមបញ្ចូលកូនសោជាមុនសិន");return;}
+  const k=(k0===ADMIN_KEY)?k0:(zsfFindKey(k0)||k0);
   if(k===ADMIN_KEY){
     await persistLoginRecord({key:k,activatedAt:Date.now(),expiresAt:0,admin:true});
     try{localStorage.removeItem("zero_last_key_draft");}catch(e){}
@@ -5692,7 +5708,7 @@ async function verifyKey(){
     try{zsfMarkKeyUsed(k,now,exp)}catch(_){}
     if(zsfWipeAdminKeys()){try{showToast("🔒 បានលុប API Key ចាស់ចេញពីឧបករណ៍នេះ — សូមដាក់ Key ផ្ទាល់ខ្លួនរបស់អ្នក",true)}catch(_){}setTimeout(function(){location.reload()},900);return;}
     unlockApp(exp);
-  }else alert("❌ កូនសោមិនត្រឹមត្រូវ (Invalid Key)!");
+  }else zsfKeyErr("❌ កូនសោនេះមិនត្រឹមត្រូវbr>span style=\"font-weight:500;font-size:12.5px;opacity:.9\">សូមពិនិត្យអក្សរម្តងទៀត (ឧ. 0 និង O, 1 និង I) ឬទាក់ទងអ្នកលក់តាម Telegram/span>");
 }
 function unlockApp(exp){
   document.body.classList.remove("auth-locked");
@@ -5732,7 +5748,7 @@ function logoutApp(){
     window.scrollTo(0,0);
   }
 }
-function generateNewKey(){let days=Math.max(1,parseInt($("newKeyDays")?.value||"0",10));let key="ZERO-"+Math.random().toString(36).slice(2,8).toUpperCase()+"-"+Math.random().toString(36).slice(2,6).toUpperCase();generatedKeys[key]=days;safeSet("zero_generated_keys",JSON.stringify(generatedKeys));$("generatedKeyDisplay").textContent=key;renderAdminKeyList()}
+function generateNewKey(){let days=Math.max(1,parseInt($("newKeyDays")?.value||"0",10));const AL="ABCDEFGHJKMNPQRSTUVWXYZ23456789",rk=function(n){let o="";for(let i=0;in;i++)o+=AL[Math.floor(Math.random()*AL.length)];return o};let key;do{key="ZERO-"+rk(6)+"-"+rk(4)}while(generatedKeys[key]);generatedKeys[key]=days;safeSet("zero_generated_keys",JSON.stringify(generatedKeys));$("generatedKeyDisplay").textContent=key;renderAdminKeyList()}
 function zsfToggleKeyList(force){
   const a=$("adminKeyListArea"); if(!a)return;
   const open=(typeof force==="boolean")?force:a.classList.contains("zk-closed");
@@ -10909,7 +10925,7 @@ window.zsfSendToTts=async function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.43";
+  var EMB="1.44";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
