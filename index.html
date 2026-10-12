@@ -2849,7 +2849,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 /div>
 div class="actions">
 button class="btn violet" disabled="" id="previewBtn">▶️ Preview Subtitle/button>
-button class="btn green" disabled="" id="downloadBtn">📥 ទាញយក SRT/button>
+div style="display:flex;gap:8px;align-items:stretch">button class="btn green" disabled="" id="downloadBtn" style="flex:1">📥 ទាញយក SRT/button>button type="button" class="btn red" id="clearSrtBtn" title="លុប SRT" onclick="zsfClearSrt()" style="flex:0 0 52px;min-width:52px;padding:0 !important;font-size:20px !important">🗑️/button>/div>
 /div>
 /section>
 section class="card">
@@ -6550,6 +6550,27 @@ function showV32Diag(msg,ok=false){
 /* ===== V41: លុប SRT និងកំណត់ត្រាបកប្រែស្វ័យប្រវត្តិ ក្រោយទាញយក SRT ខ្មែរ ===== */
 function zsfAutoClearOn(){ const el=document.getElementById("zsfAutoClear"); return el?el.checked:true; }
 try{ window.addEventListener("load",function(){ try{ const el=document.getElementById("zsfAutoClear"); if(el) el.checked=(localStorage.getItem("zsf_autoclear")!=="0"); }catch(_){} }); }catch(_){}
+function zsfClearSrt(){
+  var b=$("clearSrtBtn");
+  if(!subtitles||!subtitles.length){ showToast("គ្មាន SRT ត្រូវលុបទេ",false); return; }
+  if(!b.__arm){
+    b.__arm=1; b.textContent="❓";
+    showToast("ចុចធុងសំរាមម្តងទៀត ដើម្បីលុប SRT",false);
+    clearTimeout(b.__armT);
+    b.__armT=setTimeout(function(){ b.__arm=0; b.textContent="🗑️"; },3500);
+    return;
+  }
+  clearTimeout(b.__armT); b.__arm=0; b.textContent="🗑️";
+  try{
+    subtitles=[]; activeIndex=-1;
+    if($("subtitleList")) $("subtitleList").innerHTML='div class="notice">បន្ទាប់ពី Transcribe រួច Subtitle នឹងបង្ហាញនៅទីនេះ។/div>';
+    if($("downloadBtn")) $("downloadBtn").disabled=true;
+    if($("previewBtn")) $("previewBtn").disabled=true;
+    if($("count")) $("count").textContent="0 subtitles";
+    if($("current")) $("current").textContent="—";
+  }catch(_){}
+  showToast("🗑️ បានលុប SRT រួចរាល់",true);
+}
 function zsfResetAllRecords(){
   /* ផ្នែកបកប្រែ (Translation) */
   srtBlocks=[]; currentChunk=0;
@@ -10627,7 +10648,7 @@ body.zsf-admin #zkt_card .zkt-titlebar .zkt-toggle{order:3;flex:1 1 100%;width:1
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.15";
+  var EMB="1.16";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
