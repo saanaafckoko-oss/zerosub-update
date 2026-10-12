@@ -2849,12 +2849,13 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 /div>
 div class="zkt-voicebox zkt-pv zkt-vclosed" id="zkt_voicebox">
 div class="zpv-top">
-div class="zpv-title">span class="zpv-star" aria-hidden="true">⭐/span>span class="zpv-ttext">b>កំណត់ Preset សំឡេងតួ/b>/span>/div>
-button type="button" class="zpv-def" id="zkt_reset">svg class="zpv-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>path d="M3 3v5h5"/>path d="M12 7v5l4 2"/>/svg>កំណត់លំនាំដើម/button>
+div class="zpv-title">span class="zpv-star" aria-hidden="true">svg class="zpv-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">line x1="21" x2="14" y1="4" y2="4"/>line x1="10" x2="3" y1="4" y2="4"/>line x1="21" x2="12" y1="12" y2="12"/>line x1="8" x2="3" y1="12" y2="12"/>line x1="21" x2="16" y1="20" y2="20"/>line x1="12" x2="3" y1="20" y2="20"/>line x1="14" x2="14" y1="2" y2="6"/>line x1="8" x2="8" y1="10" y2="14"/>line x1="16" x2="16" y1="18" y2="22"/>/svg>/span>span class="zpv-ttext">b>កំណត់ Preset សំឡេងខ្មែរ (Character Presets)/b>/span>/div>
+button type="button" class="zpv-def" id="zkt_reset">svg class="zpv-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>path d="M3 3v5h5"/>path d="M12 7v5l4 2"/>/svg>លំនាំដើម/button>
 /div>
 div class="zpv-pills" id="zkt_slots">/div>
 div class="zpv-hint" id="zkt_pillhint">/div>
 div class="zkt-vpanel" id="zkt_vpanel">div class="zkt-vinner">
+div id="zkt_edit" class="zpv-edit">/div>
 div id="zkt_ctl" class="zpv-grid">/div>
 div id="zkt_fit" class="zfit">/div>
 /div>/div>
@@ -3170,7 +3171,13 @@ function load(){try{var j=JSON.parse(localStorage.getItem("zsf_khmer_tts_v1")||"
 function persist(){try{localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(S));if(document.body.classList.contains("zsf-admin")){localStorage.setItem("zsf_tts_key",$("zkt_key").value.trim());localStorage.setItem("zsf_tts_region",$("zkt_region").value.trim());localStorage.setItem("zsf_tts_mode",$("zkt_mode").value);localStorage.setItem("zsf_tts_wurl",$("zkt_wurl").value.trim())}}catch(e){}}
 var audMode=false;
 function st(m,p){m=String(m==null?"":m).split(" • ").filter(function(x){return !/Auto|នៅតែវែង|ប្រើសំឡេងតួ|ឃ្លាលេខ|\[\d\]×/.test(x)}).join(" • ");if(/^\s*✅/.test(m))m="";$("zkt_stat").textContent=m;if(p!=null)$("zkt_bar").style.width=p+"%";if(audMode){var as=$("zkt_astat"),ab=$("zkt_abar");if(as)as.textContent=m;if(ab&&p!=null)ab.style.width=p+"%"}}
-var LBL={hm:"Volume High + Mid %",pitch:"ខ្ពស់ទាប (Pitch)",bass:"កម្រិតបាស (Bass)",speed:"ល្បឿនធម្មតា",vol:"កម្រិតសំឡេង (Volume)",echo:"កម្រិតអេកូ (Echo)",auto:"Auto Speed អតិបរមា %"};
+var LBL={hm:"Volume High + Mid %",pitch:"ខ្ពស់ទាប (Pitch)",bass:"កម្រិតបាស (Bass)",speed:"ល្បឿន (Speed)",vol:"កម្រិតសំឡេង (Volume)",echo:"អេកូ (Echo)",auto:"Auto Speed %"};
+var ORD=["pitch","bass","speed","vol","echo","auto","hm"];
+function cfgOf(k){return CFG.filter(function(x){return x.k===k})[0]}
+function eqShort(k){var t=String(EQN[k]||k).replace(/\s*\(.*$/,""),m=t.split(" ");if(m.length>1&&!/[\u1780-\u17FFA-Za-z0-9]/.test(m[0]))m.shift();return m.join(" ")}
+function nmOf(i){var n=S[i]&&S[i].name;n=n?String(n).trim():"";return n||("តួអង្គ ["+(i+1)+"]")}
+function isF(v){return /Sreymom/i.test(v)}
+function sumTxt(x){return fmt("speed",x.speed)+" • "+fmt("pitch",x.pitch)+" • "+eqShort(x.eq)}
 function SV(p){return 'svg class="zpv-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'/svg>'}
 var ICO={
  hm:SV('path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2"/>'),
@@ -3190,31 +3197,34 @@ function fmt(k,v){
  if(k==="auto")return Math.round(v)+"%";
  return sg+Math.round(a)+"%";
 }
-function drawSum(){var sm=$("zkt_vsum");if(sm)sm.textContent=S.map(function(x,i){return "["+(i+1)+"] "+(VOICES[x.voice]||x.voice)}).join("  •  ")}
+function drawSum(){var sm=$("zkt_vsum");if(sm)sm.textContent=S.map(function(x,i){return "["+(i+1)+"] "+(VOICES[x.voice]||x.voice)}).join("  •  ");
+ var cs=$("zkt_slots").querySelectorAll(".zpv-sm");cs.forEach(function(el,i){if(S[i])el.textContent=sumTxt(S[i])})}
 function drawHint(){var h=$("zkt_pillhint");if(h)h.innerHTML='🎯 កំពុងកំណត់ b>'+TAGN[cur]+'/b> — ប្រើជាមួយប្រយោគដែលមានស្លាក ['+(cur+1)+'] ប៉ុណ្ណោះbr>⚡ ល្បឿនធម្មតា = ឃ្លាខ្លីអានតាមនេះ • Auto Speed = កម្រិតលឿនបន្ថែមអតិបរមា (ឃ្លាវែងលឿនឡើងតាមការគណនា មិនលើសកម្រិតនេះ)'}
-function markPills(){var ps=$("zkt_slots").querySelectorAll(".zpv-pill");for(var i=0;ips.length;i++)ps[i].classList.toggle("on",i===cur)}
+function markPills(){var ps=$("zkt_slots").querySelectorAll(".zpv-card");ps.forEach(function(el,i){el.classList.toggle("on",i===cur)})}
 function drawPills(){
  $("zkt_slots").innerHTML=S.map(function(x,i){
-  var nm=VOICES[x.voice]||x.voice;
-  var opts=Object.keys(VOICES).map(function(v){return 'option value="'+v+'"'+(v===x.voice?" selected":"")+'>'+VOICES[v]+' — '+v+'/option>'}).join("");
-  return 'div class="zpv-pill'+(i===cur?" on":"")+'" data-i="'+i+'">span class="zpv-pi">'+SPK+'/span>span class="zpv-pn">'+nm+'/span>span class="zpv-pc">▼/span>select data-i="'+i+'" aria-label="សំឡេងតួ ['+(i+1)+']">'+opts+'/select>/div>';
+  return 'div class="zpv-card t'+(i+1)+(i===cur?" on":"")+'" data-i="'+i+'" role="button" tabindex="0">div class="zpv-ch">span class="zpv-tg">['+(i+1)+']/span>span class="zpv-dot">/span>/div>div class="zpv-nm">'+esc(nmOf(i))+'/div>div class="zpv-vn">'+SPK+'span>'+esc(VOICES[x.voice]||x.voice)+'/span>/div>div class="zpv-sm">'+sumTxt(x)+'/div>/div>';
  }).join("");
  drawHint();
 }
 function drawCtl(){
  var s=S[cur],h="";
- CFG.forEach(function(c){
-  var v=Math.round(s[c.k]*10)/10;
-  var dv=defS(cur)[c.k],rs=(Math.round(dv*10)/10!==v)?'button type="button" class="zpv-rs" data-k="'+c.k+'" data-d="0" title="ត្រឡប់ទៅលំនាំដើម">↺ '+fmt(c.k,dv)+'/button>':'';
-  h+='div class="zpv-f">div class="zpv-lh">label>'+LBL[c.k]+'/label>'+rs+'/div>div class="zpv-st">button type="button" data-k="'+c.k+'" data-d="-1"'+(v=c.a?" disabled":"")+'>−/button>span class="zpv-v">'+ICO[c.k]+'b>'+fmt(c.k,v)+'/b>/span>button type="button" data-k="'+c.k+'" data-d="1"'+(v>=c.b?" disabled":"")+'>+/button>/div>/div>';
+ ORD.forEach(function(k){var c=cfgOf(k);if(!c)return;
+  var v=Math.round(s[k]*10)/10;
+  var dv=defS(cur)[k],rs=(Math.round(dv*10)/10!==v)?'button type="button" class="zpv-rs" data-k="'+k+'" data-d="0" title="ត្រឡប់ទៅលំនាំដើម">↺ '+fmt(k,dv)+'/button>':'';
+  h+='div class="zpv-f zpv-fc'+(k==="hm"?" zpv-wide":"")+'">div class="zpv-lh">label>span class="zpv-li">'+ICO[k]+'/span>'+LBL[k]+'/label>'+rs+'/div>div class="zpv-st">button type="button" data-k="'+k+'" data-d="-1"'+(v=c.a?" disabled":"")+'>−/button>span class="zpv-v">b>'+fmt(k,v)+'/b>/span>button type="button" data-k="'+k+'" data-d="1"'+(v>=c.b?" disabled":"")+'>+/button>/div>input type="range" class="zpv-rg" data-k="'+k+'" min="'+c.a+'" max="'+c.b+'" step="'+c.s+'" value="'+v+'" aria-label="'+LBL[k]+'">/div>';
  });
- h+='div class="zpv-f">label>EQ Preset/label>div class="zpv-sel">select id="zkt_eq">'+Object.keys(EQN).map(function(k){return 'option value="'+k+'"'+(k===s.eq?" selected":"")+'>'+EQN[k]+'/option>'}).join("")+'/select>/div>/div>';
+ h+='div class="zpv-f zpv-wide">label>EQ Preset/label>div class="zpv-sel">select id="zkt_eq">'+Object.keys(EQN).map(function(k){return 'option value="'+k+'"'+(k===s.eq?" selected":"")+'>'+EQN[k]+'/option>'}).join("")+'/select>/div>/div>';
  $("zkt_ctl").innerHTML=h;
+ var ed=$("zkt_edit");
+ if(ed){var opts=Object.keys(VOICES).map(function(v){return 'option value="'+v+'"'+(v===s.voice?" selected":"")+'>'+(isF(v)?"👩 ":"👨 ")+VOICES[v]+(isF(v)?" (ស្រី)":" (ប្រុស)")+'/option>'}).join("");
+  ed.innerHTML='span class="zpv-eb t'+(cur+1)+'">['+(cur+1)+']/span>span class="zpv-et">កំណត់:/span>label class="zpv-ef">span>ឈ្មោះ:/span>input type="text" id="zkt_name" maxlength="24" autocomplete="off" value="'+esc(nmOf(cur)).replace(/"/g,"&quot;")+'">/label>label class="zpv-ef">span>សំឡេង:/span>select id="zkt_voice">'+opts+'/select>/label>';}
  drawSum();drawFit();
 }
  
 try{if(localStorage.getItem("zsf_tts_v153")!=="1"){["zsf_tts_tail","zsf_tts_spill","zsf_tts_margin"].forEach(function(k){localStorage.removeItem(k)});localStorage.setItem("zsf_tts_v153","1")}}catch(_){}
-var FITD={fmax:2.0,tail:0.30,margin:0.20,shift:0},FITR={fmax:[1.5,4,0.25],tail:[0.1,3,0.1],margin:[0,0.6,0.05],shift:[-1.5,1.5,0.05]},FITK={fmax:"zsf_tts_fmax",tail:"zsf_tts_tail",margin:"zsf_tts_margin",shift:"zsf_tts_shift"};
+try{if(localStorage.getItem("zsf_tts_v159")!=="1"){localStorage.removeItem("zsf_tts_shift");localStorage.setItem("zsf_tts_v159","1")}}catch(_){}
+var FITD={fmax:2.0,tail:0.30,margin:0.20,shift:-0.15},FITR={fmax:[1.5,4,0.25],tail:[0.1,3,0.1],margin:[0,0.6,0.05],shift:[-1.5,1.5,0.05]},FITK={fmax:"zsf_tts_fmax",tail:"zsf_tts_tail",margin:"zsf_tts_margin",shift:"zsf_tts_shift"};
 function fitGet(k){try{var v=parseFloat(localStorage.getItem(FITK[k]));if(v>=FITR[k][0]&&v=FITR[k][1])return v}catch(_){}return FITD[k]}
 function fitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch(_){return true}}
 function drawFit(){
@@ -3274,9 +3284,9 @@ async function process(ab,s,targetSec){
  var e=EQ[s.eq]||EQ.flat;
  function bq(t,f,g,q){var b=oc.createBiquadFilter();b.type=t;b.frequency.value=f;b.gain.value=g;if(q)b.Q.value=q;return b}
  var f1=bq("lowshelf",200,s.bass+e[0]),f2=bq("peaking",1200,e[1]+s.hm/10,0.9),f3=bq("peaking",3500,e[2]+s.hm/10,0.9);
- var hpf=bq("highpass",75,0,0.7),dess=bq("peaking",6200,-3,2.2),lpf=bq("lowpass",9800,0,0.7);
- var cp=oc.createDynamicsCompressor();cp.threshold.value=-20;cp.knee.value=14;cp.ratio.value=2.5;cp.attack.value=0.006;cp.release.value=0.14;
- var g=oc.createGain();g.gain.value=Math.max(0,1+s.vol/100)*nrm*1.3;
+ var hpf=bq("highpass",75,0,0.7),dess=bq("peaking",6200,0,2.2),lpf=bq("lowpass",11500,0,0.7);
+ var cp=oc.createDynamicsCompressor();cp.threshold.value=-12;cp.knee.value=10;cp.ratio.value=1.5;cp.attack.value=0.006;cp.release.value=0.14;
+ var g=oc.createGain();g.gain.value=1;
  src.connect(hpf);hpf.connect(f1);f1.connect(f2);f2.connect(f3);f3.connect(dess);dess.connect(lpf);lpf.connect(cp);cp.connect(g);g.connect(oc.destination);
  if(s.echo>0){var d=oc.createDelay(1);d.delayTime.value=0.22;var fb=oc.createGain();fb.gain.value=Math.min(0.6,s.echo*0.5);var wet=oc.createGain();wet.gain.value=Math.min(0.7,s.echo*0.6);
   g.connect(d);d.connect(fb);fb.connect(d);d.connect(wet);wet.connect(oc.destination)}
@@ -3289,6 +3299,8 @@ async function process(ab,s,targetSec){
  while(e0>s0&&Math.abs(od[e0])0.004)e0--;
  var pad=Math.floor(0.03*sr);s0=Math.max(0,s0-pad);e0=Math.min(od.length-1,e0+pad);
  var tr=od.slice(s0,e0+1),fl=Math.min(Math.floor(0.008*sr),tr.length>>1);
+var tg2=0.0662*Math.max(0.05,1+s.vol/100),rr2=rms(tr);
+  if(rr2>0.0005){var kn=tg2/rr2,pkt=0;for(var zz=0;zztr.length;zz++){var a3=tr[zz]0?-tr[zz]:tr[zz];if(a3>pkt)pkt=a3}if(pkt*kn>0.98)kn=0.98/pkt;for(var zq=0;zqtr.length;zq++)tr[zq]*=kn}
  for(var fi=0;fifl;fi++){var fk=fi/fl;tr[fi]*=fk;tr[tr.length-1-fi]*=fk}
  return{data:tr,rate:rate,raw:buf.duration};
 }
@@ -3431,7 +3443,7 @@ function zsfBreath(sr,dur,rnd){
  }
  var k=1/Math.sqrt(Math.max(1e-12,sq/n));for(var j=0;jn;j++)o[j]*=k;return o;
 }
-var BREATH=0.045;try{var bv=localStorage.getItem("zsf_breath2");if(bv!==null&&bv!==""){var bn=parseFloat(bv);if(bn>=0&&bn=0.3)BREATH=bn}}catch(_){}
+var BREATH=0;try{var bv=localStorage.getItem("zsf_breath3");if(bv!==null&&bv!==""){var bn=parseFloat(bv);if(bn>=0&&bn=0.3)BREATH=bn}}catch(_){}
  
 function availFor(arr,i){
   
@@ -4291,6 +4303,14 @@ function init(){
   f.addEventListener("change",function(e){if(e.target.id==="zkt_force"){try{localStorage.setItem("zsf_tts_force",e.target.checked?"1":"0")}catch(_){}drawFit()}});
  })();
  $("zkt_ctl").onchange=function(e){if(e.target.id==="zkt_eq"){S[cur].eq=e.target.value;persist()}};
+(function(){var ed=$("zkt_edit"),ct=$("zkt_ctl");
+  if(ed){
+   ed.addEventListener("input",function(e){if(e.target&&e.target.id==="zkt_name"){S[cur].name=e.target.value;persist();var nm=$("zkt_slots").querySelectorAll(".zpv-nm")[cur];if(nm)nm.textContent=nmOf(cur)}});
+   ed.addEventListener("change",function(e){if(e.target&&e.target.id==="zkt_voice"){S[cur].voice=e.target.value;persist();drawPills();drawCtl();if(typeof pvRender==="function")pvRender()}});
+  }
+  ct.addEventListener("input",function(e){var r=e.target;if(!r||!r.classList||!r.classList.contains("zpv-rg"))return;var k=r.getAttribute("data-k"),c=cfgOf(k);if(!c)return;var v=Math.max(c.a,Math.min(c.b,Math.round(parseFloat(r.value)*10)/10));S[cur][k]=v;var f=r.closest(".zpv-f"),b=f?f.querySelector(".zpv-v b"):null;if(b)b.textContent=fmt(k,v);drawSum()});
+  ct.addEventListener("change",function(e){var r=e.target;if(r&&r.classList&&r.classList.contains("zpv-rg")){persist();drawCtl()}});
+ })();
  $("zkt_save").onclick=function(){persist();st("💾 បានរក្សាទុក Preset សំឡេងតួ",null);toastP("✅ បានរក្សាទុក Preset សំឡេងតួ")};
  $("zkt_reset").onclick=function(){S[cur]=defS(cur);draw();persist();toastP("↺ បានកំណត់ "+TAGN[cur]+" ជាលំនាំដើម")};
  $("zkt_test").onclick=test;$("zkt_run").onclick=exportAll;$("zkt_ext_run").onclick=extExport;$("zkt_audio_run").onclick=audioOnly;
@@ -10199,7 +10219,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
       "",
       "### 4. EXECUTION & VALIDATION WORKFLOW",
       "1) Process chronologically and build a lightweight voice table: every distinct voice you hear gets a short id (A, B, C ...), a gender (male or female) and a 3-6 word acoustic description (e.g. 'deep calm baritone', 'bright young female'). If KNOWN VOICES are given below and a voice sounds the same, reuse that id and gender; a new person gets a new id. One id = ONE person = ONE gender, always.",
-      "2) Global consistency pass: the same voice in the same scene keeps the same gender/classification. One speaker often says several lines in a row, so never assume speakers alternate.",
+      "2) Global consistency pass: the same voice in the same scene keeps the same gender/classification. One speaker often says several lines in a row, so never assume speakers alternate. Timing hint: lines separated by a tiny gap (under about 0.3 s) are usually the same speaker continuing; a male/female switch needs a real change of voice that you can hear. Very short lines (one or two words) are the easiest to get wrong, so compare them with the neighbouring lines of the same scene.",
       "3) Strict validation before answering: (a) every line has a spk that exists in your voice table; (b) a spk never changes gender; (c) whenever consecutive lines switch between a male and a female voice, re-listen to those exact timestamps and confirm the voice really changed; (d) if unsure about a line, prefer the voice of the neighbouring line in the same scene over guessing from the words; (e) the ids and the number of lines match the input exactly.",
       "Times are relative to the start of this clip (mm:ss.mmm).",
       "@@CTX@@",
@@ -10288,7 +10308,9 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     "   [3] male inner thought (clear audio evidence of inner monologue: echo, filtered or detached voice)",
     "   [4] female inner thought (same evidence)",
     "   Whisper, shout, off-screen voice, narrator and phone calls are SPOKEN ([1] or [2]). If unsure between spoken and thought, choose spoken. If voices overlap, use the main voice only.",
-    "3) Translate the line into natural, spoken Khmer that fits the scene and tone. Keep character names consistent.",
+    "   VOICE RULES: gender is judged ONLY from the physical voice (pitch and timbre), never from names, pronouns, titles or the idea that speakers alternate. Build a small voice table in your head (A, B, C ...): one voice = one person = one gender. One speaker often says several lines in a row; lines with a tiny gap (under about 0.3 s) are usually the same speaker continuing. When two neighbouring lines switch between male and female, re-listen to confirm the voice really changed. If still unsure, keep the voice of the neighbouring line in the same scene.",
+    "3) Translate the line into natural, spoken Khmer. The STORY CARD / genre block given below (if present) is MANDATORY: it decides vocabulary, register, rhythm and emotion of EVERY line (e.g. revenge or face-slap = cold, sharp, proud; sweet romance = soft and warm; ancient or palace = old-style and royal words by rank; comedy = light and playful; horror or suspense = tense and short). If the genre says AUTO, work out the genre from the story and sound, then follow it. Keep character names and forms of address consistent.",
+    "4) The tag decides the Khmer wording: a male speaker ([1]/[3]) uses ខ្ញុំ / ខ្ញុំបាទ and the reply «បាទ»; a female speaker ([2]/[4]) uses ខ្ញុំ / នាងខ្ញុំ and the reply «ចាស». Never mix them. An inner thought ([3]/[4]) is a private first-person monologue: address nobody and add no polite reply particles.",
     "",
     "STRICT RULES:",
     "- Do NOT change sequence numbers or timestamps. The number of entries in your output MUST equal the number in the input.",
@@ -10332,7 +10354,8 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     if(((t1+PAD*1000-clipMs)/1000)*bps>14*1024*1024)throw new Error("សំឡេងវែងពេកសម្រាប់ផ្នែកនេះ");
     var wav=b64(sliceWav(A.ab,A.info,Math.max(0,clipMs/1000-A.offset),(t1/1000+PAD)-A.offset));
     var srt=lines.map(function(l,i){var ti=times(l);return (i+1)+"\n"+fmtS(ti.s-clipMs)+" --> "+fmtS(ti.e-clipMs)+"\n"+l.text+"\n"}).join("\n");
-    var prompt=DIRECT_PROMPT+(gl?("\n\nGLOSSARY (Chinese names/terms - always use one consistent Khmer rendering):\n"+String(gl).slice(0,3000)):"")+"\n\n=== ORIGINAL SRT ===\n"+srt;
+    var story="";try{if(typeof zsfStoryBlock==="function")story=String(zsfStoryBlock()||"").slice(0,6000);}catch(_){story="";}
+    var prompt=DIRECT_PROMPT+(story?("\n\nSTORY CARD / GENRE (Khmer notes - MANDATORY for the translation of every line):"+story):"")+(gl?("\n\nGLOSSARY (Chinese names/terms - always use one consistent Khmer rendering):\n"+String(gl).slice(0,3000)):"")+"\n\n=== ORIGINAL SRT ===\n"+srt;
     var model=(typeof selections!=="undefined"&&selections&&selections.geminiModel)||"gemini-flash-latest";
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0)+(rr||0),txt=null,last=null;
      
@@ -10434,7 +10457,8 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
           if(tq.s-tp.e3000&&tn.s-tq.e3000)sus[q]=1;
         }
       }
-      var sl=Object.keys(sus).map(Number).sort(function(a,b){return a-b}).slice(0,25),wins=[];
+      srtBlocks.forEach(function(b,i){var m=TAG_RE.exec(b.text||"");if(m&&+m[1]>=3)sus[i]=1;});
+      var sl=Object.keys(sus).map(Number).sort(function(a,b){return a-b}).slice(0,40),wins=[];
       sl.forEach(function(i){var a0=Math.max(0,i-2),b0=Math.min(srtBlocks.length-1,i+2),L=wins[wins.length-1];
         if(L&&a0=L.b+1){L.b=Math.max(L.b,b0);L.t.push(i);}else wins.push({a:a0,b:b0,t:[i]});});
       for(var w=0;wwins.length;w++){
@@ -10732,6 +10756,38 @@ html body #zkt_card .zpv-rs{flex:none;margin:0;padding:2px 9px;border-radius:999
 #zkt_card .zfit-sw span{display:flex;flex-direction:column;gap:2px}
 #zkt_card .zfit-sw b{font-size:14px;font-weight:800;color:#fff}
 #zkt_card .zfit-sw small{font-size:11.5px;line-height:1.4;color:#9ca3af}
+/style>
+style id="zsf-v108-presetcards">
+#zkt_card .zpv-hint{display:none}
+#zkt_card .zpv-pills{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+html body #zkt_card .zpv-card{position:relative;display:flex;flex-direction:column;gap:5px;min-width:0;padding:9px 8px 8px;border-radius:14px;background:#1a2438;border:1.5px solid #2c3956;color:#dfe8f7;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;transition:border-color .15s,box-shadow .15s}
+html body #zkt_card .zpv-card.on{border-color:#22c55e;background:linear-gradient(180deg,rgba(34,197,94,.12),#1a2438);box-shadow:0 0 0 1px rgba(34,197,94,.35),0 4px 14px rgba(34,197,94,.18)}
+#zkt_card .zpv-ch{display:flex;align-items:center;justify-content:space-between}
+#zkt_card .zpv-tg,#zkt_card .zpv-eb{display:inline-block;padding:1px 7px;border-radius:6px;font-size:11px;font-weight:800;color:#fff;background:#3b82f6}
+#zkt_card .zpv-eb{font-size:12px;padding:2px 8px}
+#zkt_card .zpv-card.t2 .zpv-tg,#zkt_card .zpv-eb.t2{background:#ef4444}
+#zkt_card .zpv-card.t3 .zpv-tg,#zkt_card .zpv-eb.t3{background:#f59e0b}
+#zkt_card .zpv-card.t4 .zpv-tg,#zkt_card .zpv-eb.t4{background:#10b981}
+#zkt_card .zpv-dot{width:7px;height:7px;border-radius:50%;background:#475569}
+#zkt_card .zpv-card.on .zpv-dot{background:#22c55e;box-shadow:0 0 6px #22c55e}
+#zkt_card .zpv-nm{font-size:12px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#zkt_card .zpv-vn{display:flex;align-items:center;gap:4px;min-width:0;font-size:10.5px;color:#9fb0cc}
+#zkt_card .zpv-vn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#zkt_card .zpv-vn .zpv-i{width:11px;height:11px}
+#zkt_card .zpv-sm{font-size:9.5px;color:#8fa0bd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#zkt_card .zpv-edit{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;padding:10px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid #2c3956}
+#zkt_card .zpv-et{font-size:12px;font-weight:700;color:#a4b4d0}
+#zkt_card .zpv-ef{flex:1 1 140px;display:flex;align-items:center;gap:6px;min-width:0;margin:0;font-size:12px;color:#a4b4d0}
+#zkt_card .zpv-ef span{flex:none;white-space:nowrap}
+html body #zkt_card .zpv-ef input,html body #zkt_card .zpv-ef select{flex:1;min-width:0;width:100%;height:40px;margin:0;padding:0 10px;border-radius:12px;background:#1a2438;border:1px solid #2c3956;color:#fff;font-family:inherit;font-size:14px;font-weight:700;box-shadow:none;outline:0}
+#zkt_card .zpv-grid{gap:10px 12px}
+html body #zkt_card .zpv-fc{margin:0;padding:10px 10px 8px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid #2c3956}
+#zkt_card .zpv-wide{grid-column:1/-1}
+#zkt_card .zpv-li{display:inline-flex;vertical-align:-3px;margin-right:6px;color:var(--accent-glow,#00e5ff)}
+#zkt_card .zpv-li .zpv-i{width:14px;height:14px}
+html body #zkt_card .zpv-fc .zpv-st{height:40px}
+html body #zkt_card input.zpv-rg{display:block;width:100%;height:22px;margin:8px 0 0;padding:0;border:0;background:transparent;box-shadow:none;accent-color:var(--accent-glow,#00e5ff);-webkit-appearance:auto;appearance:auto}
+#zkt_card .zpv-star .zpv-i{width:20px;height:20px;color:var(--accent-glow,#00e5ff)}
 /style>
 style id="zsf-v107-admbar">
 body.zsf-admin #zkt_card .zkt-titlebar{flex-wrap:wrap}
@@ -11133,7 +11189,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.56";
+  var EMB="1.60";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
