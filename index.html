@@ -10680,14 +10680,15 @@ html body #zkt_card #zkt_cuelist .zkt-cue.zkt-warn,html body #project1MediaToSrt
 (function(){
 "use strict";
 var $=function(i){return document.getElementById(i)};
-var CH=8*1024*1024,busy=false;
+var CH=8*1024*1024,busy=false,PART_SEC=180,PART_LINES=60,upCache=null;
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k)||"";localStorage.setItem(k,v)}catch(e){return ""}}
 function st(m,p){var s=$("zsfGemStatus");if(s)s.textContent=m;if(p!=null){var b=$("zsfGemBar");if(b)b.style.width=Math.max(0,Math.min(100,p))+"%"}}
 var DEF_URL="https://sweet-firefly-faa0.saanaafckoko.workers.dev";
 function base(){return((($("zsfGemUrl")&&$("zsfGemUrl").value)||DEF_URL)).trim().replace(/\/+$/,"")}
 function hdr(h){h=h||{};var a=(($("zsfGemAcc")&&$("zsfGemAcc").value)||"").trim();if(a)h["X-Access"]=a;return h}
 async function call(path,opt){
-  var r=await fetch(base()+path,opt),j;
+  var r,j;
+  try{r=await fetch(base()+path,opt)}catch(e){throw new Error("ភ្ជាប់ Worker មិនបាន ឬចាំយូរពេក (Failed to fetch)")}
   try{j=await r.json()}catch(e){j={error:"HTTP "+r.status}}
   if(!r.ok||j.error)throw new Error((j.error||("HTTP "+r.status))+(j.detail?" — "+j.detail:""));
   return j;
@@ -10708,32 +10709,101 @@ function blocksSrt(){
   })}catch(e){}
   return {srt:a.join("\n"),idx:idx};
 }
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+function secOf(t){var m=String(t||"").match(/(\d+):(\d+):(\d+)[,.](\d+)/);return m?(+m[1])*3600+(+m[2])*60+(+m[3])+(+m[4])/1000:0}
+function splitGroups(blocks){
+  /* កាត់ SRT ជាផ្នែកៗ (ប្រហែល 3 នាទី ឬ 60 បន្ទាត់) ដើម្បីឲ្យ Gemini ធ្វើតែម្តងតិចៗ */
+  var G=[],cur=[],t0=0;
+  blocks.forEach(function(b){
+    var s=secOf(String(b.time).split("-->")[0]);
+    if(cur.length&&(s-t0>PART_SEC||cur.length>=PART_LINES)){G.push(cur);cur=[]}
+    if(!cur.length)t0=s;
+    cur.push(b);
+  });
+  if(cur.length)G.push(cur);
+  return G;
+}
+async function uploadVideo(f,P){
+  var mime=f.type||"video/mp4",size=f.size,sig=(f.name||"")+":"+size+":"+(f.lastModified||0),file=null;
+  P("📡 កំពុងចាប់ផ្តើមផ្ញើ…",2);
+  var s0=await callRetry("/start",function(){return{method:"POST",headers:hdr({"Content-Type":"application/json"}),body:JSON.stringify({size:size,mime:mime,name:f.name||"video"})}},3);
+  var up=s0.uploadUrl;
+  for(var off=0;size>off;off+=CH){
+    var end=Math.min(off+CH,size),fin=end>=size,o=off;
+    P("⬆️ កំពុងផ្ញើវីដេអូ "+Math.round(end/1048576)+" / "+Math.round(size/1048576)+" MB",3+(end/size)*62);
+    var r=await callRetry("/chunk",function(){return{method:"POST",headers:hdr({"X-Upload-Url":up,"X-Offset":String(o),"X-Final":fin?"1":"0"}),body:f.slice(o,end)}},3);
+    if(fin)file=r.file;
+  }
+  if(!file)throw new Error("ផ្ញើវីដេអូមិនចប់");
+  upCache={sig:sig,file:file,t:Date.now()};
+  return file;
+}
+/* Worker ចាស់លុបឯកសារវីដេអូចោលក្រោយ Gemini ធ្វើរួចម្តង → ពេលនោះត្រូវផ្ញើវីដេអូម្តងទៀត */
+function needReupload(e){return /403|404|permission|not.?found|not exist|precondition|not in an active/i.test(String((e&&e.message)||e))}
+async function analyzePart(ctx,lines,gl,P,tag,lo,hi,depth){
+  var srt=lines.map(function(b,i){return (i+1)+"\n"+b.time+"\n"+b.text+"\n"}).join("\n");
+  var t1=String(lines[0].time).split("-->")[0].trim(),t2=String(lines[lines.length-1].time).split("-->")[1];t2=String(t2||"").trim();
+  var note="NOTE: the attached video is the COMPLETE episode, but translate ONLY the subtitle lines in the SRT given in this request (they cover "+t1+" to "+t2+"). Do not add, skip or merge lines; keep every id and timestamp unchanged.";
+  var gl2=(gl?gl+"\n\n":"")+note;
+  var canSplit=lines.length>=8&&3>depth,err=null;
+  for(var at=0;3>at;at++){
+    var pc=lo,re=false,tmr=setInterval(function(){pc=Math.min(hi,pc+0.6);P(tag,pc)},1000);
+    P(tag,lo);
+    try{
+      var res=await call("/analyze",{method:"POST",headers:hdr({"Content-Type":"application/json"}),body:JSON.stringify({file:ctx.file,srt:srt,glossary:gl2})});
+      var out=res&&res.srt?parseSRT(res.srt):[];
+      if(!out.length)throw new Error("Gemini មិនបានផ្ញើ SRT មកវិញ");
+      if(out.length*2>lines.length)return out;
+      throw new Error("Gemini ឆ្លើយមិនគ្រប់បន្ទាត់ ("+out.length+"/"+lines.length+")");
+    }catch(e){
+      err=e;
+      if(needReupload(e)&&8>ctx.up){
+        ctx.up++;upCache=null;re=true;
+        try{ctx.file=await uploadVideo(ctx.f,function(m){P("♻️ "+m,lo)});at--;}catch(e2){err=e2;re=false}
+      }
+    }finally{clearInterval(tmr)}
+    if(re)continue;
+    if(canSplit)break;
+    await sleep(3000*(at+1));
+  }
+  if(canSplit){
+    var h=Math.ceil(lines.length/2),mid=(lo+hi)/2;
+    P("✂️ "+tag+" — ផ្នែកនេះធ្ងន់ពេក កាត់ជា ២ ផ្នែកតូចជាងមុន…",lo);
+    await sleep(1200);
+    var A=await analyzePart(ctx,lines.slice(0,h),gl,P,tag+" (១)",lo,mid,depth+1);
+    var B=await analyzePart(ctx,lines.slice(h),gl,P,tag+" (២)",mid,hi,depth+1);
+    return A.concat(B);
+  }
+  throw err;
+}
 async function core(P,srt){
   var f=null;try{f=(window.__zsfMedia&&window.__zsfMedia.file)||null}catch(e){}
   if(!f)throw new Error("សូមបញ្ចូល Video នៅផ្នែក 01 មុន");
   if(!srt)throw new Error("មិនទាន់មាន SRT ចិន — សូមបង្កើត ឬនាំចូល SRT មុន");
   if(!base())throw new Error("សូមដាក់ Worker URL មុន (ផ្នែក 03B)");
   ls("zsf_gem_url",base());ls("zsf_gem_acc",(($("zsfGemAcc")&&$("zsfGemAcc").value)||"").trim());
-  var tm=null;
+  var ctx={f:f,file:null,up:0};
   try{
-    var mime=f.type||"video/mp4",size=f.size;
-    P("📡 កំពុងចាប់ផ្តើមផ្ញើ…",2);
-    var s0=await callRetry("/start",function(){return{method:"POST",headers:hdr({"Content-Type":"application/json"}),body:JSON.stringify({size:size,mime:mime,name:f.name||"video"})}},3);
-    var up=s0.uploadUrl,file=null;
-    for(var off=0;size>off;off+=CH){
-      var end=Math.min(off+CH,size),fin=end>=size,o=off;
-      P("⬆️ កំពុងផ្ញើវីដេអូ "+Math.round(end/1048576)+" / "+Math.round(size/1048576)+" MB",3+(end/size)*62);
-      var r=await callRetry("/chunk",function(){return{method:"POST",headers:hdr({"X-Upload-Url":up,"X-Offset":String(o),"X-Final":fin?"1":"0"}),body:f.slice(o,end)}},3);
-      if(fin)file=r.file;
-    }
-    if(!file)throw new Error("ផ្ញើវីដេអូមិនចប់");
-    var pc=68;P("🤖 Gemini កំពុងមើលវីដេអូ និងបកប្រែ… (អាចប្រើពេល 1-3 នាទី)",pc);
-    tm=setInterval(function(){pc=Math.min(96,pc+0.6);P("🤖 Gemini កំពុងមើលវីដេអូ និងបកប្រែ… (អាចប្រើពេល 1-3 នាទី)",pc)},1000);
+    var sig=(f.name||"")+":"+f.size+":"+(f.lastModified||0);
+    if(upCache&&upCache.sig===sig&&(40*3600*1000>Date.now()-upCache.t)){
+      ctx.file=upCache.file;P("♻️ វីដេអូបានផ្ញើរួចហើយ — មិនបាច់ផ្ញើម្តងទៀត",66);
+    }else ctx.file=await uploadVideo(f,P);
     var gl="";try{gl=($("zsfGlossary")&&$("zsfGlossary").value||"").trim()}catch(e){}
-    var res=await call("/analyze",{method:"POST",headers:hdr({"Content-Type":"application/json"}),body:JSON.stringify({file:file,srt:srt,glossary:gl})});
-    if(!res.srt)throw new Error("Gemini មិនបានផ្ញើ SRT មកវិញ");
-    return res;
-  }finally{if(tm)clearInterval(tm)}
+    var blocks=parseSRT(srt),groups=splitGroups(blocks),N=groups.length,all=[];
+    if(!N)throw new Error("មិនទាន់មាន SRT ចិន — សូមបង្កើត ឬនាំចូល SRT មុន");
+    for(var gi=0;N>gi;gi++){
+      var lo=68+(gi/N)*28,hi=68+((gi+1)/N)*28-0.5;
+      var tag="🤖 Gemini កំពុងមើលវីដេអូ និងបកប្រែ… ផ្នែក "+(gi+1)+"/"+N;
+      var part=await analyzePart(ctx,groups[gi],gl,P,tag,lo,hi,0);
+      all=all.concat(part);
+      P("✅ ផ្នែក "+(gi+1)+"/"+N+" ចប់ ("+all.length+" បន្ទាត់)",68+((gi+1)/N)*28);
+    }
+    var merged=all.map(function(o,i){return (i+1)+"\n"+o.time+"\n"+o.text+"\n"}).join("\n");
+    return {srt:merged,outCount:all.length};
+  }catch(e){
+    if(needReupload(e))upCache=null;
+    throw e;
+  }
 }
 /* ប៊ូតុង 03B ដាច់ដោយឡែក (លាក់ហើយ) — នៅរក្សាទុកជាបម្រុង */
 async function run(){
@@ -10844,7 +10914,7 @@ setTimeout(installHook,2000);
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.25";
+  var EMB="1.27";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
