@@ -2709,6 +2709,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 button class="btn-auto-translate-large" id="btn_auto_translate" onclick="startAutoTranslateLoop()">
                 🚀 បកប្រែដោយ AI
             /button>
+button class="btn-auto-translate-large" id="btn_gem_translate" type="button" onclick="zsfGemClick()" style="display:none;font-size:15px;padding:12px;margin-top:8px">🤖 បកប្រែដោយ Gemini (វីដេអូ)/button>
 /div>
 div class="pagination-container">
 button class="arrow-btn" onclick="changeChunk(-1)">◀/button>
@@ -3007,6 +3008,8 @@ html body #project1MediaToSrt #zkt_card #zkt_vhead:active{filter:brightness(1.15
 #zkt_admin{display:none}
 body.zsf-admin #zkt_admin{display:block}
 html body #zsfGemCard{display:none!important}
+html body #btn_gem_translate{display:none!important}
+html body.zsf-admin #btn_gem_translate{display:block!important;width:100%}
 html body.zsf-admin #zsfGemCard{display:block!important}
 body.zsf-admin #zkt_admin.zkt-closed{display:none}
 #zkt_admin .zkt-conn-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 12px}
@@ -10752,13 +10755,17 @@ async function run(){
   }
 }
 /* ភ្ជាប់ចូលប៊ូតុង «🚀 បកប្រែដោយ AI» និង Export 1 Click — បើមាន Worker URL + Video ប្រើ Gemini ជំនួស */
+window.zsfGemClick=function(){window.__zsfGemStrict=true;window.startAutoTranslateLoop()};
 function installHook(){
   var orig=window.startAutoTranslateLoop;
   if(typeof orig!=="function"||orig.__zsfGem)return;
   var w=async function(){
+    var strict=!!window.__zsfGemStrict;window.__zsfGemStrict=false;
     var hasVid=false;try{hasVid=!!(window.__zsfMedia&&window.__zsfMedia.file)}catch(e){}
     var bs=blocksSrt();
-    if(!base()||!hasVid||!bs.idx.length||busy)return orig.apply(this,arguments);
+    if(strict&&(!hasVid||!bs.idx.length)){try{showToast("⚠️ ត្រូវមានវីដេអូ និង SRT ចិនជាមុន",false)}catch(e){}return}
+    if(!strict&&(!base()||!hasVid||!bs.idx.length||busy))return orig.apply(this,arguments);
+    if(busy)return;
     try{if(isTranslating)return}catch(e){}
     var P=function(m,p){try{toggleProgressBar(true,m,p)}catch(e){}try{st(m,p)}catch(e){}};
     busy=true;try{isTranslating=true}catch(e){}
@@ -10800,11 +10807,12 @@ function installHook(){
       setTimeout(function(){try{toggleProgressBar(false)}catch(e){}},1800);
       if(!remain){try{zsfScrollToDownload()}catch(e){}}
     }catch(e){
-      var m="⚠️ Gemini Worker មិនបាន ("+String((e&&e.message)||e).slice(0,90)+") — ប្រើវិធីបកប្រែចាស់ជំនួស";
+      var m=strict?("❌ Gemini៖ "+String((e&&e.message)||e).slice(0,160)):("⚠️ Gemini Worker មិនបាន ("+String((e&&e.message)||e).slice(0,90)+") — ប្រើវិធីបកប្រែចាស់ជំនួស");
       window.__zsfGemErr=String((e&&e.message)||e);
       try{showToast(m,false)}catch(x){}
       st(m,0);
-      fell=true;
+      fell=!strict;
+      if(strict){try{toggleProgressBar(true,m,0)}catch(x){}setTimeout(function(){try{toggleProgressBar(false)}catch(x){}},6000)}
     }finally{
       busy=false;try{isTranslating=false;updateLineCounts()}catch(e){}
     }
@@ -10836,7 +10844,7 @@ setTimeout(installHook,2000);
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.24";
+  var EMB="1.25";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
