@@ -2627,11 +2627,11 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 div class="toggle-switch" style="margin-bottom:12px;">
 span class="toggle-label" id="lbl_fit">✂️ AI កាត់ខ្លីអត្ថបទខ្មែរឱ្យសមពេល (បិទ = លឿនជាង)/span>
 label class="switch">
-input checked="" id="fitToggle" onchange="try{localStorage.setItem('zsf_fit_on',this.checked?'1':'0')}catch(e){}" type="checkbox"/>
+input id="fitToggle" onchange="try{localStorage.setItem('zsf_fit_on',this.checked?'1':'0')}catch(e){}" type="checkbox"/>
 span class="slider">/span>
 /label>
 /div>
-script>try{if(localStorage.getItem('zsf_fit_on')==='0')document.getElementById('fitToggle').checked=false}catch(e){}/script>
+script>try{if(localStorage.getItem('zsf_fit_on')==='1')document.getElementById('fitToggle').checked=true}catch(e){}/script>
 /div>
 div class="settings-group vrs-g-file">
 div class="settings-group-label">📂 ឯកសារ SRT/div>
@@ -2921,7 +2921,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 label class="zkt-xc" style="display:none">input type="checkbox" id="zkt_x_video" checked/>span>🎬 ផ្គុំជាវីដេអូ/span>/label>
 label class="zkt-xc">input type="checkbox" id="zkt_x_mute" checked/>span>🔇 បិទសំឡេងដើម/span>/label>
 /div>
-div class="zkt-xorig" id="zkt_x_origrow" style="display:none">div class="zkt-xr">label for="zkt_x_origvol">🎼 សំឡេង Background (ពេលមិនអាន)/label>b id="zkt_x_ovt">100%/b>/div>input type="range" id="zkt_x_origvol" min="0" max="100" step="5" value="100"/>div class="zkt-xr">label for="zkt_x_duck">🗣️ Background ពេល TTS កំពុងអាន/label>b id="zkt_x_duckt">8%/b>/div>input type="range" id="zkt_x_duck" min="0" max="100" step="1" value="8"/>/div>
+div class="zkt-xorig" id="zkt_x_origrow" style="display:none">div class="zkt-xr">label for="zkt_x_origvol">🎼 សំឡេង Background (ពេលមិនអាន)/label>b id="zkt_x_ovt">100%/b>/div>input type="range" id="zkt_x_origvol" min="0" max="100" step="5" value="100"/>div class="zkt-xr">label for="zkt_x_duck">🗣️ Background ពេល TTS កំពុងអាន/label>b id="zkt_x_duckt">3%/b>/div>input type="range" id="zkt_x_duck" min="0" max="20" step="1" value="3"/>/div>
 div class="zkt-xnote">💡 ធីក «ផ្គុំជាវីដេអូ» = យកវីដេអូដែលដាក់នៅប្រអប់ខាងលើ ផ្គុំជាមួយសំឡេងខ្មែរ។ ធីក «បិទសំឡេងដើម» = សំឡេងចិនដើមនឹងមិនលាយចូលទេ។ ការនាំចេញចំណាយពេលស្មើនឹងប្រវែងវីដេអូ — កុំចាកចេញពីទំព័រ ឬបិទអេក្រង់។/div>
 /div>
 button class="btn-3d btn-full zkt-run" id="zkt_ext_run" type="button" style="margin-bottom:8px;background:linear-gradient(135deg,#7c3aed,#2563eb)!important;color:#fff!important">📥🎬 Export ជាមួយ SRT ខ្មែរពីខាងក្រៅ/button>
@@ -3485,7 +3485,7 @@ async function runAll(quiet){
    var o=Math.floor(o0*sr);
    for(var k=0;kd.length&&o+ktotal;k++)master[o+k]+=d[k];
    cursor=o0+d.length/sr+0.04;
-   if(segsTmp)segsTmp.push([o0,o0+d.length/sr]);
+   if(segsTmp)segsTmp.push([Math.min(o0,c.start/1000),Math.max(o0+d.length/sr,c.end/1000)]);
     
    try{if(BREATH>0&&d.length/sr>0.3){
     var endT=o0+d.length/sr,nxS=cues[i+1]?cues[i+1].start/1000:1e9,rnd=zsfRand(i*7919+13);
@@ -8238,7 +8238,7 @@ async function zsfKhmerFit(){
   let bg=null; try{ bg=zsfBorrowGaps(); }catch(e){ console.warn("zsfBorrowGaps",e); }          
   const fin=(r)=>{ try{ r.borrowed=bg?bg.n:0; r.overIds=zsfKmOverList().map(x=>x.b.id); window.__zsfKmOverIds=r.overIds; }catch(_){} return r; };
    
-  let off=false; try{ off=localStorage.getItem("zsf_fit_on")==="0"; }catch(_){}
+  let off=false; try{ off=localStorage.getItem("zsf_fit_on")!=="1"; }catch(_){ off=true; }
   if(off) return fin({before:0,fixed:0,left:0,skipped:true});
   window.__zsfFitDeadline=Date.now()+90000;       
   const r1=await zsfKhmerFitOnce();
@@ -11195,7 +11195,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.61";
+  var EMB="1.64";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
