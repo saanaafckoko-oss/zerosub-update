@@ -2920,7 +2920,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 div class="zkt-xorig" id="zkt_x_origrow" style="display:none">div class="zkt-xr">label for="zkt_x_origvol">🎼 សំឡេង Background (ពេលមិនអាន)/label>b id="zkt_x_ovt">100%/b>/div>input type="range" id="zkt_x_origvol" min="0" max="100" step="5" value="100"/>div class="zkt-xr">label for="zkt_x_duck">🗣️ Background ពេល TTS កំពុងអាន/label>b id="zkt_x_duckt">3%/b>/div>input type="range" id="zkt_x_duck" min="0" max="20" step="1" value="3"/>/div>
 div class="zkt-xnote">💡 ធីក «ផ្គុំជាវីដេអូ» = យកវីដេអូដែលដាក់នៅប្រអប់ខាងលើ ផ្គុំជាមួយសំឡេងខ្មែរ។ ធីក «បិទសំឡេងដើម» = សំឡេងចិនដើមនឹងមិនលាយចូលទេ។ ការនាំចេញចំណាយពេលស្មើនឹងប្រវែងវីដេអូ — កុំចាកចេញពីទំព័រ ឬបិទអេក្រង់។/div>
 /div>
-button class="btn-3d btn-full zkt-run" id="zkt_ext_run" type="button" style="margin-bottom:8px;background:linear-gradient(135deg,#7c3aed,#2563eb)!important;color:#fff!important">📥🎬 Export ជាមួយ SRT ខ្មែរពីខាងក្រៅ/button>
+button class="btn-3d btn-full zkt-run" id="zkt_ext_run" type="button" style="margin-bottom:8px">📥🎬 Export ជាមួយ SRT ខ្មែរពីខាងក្រៅ/button>
 div class="zkt-extnote" style="margin:0 2px 10px;font-size:12px;line-height:1.5;color:#9fb0cc">វីដេអូ (ប្រអប់ខាងលើ) + SRT ខ្មែរដែលអ្នកនាំចូល → អានជាសំឡេងខ្មែរ → ផ្គុំជាវីដេអូ → ទាញយក។ មិនទាញ SRT ពីវីដេអូ ហើយមិនបកប្រែទេ។/div>
 button class="btn-3d btn-full zkt-run zkt-export" id="zkt_run" type="button">🎬 នាំចេញវីដេអូ Export 1 Click/button>
 div id="zkt_stat" class="zkt-stat">/div>
@@ -2936,6 +2936,16 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 div class="zkt-note" style="margin-top:8px">💡 បិទតួអង្គ ([✕]) ដែលមិនចង់អាន រួចចុច «លុប ហើយបង្កើតថ្មី» ដើម្បីដំណើរការសារជាថ្មី។/div>
 /div>
 /section>
+style id="zkt_tidy">
+html body #zkt_card #zkt_aopt{background:rgba(255,255,255,.04)!important;border:1px solid rgba(255,255,255,.14)!important;box-shadow:none!important;border-radius:16px!important;padding:12px!important}
+html body #zkt_card #zkt_aopt .zkt-aopt-h{font-size:13px!important;opacity:.85!important;margin:0 0 8px!important;text-shadow:none!important}
+html body #zkt_card #zkt_audio_run{background:transparent!important;border:1.5px solid #f59e0b!important;color:#fbbf24!important;box-shadow:none!important;text-shadow:none!important;padding:12px!important;font-size:14px!important}
+html body #zkt_card #zkt_ext_run{background:transparent!important;border:1.5px solid rgba(167,139,250,.75)!important;color:#c4b5fd!important;box-shadow:none!important;text-shadow:none!important;padding:12px!important;font-size:14px!important}
+html body #zkt_card #zkt_run{box-shadow:0 6px 18px rgba(16,185,129,.28)!important;text-shadow:none!important;font-size:16px!important;padding:16px 12px!important;margin-top:4px!important}
+html body #zkt_card .zkt-extnote,html body #zkt_card .zkt-xnote,html body #zkt_card .zkt-note{font-size:11.5px!important;line-height:1.5!important;opacity:.6!important;margin:6px 2px 12px!important}
+html body #zkt_card #zkt_del,html body #zkt_card #zkt_redo{background:transparent!important;box-shadow:none!important;text-shadow:none!important;font-size:12.5px!important;padding:10px!important;color:rgba(255,255,255,.82)!important;border:1px solid rgba(255,255,255,.22)!important}
+html body #zkt_card #zkt_del{color:#fca5a5!important;border-color:rgba(248,113,113,.45)!important}
+/style>
 style>
 
 #zkt_card .zkt-titlebar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
@@ -4344,6 +4354,38 @@ function init(){
    };
    $("zkt_srt_clear").onclick=async function(){if(ta.value.trim()&&!(await zsfConfirm("សម្អាតអត្ថបទ SRT ក្នុងប្រអប់នេះមែនទេ?")))return;ta.value="";srtInfo()};
    srtInfo();
+  })();
+  (function(){
+   var KEY="zsf_srt_session_v1",ta=$("zkt_srt_txt"),card=$("zkt_card");if(!ta||!card)return;
+   var last="",hadText=false,box=null;
+   try{var sty=document.createElement("style");sty.textContent="html body #zkt_card #zkt_recov{margin:0 0 12px;padding:12px;border-radius:16px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.5)}html body #zkt_card #zkt_recov .rt{font-weight:900;font-size:14px;margin:0 0 4px}html body #zkt_card #zkt_recov .rd{font-size:12px;opacity:.88;line-height:1.5;margin:0 0 10px;word-break:break-all}html body #zkt_card #zkt_recov .rb{display:flex;gap:8px;flex-wrap:wrap}html body #zkt_card #zkt_recov button{flex:1 1 130px;margin:0;padding:11px 10px;border-radius:12px;font-weight:900;font-size:13px;cursor:pointer;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.28)}html body #zkt_card #zkt_recov button.go{background:linear-gradient(180deg,#10b981,#059669);border-color:#34d399}";document.head.appendChild(sty)}catch(_){}
+   function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||"null");if(j&&typeof j.t==="string"&&j.t.trim()&&(Date.now()-(j.ts||0))30*864e5)return j}catch(_){}return null}
+   function drop(){try{localStorage.removeItem(KEY)}catch(_){}}
+   function nameNow(){var el=$("zkt_fname"),s=el?String(el.textContent||""):"";s=s.replace(/^[\u2705\s]+/,"").replace(/\s*\u2022.*$/,"").trim();return(s&&!/^មិនទាន់/.test(s))?s:"SRT"}
+   function ago(ts){var m=Math.max(0,Math.round((Date.now()-ts)/60000));if(m1)return"ទើបតែ";if(m60)return m+" នាទីមុន";var h=Math.round(m/60);if(h24)return h+" ម៉ោងមុន";return Math.round(h/24)+" ថ្ងៃមុន"}
+   function hide(){if(box&&box.parentNode)box.parentNode.removeChild(box);box=null}
+   function mk(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+   function show(j){
+    hide();box=mk("div","");box.id="zkt_recov";
+    box.appendChild(mk("div","rt","🔄 រកឃើញការងារចុងក្រោយ (Session Recovery)"));
+    box.appendChild(mk("div","rd","ឯកសារ: "+j.n+" ("+(j.c||0)+" បន្ទាត់) • រក្សាទុកកាលពី "+ago(j.ts||0)));
+    var row=mk("div","rb"),go=mk("button","go","↩ ទាញយកមកវិញ (Restore)"),no=mk("button","","🗑 មិនទាញយក");
+    go.type="button";no.type="button";
+    go.onclick=function(){try{setSrcTab("file")}catch(_){}ta.value=j.t;var fn=$("zkt_fname");if(fn)fn.textContent="✅ "+j.n+" • ស្ដារមកវិញ";try{srtInfo()}catch(_){}last=ta.value;hadText=true;hide()};
+    no.onclick=function(){drop();hide()};
+    row.appendChild(go);row.appendChild(no);box.appendChild(row);
+    card.insertBefore(box,card.children[1]||null);
+   }
+   function save(){
+    var v=ta.value;
+    if(!v.trim()){if(hadText){drop();hadText=false;last=""}return}
+    if(box)hide();
+    hadText=true;if(v===last)return;last=v;
+    try{localStorage.setItem(KEY,JSON.stringify({t:v,n:nameNow(),c:(v.match(/-->/g)||[]).length,ts:Date.now()}))}catch(_){}
+   }
+   var j0=load();if(j0&&!ta.value.trim())show(j0);
+   setInterval(save,2500);
+   try{window.addEventListener("pagehide",save);document.addEventListener("visibilitychange",function(){if(document.hidden)save()})}catch(_){}
   })();
   (function(){
    var v=$("zkt_x_video"),m=$("zkt_x_mute"),o=$("zkt_x_origvol"),row=$("zkt_x_origrow");if(!v||!m||!o||!row)return;
@@ -11356,7 +11398,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.75";
+  var EMB="1.77";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
