@@ -4817,21 +4817,21 @@ function normalizeTranslationForCheck(text){
 function containsForeignChars(text){
   let t=normalizeTranslationForCheck(text);
   if(!t)return false;
-  try{t=zsfStripAllowedLatin(t);}catch(_){}   
-  
-  
+  try{t=zsfStripAllowedLatin(t);}catch(_){}
+  /* V1.78: អក្សរកាត់ឡាតាំងធម្មតា (VIP, AI, KTV, OK, WiFi, kg, km ...) មិនចាត់ជាកំហុស — ដូចអ្វីដែល prompt អនុញ្ញាតឱ្យ AI ទុក */
+  t=t.replace(/\b[A-Z][A-Z0-9]{1,5}\b/g," ").replace(/\b(?:Wi-?Fi|iPhone|iPad|kg|km|cm|mm|ml|GB|MB)\b/g," ");
   return /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3040-\u30FF\uAC00-\uD7AF\u0E00-\u0E7F\u0400-\u04FF\u0600-\u06FF\u0900-\u097F\u0980-\u09FF\u0E80-\u0EFF\u1000-\u109FA-Za-z]/.test(t);
 }
 function translationNeedsRepair(block){
   const tr=String(block?.trans||"").trim();
+  /* V1.78: ប្រភពគ្មានអក្សរសោះ (♪ … — លេខសុទ្ធ) មិនត្រូវការបកប្រែ → កុំចាប់ជាបន្ទាត់ខុសជារៀងរហូត */
+  if(!/\p{L}/u.test(normalizeTranslationForCheck(block?.text||"")))return false;
   if(!tr)return true;
   const clean=normalizeTranslationForCheck(tr);
-  
-  
-  
   const hasKhmer=/[\u1780-\u17FF]/.test(clean);
-  const hasForeign=containsForeignChars(clean);
-  return !hasKhmer || hasForeign;
+  /* V1.78: បន្ទាត់ដែលបានទទួលយក (ខ្មែរ + ឡាតាំងតិចតួច) ក្រោយ AI ព្យាយាមហើយ — មានសុពលភាពតែអត្ថបទនោះប៉ុណ្ណោះ */
+  if(hasKhmer&&block.repairGaveUp===tr)return false;
+  return !hasKhmer||containsForeignChars(clean);
 }
 function getRepairCandidates(){return srtBlocks.filter(translationNeedsRepair);}
 function updateLineCounts(){
@@ -5513,9 +5513,8 @@ ${targets}`;
 function validateKhmerOutput(out,items){
   if(!validateTranslations(out,items))return false;
   return out.every(x=>{
-    let clean=normalizeTranslationForCheck(x.text);
-    try{clean=zsfStripAllowedLatin(clean);}catch(_){}
-    return /[\u1780-\u17FF]/.test(clean)&&!/[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3040-\u30FF\uAC00-\uD7AF\u0E00-\u0E7F\u0400-\u04FFA-Za-z]/.test(clean);
+    const clean=normalizeTranslationForCheck(x.text);
+    return /[\u1780-\u17FF]/.test(clean)&&!containsForeignChars(clean);
   });
 }
  
@@ -5584,46 +5583,47 @@ async function zsfRepairFast(items,onProgress){
   try{await zsfPrepareStoryBible();}catch(_){}
   const keys=userApiKeys.filter(Boolean);
   if(!keys.length)throw new Error("សូមបញ្ចូល Gemini API Key ជាមុនសិន");
-  const SIZE=5,groups=[];
+  /* V1.78: ក្រុមធំជាង (10) = prompt តិចជាង · ស្របគ្នាច្រើនជាង · ព្យាយាមអតិបរមា 2 ដងក្នុងមួយក្រុម (មិនវិលគ្រប់ Key) */
+  const SIZE=10,ATT=2,groups=[];
   for(let i=0;iitems.length;i+=SIZE)groups.push(items.slice(i,i+SIZE));
-  const CONC=Math.max(1,Math.min(groups.length,Math.max(3,Math.min(8,keys.length*2))));
+  const CONC=Math.max(1,Math.min(groups.length,Math.max(4,Math.min(8,keys.length*2))));
   let next=0,done=0,fixed=0,lastErr=null;
   const itemOf=(its,id)=>its.find(i=>String(i.id)===String(id));
   async function runGroup(its,startKey){
-    for(let n=0;nkeys.length;n++){
+    let part=[];const best=new Map();
+    for(let n=0;nATT;n++){
+      const todo=its.filter(i=>!part.some(x=>String(x.id)===String(i.id)));
+      if(!todo.length)break;
       const key=keys[(startKey+n)%keys.length];
       try{
-        const raw=await requestGeminiRepair(buildRepairPrompt(its),key,selections.geminiModel,25000);
-        const out=extractRepairTranslations(raw,its);
-        const part=out.filter(x=>{const it=itemOf(its,x.id);return it&&x.text&&x.text.trim()&&validateKhmerOutput([x],[it])});
-        if(part.length===its.length)return part;
-        if(its.length>1){
-          const got=new Set(part.map(x=>String(x.id)));
-          const rest=its.filter(i=>!got.has(String(i.id)));
-          const singles=await Promise.all(rest.map(async it=>{
-            try{
-              const r=await requestGeminiRepair(buildRepairPrompt([it]),key,selections.geminiModel,20000);
-              const o=extractRepairTranslations(r,[it]);
-              return validateKhmerOutput(o,[it])?o[0]:null;
-            }catch(e){lastErr=e;return null}
-          }));
-          const all=part.concat(singles.filter(Boolean));
-          if(all.length)return all;
-        }else if(part.length)return part;
-        lastErr=new Error("AI លទ្ធផលមិនទាន់ត្រឹមត្រូវសម្រាប់បន្ទាត់ជួសជុល");
-      }catch(e){lastErr=e}
+        const raw=await requestGeminiRepair(buildRepairPrompt(todo),key,selections.geminiModel,25000);
+        const out=extractRepairTranslations(raw,todo);
+        out.forEach(x=>{
+          const it=itemOf(todo,x.id);if(!it||!x.text||!x.text.trim())return;
+          if(validateKhmerOutput([x],[it]))part.push(x);
+          else if(/[\u1780-\u17FF]/.test(normalizeTranslationForCheck(x.text)))best.set(String(x.id),x.text.trim());
+        });
+      }catch(e){lastErr=e;if(/401|403|api key/i.test(String((e&&e.message)||e)))break;}
     }
-    return [];
+    return {part,best};
   }
   async function worker(w){
     while(true){
       const gi=next++;
       if(gi>=groups.length)return;
-      let out=[];
-      try{out=await runGroup(groups[gi],w)}catch(e){lastErr=e}
-      out.forEach(x=>{
+      let res={part:[],best:new Map()};
+      try{res=await runGroup(groups[gi],w)}catch(e){lastErr=e}
+      const okIds=new Set();
+      res.part.forEach(x=>{
         const b=srtBlocks.find(b=>String(b.id)===String(x.id));
-        if(b&&x.text&&x.text.trim()){b.trans=x.text.trim();try{zsfEnforceTag(b)}catch(_){}fixed++}
+        if(b&&x.text&&x.text.trim()){b.trans=x.text.trim();delete b.repairBest;try{zsfEnforceTag(b)}catch(_){}fixed++;okIds.add(String(x.id))}
+      });
+      groups[gi].forEach(it=>{
+        if(okIds.has(String(it.id)))return;
+        const b=srtBlocks.find(b=>String(b.id)===String(it.id));
+        if(!b)return;
+        b.repairFails=(b.repairFails||0)+1;
+        if(res.best.has(String(it.id)))b.repairBest=res.best.get(String(it.id));
       });
       done++;
       try{saveData()}catch(_){}
@@ -5642,19 +5642,35 @@ window.zsfAutoRepairAll=async function(){
   for(let w=0;w30&&isTranslating;w++)await new Promise(r=>setTimeout(r,500));
   if(isTranslating)return false;
   isTranslating=true;
-  let lastErr=null;
+  let lastErr=null,kept=0;
   try{
-    for(let round=1;round=4;round++){
-      const broken=getRepairCandidates();
+    srtBlocks.forEach(b=>{
+      b.repairFails=0;delete b.repairBest;
+      /* ប្រភពជា ♪ / … / លេខសុទ្ធ → ចម្លងទៅជាអត្ថបទបកប្រែ មិនបាច់ឱ្យ AI បកប្រែ */
+      if(!String(b.trans||"").trim()&&!/\p{L}/u.test(normalizeTranslationForCheck(b.text||"")))b.trans=String(b.text||"").trim();
+    });
+    for(let round=1;round=3;round++){
+      /* បន្ទាត់ដែលបរាជ័យ 2 ដងរួចហើយ មិនផ្ញើទៀតទេ (ជៀសវាង loop យូរ) */
+      const broken=getRepairCandidates().filter(b=>(b.repairFails||0)2);
       if(!broken.length)break;
-      toggleProgressBar(true,`🧹 រកឃើញ ${broken.length} បន្ទាត់មិនទាន់បកប្រែ — AI កំពុងជួសជុលស្វ័យប្រវត្តិ (ជុំ ${round}/4)`,3);
+      toggleProgressBar(true,`🧹 រកឃើញ ${broken.length} បន្ទាត់មិនទាន់បកប្រែ — AI កំពុងជួសជុលស្វ័យប្រវត្តិ (ជុំ ${round}/3)`,3);
       await new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));
+      let fx=0;
       try{
-        await zsfRepairFast(broken,(d,t,f)=>toggleProgressBar(true,`🛠️ ជួសជុលស្វ័យប្រវត្តិ ${d}/${t} • ជុំ ${round}/4`,Math.max(3,Math.round(d/t*100))));
+        fx=await zsfRepairFast(broken,(d,t,f)=>toggleProgressBar(true,`🛠️ ជួសជុលស្វ័យប្រវត្តិ ${d}/${t} • ជុំ ${round}/3`,Math.max(3,Math.round(d/t*100))));
       }catch(e){lastErr=e;if(/401|403|api key/i.test(String((e&&e.message)||e)))break;}
       if(!getRepairCandidates().length)break;
-      await new Promise(r=>setTimeout(r,round===1?600:2500));
+      if(!fx&&round>=2)break; /* គ្មានដំណើរការទៅមុខ → ឈប់ មិនចាំឱ្យអស់ជុំ */
+      await new Promise(r=>setTimeout(r,round===1?300:1500));
     }
+    /* ទទួលយកបន្ទាត់ដែលមានអក្សរខ្មែរ តែមានអក្សរឡាតាំង/បរទេសតិចតួច (ជំនួសឱ្យទទេ ឬបញ្ឈប់ Export) */
+    srtBlocks.forEach(b=>{
+      if(!translationNeedsRepair(b))return;
+      const cand=String(b.repairBest||b.trans||"").trim();
+      if(cand&&/[\u1780-\u17FF]/.test(normalizeTranslationForCheck(cand))){
+        b.trans=cand;b.repairGaveUp=cand;try{zsfEnforceTag(b)}catch(_){}kept++;
+      }
+    });
   }finally{
     isTranslating=false;
     try{renderEditor()}catch(_){}
@@ -5662,7 +5678,7 @@ window.zsfAutoRepairAll=async function(){
     try{updateLineCounts()}catch(_){}
   }
   const left=getRepairCandidates().length;
-  try{toggleProgressBar(true,left?`⚠️ នៅសល់ ${left} បន្ទាត់មិនទាន់ជួសជុល`:"✅ ជួសជុលបន្ទាត់ទាំងអស់រួចរាល់ — បន្ត Export",100)}catch(_){}
+  try{toggleProgressBar(true,left?`⚠️ នៅសល់ ${left} បន្ទាត់មិនទាន់ជួសជុល`:(kept?`✅ រួចរាល់ (ទុក ${kept} បន្ទាត់ដែលមានអក្សរឡាតាំងតិចតួច)`:"✅ ជួសជុលបន្ទាត់ទាំងអស់រួចរាល់ — បន្ត Export"),100)}catch(_){}
   if(left&&lastErr){try{showToast("❌ "+friendlyError(lastErr),false)}catch(_){}}
   return left===0;
 };
@@ -8010,7 +8026,7 @@ async function zsfFillGaps(key,idx,buf,plan,merged,opts){
   let prof=null, speechExtra=[];
   try{
     prof=zsfComputeRms(buf,plan);
-    speechExtra=zsfUncoveredSpeech(merged,prof).filter(g=>!pieces.some(p=>g.fromp.to&&g.to>p.from)).slice(0,60).sort((a,b)=>a.from-b.from);
+    speechExtra=zsfUncoveredSpeech(merged,prof).filter(g=>!pieces.some(p=>g.fromp.to&&g.to>p.from)).slice(0,25).sort((a,b)=>a.from-b.from);
     pieces=pieces.concat(speechExtra.map(g=>({from:g.from,to:g.to,speech:true})));
   }catch(e){ console.warn("speech-gap scan failed",e); }
   const al=(s)=>Math.floor(Math.max(0,s)*byteRate/blockAlign)*blockAlign;
@@ -11398,7 +11414,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.77";
+  var EMB="1.79";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
