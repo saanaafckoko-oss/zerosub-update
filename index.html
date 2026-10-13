@@ -2739,8 +2739,6 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 textarea id="zsfGlossary" rows="3" spellcheck="false" placeholder="ឧទាហរណ៍៖&#10;陈凡&#10;薛少&#10;扬州&#10;以工代赈" style="width:100%;box-sizing:border-box;border:1px solid var(--border-color);background:#071222;color:#eef7ff;border-radius:12px;padding:10px 12px;outline:none;font-size:14px;resize:vertical">/textarea>
 div style="font-size:11px;color:var(--text-gray);margin-top:4px;line-height:1.4">ជួយ Whisper និង Gemini ឱ្យសរសេរឈ្មោះ/ពាក្យពិសេសឱ្យត្រូវ (រក្សាទុកក្នុង browser ស្វ័យប្រវត្តិ)។/div>
 /div>
-div class="zpg" id="zsfPauseBox">span class="zpg-ico">⏱️/span>b class="zpg-lbl">ចន្លោះដង្ហើមកាត់ឃ្លា :/b>input type="range" id="zsfPauseGap" min="0.1" max="1.5" step="0.05" value="0.3" aria-label="ចន្លោះដង្ហើមកាត់ឃ្លា">output class="zpg-val" id="zsfPauseVal">0.30s/output>/div>
-div class="zpg-hint">span>តូច = កាត់ឃ្លាញឹក · ធំ = កាត់តិច/span>button type="button" id="zsfPauseReset">↺ លំនាំដើម 0.30s/button>/div>
 details id="zsfAdvOpts" style="margin-top:10px;border:1px solid var(--border-color);border-radius:12px;padding:8px 12px">
 summary style="cursor:pointer;font-size:13px;font-weight:600;list-style-position:inside">⚙️ ជម្រើសកែ SRT កម្រិតខ្ពស់ (បើកទាំងអស់ស្រាប់ — ចុចដើម្បីកែ)/summary>
 div style="margin-top:10px;display:grid;gap:8px">
@@ -2751,6 +2749,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfProofread" checked style="width:auto;margin-top:3px">span>✨ កែអក្សរចិនខុសតាមបរិបទដោយ Gemini (ត្រូវការ Gemini Key — មិនប៉ះពេលវេលា មិនប្តូរលេខបន្ទាត់)/span>/label>
 label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfSnapTiming" style="width:auto;margin-top:3px">span>🎯 កែពេលវេលា៖ កាត់ចំណុចស្ងាត់ចេញពីដើម/ចុងបន្ទាត់ តាមសំឡេងពិត/span>/label>
 label style="display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.4">span>⏱️ ទាញពេលវេលាទាំងអស់មកមុន (វិនាទី)៖/span>input type="number" id="zsfTimeShift" value="0" min="0" max="1.5" step="0.05" style="width:72px">span style="opacity:.7;font-size:12px">(0.4 = ត្រូវនឹងអក្សរដុតក្នុងវីដេអូសាកល្បង · បើបិទ 🎯 ប្រើ ~0.2 · 0 = មិនប្តូរ)/span>/label>
+div class="zpg" id="zsfPauseBox">span class="zpg-ico">⏱️/span>b class="zpg-lbl">ចន្លោះដង្ហើមកាត់ឃ្លា/b>output class="zpg-val" id="zsfPauseVal">0.30s/output>input type="range" id="zsfPauseGap" min="0.1" max="1.5" step="0.05" value="0.3" aria-label="ចន្លោះដង្ហើមកាត់ឃ្លា">div class="zpg-hint">span>តូច = កាត់ឃ្លាញឹក · ធំ = កាត់តិច/span>button type="button" id="zsfPauseReset">↺ លំនាំដើម 0.30s/button>/div>/div>
 /div>/details>
 div class="media" id="mediaBox">
 video controls="" id="video" playsinline="">/video>
@@ -5881,11 +5880,29 @@ async function verifyKey(){
     zsfKeyErr(ZSF_KEY_FAIL);
   }finally{__zsfKeyBusy=false}
 }
+function zsfIntroScroll(){
+  if(window.__zsfIntro)return;window.__zsfIntro=1;
+  var tries=0;
+  function go(){
+    tries++;
+    try{
+      if(!document.body.classList.contains("vrs-tab-media")){
+        var tb=document.querySelector('[data-vrs-tab="media"]');if(tb)tb.click();
+        if(tries12){setTimeout(go,300);return}
+      }
+      setTimeout(function(){
+        try{var dz=document.getElementById("dropZone");if(dz&&dz.offsetParent!==null){var y=dz.getBoundingClientRect().top+(window.pageYOffset||0)-90;window.scrollTo({top:Math.max(0,y),behavior:"smooth"})}}catch(_){}
+      },700);
+    }catch(_){}
+  }
+  setTimeout(go,500);
+}
 function unlockApp(exp){
   document.body.classList.remove("auth-locked");
   document.body.classList.add("auth-unlocked");
   $("authScreen").style.display="none";
   $("mainApp").style.display="block";
+  try{zsfIntroScroll()}catch(_){}
   const expiryEl=$("keyExpiryDateDisplay");
   document.body.classList.toggle("zsf-admin",exp==="ADMIN");
   if(exp==="ADMIN"){
@@ -9703,6 +9720,10 @@ html body .auth-watermark, html body .auth-screen .watermark{background:none!imp
 html body .auth-watermark *{color:var(--text-gray)!important}
 
 /style>
+style id="zsf-v166-chips">
+html body .vrs-chips{display:grid!important;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px}
+html body .vrs-chip{justify-content:center;text-align:center;padding:12px 10px;border-radius:var(--vrs-radius);font-size:13px;min-width:0;white-space:normal;line-height:1.3}
+/style>
 script id="vrs-clean-ui-js">
  
 (function(){
@@ -9728,7 +9749,7 @@ html body .auth-watermark *{color:var(--text-gray)!important}
     try{localStorage.setItem('vrs_ui_tab',name)}catch(e){}
   }
   tabs.forEach(function(b){b.addEventListener('click',function(){setTab(b.getAttribute('data-vrs-tab'));window.scrollTo({top:0,behavior:'smooth'})})});
-  var st='translate'; try{st=localStorage.getItem('vrs_ui_tab')||'translate'}catch(e){}
+  var st='media';
   setTab(st==='media'?'media':'translate');
 
    
@@ -10743,14 +10764,23 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 #zsfPauseBox .zpg-scale{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:10.5px;color:var(--text-gray)}
 #zsfPauseBox .zpg-scale button{border:1px solid var(--border-color);background:transparent;color:var(--text-gray);border-radius:999px;padding:3px 9px;font-size:10.5px;font-family:inherit;cursor:pointer}
 /style>
-style id="zsf-v165-pause">
-#zsfPauseBox.zpg{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;padding:10px 14px;margin-top:10px;border-radius:16px}
-#zsfPauseBox .zpg-ico{font-size:18px}
-#zsfPauseBox .zpg-lbl{flex:none;font-size:14px;font-weight:800;color:var(--text-white)}
-#zsfPauseBox input[type=range]{flex:1 1 120px;min-width:100px;width:auto;margin:0}
-#zsfPauseBox .zpg-val{flex:none;min-width:58px;font-size:14px;padding:4px 8px}
-.zpg-hint{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 2px 0;font-size:11px;color:var(--text-gray)}
-.zpg-hint button{border:1px solid var(--border-color);background:transparent;color:var(--text-gray);border-radius:999px;padding:3px 9px;font-size:10.5px;font-family:inherit;cursor:pointer}
+style id="zsf-v167-ui">
+#zsfPauseBox.zpg{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;padding:10px 12px;margin:0;border-radius:14px}
+#zsfPauseBox .zpg-lbl{flex:1;min-width:0;font-size:13.5px;font-weight:800;color:var(--text-white)}
+#zsfPauseBox .zpg-val{flex:none;min-width:56px;font-size:13.5px;padding:3px 8px;text-align:center}
+#zsfPauseBox input[type=range]{flex:1 1 100%;width:100%;margin:2px 0}
+#zsfPauseBox .zpg-hint{flex:1 1 100%;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;font-size:11px;color:var(--text-gray)}
+#zsfPauseBox .zpg-hint button{border:1px solid var(--border-color);background:transparent;color:var(--text-gray);border-radius:999px;padding:3px 9px;font-size:10.5px;font-family:inherit;cursor:pointer}
+html body div.vrs-chips{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;justify-content:stretch!important;margin:0 0 14px!important}
+html body div.vrs-chips .vrs-chip{display:flex!important;align-items:center;justify-content:center;gap:8px;width:100%;min-width:0;min-height:54px;box-sizing:border-box;padding:12px 10px!important;border-radius:var(--vrs-radius,20px)!important;background:var(--card-bg)!important;border:1px solid var(--vrs-line)!important;box-shadow:var(--vrs-shadow)!important;font-size:14px!important;font-weight:800;line-height:1.3;white-space:normal;text-align:center}
+html body div.vrs-chips .vrs-chip-ok{color:var(--success)!important}
+html body div.vrs-chips #keyExpiryDateDisplay{color:var(--vrs-accent)!important}
+html body nav.vrs-tabs{gap:6px!important;padding:5px!important;border-radius:var(--vrs-radius,20px)!important}
+html body nav.vrs-tabs button{padding:15px 8px!important;border-radius:15px!important;font-size:14.5px!important;font-weight:800!important;border:1.5px solid transparent!important}
+html body nav.vrs-tabs button[data-vrs-tab="media"]{color:#38bdf8!important;background:rgba(56,189,248,.08)!important}
+html body nav.vrs-tabs button[data-vrs-tab="translate"]{color:#c084fc!important;background:rgba(192,132,252,.08)!important}
+html body nav.vrs-tabs button[data-vrs-tab="media"].on{color:#fff!important;background:linear-gradient(135deg,#0ea5e9,#2563eb)!important;border-color:#7dd3fc!important;box-shadow:0 4px 14px rgba(14,165,233,.35)!important}
+html body nav.vrs-tabs button[data-vrs-tab="translate"].on{color:#fff!important;background:linear-gradient(135deg,#a855f7,#7c3aed)!important;border-color:#d8b4fe!important;box-shadow:0 4px 14px rgba(168,85,247,.35)!important}
 /style>
 script id="zsf-v107-pause-js">
 (function(){
@@ -11206,7 +11236,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.66";
+  var EMB="1.67";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
