@@ -8026,7 +8026,7 @@ async function zsfFillGaps(key,idx,buf,plan,merged,opts){
   let prof=null, speechExtra=[];
   try{
     prof=zsfComputeRms(buf,plan);
-    speechExtra=zsfUncoveredSpeech(merged,prof).filter(g=>!pieces.some(p=>g.fromp.to&&g.to>p.from)).slice(0,60).sort((a,b)=>a.from-b.from);
+    speechExtra=zsfUncoveredSpeech(merged,prof).filter(g=>!pieces.some(p=>g.fromp.to&&g.to>p.from)).slice(0,25).sort((a,b)=>a.from-b.from);
     pieces=pieces.concat(speechExtra.map(g=>({from:g.from,to:g.to,speech:true})));
   }catch(e){ console.warn("speech-gap scan failed",e); }
   const al=(s)=>Math.floor(Math.max(0,s)*byteRate/blockAlign)*blockAlign;
