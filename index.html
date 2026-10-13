@@ -10765,6 +10765,8 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 #zsfPauseBox .zpg-scale button{border:1px solid var(--border-color);background:transparent;color:var(--text-gray);border-radius:999px;padding:3px 9px;font-size:10.5px;font-family:inherit;cursor:pointer}
 /style>
 style id="zsf-v167-ui">
+/* v1.68: លាក់ប្រអប់ភាគរយ + អក្សរវិភាគក្នុង 03 Subtitle Preview (មានរបារភាគរយខាងក្រោមរួចហើយ) */
+html body .progress-wrap,html body #v32diag{display:none!important}
 #zsfPauseBox.zpg{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;padding:10px 12px;margin:0;border-radius:14px}
 #zsfPauseBox .zpg-lbl{flex:1;min-width:0;font-size:13.5px;font-weight:800;color:var(--text-white)}
 #zsfPauseBox .zpg-val{flex:none;min-width:56px;font-size:13.5px;padding:3px 8px;text-align:center}
@@ -11236,7 +11238,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.67";
+  var EMB="1.68";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
