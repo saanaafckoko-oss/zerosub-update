@@ -3493,7 +3493,7 @@ async function runAll(quiet){
   if(total>sr*3600*1.5)throw new Error("វីដេអូវែងពេក (លើស ១.៥ ម៉ោង) សូមបំបែក SRT");
   segsTmp=[];var master=new Float32Array(total),over=0,fail=0,skipped=0,cursor=0,fastN=0,longIds=[];
   var results=new Array(cues.length),nextPlace=0,nextJob=0,doneN=0,fatal=null,throttleUntil=0,jobs=[];
-  var CONC=6;try{var cv=parseInt(localStorage.getItem("zsf_tts_conc"),10);if(cv>=1&&cv=12)CONC=cv}catch(_){}
+  var CONC=10;try{var cv=parseInt(localStorage.getItem("zsf_tts_conc"),10);if(cv>=1&&cv=12)CONC=cv}catch(_){}
   for(var i0=0;i0cues.length;i0++){if(!inc[cues[i0].tag-1]){results[i0]=false;skipped++}else jobs.push(i0)}
   var place=function(i){
    var r=results[i];results[i]=null;if(!r)return;
@@ -4248,10 +4248,14 @@ async function exportAll(){
   if(!r)r=await exportVideo(lastMaster,lastSr,mute,ov);
    
   try{
-   if(r&&r.blob&&r.blob.size>0&&r.blob.size=629145600){
+   if(r&&r.blob&&r.blob.size>0&&r.blob.size=314572800){
     st("📦 កំពុងរៀបវីដេអូចុងក្រោយ…",97);
-    var fb0=await r.blob.arrayBuffer();
-    r.blob=new Blob([fb0],{type:r.blob.type||"video/mp4"});fb0=null;
+    var CHM=8*1024*1024,bparts=[],bty=r.blob.type||"video/mp4",bsz=r.blob.size;
+    for(var po=0,pn=0;pobsz;po+=CHM,pn++){
+     bparts.push(new Blob([await r.blob.slice(po,po+CHM).arrayBuffer()]));
+     if(pn%6===0){st("📦 កំពុងរៀបវីដេអូចុងក្រោយ… "+Math.round(po/bsz*100)+"%",97);await sleep(0)}
+    }
+    r.blob=new Blob(bparts,{type:bty});bparts=null;
    }
   }catch(ce){try{console.warn("materialize",ce)}catch(_){}}
    
@@ -7860,7 +7864,7 @@ function zsfRetryAfterMs(e){
 async function zsfCallWithRetry(fn){
   let lastErr;
   for(let a=0;a6;a++){
-    try{ return await fn(); }
+    try{ const __g=(window.__zsfG=window.__zsfG||{calls:0,r429:0,wait:0});__g.calls++; return await fn(); }
     catch(e){
       lastErr=e;
       if(e.http===401||e.http===403||e.http===413) throw e;
@@ -7868,7 +7872,9 @@ async function zsfCallWithRetry(fn){
         const w=zsfRetryAfterMs(e);
         if(w>60000) throw e;    
         const nLive=(window.__zsfKeyPool||[]).filter(p=>!p.bad).length;
-        await zsfSleep(Math.max(w+500,(nLive>1?2000:7000)*(a+1)));
+        const __ws=Math.max(w+500,(nLive>1?2000:7000)*(a+1));
+        try{window.__zsfG.r429++;window.__zsfG.wait+=__ws}catch(_){}
+        await zsfSleep(__ws);
         continue;
       }
       if(a>=4) throw e;
@@ -8614,6 +8620,7 @@ async function transcribeWithKey(key,idx,uploadFile){
       const skipped=[];
       let lastChunkErr=null;
       let doneParts=0;
+      const __tc0=Date.now();
       const partResults=await zsfPool(cuts.map((_,i)=>i),ZSF_PARALLEL,async(part)=>{
         const r=zsfChunkRange(plan,part);
         const chunkBuf=zsfBuildWav(buf,plan,r.aOff,r.aN);
@@ -8649,6 +8656,7 @@ async function transcribeWithKey(key,idx,uploadFile){
         }
       }
       partResults.forEach(x=>{ if(x) zsfMergeChunk(merged,x.result,x.r.shift,x.r.ownFrom,x.r.ownTo); });
+      try{window.__zsfG.chunkSec=Math.round((Date.now()-__tc0)/1000);window.__zsfG.parts=cuts.length}catch(_){}
       skipped.sort((a,b)=>a-b);
       if(!skipped.length && !window.__zsfSuper && ($("zsfGapFill")?$("zsfGapFill").checked:true)){
         let dropped=[];
@@ -8656,6 +8664,7 @@ async function transcribeWithKey(key,idx,uploadFile){
           dropped=zsfDropDense(merged);
           const __tg0=Date.now();
           const gf=await zsfFillGaps(key,idx,buf,plan,merged,{hints:dropped.map(d=>d.t),onProgress:(i,n)=>setProgress(94,`🔎 ពិនិត្យអត្ថបទដែលបាត់ ${i}/${n}…`)});
+          try{window.__zsfG.gapSec=Math.round((Date.now()-__tg0)/1000);window.__zsfG.gaps=gf.gaps}catch(_){}
           try{showToast("⏱ ពិនិត្យអត្ថបទដែលបាត់ "+gf.gaps+" កន្លែង ចំណាយ "+Math.round((Date.now()-__tg0)/1000)+" វិនាទី",true)}catch(_){}
           gf.denseFound=dropped.length;
           gf.denseRestored=zsfRestoreDense(merged,dropped);
@@ -9287,7 +9296,7 @@ async function transcribe(){
       showV32Diag(`WebCodecs Audio Extraction PASS • ${outSec.toFixed(2)}s PCM/WAV • codec ${codec} • ${rate}Hz • ${ch}ch • offset ${Number(d.sourceOffsetSec||0).toFixed(4)}s • frames ${frames} • ⏱️ extraction ${extractionWallSeconds.toFixed(2)}s (${extractionX.toFixed(2)}× realtime)`,true);
       stopProgressTimers();
       setProgress(76,`✅ Audio Extraction PASS • ${outSec.toFixed(2)}s • processing ${extractionWallSeconds.toFixed(1)}s • ${extractionX.toFixed(2)}× realtime • កំពុងផ្ញើទៅ Groq…`);
-      
+      try{window.__zsfExtSec=extractionWallSeconds}catch(_){}
     }catch(v32e){
       console.warn("V32.1 prototype failed",v32e);
       stopProgressTimers(); setProgress(0,"❌ V32.24 CapCut EP1 Segmentation • Speed Meter FAIL — Audio Extraction");
@@ -9304,6 +9313,7 @@ async function transcribe(){
     }
     toast(`បានបង្រួមសំឡេងរួច • ${fmtBytes(uploadFile.size)} • កំពុងផ្ញើទៅ Groq…`);
   }
+  window.__zsfG={calls:0,r429:0,wait:0};
   try{zsfInitKeyPool(keys)}catch(_){}
   startApiProgress();
   setProgress(78,"☁️ Groq កំពុងស្តាប់សំឡេង និងកំណត់ timestamp…");
@@ -9429,6 +9439,7 @@ async function transcribe(){
         if(data.__normReport&&(data.__normReport.shifted||data.__normReport.addedSegments)) extraNotes.push(`🧹 សម្អាត timeline: ពាក្យត្រួតគ្នា ${data.__normReport.shifted}, segment បន្ថែម ${data.__normReport.addedSegments}`);
         { const nOrph=zsfMergeOrphans(subtitles); if(nOrph) extraNotes.push(`🧩 ភ្ជាប់អក្សរតែមួយដែលដាច់ ${nOrph} បន្ទាត់`); }
         try{ const rc=data.__recon; if(rc&&(rc.added||rc.skipped)) extraNotes.push(`🧷 ពិនិត្យអក្សរបាត់៖ បំពេញត្រឡប់ ${rc.added} អក្សរ`+(rc.rebuilt?` • សង់ឡើងវិញពី segment ${rc.rebuilt} ឃ្លា`:"")+(rc.skipped?` • មិនប្រាកដ ${rc.skipped} (រំលង)`:"")); }catch(_){}
+        try{ const g=window.__zsfG; if(g) extraNotes.push(`⏱ ទាញសំឡេង ${Math.round(window.__zsfExtSec||0)}s • Groq ${g.calls} ដង • ចម្រៀក ${g.parts||0} ប្រើ ${g.chunkSec||0}s • ពិនិត្យបាត់ ${g.gaps||0} កន្លែង ប្រើ ${g.gapSec||0}s • ជួប 429 ${g.r429} ដង រង់ចាំ ${Math.round(g.wait/1000)}s`); }catch(_){}
         if($("zsfSnapTiming")&&$("zsfSnapTiming").checked&&data.__profile&&Math.abs((Number(uploadFile.__captureRate)||1)-1)0.03){
           const nSnap=zsfSnapToSpeech(subtitles,data.__profile,Number(uploadFile.__sourceStartTimeSec)||0);
           extraNotes.push(`🎯 កែពេលវេលា ${nSnap} បន្ទាត់`);
@@ -11481,7 +11492,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.85";
+  var EMB="1.88";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
