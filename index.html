@@ -2742,10 +2742,10 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 details id="zsfAdvOpts" style="margin-top:10px;border:1px solid var(--border-color);border-radius:12px;padding:8px 12px">
 summary style="cursor:pointer;font-size:13px;font-weight:600;list-style-position:inside">⚙️ ជម្រើសកែ SRT កម្រិតខ្ពស់ (បើកទាំងអស់ស្រាប់ — ចុចដើម្បីកែ)/summary>
 div style="margin-top:10px;display:grid;gap:8px">
-label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfSuperSpeed" checked style="width:auto;margin-top:3px">span>⚡ b>Super Speed/b> — ផ្ញើសំឡេងជាផ្នែកធំជាង ស្របគ្នាច្រើនជាង ហើយរំលងជំហានយឺតៗ (ស្តាប់ឡើងវិញ + Gemini កាត់ឃ្លា + Gemini កែអក្សរ)។ បិទវាបើចង់បានគុណភាពពេញលេញ តែយឺតជាង/span>/label>
+label hidden style="display:none!important">input type="checkbox" id="zsfSuperSpeed" style="width:auto;margin-top:3px">span>⚡ b>Super Speed/b> — ផ្ញើសំឡេងជាផ្នែកធំជាង ស្របគ្នាច្រើនជាង ហើយរំលងជំហានយឺតៗ (ស្តាប់ឡើងវិញ + Gemini កាត់ឃ្លា + Gemini កែអក្សរ)។ បិទវាបើចង់បានគុណភាពពេញលេញ តែយឺតជាង/span>/label>
 label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfGapFill" checked style="width:auto;margin-top:3px">span>🔎 ស្វែងរក និងបំពេញអត្ថបទដែលបាត់ (ស្តាប់ឡើងវិញត្រង់កន្លែងស្ងាត់ពីរវិនាទីឡើង)/span>/label>
 label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfAiSeg" checked style="width:auto;margin-top:3px">span>✂️ ឱ្យ Gemini ជួយកាត់ឃ្លាតាមបែប CapCut (ត្រូវការ Gemini Key — បើមិនបានលទ្ធផល កម្មវិធីប្រើវចនានុក្រមចិនជំនួសដោយស្វ័យប្រវត្តិ)/span>/label>
-label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfArabicNum" checked style="width:auto;margin-top:3px">span>🔢 ប្តូរលេខចិន (二十, 三十万) ជាលេខឡាតាំង (20, 30万) ដូច CapCut/span>/label>
+label hidden style="display:none!important">input type="checkbox" id="zsfArabicNum" style="width:auto;margin-top:3px">span>🔢 ប្តូរលេខចិន (二十, 三十万) ជាលេខឡាតាំង (20, 30万) ដូច CapCut/span>/label>
 label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfProofread" checked style="width:auto;margin-top:3px">span>✨ កែអក្សរចិនខុសតាមបរិបទដោយ Gemini (ត្រូវការ Gemini Key — មិនប៉ះពេលវេលា មិនប្តូរលេខបន្ទាត់)/span>/label>
 label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfSnapTiming" style="width:auto;margin-top:3px">span>🎯 កែពេលវេលា៖ កាត់ចំណុចស្ងាត់ចេញពីដើម/ចុងបន្ទាត់ តាមសំឡេងពិត/span>/label>
 label style="display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.4">span>⏱️ ទាញពេលវេលាទាំងអស់មកមុន (វិនាទី)៖/span>input type="number" id="zsfTimeShift" value="0" min="0" max="1.5" step="0.05" style="width:72px">span style="opacity:.7;font-size:12px">(0.4 = ត្រូវនឹងអក្សរដុតក្នុងវីដេអូសាកល្បង · បើបិទ 🎯 ប្រើ ~0.2 · 0 = មិនប្តូរ)/span>/label>
@@ -7938,8 +7938,8 @@ function zsfFindGaps(merged,totalSec,hints){
   const pieces=[];
   for(const g of top){
     let s=g.from;
-    while(g.to-s>ZSF_GAP_MAX_WINDOW+1){ pieces.push({from:s,to:s+ZSF_GAP_MAX_WINDOW}); s+=ZSF_GAP_MAX_WINDOW; }
-    pieces.push({from:s,to:g.to});
+    while(g.to-s>ZSF_GAP_MAX_WINDOW+1){ pieces.push({from:s,to:s+ZSF_GAP_MAX_WINDOW,hint:g.hint}); s+=ZSF_GAP_MAX_WINDOW; }
+    pieces.push({from:s,to:g.to,hint:g.hint});
   }
   return pieces;
 }
@@ -8053,6 +8053,22 @@ async function zsfFillGaps(key,idx,buf,plan,merged,opts){
   let prof=null, speechExtra=[];
   try{
     prof=zsfComputeRms(buf,plan);
+    try{
+      if(prof&&prof.rms&&prof.rms.length>10){
+        const F0=prof.frameSec,R0=prof.rms,N0=R0.length,sm0=new Float32Array(N0);
+        for(let i=0;N0>i;i++){let s=0,c=0;for(let k=-2;2>=k;k++){const j=i+k;if(j>=0&&N0>j){s+=R0[j];c++;}}sm0[i]=s/c;}
+        const srt0=Array.from(sm0).sort((a,b)=>a-b);
+        const thr0=Math.max(srt0[Math.floor(N0*0.25)]*2.2,220)*0.8;
+        const before0=pieces.length;
+        pieces=pieces.filter(p=>{
+          if(p.hint) return true;
+          const a0=Math.max(0,Math.floor(p.from/F0)), b0=Math.min(N0-1,Math.floor(p.to/F0));
+          let c0=0; for(let i=a0;b0>=i;i++){ if(sm0[i]>=thr0) c0++; }
+          return c0*F0>=0.4;
+        });
+        window.__zsfGapSkipped=before0-pieces.length;
+      }
+    }catch(e0){ console.warn("gap energy filter failed",e0); }
     speechExtra=zsfUncoveredSpeech(merged,prof).filter(g=>!pieces.some(p=>g.fromp.to&&g.to>p.from)).slice(0,25).sort((a,b)=>a.from-b.from);
     pieces=pieces.concat(speechExtra.map(g=>({from:g.from,to:g.to,speech:true})));
   }catch(e){ console.warn("speech-gap scan failed",e); }
@@ -9239,7 +9255,7 @@ async function transcribe(){
     return false;
   }
   $("transcribeBtn").disabled=true;
-  window.__zsfSuper=!($("zsfSuperSpeed")&&!$("zsfSuperSpeed").checked);    
+  window.__zsfSuper=false;    
   ZSF_CHUNK_SEC=window.__zsfSuper?30:22;
   window.__zsfProofChanges=[];
   stopProgressTimers();
@@ -9479,7 +9495,7 @@ async function transcribe(){
   const g=$("zsfGlossary"); if(!g) return;
   try{ const saved=safeGet("zsf_glossary"); if(saved) g.value=saved; }catch(_){}
   g.addEventListener("input",()=>safeSet("zsf_glossary",g.value));
-  [["zsfSuperSpeed"],["zsfGapFill"],["zsfProofread"],["zsfSnapTiming"],["zsfAiSeg"]].forEach(([id])=>{
+  [["zsfGapFill"],["zsfProofread"],["zsfSnapTiming"],["zsfAiSeg"]].forEach(([id])=>{
     const c=$(id); if(!c) return;
     const sk="zsf_opt_"+(id==="zsfSnapTiming"?"zsfSnapTiming2":id);
     const v=safeGet(sk); if(v==="0") c.checked=false; else if(v==="1") c.checked=true;
@@ -9946,7 +9962,6 @@ html body #project1MediaToSrt .vf2-closed>h2{margin-bottom:0!important}
   var ROWS={
     zsfGapFill:['🔎 បំពេញអត្ថបទដែលបាត់','ស្តាប់ឡើងវិញត្រង់កន្លែងស្ងាត់ពីរវិនាទីឡើង'],
     zsfAiSeg:['✂️ កាត់ឃ្លាតាមបែប CapCut','Gemini ជួយកាត់ឃ្លា (ត្រូវការ Gemini Key) — បើមិនបានលទ្ធផល កម្មវិធីប្រើវចនានុក្រមចិនជំនួសដោយស្វ័យប្រវត្តិ'],
-    zsfArabicNum:['🔢 ប្តូរលេខចិនជាលេខឡាតាំង','二十, 三十万 → 20, 30万 ដូច CapCut'],
     zsfProofread:['✨ កែអក្សរចិនខុសតាមបរិបទ','ដោយ Gemini (ត្រូវការ Gemini Key) — មិនប៉ះពេលវេលា មិនប្តូរលេខបន្ទាត់'],
     zsfSnapTiming:['🎯 កែពេលវេលាតាមសំឡេងពិត','កាត់ចំណុចស្ងាត់ចេញពីដើម/ចុងបន្ទាត់']
   };
@@ -10853,7 +10868,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
       window.__zsfUpdErr="❌ "+String((e&&e.message)||e)+" • ចុចដើម្បីសាកម្តងទៀត";render();
     });
   }
-  function init(){build();check();}
+  function init(){build();check(function(x){try{if(x==="new"&&!ss("zsfUpdTried")&&!window.__zsfUpdBusy&&!window.__zsfAutoDone){window.__zsfAutoDone=1;setTimeout(onTap,1200);}}catch(e){}});}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
   document.addEventListener("visibilitychange",function(){if(!document.hidden)check();});
 })();
@@ -11441,7 +11456,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.79";
+  var EMB="1.83";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
