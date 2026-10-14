@@ -4769,7 +4769,7 @@ async function requestGeminiOnce(prompt,key,model,jsonMode){if(!key)throw new Er
 async function testUserApiKey(index,btn){let key=($("apiKey_"+index)?.value||"").trim();if(!key)return showToast("⚠️ សូមបញ្ចូល API Key ជាមុនសិន!",false);let old=btn.textContent;btn.textContent="⏳";try{await requestGemini("Reply with only: OK",key,selections.geminiModel);btn.textContent="✅ OK";try{const ks=Array.from({length:10},(_,i)=>($("apiKey_"+i)?.value||"").trim()).filter((v,i,a)=>v&&a.indexOf(v)===i);while(ks.length10)ks.push("");userApiKeys=ks;safeSet("zero_user_api_keys",JSON.stringify(ks))}catch(_){}showToast(`🎉 API Key #${index+1} ដំណើរការល្អ! (បានរក្សាទុកស្វ័យប្រវត្តិ)`,true)}catch(e){btn.textContent="❌ Fail";console.warn("Gemini key test failed:",e);showToast(`❌ API Key #${index+1}: ${friendlyError(e)} • ${String((e&&e.message)||e).slice(0,140)}`,false)}finally{setTimeout(()=>btn.textContent=old,2500)}}
 function friendlyError(e){let m=String(e?.message||e||"");if(/401|403|api key|authentication|credential/i.test(m))return"API Key មិនត្រឹមត្រូវ ឬគ្មានសិទ្ធិ";if(/429|quota|resource exhausted/i.test(m))return"API Key អស់ quota ឬត្រូវបានកំណត់ល្បឿន";if(/404|not found/i.test(m))return"Model មិនមានសម្រាប់ Key នេះ";if(/abort|timeout/i.test(m))return"ការតភ្ជាប់អស់ពេល";return m.slice(0,180)}
 
-const ZSF_MODEL_FALLBACKS=["gemini-3.1-flash-lite","gemini-3.5-flash-lite","gemini-3.5-flash"];
+const ZSF_MODEL_FALLBACKS=["gemini-3.6-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-3.5-flash"];
 function zsfIsQuotaError(e){ const m=String((e&&e.message)||e||""); return (e&&e.status===429)||/quota|exceeded your current|resource.?exhausted|rate.?limit/i.test(m); }
 function zsfIsBusyError(e){
   const m=String((e&&e.message)||e||""); const s=e&&e.status;
@@ -10420,14 +10420,19 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     var model=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
     var ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx,!!(frames&&frames.length)),last=null,best={map:{},voices:[]};
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0);
+    var TMODELS=[model,"gemini-3.6-flash","gemini-3.5-flash-lite","gemini-3.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
     for(var round=0;round2;round++){
-      for(var n=0;nks.length;n++){
-        try{
-          var pr=parseTags(await callGemini(prompt,wavB64,ks[(start+n)%ks.length],model,frames),ids),c=Object.keys(pr.map).length;
-          if(c>=Object.keys(best.map).length)best=pr;
-          if(c===ids.size||c>0.8*ids.size)return pr;
-          last=new Error("AI ឆ្លើយមិនគ្រប់បន្ទាត់");
-        }catch(e){last=e;}
+      for(var tm2=0;tm2TMODELS.length;tm2++){
+        var wall=0;
+        for(var n=0;nks.length;n++){
+          try{
+            var pr=parseTags(await callGemini(prompt,wavB64,ks[(start+n)%ks.length],TMODELS[tm2],frames),ids),c=Object.keys(pr.map).length;
+            if(c>=Object.keys(best.map).length)best=pr;
+            if(c===ids.size||c>0.8*ids.size)return pr;
+            last=new Error("AI ឆ្លើយមិនគ្រប់បន្ទាត់");
+          }catch(e){last=e;if(e&&(e.status===404||e.status===429))wall++;}
+        }
+        if(wallks.length)break;
       }
       await new Promise(function(r){setTimeout(r,1500)});
     }
@@ -10507,35 +10512,35 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     var model=(typeof selections!=="undefined"&&selections&&selections.geminiModel)||"gemini-flash-latest";
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0)+(rr||0),txt=null,last=null;
      
-    var MODELS=[model,"gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-2.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
+    var MODELS=[model,"gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-2.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
     var gparts=[{inline_data:{mime_type:"audio/wav",data:wav}},{text:prompt}];
     var DEAD=window.__zsfDeadModels=window.__zsfDeadModels||{},COOL=window.__zsfCoolModels=window.__zsfCoolModels||{};
-    var lastQuota=false,usedFb="";
+    var lastQuota=false,usedFb="";var kcn=function(m,k){return m+"|"+k};
     for(var round=0;3>round&&txt===null;round++){
       for(var mi=0;MODELS.length>mi&&txt===null;mi++){
-        var md=MODELS[mi],hard=0;
-        if(DEAD[md]&&DEAD[md]>Date.now())continue;
-        if(COOL[md]&&COOL[md]>Date.now())continue;
+        var md=MODELS[mi];
         for(var n=0;ks.length>n;n++){
-          try{txt=await directGen(gparts,ks[(start+n)%ks.length],md);if(md!==model)usedFb=md;break;}
+          var kk=ks[(start+n)%ks.length],kid=kcn(md,kk);
+          if(DEAD[kid]&&DEAD[kid]>Date.now())continue;
+          if(COOL[kid]&&COOL[kid]>Date.now())continue;
+          try{txt=await directGen(gparts,kk,md);if(md!==model)usedFb=md;break;}
           catch(e){
             last=e;var sc=e&&e.status,msg=String((e&&e.message)||"");
             lastQuota=(sc===429)||/quota|exceeded your current|resource.?exhausted|rate.?limit/i.test(msg);
             if(lastQuota){
               var dm=msg.match(/retry in ([0-9.]+)\s*s/i),dl=dm?Math.ceil(parseFloat(dm[1]))+1:20;
-              if(/limit:\s*0\b/i.test(msg)||dl>70){hard++;continue;}    
-              COOL[md]=Math.max(COOL[md]||0,Date.now()+dl*1000);continue;  
+              if(/limit:\s*0\b/i.test(msg)||dl>70){DEAD[kid]=Date.now()+600000;continue;}    
+              COOL[kid]=Math.max(COOL[kid]||0,Date.now()+dl*1000);continue;  
             }
-            if(sc===404||/not found|is not supported|no longer available|does not exist|unknown model/i.test(msg)){DEAD[md]=Date.now()+3600000;break;}
+            if(sc===404||/not found|is not supported|no longer available|does not exist|unknown model/i.test(msg)){DEAD[kid]=Date.now()+3600000;continue;}
             if(sc===500||sc===502||sc===503||sc===504)continue;
             if(!sc)break;
           }
         }
-        if(txt===null&&hard>0&&hard===ks.length)DEAD[md]=Date.now()+600000;
       }
       if(txt!==null)break;
       var wake=0;
-      MODELS.forEach(function(m){if(DEAD[m]&&DEAD[m]>Date.now())return;var c=COOL[m]||0;if(c>Date.now()&&(!wake||wake>c))wake=c;});
+      MODELS.forEach(function(m){ks.forEach(function(k){var q=kcn(m,k);if(DEAD[q]&&DEAD[q]>Date.now())return;var c=COOL[q]||0;if(c>Date.now()&&(!wake||wake>c))wake=c;});});
       if(!wake)break;
       var ws=Math.min(65000,Math.max(1000,wake-Date.now()));
       toastS("⏳ Gemini quota ពេញបណ្តោះអាសន្ន — រង់ចាំ "+Math.ceil(ws/1000)+" វិនាទី ហើយសាកម្តងទៀតស្វ័យប្រវត្តិ",true);
@@ -11476,7 +11481,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.84";
+  var EMB="1.85";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
