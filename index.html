@@ -3488,7 +3488,7 @@ async function runAll(quiet){
  if(busy)return false;var okRun=false;busy=true;stopReq=false;persist();$("zkt_dl").style.display="none";
  try{window.zsfTtsProgress&&window.zsfTtsProgress(0,"កំពុងរៀបចំអត្ថបទសម្រាប់អាន…")}catch(_){}
  try{
-  var cues=await getCues();var sigNow=cueSig(cues);if(!cues.length)throw new Error("គ្មានអត្ថបទសម្រាប់អាន");if(!inc.some(Boolean))throw new Error("សូមបើកយ៉ាងហោចណាស់មួយតួអង្គ ([✓]) ជាមុន");
+  var __tT0=Date.now();var cues=await getCues();var sigNow=cueSig(cues);if(!cues.length)throw new Error("គ្មានអត្ថបទសម្រាប់អាន");if(!inc.some(Boolean))throw new Error("សូមបើកយ៉ាងហោចណាស់មួយតួអង្គ ([✓]) ជាមុន");
   var sr=24000,total=Math.ceil(((cues[cues.length-1].end/1000)+3)*sr);
   if(total>sr*3600*1.5)throw new Error("វីដេអូវែងពេក (លើស ១.៥ ម៉ោង) សូមបំបែក SRT");
   segsTmp=[];var master=new Float32Array(total),over=0,fail=0,skipped=0,cursor=0,fastN=0,longIds=[];
@@ -3560,7 +3560,7 @@ async function runAll(quiet){
   $("zkt_audio").src=url;$("zkt_audio").style.display="block";
   var a2=$("zkt_dl");a2.href=url;a2.download="khmer_tts.wav";a2.style.display="block";
   var fitNote=over?(" • ⚠️ ពិបាក fit "+over+" ឃ្លា"+(longIds.length?" (#"+longIds.slice(0,8).join(", #")+(longIds.length>8?"…":"")+")":"")):"";
-  st("✅ ចប់រួចរាល់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+fitNote,100);
+  st("✅ ចប់រួចរាល់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+fitNote+" • ⏱ "+Math.round((Date.now()-__tT0)/1000)+" វិនាទី",100);
   try{if(!quiet)window.zsfTtsFinish&&window.zsfTtsFinish(true,"✅ អានអក្សរជាសំឡេងចប់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+(skipped?" • រំលង "+skipped:"")+fitNote)}catch(_){}
  }catch(e){st("❌ "+e.message,0);try{window.zsfTtsFinish&&window.zsfTtsFinish(false,"❌ "+e.message)}catch(_){}}
  busy=false;return okRun;
@@ -7695,7 +7695,8 @@ const ZSF_ZH_PROMPT = "以下是普通话对白，请使用简体中文和标点
 const ZSF_PUNCT_RE = /[\s\u3000，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g;
 const ZSF_GAP_MIN_SEC = 1.2;     
 const ZSF_GAP_PAD_SEC = 1.5;     
-const ZSF_GAP_MAX_WINDOW = 10;   
+const ZSF_GAP_MAX_WINDOW = 10;
+const ZSF_GAP_MAX_PIECES = 30;   
 const ZSF_GAP_MAX_COUNT = 160;    
 
 function zsfGlossaryTerms(){
@@ -8071,6 +8072,7 @@ async function zsfFillGaps(key,idx,buf,plan,merged,opts){
     }catch(e0){ console.warn("gap energy filter failed",e0); }
     speechExtra=zsfUncoveredSpeech(merged,prof).filter(g=>!pieces.some(p=>g.fromp.to&&g.to>p.from)).slice(0,25).sort((a,b)=>a.from-b.from);
     pieces=pieces.concat(speechExtra.map(g=>({from:g.from,to:g.to,speech:true})));
+    try{ if(pieces.length>ZSF_GAP_MAX_PIECES){ pieces=pieces.map((p,i)=>({p:p,i:i,s:(p.hint?3:(p.speech?2:1)),l:p.to-p.from})).sort((a,b)=>b.s-a.s||b.l-a.l).slice(0,ZSF_GAP_MAX_PIECES).sort((a,b)=>a.i-b.i).map(x=>x.p); } }catch(_){}
   }catch(e){ console.warn("speech-gap scan failed",e); }
   const al=(s)=>Math.floor(Math.max(0,s)*byteRate/blockAlign)*blockAlign;
   const wordText=(w)=>String(w.word!==undefined?w.word:(w.text||""));
@@ -8652,7 +8654,9 @@ async function transcribeWithKey(key,idx,uploadFile){
         let dropped=[];
         try{
           dropped=zsfDropDense(merged);
+          const __tg0=Date.now();
           const gf=await zsfFillGaps(key,idx,buf,plan,merged,{hints:dropped.map(d=>d.t),onProgress:(i,n)=>setProgress(94,`🔎 ពិនិត្យអត្ថបទដែលបាត់ ${i}/${n}…`)});
+          try{showToast("⏱ ពិនិត្យអត្ថបទដែលបាត់ "+gf.gaps+" កន្លែង ចំណាយ "+Math.round((Date.now()-__tg0)/1000)+" វិនាទី",true)}catch(_){}
           gf.denseFound=dropped.length;
           gf.denseRestored=zsfRestoreDense(merged,dropped);
           merged.__gapReport=gf;
@@ -10564,6 +10568,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     var key=(f.name||"")+"|"+f.size+"|"+srtBlocks.length;
     if(key===lastKey)return;  
     if(!keys().length)return;
+    var __tTag0=Date.now();
     prog("🎭 កំពុងរៀបចំសំឡេង សម្រាប់ចាប់ប្រុស/ស្រី...",1);
     var A=await getAudio(f),bps=A.info.fmt.sr*(A.info.fmt.ba||2);
     var V=null;try{V=await openVideo(f);}catch(_){V=null;}
@@ -10584,18 +10589,32 @@ var prep=function(g){return (async function(){try{
         return {idxs:idxs,wav:wav,lines:lines,fr:fr};
       }catch(e){console.warn("prep failed",e);return null;}})();};
     var prepP=groups.length?prep(0):null;
-    for(var g=0;ggroups.length;g++){
-      var idxs=groups[g],P0=await prepP;
-      prepP=(g+1groups.length)?prep(g+1):null;
+    var tagConc=3;try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=6)tagConc=tcv}catch(_){}
+    var inflight=[];
+    var runGroup=async function(g,P0,ctx0){
+      var idxs=groups[g];
       prog("🎭 AI កំពុងស្តាប់សំឡេង ប្រុស/ស្រី • ក្រុម "+(g+1)+"/"+groups.length,2+8*g/groups.length);
       try{
         if(!P0)throw new Error("prep");
-        var rs=await classifyChunk(P0.lines,ctx,P0.wav,P0.fr),map=rs.map;profile=mergeProf(profile,rs.voices);Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});
+        var rs=await classifyChunk(P0.lines,ctx0,P0.wav,P0.fr),map=rs.map;profile=mergeProf(profile,rs.voices);Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});
         idxs.forEach(function(i){var b=srtBlocks[i],tg=map[String(b.id)];if(tg){b.text=applyTag(b.text,tg);done++;}else failed++;});
       }catch(e){console.warn("tag chunk failed",e);failed+=idxs.length;}
       var tail=idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");ctx=profText(profile)+(tail?((profile.length?". ":"")+"Tags of the last lines before this clip (id=tag): "+tail):"");
+    };
+    for(var g=0;ggroups.length;g++){
+      var P0=await prepP;
+      prepP=(g+1groups.length)?prep(g+1):null;
+      var rec={done:false,p:null};
+      rec.p=runGroup(g,P0,ctx).then(function(){this.done=true}.bind(rec));
+      inflight.push(rec);
+      if(g===0)await rec.p;
+      while(inflight.filter(function(r){return !r.done}).length>=tagConc){
+        await Promise.race(inflight.filter(function(r){return !r.done}).map(function(r){return r.p}));
+      }
     }
-     
+    await Promise.all(inflight.map(function(r){return r.p}));
+    try{toastS("⏱ ចាប់សំឡេង [1]-[4] ចំណាយ "+Math.round((Date.now()-__tTag0)/1000)+" វិនាទី",true)}catch(_){}
+
     var rechecked=0,changed=0;
     try{
       var sus={};lowIds.forEach(function(id){if(idxById[id]!==undefined)sus[idxById[id]]=1;});
@@ -11097,7 +11116,7 @@ async function core(P,srt,tok){tok=tok||{c:false};
   if(!direct&&!document.body.classList.contains("zsf-admin"))throw new Error("ត្រូវការ Gemini API Key ផ្ទាល់ខ្លួន — សូមបង្កើត Key ខ្លួនឯងពី Google AI Studio");
   if(!direct&&!base())throw new Error("សូមដាក់ Worker URL មុន (ផ្នែក 03B)");
   ls("zsf_gem_url",base());ls("zsf_gem_acc",(($("zsfGemAcc")&&$("zsfGemAcc").value)||"").trim());
-  var ctx={f:f,file:null,up:0,direct:direct,tok:tok};
+  var ctx={f:f,file:null,up:0,direct:direct,tok:tok},__tL0=Date.now();
   try{
     var sig=(f.name||"")+":"+f.size+":"+(f.lastModified||0);
     if(direct){P("🎧 កំពុងរៀបចំសំឡេងសម្រាប់ Gemini (ផ្ញើពីទូរស័ព្ទផ្ទាល់ មិនឆ្លងកាត់ Worker)…",5)}
@@ -11129,6 +11148,7 @@ async function core(P,srt,tok){tok=tok||{c:false};
     }catch(e){stop=true;throw e;}finally{clearInterval(pt);}
     for(var gi2=0;N>gi2;gi2++)all=all.concat(results[gi2]||[]);
     var merged=all.map(function(o,i){return (i+1)+"\n"+o.time+"\n"+o.text+"\n"}).join("\n");
+    try{showToast("⏱ Gemini ស្តាប់សំឡេង និងបកប្រែ "+N+" ផ្នែក ចំណាយ "+Math.round((Date.now()-__tL0)/1000)+" វិនាទី",true)}catch(_){}
     return {srt:merged,outCount:all.length};
   }catch(e){
     if(needReupload(e))upCache=null;
@@ -11456,7 +11476,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.83";
+  var EMB="1.84";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
