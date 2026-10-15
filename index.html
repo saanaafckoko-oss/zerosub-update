@@ -3154,6 +3154,101 @@ html body #zkt_card .zkt-cchips,html body #project1MediaToSrt #zkt_card .zkt-cch
 html body #zkt_card .zkt-cc,html body #project1MediaToSrt #zkt_card .zkt-cc{flex:none!important;margin:0!important;padding:4px 8px!important;border-radius:9px!important;border:1px solid #2b3654!important;background:transparent!important;color:#a9b4cc!important;font-size:16px!important;font-weight:700!important;line-height:1.3!important;white-space:nowrap!important}
 html body #zkt_card .zkt-cc.on,html body #project1MediaToSrt #zkt_card .zkt-cc.on{border:2px solid #3b82f6!important;background:#14295c!important;color:#fff!important;padding:3px 7px!important}
 /style>
+script id="zsf-khmer-numbers">
+(function(){
+// Convert numbers (0-9 and Khmer digits ០-៩) inside text into Khmer words,
+// so TTS voices read them correctly. Example: "20 យ័ន" -> "ម្ភៃ យ័ន"
+
+const KH_DIGITS = "០១២៣៤៥៦៧៨៩";
+const ONES = ["សូន្យ", "មួយ", "ពីរ", "បី", "បួន", "ប្រាំ", "ប្រាំមួយ", "ប្រាំពីរ", "ប្រាំបី", "ប្រាំបួន"];
+const TENS = ["", "ដប់", "ម្ភៃ", "សាមសិប", "សែសិប", "ហាសិប", "ហុកសិប", "ចិតសិប", "ប៉ែតសិប", "កៅសិប"];
+
+function toAscii(s) {
+  return s.replace(/[០-៩]/g, (d) => String(KH_DIGITS.indexOf(d)));
+}
+
+function below100(n) {
+  if (n  10) return ONES[n];
+  return TENS[Math.floor(n / 10)] + (n % 10 ? ONES[n % 10] : "");
+}
+
+function below1000000(n) {
+  let out = "";
+  const units = [
+    [100000, "សែន"],
+    [10000, "ម៉ឺន"],
+    [1000, "ពាន់"],
+    [100, "រយ"],
+  ];
+  for (const [v, w] of units) {
+    const d = Math.floor(n / v);
+    if (d > 0) out += ONES[d] + w;
+    n %= v;
+  }
+  if (n > 0) out += below100(n);
+  return out;
+}
+
+// Integer (as BigInt) to Khmer words
+function intToKhmer(big) {
+  if (big === 0n) return ONES[0];
+  const MIL = 1000000n;
+  let out = "";
+  if (big >= MIL) {
+    out += intToKhmer(big / MIL) + "លាន";
+    big %= MIL;
+  }
+  if (big > 0n) out += below1000000(Number(big));
+  return out;
+}
+
+function digitByDigit(str) {
+  return [...str].map((c) => ONES[Number(c)]).join(" ");
+}
+
+function numberToKhmer(raw) {
+  let s = toAscii(raw).replace(/,/g, "");
+  const [intPart, decPart] = s.split(".");
+  let words;
+  // phone-like / code-like numbers: leading zero or very long -> digit by digit
+  if ((intPart.length > 1 && intPart.startsWith("0")) || intPart.length > 15) {
+    words = digitByDigit(intPart);
+  } else {
+    words = intToKhmer(BigInt(intPart));
+  }
+  if (decPart !== undefined && decPart !== "") {
+    words += " ក្បៀស " + digitByDigit(decPart);
+  }
+  return words;
+}
+
+const NUM_SRC = "[0-9០-៩]+(?:,[0-9០-៩]{3})*(?:\\.[0-9០-៩]+)?";
+
+function convertNumbersToKhmerWords(text) {
+  text = String(text == null ? "" : text);
+  // time 10:30 -> "10 30" ; 10:00 -> "10"
+  text = text.replace(/([0-9០-៩]{1,2}):([0-9០-៩]{2})(?![0-9០-៩])/g, (m, h, mi) =>
+    /^(0|០)+$/.test(mi) ? h : h + " " + mi
+  );
+  // group 1: speaker tags [1]-[4] are kept untouched
+  const re = new RegExp("(\\[[1-4១-៤]\\])|(\\$\\s*)?(" + NUM_SRC + ")(\\s*%|\\s*៛)?", "g");
+  return text.replace(re, (m, tag, dollar, num, suf, offset, whole) => {
+    if (tag) return m;
+    let w = numberToKhmer(num);
+    if (suf) w += /%/.test(suf) ? " ភាគរយ" : " រៀល";
+    if (dollar) w += " ដុល្លារ";
+    const next = whole[offset + m.length];
+    if (next && /[\u1780-\u17FF]/.test(next)) w += " ";
+    return w;
+  });
+}
+
+// Browser: window.convertNumbersToKhmerWords ; Node: module.exports
+if (typeof module !== "undefined") module.exports = { convertNumbersToKhmerWords, numberToKhmer };
+if (typeof window !== "undefined") window.convertNumbersToKhmerWords = convertNumbersToKhmerWords;
+
+})();
+/script>
 script id="zsf-khmer-tts">
 (function(){
 "use strict";
@@ -3277,6 +3372,7 @@ async function synthEdge(text,s){
  }
 }
 async function synth(text,s){
+ try{if(window.convertNumbersToKhmerWords)text=window.convertNumbersToKhmerWords(text)}catch(e){}
  if($("zkt_mode").value==="edge")return synthEdge(text,s);
  var key=$("zkt_key").value.trim(),reg=$("zkt_region").value.trim().toLowerCase();
  if(!key||!reg)throw new Error("សូមបញ្ចូល Azure Key និង Region ជាមុន");
@@ -11510,7 +11606,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.91";
+  var EMB="1.92";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
