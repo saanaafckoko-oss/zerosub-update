@@ -3259,7 +3259,7 @@ var EQ={studio:[1.5,1,0],phone:[-4,3,5],story:[1,2.5,3],warm:[3,0,-2],fairy:[2,1
 var EQN={studio:"✨ ស្ទូឌីយោ (ពិរោះ ស្រាល)",phone:"📱 ស្រួយភ្លឺ (ទូរសព្ទ)",story:"🎙️ និទានរឿង (ច្បាស់)",warm:"📻 បាសកក់ក្តៅ (សំឡេងវិទ្យុ)",fairy:"🧚 និទានរឿងព្រេង",podcast:"📻 ផតខាស្ត",flat:"🎚️ សំឡេងដើម (Flat)"};
 var EQMIG={bright:"phone",deep:"warm"};    
  
-function defS(i){return{voice:i%2?"km-KH-SreymomNeural":"km-KH-PisethNeural",hm:0,pitch:-2,bass:0,speed:20,vol:20,echo:0,auto:40,eq:"studio",clone:1}}
+function defS(i){return{voice:i%2?"km-KH-SreymomNeural":"km-KH-PisethNeural",hm:-15,pitch:-2,bass:2,speed:20,vol:2,echo:0,auto:40,eq:"studio",clone:0.5}}
 var CFG=[{k:"hm",t:"Volume High+Mid %",s:5,a:-50,b:100,u:"%"},{k:"pitch",t:"Pitch",s:1,a:-50,b:50,u:"Hz"},
 {k:"bass",t:"Bass dB",s:1,a:-10,b:15,u:"dB"},{k:"speed",t:"Speed",s:1,a:-50,b:100,u:"%"},
 {k:"vol",t:"Volume",s:5,a:-80,b:100,u:"%"},{k:"echo",t:"Echo",s:0.1,a:0,b:1,u:""},
@@ -3268,7 +3268,7 @@ var CFG=[{k:"hm",t:"Volume High+Mid %",s:5,a:-50,b:100,u:"%"},{k:"pitch",t:"Pitc
 var DEFAULT_WURL="https://little-unit-043f.saanaafckoko.workers.dev";
 var S,cur=0,inc=[true,true,true,true],stopReq=false;
 try{var ji=JSON.parse(localStorage.getItem("zsf_tts_inc")||"null");if(Array.isArray(ji)&&ji.length===4)inc=ji.map(Boolean)}catch(e){}
-function load(){var FL="zsf_tts_v170";try{var j=JSON.parse(localStorage.getItem("zsf_khmer_tts_v1")||"null");if(Array.isArray(j)&&j.length===4){try{if(localStorage.getItem(FL)!=="1"){j.forEach(function(x){if(x&&x.speed===10)x.speed=20});localStorage.setItem(FL,"1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v171")!=="1"){j.forEach(function(x){if(x&&x.auto===40)x.auto=30});localStorage.setItem("zsf_tts_v171","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v172")!=="1"){j.forEach(function(x){if(x&&x.auto===30)x.auto=40});localStorage.setItem("zsf_tts_v172","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}}catch(_){}return j}}catch(e){}try{localStorage.setItem(FL,"1");localStorage.setItem("zsf_tts_v171","1");localStorage.setItem("zsf_tts_v172","1")}catch(_){}return[0,1,2,3].map(defS)}
+function load(){var FL="zsf_tts_v170";try{var j=JSON.parse(localStorage.getItem("zsf_khmer_tts_v1")||"null");if(Array.isArray(j)&&j.length===4){try{if(localStorage.getItem(FL)!=="1"){j.forEach(function(x){if(x&&x.speed===10)x.speed=20});localStorage.setItem(FL,"1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v171")!=="1"){j.forEach(function(x){if(x&&x.auto===40)x.auto=30});localStorage.setItem("zsf_tts_v171","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v172")!=="1"){j.forEach(function(x){if(x&&x.auto===30)x.auto=40});localStorage.setItem("zsf_tts_v172","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v193")!=="1"){try{localStorage.setItem("zsf_khmer_tts_v1_bak193",JSON.stringify(j))}catch(_){}var cl=function(v,a,b){return Math.max(a,Math.min(b,v))};j.forEach(function(x){if(!x)return;x.vol=cl(Math.round(((1+(+x.vol||0)/100)*0.852-1)*100),-80,100);x.bass=cl((+x.bass||0)+2,-10,15);x.hm=cl((+x.hm||0)-15,-50,100);x.clone=cl((x.clone===undefined||x.clone===null||isNaN(+x.clone)?1:+x.clone)*0.5,0,1)});localStorage.setItem("zsf_tts_v193","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}}catch(_){}return j}}catch(e){}try{localStorage.setItem(FL,"1");localStorage.setItem("zsf_tts_v171","1");localStorage.setItem("zsf_tts_v172","1");localStorage.setItem("zsf_tts_v193","1")}catch(_){}return[0,1,2,3].map(defS)}
 function persist(){try{localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(S));if(document.body.classList.contains("zsf-admin")){localStorage.setItem("zsf_tts_key",$("zkt_key").value.trim());localStorage.setItem("zsf_tts_region",$("zkt_region").value.trim());localStorage.setItem("zsf_tts_mode",$("zkt_mode").value);localStorage.setItem("zsf_tts_wurl",$("zkt_wurl").value.trim())}}catch(e){}}
 var audMode=false;
 function st(m,p){m=String(m==null?"":m).split(" • ").filter(function(x){return !/Auto|នៅតែវែង|ប្រើសំឡេងតួ|ឃ្លាលេខ|\[\d\]×/.test(x)}).join(" • ");if(/^\s*✅/.test(m))m="";$("zkt_stat").textContent=m;if(p!=null)$("zkt_bar").style.width=p+"%";if(audMode){var as=$("zkt_astat"),ab=$("zkt_abar");if(as)as.textContent=m;if(ab&&p!=null)ab.style.width=p+"%"}}
@@ -11606,7 +11606,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.92";
+  var EMB="1.93";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
