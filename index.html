@@ -3255,16 +3255,25 @@ function ssml(text,s){
 }
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
 function ready(){return $("zkt_mode").value==="edge"?!!$("zkt_wurl").value.trim():!!($("zkt_key").value.trim()&&$("zkt_region").value.trim())}
+function withTO(p,ms,ctl){return new Promise(function(res,rej){var t=setTimeout(function(){try{ctl&&ctl.abort()}catch(e){}rej(new Error("timeout"))},ms);p.then(function(v){clearTimeout(t);res(v)},function(e){clearTimeout(t);rej(e)})})}
 async function synthEdge(text,s){
  var wu=$("zkt_wurl").value.trim();if(!wu)throw new Error("សូមបញ្ចូល Worker URL ជាមុន (មើលការណែនាំដាក់ Worker)");
  for(var n=0;n3;n++){
-  var res;
-  try{res=await fetch(wu,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:text,voice:s.voice,rate:Math.round(s.speed),pitch:Math.round(s.pitch)})})}
-  catch(e){if(n===2)throw new Error("ភ្ជាប់ Worker មិនបាន (ពិនិត្យ URL និងអ៊ីនធឺណិត)");await sleep(1500);continue}
-  if(res.ok)return await res.arrayBuffer();
-  var msg="";try{msg=(await res.text()).slice(0,120)}catch(e){}
-  if(res.status>=500&&n2){await sleep(1500);continue}
-  throw new Error("Worker/Edge បរាជ័យ HTTP "+res.status+(msg?" — "+msg:""));
+  var out,ctl=window.AbortController?new AbortController():null;
+  try{
+   out=await withTO((async function(){
+    var r=await fetch(wu,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:text,voice:s.voice,rate:Math.round(s.speed),pitch:Math.round(s.pitch)}),signal:ctl?ctl.signal:undefined});
+    if(r.ok)return {ok:true,ab:await r.arrayBuffer()};
+    var m="";try{m=(await r.text()).slice(0,120)}catch(e){}
+    return {ok:false,status:r.status,msg:m};
+   })(),30000,ctl);
+  }catch(e){
+   if(n===2)throw new Error(e&&e.message==="timeout"?"Worker ឆ្លើយតបយឺតពេក (30 វិនាទី) — Microsoft Edge TTS ប្រហែលមិនដំណើរការ":"ភ្ជាប់ Worker មិនបាន (ពិនិត្យ URL និងអ៊ីនធឺណិត)");
+   await sleep(1500);continue;
+  }
+  if(out.ok)return out.ab;
+  if(out.status>=500&&n2){await sleep(1500);continue}
+  throw new Error("Worker/Edge បរាជ័យ HTTP "+out.status+(out.msg?" — "+out.msg:""));
  }
 }
 async function synth(text,s){
@@ -3272,14 +3281,22 @@ async function synth(text,s){
  var key=$("zkt_key").value.trim(),reg=$("zkt_region").value.trim().toLowerCase();
  if(!key||!reg)throw new Error("សូមបញ្ចូល Azure Key និង Region ជាមុន");
  for(var n=0;n3;n++){
-  var res;
-  try{res=await fetch("https://"+reg+".tts.speech.microsoft.com/cognitiveservices/v1",{method:"POST",headers:{"Ocp-Apim-Subscription-Key":key,"Content-Type":"application/ssml+xml","X-Microsoft-OutputFormat":"riff-24khz-16bit-mono-pcm"},body:ssml(text,s)})}
-  catch(e){if(n===2)throw new Error("បណ្តាញមានបញ្ហា ឬ Region/CORS មិនត្រឹមត្រូវ");await sleep(1500);continue}
-  if(res.ok)return await res.arrayBuffer();
-  if(res.status===401||res.status===403)throw new Error("Key ឬ Region មិនត្រឹមត្រូវ (HTTP "+res.status+")");
-  if(res.status===429){if(n===2)throw new Error("លើសកូតា/ហៅញឹកពេក (429)");await sleep(2500*(n+1));continue}
-  if(res.status>=500&&n2){await sleep(1500);continue}
-  throw new Error("Azure បរាជ័យ HTTP "+res.status);
+  var out,ctl=window.AbortController?new AbortController():null;
+  try{
+   out=await withTO((async function(){
+    var r=await fetch("https://"+reg+".tts.speech.microsoft.com/cognitiveservices/v1",{method:"POST",headers:{"Ocp-Apim-Subscription-Key":key,"Content-Type":"application/ssml+xml","X-Microsoft-OutputFormat":"riff-24khz-16bit-mono-pcm"},body:ssml(text,s),signal:ctl?ctl.signal:undefined});
+    if(r.ok)return {ok:true,ab:await r.arrayBuffer()};
+    return {ok:false,status:r.status};
+   })(),30000,ctl);
+  }catch(e){
+   if(n===2)throw new Error(e&&e.message==="timeout"?"Azure ឆ្លើយតបយឺតពេក (30 វិនាទី)":"បណ្តាញមានបញ្ហា ឬ Region/CORS មិនត្រឹមត្រូវ");
+   await sleep(1500);continue;
+  }
+  if(out.ok)return out.ab;
+  if(out.status===401||out.status===403)throw new Error("Key ឬ Region មិនត្រឹមត្រូវ (HTTP "+out.status+")");
+  if(out.status===429){if(n===2)throw new Error("លើសកូតា/ហៅញឹកពេក (429)");await sleep(2500*(n+1));continue}
+  if(out.status>=500&&n2){await sleep(1500);continue}
+  throw new Error("Azure បរាជ័យ HTTP "+out.status);
  }
 }
 var AC=null;function ctx(){return AC||(AC=new (window.AudioContext||window.webkitAudioContext)())}
@@ -3543,6 +3560,7 @@ async function runAll(quiet){
     }
     if(r){r.av=av;results[i]=r}else{results[i]=false;fail++}
     doneN++;
+    if(doneN===fail&&fail>=6&&!fatal)fatal=new Error("❌ អានសំឡេងមិនបាន៖ ៦ ឃ្លាដំបូងបរាជ័យទាំងអស់ — Microsoft Edge TTS (Worker) ប្រហែលមិនដំណើរការ។ សូមប្តូរទៅ «Azure (ត្រូវការ Key)» ក្នុងការកំណត់ Key ហើយសាកម្តងទៀត");
     st("កំពុងបង្កើត "+doneN+"/"+jobs.length,(doneN/Math.max(1,jobs.length))*100);
     try{window.zsfTtsProgress&&window.zsfTtsProgress((doneN/Math.max(1,jobs.length))*100,"កំពុងបង្កើតសំឡេង "+doneN+"/"+jobs.length)}catch(_){}
     flush();
@@ -11492,7 +11510,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.88";
+  var EMB="1.90";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
@@ -11523,6 +11541,38 @@ window.zsfVideoPoster=function(v){
           }).catch(function(err){try{ZSFApp.abort(String(err))}catch(_){}});
         };
         document.addEventListener("click",window.__zsfDlH,true);
+      }
+    }catch(_){}
+    /* V1.90: APK ចាស់ (គ្មាន ZSFApp) — រក្សាទុកឯកសារធំជាដុំៗ 3MB តាម ZSNative.putFile + saveToDownloads ជំនួស saveBase64 (ដែលធ្វើឱ្យ RAM ពេញ) */
+    try{
+      if(!window.ZSFApp && window.ZSNative && typeof ZSNative.putFile==="function" && typeof ZSNative.saveToDownloads==="function"){
+        var zsToast=function(m){try{var t=document.getElementById("zsChunkToast");if(!t){t=document.createElement("div");t.id="zsChunkToast";t.style.cssText="position:fixed;left:12px;right:12px;bottom:24px;z-index:2147483647;background:#1e1033;color:#fff;border:1px solid #7e22ce;border-radius:12px;padding:12px 14px;font:14px/1.5 sans-serif;text-align:center";(document.body||document.documentElement).appendChild(t)}t.textContent=m;t.style.display="block";clearTimeout(t._h);t._h=setTimeout(function(){t.style.display="none"},6000)}catch(e){}};
+        var zsIsDl=function(a){return a&&a.hasAttribute&&a.hasAttribute("download")&&a.href&&a.href.indexOf("blob:")===0};
+        var zsSave=function(a){
+          var name=a.getAttribute("download")||"file";
+          fetch(a.href).then(function(r){return r.blob()}).then(async function(b){
+            var tmp="zsdl_"+Date.now()+".bin",CH=3*1024*1024,ok=true;
+            zsToast("កំពុងរក្សាទុក… 0%");
+            for(var o=0;o<b.size;o+=CH){
+              var u=new Uint8Array(await b.slice(o,o+CH).arrayBuffer()),t="";
+              for(var i=0;i<u.length;i+=32768)t+=String.fromCharCode.apply(null,u.subarray(i,i+32768));
+              if(!ZSNative.putFile(tmp,btoa(t),o>0)){ok=false;break}
+              zsToast("កំពុងរក្សាទុក… "+Math.min(99,Math.round((o+CH)/b.size*100))+"%");
+            }
+            if(!ok){try{ZSNative.deleteFile(tmp)}catch(_){}zsToast("រក្សាទុកមិនបាន (ទំហំទូរសព្ទពេញ?)");return}
+            var cb="zsDlCb"+Date.now();
+            window[cb]=function(r){try{ZSNative.deleteFile(tmp)}catch(_){}delete window[cb];zsToast(r&&r.ok?"✅ រក្សាទុករួចក្នុង Downloads: "+name:"រក្សាទុកមិនបាន: "+(r&&r.error||""))};
+            ZSNative.saveToDownloads(name,b.type||"application/octet-stream",tmp,cb);
+          }).catch(function(err){zsToast("រក្សាទុកមិនបាន: "+err)});
+        };
+        if(window.__zsChunkH)document.removeEventListener("click",window.__zsChunkH,true);
+        window.__zsChunkH=function(e){var a=e.target&&e.target.closest?e.target.closest("a[download]"):null;if(zsIsDl(a)){e.preventDefault();e.stopPropagation();zsSave(a)}};
+        document.addEventListener("click",window.__zsChunkH,true);
+        if(!window.__zsChunkP){
+          window.__zsChunkP=1;
+          var prevClick=HTMLAnchorElement.prototype.click;
+          HTMLAnchorElement.prototype.click=function(){if(zsIsDl(this)){zsSave(this);return}return prevClick.apply(this,arguments)};
+        }
       }
     }catch(_){}
     setTimeout(function(){ if(document.getElementById("authScreen")||document.getElementById("mainApp")) setTries(0); },8000);
