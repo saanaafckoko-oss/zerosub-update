@@ -3259,6 +3259,21 @@ var EQ={kclone:[0,0,0],studio:[1.5,1,0],phone:[-4,3,5],story:[1,2.5,3],warm:[3,0
 var EQN={kclone:"⭐ ដូចសំឡេងគំរូ (ពិសិដ្ឋ/ស្រីមុំ)",studio:"✨ ស្ទូឌីយោ (ពិរោះ ស្រាល)",phone:"📱 ស្រួយភ្លឺ (ទូរសព្ទ)",story:"🎙️ និទានរឿង (ច្បាស់)",warm:"📻 បាសកក់ក្តៅ (សំឡេងវិទ្យុ)",fairy:"🧚 និទានរឿងព្រេង",podcast:"📻 ផតខាស្ត",flat:"🎚️ សំឡេងដើម (Flat)"};
 var EQMIG={bright:"phone",deep:"warm"};    
  
+var ROLEG=[
+{t:"🎭 តួអង្គ",l:[
+["sweet","🌸 តួឯកស្រី / ផ្អែមទន់ភ្លន់ (Sweet Heroine)",{dp:20,speed:12,bass:-1,vol:2,echo:0,eq:"fairy",auto:40}],
+["villain","🦹 តួកាច / មេបិសាច / ឃោរឃៅ (Dark Villain)",{dp:-35,speed:5,bass:4,vol:8,echo:0.3,eq:"warm",auto:40}],
+["action","🔥 សកម្មភាព / វាយប្រហារ (Action Epic)",{dp:0,speed:32,bass:2,vol:12,echo:0.1,eq:"story",auto:50}]]},
+{t:"👥 វ័យ & និទានរឿង",l:[
+["grandpa","👴 លោកតា / ព្រឹទ្ធាចារ្យ (Elder Grandpa)",{dp:-30,speed:-5,bass:3,vol:0,echo:0,eq:"warm",auto:30}],
+["grandma","👵 លោកយាយ / មេដោះ (Elder Grandma)",{dp:0,speed:-3,bass:0,vol:0,echo:0,eq:"warm",auto:30}],
+["child","🧒 កុមារ / ក្មេងតូច / ស្រួយស្រស់ (Cute Child)",{dp:45,speed:18,bass:-3,vol:4,echo:0,eq:"fairy",auto:40}],
+["audiobook","📖 និទានរឿង / ប្រលោមលោក (Audiobook)",{dp:-5,speed:8,bass:1,vol:0,echo:0,eq:"story",auto:30}]]},
+{t:"🎙️ វិទ្យុ & ផ្សព្វផ្សាយ",l:[
+["podcast","🎙️ វិទ្យុ & ផតខាស្ត (Podcast Pro)",{dp:-5,speed:15,bass:2,vol:4,echo:0,eq:"podcast",auto:40}],
+["news","📢 អ្នកអានព័ត៌មាន / ពិធីករ (News Anchor)",{dp:0,speed:22,bass:0,vol:6,echo:0,eq:"story",auto:50}]]}];
+var ROLEMAP={};ROLEG.forEach(function(g){g.l.forEach(function(r){ROLEMAP[r[0]]=r[2]})});
+function applyRole(id){var r=ROLEMAP[id];if(!r)return;var d=defS(cur),s=S[cur];s.pitch=Math.max(-80,Math.min(50,d.pitch+r.dp));s.speed=r.speed;s.bass=r.bass;s.vol=r.vol;s.echo=r.echo;s.eq=r.eq;s.auto=r.auto;s.hm=0}
 function defS(i){return{voice:i%2?"km-KH-SreymomNeural":"km-KH-PisethNeural",hm:0,pitch:(i%2?-55:-2),bass:0,speed:20,vol:2,echo:0,auto:40,eq:"kclone",clone:1}}
 var CFG=[{k:"hm",t:"Volume High+Mid %",s:5,a:-50,b:100,u:"%"},{k:"pitch",t:"Pitch",s:1,a:-80,b:50,u:"Hz"},
 {k:"bass",t:"Bass dB",s:1,a:-10,b:15,u:"dB"},{k:"speed",t:"Speed",s:1,a:-50,b:100,u:"%"},
@@ -3315,6 +3330,7 @@ function drawCtl(){
   var dv=defS(cur)[k],rs=(Math.round(dv*10)/10!==v)?'button type="button" class="zpv-rs" data-k="'+k+'" data-d="0" title="ត្រឡប់ទៅលំនាំដើម">↺ '+fmt(k,dv)+'/button>':'';
   h+='div class="zpv-f zpv-fc'+(k==="hm"?" zpv-wide":"")+'">div class="zpv-lh">label>span class="zpv-li">'+ICO[k]+'/span>'+LBL[k]+'/label>'+rs+'/div>div class="zpv-st">button type="button" data-k="'+k+'" data-d="-1"'+(v=c.a?" disabled":"")+'>−/button>span class="zpv-v">b>'+fmt(k,v)+'/b>/span>button type="button" data-k="'+k+'" data-d="1"'+(v>=c.b?" disabled":"")+'>+/button>/div>input type="range" class="zpv-rg" data-k="'+k+'" min="'+c.a+'" max="'+c.b+'" step="'+c.s+'" value="'+v+'" aria-label="'+LBL[k]+'">/div>';
  });
+ h+='div class="zpv-f zpv-wide">label>🎭 Preset តួអង្គ (ជ្រើស → កំណត់ស្វ័យប្រវត្តិ)/label>div class="zpv-sel">select id="zkt_role">option value="">— ជ្រើសរើស —/option>'+ROLEG.map(function(g){return 'optgroup label="'+g.t+'">'+g.l.map(function(r){return 'option value="'+r[0]+'">'+r[1]+'/option>'}).join("")+'/optgroup>'}).join("")+'/select>/div>/div>';
  h+='div class="zpv-f zpv-wide">label>EQ Preset/label>div class="zpv-sel">select id="zkt_eq">'+Object.keys(EQN).map(function(k){return 'option value="'+k+'"'+(k===s.eq?" selected":"")+'>'+EQN[k]+'/option>'}).join("")+'/select>/div>/div>';
  var CL0=(s.clone===undefined||s.clone===null||isNaN(+s.clone))?1:+s.clone;
  h+='div class="zpv-f zpv-wide">label>ភាពថ្លា និងខ្យល់ ដូចសំឡេងគំរូ/label>div class="zpv-sel">select id="zkt_clone">'+[["0","បិទ"],["0.5","ស្រាល (50%)"],["1","ដូចគំរូ (100%)"]].map(function(o){return 'option value="'+o[0]+'"'+(+o[0]===CL0?" selected":"")+'>'+o[1]+'/option>'}).join("")+'/select>/div>/div>';
@@ -3416,6 +3432,7 @@ async function process(ab,s,targetSec){
   g.connect(d);d.connect(fb);fb.connect(d);d.connect(wet);wet.connect(oc.destination)}
  src.start(0);
  var out=await oc.startRendering();
+try{var AIRG=0.004*CLN;if(AIRG>0){var odA=out.getChannelData(0),SRA=out.sampleRate,ahp=Math.exp(-2*Math.PI*3000/SRA),alp=1-Math.exp(-2*Math.PI*9500/SRA),att=1/(0.0021*SRA),rel=1/(0.104*SRA),ev=0,hpv=0,xp=0,lpv=0;for(var qa=0;odA.length>qa;qa++){var va=odA[qa];va=va>0?va:-va;ev+=(va>ev?att:rel)*(va-ev);var wn=Math.random()*2-1;hpv=ahp*(hpv+wn-xp);xp=wn;lpv+=alp*(hpv-lpv);odA[qa]+=lpv*ev*AIRG}}}catch(_){}
  var od=out.getChannelData(0),pk0=0;for(var z=0;zod.length;z++){var aa=od[z]0?-od[z]:od[z];if(aa>pk0)pk0=aa}
  if(pk0>0.98){var kk=0.98/pk0;for(var z2=0;z2od.length;z2++)od[z2]*=kk}
  var s0=0,e0=od.length-1;
@@ -3584,7 +3601,7 @@ function zsfBreath(sr,dur,rnd){
  }
  var k=1/Math.sqrt(Math.max(1e-12,sq/n));for(var j=0;jn;j++)o[j]*=k;return o;
 }
-var BREATH=0.012;try{var bv=localStorage.getItem("zsf_breath3");if(bv!==null&&bv!==""){var bn=parseFloat(bv);if(bn>=0&&bn=0.3)BREATH=bn}}catch(_){}
+var BREATH=0;try{var bv=localStorage.getItem("zsf_breath3");if(bv!==null&&bv!==""){var bn=parseFloat(bv);if(bn>=0&&bn=0.3)BREATH=bn}}catch(_){}
  
 function availFor(arr,i){
   
@@ -4474,7 +4491,7 @@ function init(){
   f.addEventListener("click",function(e){var b=e.target&&e.target.closest?e.target.closest("button[data-g]"):null;if(!b||b.disabled)return;if(hFired){hFired=false;return}fitStep(b.getAttribute("data-g"),+b.getAttribute("data-d"))});
   f.addEventListener("change",function(e){if(e.target.id==="zkt_force"){try{localStorage.setItem("zsf_tts_force",e.target.checked?"1":"0")}catch(_){}drawFit()}});
  })();
- $("zkt_ctl").onchange=function(e){if(e.target.id==="zkt_eq"){S[cur].eq=e.target.value;persist()}if(e.target.id==="zkt_clone"){S[cur].clone=+e.target.value;persist()}};
+ $("zkt_ctl").onchange=function(e){if(e.target.id==="zkt_role"){if(e.target.value){applyRole(e.target.value);persist();drawPills();drawCtl();drawSum();if(typeof pvRender==="function")pvRender()}return}if(e.target.id==="zkt_eq"){S[cur].eq=e.target.value;persist()}if(e.target.id==="zkt_clone"){S[cur].clone=+e.target.value;persist()}};
 (function(){var ed=$("zkt_edit"),ct=$("zkt_ctl");
   if(ed){
    ed.addEventListener("input",function(e){if(e.target&&e.target.id==="zkt_name"){S[cur].name=e.target.value;persist();var nm=$("zkt_slots").querySelectorAll(".zpv-nm")[cur];if(nm)nm.textContent=nmOf(cur)}});
@@ -5151,7 +5168,8 @@ TRANSLATION RULES (strict):
 9. NO 'ៗ': NEVER use the Khmer repetition symbol 'ៗ' (the TTS program cannot read it). Spell the word out: write "ទេទេ" not "ទេៗ", "លឿនលឿន" not "លឿនៗ", "យឺតយឺត" not "យឺតៗ".
 10. Return only what the OUTPUT FORMAT asks: no notes and no explanations in brackets.
 11. GENRE IS MANDATORY: the "Atmosphere/Genre Context" and the genre guidance (ការណែនាំតាមប្រភេទ) in the STORY CARD decide vocabulary, register, rhythm and emotion on EVERY line (e.g. revenge/face-slap = cold, sharp, proud; ancient = old-fashioned respectful words by rank; romance = soft and tender; comedy = quick and funny; horror = short and tense; modern = casual everyday talk). Never use a register that does not fit the genre or the speaker's era.
-12. ADAPT & CONDENSE: if a source sentence is long or uses a difficult idiom, adapt it into shorter, easy-to-read Khmer that keeps the full intent and essence (never drop a fact, name, number or negation). Make the dialogue punchy, smooth, dramatic and captivating so the audience stays hooked, in the exact emotion of the scene.`;
+12. ADAPT & CONDENSE: if a source sentence is long or uses a difficult idiom, adapt it into shorter, easy-to-read Khmer that keeps the full intent and essence (never drop a fact, name, number or negation). Make the dialogue punchy, smooth, dramatic and captivating so the audience stays hooked, in the exact emotion of the scene.
+13. EASY FOR THE VOICE PROGRAM (Piseth / Sreymom) TO READ: the Khmer is read aloud by a text-to-speech voice, so write only what it can read smoothly. (a) Use common spoken Khmer words; avoid rare Pali/Sanskrit or bookish words unless the genre or the speaker really needs a royal/ancient register. (b) Use short sentences and put "។", "," or "?" where a person would pause; never write a long sentence with no punctuation. (c) No emoji and no unspoken symbols (* # / ~ -> ( ) ♪), and no English abbreviations with dots; use plain Khmer words. (d) Write units and titles in Khmer words (ដុល្លារ, ម៉ោង, នាទី, ម៉ឺន, សែន, លាន, ភាគរយ); digits may stay only when needed, because the program converts digits into Khmer words itself. (e) Use the ellipsis (...) rarely: at most one short one per line. (f) Write every name exactly the same way each time, so the voice pronounces it the same way.`;
 }
 function buildPrompt(items){
   const keep=$("keepTags")?.value==="true";
@@ -5216,6 +5234,13 @@ const ZSF_TAG_RULES=`
 • សម្រេចពីបរិបទ៖ សព្វនាម 他/她 · ឈ្មោះ · ឋានៈ (លោក/លោកស្រី/ប្អូនស្រី/បងប្រុស…) · ពាក្យហៅគ្នា · ប្រតិកម្មរបស់អ្នកឆ្លើយតប · ការឆ្លើយឆ្លងជាវេនៗរវាងតួពីរ។
 • បន្ទាត់ដែលជាផ្នែកបន្តនៃប្រយោគតែមួយ (កាត់ជាច្រើនបន្ទាត់) ត្រូវប្រើសញ្ញាដូចគ្នា។ ក្នុងការគិត [3]/[4] ភេទត្រូវតាមតួដែលកំពុងគិត។
 • បើមិនអាចដឹងភេទបានពិតប្រាកដ ត្រូវប្រើភេទដូចបន្ទាត់មុន ហើយកុំប្តូរភេទដោយគ្មានភស្តុតាង។ បើមានសញ្ញាក្នុង TARGET រួចហើយ ត្រូវរក្សាដដែល មិនត្រូវកែ។
+
+ជំហាន គ — តាមដានអ្នកនិយាយ (ដើម្បីភាពសុក្រឹត):
+• ប្រើបញ្ជីតួអង្គក្នុង STORY CARD (ឈ្មោះ + ភេទ)។ ពេលបន្ទាត់ហៅឈ្មោះ ឬឆ្លើយតបនឹងតួណាមួយ ត្រូវសម្រេចអ្នកនិយាយតាមភេទរបស់តួនោះ។
+• តួដែល "ត្រូវបានហៅ" មិនមែនអ្នកនិយាយទេ។ បើបន្ទាត់ហៅទៅកាន់ស្ត្រី (夫人/娘子/姑娘/小姐/公主/娘娘/姐/妈/婆婆/奶奶/阿姨) អ្នកនិយាយមិនមែនស្ត្រីនោះឯង។ បើហៅទៅកាន់បុរស (老爷/少爷/公子/大人/王爷/陛下/哥/爸/爷爷/叔叔/先生/总裁) អ្នកនិយាយមិនមែនបុរសនោះឯង។
+• ពាក្យហៅខ្លួនឯង: ស្ត្រី = 妾身/奴婢/奴家/臣妾/哀家/本宫/小女子/民女/人家។ បុរស = 本王/本座/朕/老夫/在下/属下/末将/小人/本少/老子/本帅។
+• 他 = បុរសដែលគេនិយាយអំពី (មិនមែនអ្នកនិយាយ)។ 她 = ស្ត្រីដែលគេនិយាយអំពី (មិនមែនអ្នកនិយាយ)។
+• ក្នុងឈុតមនុស្ស ២ នាក់ ការឆ្លើយឆ្លងប្តូរអ្នកនិយាយ តែបន្ទាត់ដែលជាផ្នែកបន្តនៃប្រយោគតែមួយ ត្រូវរក្សាអ្នកនិយាយដដែល។ បើមិនប្រាកដ ប្រើអ្នកនិយាយដូចបន្ទាត់មុន ហើយកុំប្តូរភេទដោយគ្មានភស្តុតាង។
 
 ត្រួតពិនិត្យមុនឆ្លើយ: (១) គ្រប់បន្ទាត់មានសញ្ញា (ច្រើនបានតែបន្ទាត់ដែល TARGET មានសញ្ញាច្រើនស្រាប់) (២) បន្ទាត់ណាដាក់ [3]/[4] ត្រូវមានភស្តុតាងច្បាស់ បើគ្មាន ប្តូរទៅ [1]/[2] (៣) ភេទសមនឹងតួ។
 `;
@@ -5366,11 +5391,11 @@ async function zsfFillGuessedTags(){
     const part=need.slice(from,from+40);
     toggleProgressBar(true,"🎭 កំណត់ប្រុស/ស្រី/គិតក្នុងចិត្ត "+Math.min(from+40,need.length)+"/"+need.length,95);
     const lines=[];
-    part.forEach(i=>{for(let j=Math.max(0,i-3);j=Math.min(srtBlocks.length-1,i+3);j++){if(!lines.some(x=>x.i===j))lines.push({i:j});}});
+    part.forEach(i=>{for(let j=Math.max(0,i-5);j=Math.min(srtBlocks.length-1,i+5);j++){if(!lines.some(x=>x.i===j))lines.push({i:j});}});
     lines.sort((a,b)=>a.i-b.i);
     const rows=lines.map(x=>{const b=srtBlocks[x.i];const known=/^\s*\[([1-4])\]/.exec(String(b.text||""));const cur=(!b._tagGuess&&known)?+known[1]:null;
       return {id:String(b.id),zh:String(b.text||"").replace(TG,""),km:String(b.trans||"").replace(TG,""),target:part.includes(x.i),known_tag:cur};});
-    const prompt="You are a subtitle voice-tag classifier for short dramas (source subtitles + Khmer translation).\nFor EVERY row with target=true choose EXACTLY ONE tag:\n1 = male character speaking aloud\n2 = female character speaking aloud\n3 = male character's inner thought (not spoken aloud)\n4 = female character's inner thought (not spoken aloud)\nUse the dialogue flow, pronouns, forms of address, who is being spoken to, and the known_tag of neighbouring rows (same scene keeps the same speaker gender unless the dialogue switches). This is TEXT ONLY, so be conservative: decide gender from explicit clues (pronouns, titles such as 先生/小姐/哥/姐/妈/爸, gendered self-reference and polite words, who is being addressed) and keep the same speaker for a continuing conversation. Do NOT flip between male and female without textual evidence, and do NOT assume speakers alternate on every line. If there is no clue, copy the gender of the nearest known_tag row. Use 3 or 4 only when the line is clearly an inner monologue; otherwise use 1 or 2. Never skip a target row.\nOUTPUT: ONLY a JSON array [{\"id\":\"id>\",\"tag\":1}, ...] covering every target row, no other text.\n\nROWS (JSON):\n"+JSON.stringify(rows);
+    const prompt="You are a subtitle voice-tag classifier for short dramas (source subtitles + Khmer translation).\nFor EVERY row with target=true choose EXACTLY ONE tag:\n1 = male character speaking aloud\n2 = female character speaking aloud\n3 = male character's inner thought (not spoken aloud)\n4 = female character's inner thought (not spoken aloud)\nUse the dialogue flow, pronouns, forms of address, who is being spoken to, and the known_tag of neighbouring rows (same scene keeps the same speaker gender unless the dialogue switches). This is TEXT ONLY, so be conservative: decide gender from explicit clues (pronouns, titles such as 先生/小姐/哥/姐/妈/爸, gendered self-reference and polite words, who is being addressed) and keep the same speaker for a continuing conversation. Do NOT flip between male and female without textual evidence, and do NOT assume speakers alternate on every line. If there is no clue, copy the gender of the nearest known_tag row. Use 3 or 4 only when the line is clearly an inner monologue; otherwise use 1 or 2. Never skip a target row.\n"+zsfTagCharsHint()+"OUTPUT: ONLY a JSON array [{\"id\":\"id>\",\"tag\":1}, ...] covering every target row, no other text.\n\nROWS (JSON):\n"+JSON.stringify(rows);
     let map=null;
     for(let t=0;tMath.min(keys.length,3)&&!map;t++){
       try{
@@ -5388,6 +5413,7 @@ async function zsfFillGuessedTags(){
   }
   return {need:need.length,done};
 }
+function zsfTagCharsHint(){var o="";try{if(typeof zsfBible!=="undefined"&&zsfBible&&zsfBible.characters&&zsfBible.characters.length){o+="Known characters (name=Khmer | gender): "+zsfBible.characters.slice(0,40).map(function(c){return c.zh+"="+c.km+" | "+(c.gender||"?")}).join(" ; ")+"\n"}}catch(_){}o+="Gender clues: female self-reference 妾身/奴婢/奴家/臣妾/哀家/本宫/小女子/民女/人家; male self-reference 本王/本座/朕/老夫/在下/属下/末将/小人/本少/老子/本帅. A person addressed as 夫人/娘子/姑娘/小姐/公主/娘娘/姐/妈/婆婆/奶奶/阿姨 is a woman and is NOT the speaker; a person addressed as 老爷/少爷/公子/大人/王爷/陛下/哥/爸/爷爷/叔叔/先生/总裁 is a man and is NOT the speaker. 他/她 name the person talked ABOUT, never the speaker. When the line names a known character or answers him/her, use that character's gender. A sentence split over several rows keeps the same speaker.\n";return o}
 function zsfSrtOut(){
   const keep=$("keepTags")?.value==="true";
   if(keep)srtBlocks.forEach(b=>{if(String(b.trans||"").trim())zsfEnforceTag(b);});
@@ -11606,7 +11632,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.96";
+  var EMB="2.00";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
