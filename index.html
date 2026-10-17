@@ -2684,10 +2684,6 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 !-- Lines here -->
 /div>
 input id="filename" type="hidden" value="khmer_subtitle.srt"/>
-div class="workspace-actions">
-button class="workspace-upload-btn" onclick="document.getElementById('fileInput').click()" type="button">📄 បញ្ចូល SRT ថ្មី/button>
-button class="workspace-clear-btn" id="btn_clear_file_workspace" onclick="clearFileData()" type="button">🗑️ លុប SRT នេះ/button>
-/div>
 label id="zsfAutoClearRow" style="display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:10px 12px;border-radius:14px;border:1px solid var(--border-color);background:rgba(0,0,0,.25);font-size:13px;font-weight:700;color:var(--text-white);cursor:pointer">input checked="" id="zsfAutoClear" onchange="try{localStorage.setItem('zsf_autoclear',this.checked?'1':'0')}catch(e){}" style="width:20px;height:20px;flex:none" type="checkbox"/>span>🧹 លុប SRT និងកំណត់ត្រាបកប្រែស្វ័យប្រវត្តិ ក្រោយនាំចេញវីដេអូរួច (ចាប់ផ្តើមថ្មី)/span>/label>
 button class="btn-3d btn-full" id="btn_download" onclick="downloadSRT()" style="background:linear-gradient(180deg, #10b981 0%, #047857 100%); border-color:#059669; padding:16px; font-size:15px; color:white; text-shadow: var(--text-shadow-strong); box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 10px rgba(5, 150, 105, 0.4);">
             📥 ទាញយកឯកសារ (Download)
@@ -2917,7 +2913,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 label class="zkt-xc" style="display:none">input type="checkbox" id="zkt_x_video" checked/>span>🎬 ផ្គុំជាវីដេអូ/span>/label>
 label class="zkt-xc">input type="checkbox" id="zkt_x_mute" checked/>span>🔇 បិទសំឡេងដើម/span>/label>
 /div>
-div class="zkt-xorig" id="zkt_x_origrow" style="display:none">div class="zkt-xr">label for="zkt_x_origvol">🎼 សំឡេង Background (ពេលមិនអាន)/label>b id="zkt_x_ovt">100%/b>/div>input type="range" id="zkt_x_origvol" min="0" max="100" step="5" value="100"/>div class="zkt-xr">label for="zkt_x_duck">🗣️ Background ពេល TTS កំពុងអាន/label>b id="zkt_x_duckt">3%/b>/div>input type="range" id="zkt_x_duck" min="0" max="20" step="1" value="3"/>label class="zkt-xc" style="margin-top:6px">input type="checkbox" id="zkt_x_vr"/>span>🎤 កាត់សំឡេងតួអង្គចេញ (Beta)/span>/label>/div>
+div class="zkt-xorig" id="zkt_x_origrow" style="display:none">div class="zkt-xr">label for="zkt_x_origvol">🎼 សំឡេង Background (ពេលមិនអាន)/label>b id="zkt_x_ovt">100%/b>/div>input type="range" id="zkt_x_origvol" min="0" max="100" step="5" value="100"/>div class="zkt-xr">label for="zkt_x_duck">🗣️ Background ពេល TTS កំពុងអាន/label>b id="zkt_x_duckt">0%/b>/div>input type="range" id="zkt_x_duck" min="0" max="20" step="1" value="0"/>label class="zkt-xc" style="margin-top:6px">input type="checkbox" id="zkt_x_vr"/>span>🎤 កាត់សំឡេងតួអង្គចេញ (Beta)/span>/label>/div>
 div class="zkt-xnote">💡 ធីក «ផ្គុំជាវីដេអូ» = យកវីដេអូដែលដាក់នៅប្រអប់ខាងលើ ផ្គុំជាមួយសំឡេងខ្មែរ។ ធីក «បិទសំឡេងដើម» = សំឡេងចិនដើមនឹងមិនលាយចូលទេ។ ការនាំចេញចំណាយពេលស្មើនឹងប្រវែងវីដេអូ — កុំចាកចេញពីទំព័រ ឬបិទអេក្រង់។/div>
 /div>
 button class="btn-3d btn-full zkt-run" id="zkt_ext_run" type="button" style="margin-bottom:8px">📥🎬 Export ជាមួយ SRT ខ្មែរពីខាងក្រៅ/button>
@@ -4019,7 +4015,7 @@ async function exportVideoFast(master,sr,mute,ov){
     if(!orig)return null;
    }
   }
-  var duckPct=8;try{var dkv=parseFloat($("zkt_x_duck").value);if(dkv>=0&&dkv=100)duckPct=dkv}catch(e){}
+  var duckPct=0;try{var dkv=parseFloat($("zkt_x_duck").value);if(dkv>=0&&dkv=100)duckPct=dkv}catch(e){}
   var bg=ov/100,dk=duckPct/100,pts=[[0,bg]];
   if(orig&&lastSegs&&lastSegs.length){
    var shF=fitGet("shift"),sg=lastSegs.map(function(x){return[Math.max(0,x[0]+shF),Math.max(0,x[1]+shF)]}).sort(function(a,b){return a[0]-b[0]}),mg=[];
@@ -4084,7 +4080,7 @@ async function exportVideoFast(master,sr,mute,ov){
     var s=(gi-SHS)*ratio,i0=Math.floor(s),fr=s-i0,v=0;
     if(s>=0){if(i0+1ml)v=master[i0]+(master[i0+1]-master[i0])*fr;else if(i0ml)v=master[i0]}
     var l=v,r=v;
-    if(o0){var gl=gi-wCur.start;if(VR&&o0!==o1){VR(o0[gl],o1[gl]);l+=VR.l*g;r+=VR.r*g}else{l+=o0[gl]*g;r+=o1[gl]*g}}
+    if(o0){var gl=gi-wCur.start;if(VR){VR(o0[gl],o1[gl]);l+=VR.l*g;r+=VR.r*g}else{l+=o0[gl]*g;r+=o1[gl]*g}}
     data[i]=l>1?1:l-1?-1:l;data[n+i]=r>1?1:r-1?-1:r;
    }
    var ad=new AudioData({format:"f32-planar",sampleRate:OUT,numberOfFrames:n,numberOfChannels:NCH,timestamp:Math.round(n0/OUT*1e6),data:data});
@@ -4118,10 +4114,16 @@ function zfMakeVR(sr){
  function hs(f,g){var A=Math.pow(10,g/40),w=2*Math.PI*f/sr,c=Math.cos(w),s=Math.sin(w),a=s/2*Math.SQRT2,r=2*Math.sqrt(A)*a;
   return bq(A*((A+1)+(A-1)*c+r),-2*A*((A-1)+(A+1)*c),A*((A+1)+(A-1)*c-r),(A+1)-(A-1)*c+r,2*((A-1)-(A+1)*c),(A+1)-(A-1)*c-r)}
  var Q=0.7071,bL=lp(90,Q),bR=lp(90,Q),hL=hp(90,Q),hR=hp(90,Q),e1=pk(1000,1000/1800,-14),e2=pk(2800,2800/1600,-10),sh=hs(4500,-9),lo=lp(6000,Q);
+ /* V2.002: ផ្លូវបំពេញ (mid) — ពេល Background នៅកណ្ដាល (mono/ចំកណ្ដាល) L-R ស្ទើរសូន្យ ធ្វើឲ្យស្ងាត់។ ដូច្នេះបន្ថែមផ្នែកកណ្ដាលដែលបានបន្ថយសំឡេងមនុស្ស (300-3400Hz) */
+ var hM=hp(90,Q),m0=pk(500,0.6,-8),m1=pk(1000,1000/1800,-14),m2=pk(2800,2800/1600,-10),m3=hs(4500,-9),mlo=lp(6000,Q),Es=0,Em=0;
  function f(x0,x1){
   var m=run(hL,x0)-run(hR,x1);
+  var md=run(hM,(x0+x1)*0.5);
+  Es+=(m*m*0.25-Es)*0.0002;Em+=(md*md-Em)*0.0002;
+  var w=Es/(Es+Em+1e-9),fill=0.1+0.55*(1-w);
   m=run(e1,m);m=run(e2,m);m=run(sh,m);m=run(lo,m);m*=1.25;
-  f.l=0.4*run(bL,x0)+0.6*m;f.r=0.4*run(bR,x1)+0.6*m;
+  var q=run(m0,md);q=run(m1,q);q=run(m2,q);q=run(m3,q);q=run(mlo,q);
+  f.l=0.4*run(bL,x0)+0.6*m+fill*q;f.r=0.4*run(bR,x1)+0.6*m+fill*q;
  }
  f.l=0;f.r=0;return f;
 }
@@ -4134,6 +4136,9 @@ function zfVRGraph(ac,src,out){
  sum.connect(e1);e1.connect(e2);e2.connect(sh);sh.connect(lo);lo.connect(mg);mg.connect(out);
  var bl=nf("lowpass",90,0.7071),br=nf("lowpass",90,0.7071),bg=ac.createGain();bg.gain.value=0.4;
  sp.connect(bl,0);sp.connect(br,1);bl.connect(bg);br.connect(bg);bg.connect(out);
+ var md=ac.createGain();md.gain.value=0.5;sp.connect(md,0);sp.connect(md,1);
+ var mh=nf("highpass",90,0.7071),k0=nf("peaking",500,0.6,-8),k1=nf("peaking",1000,1000/1800,-14),k2=nf("peaking",2800,2800/1600,-10),k3=nf("highshelf",4500,null,-9),k4=nf("lowpass",6000,0.7071),kg=ac.createGain();kg.gain.value=0.4;
+ md.connect(mh);mh.connect(k0);k0.connect(k1);k1.connect(k2);k2.connect(k3);k3.connect(k4);k4.connect(kg);kg.connect(out);
 }
 async function exportVideo(master,sr,mute,ov){
  var url="",mf=null;try{var __m=window.__zsfMedia||{};url=__m.url||"";mf=__m.file||null}catch(e){}
@@ -4144,7 +4149,7 @@ async function exportVideo(master,sr,mute,ov){
  var AC_=window.AudioContext||window.webkitAudioContext;if(!AC_)throw new Error("Browser មិនគាំទ្រ Web Audio");
  var mime=pickMime();
  try{$("video").pause()}catch(e){}
- var useOrig=!mute&&ov>0,ogN=null,duckPct=8;try{var dkv=parseFloat($("zkt_x_duck").value);if(dkv>=0&&dkv=100)duckPct=dkv}catch(e){}
+ var useOrig=!mute&&ov>0,ogN=null,duckPct=0;try{var dkv=parseFloat($("zkt_x_duck").value);if(dkv>=0&&dkv=100)duckPct=dkv}catch(e){}
  var v=document.createElement("video"),ac=null,rec=null,wl=null,tmr=null,ms=null,ts=null;
  function cleanup(){
   if(tmr){clearInterval(tmr);tmr=null}
@@ -4550,8 +4555,8 @@ function init(){
   })();
   (function(){
    var v=$("zkt_x_video"),m=$("zkt_x_mute"),o=$("zkt_x_origvol"),row=$("zkt_x_origrow");if(!v||!m||!o||!row)return;
-   try{var a=localStorage.getItem("zsf_x_video"),b=localStorage.getItem("zsf_x_mute"),c=localStorage.getItem("zsf_x_bg");v.checked=true; if(b!=null)m.checked=b==="1";if(c!=null&&c!=="")o.value=c;var dk0=$("zkt_x_duck"),d0=localStorage.getItem("zsf_x_duck");if(dk0&&d0!=null&&d0!=="")dk0.value=d0}catch(_){}
-   function sync(){row.style.display=m.checked?"none":"flex";try{localStorage.setItem("zsf_x_video",v.checked?"1":"0");localStorage.setItem("zsf_x_mute",m.checked?"1":"0");localStorage.setItem("zsf_x_bg",String(o.value));var dk=$("zkt_x_duck");if(dk)localStorage.setItem("zsf_x_duck",String(dk.value))}catch(_){}var t1=$("zkt_x_ovt"),t2=$("zkt_x_duckt"),dk2=$("zkt_x_duck");if(t1)t1.textContent=o.value+"%";if(t2&&dk2)t2.textContent=dk2.value+"%"}
+   try{var a=localStorage.getItem("zsf_x_video"),b=localStorage.getItem("zsf_x_mute"),c=localStorage.getItem("zsf_x_bg");v.checked=true; if(b!=null)m.checked=b==="1";if(c!=null&&c!=="")o.value=c;var dk0=$("zkt_x_duck"),d0=localStorage.getItem("zsf_x_duck0");if(dk0&&d0!=null&&d0!=="")dk0.value=d0}catch(_){}
+   function sync(){row.style.display=m.checked?"none":"flex";try{localStorage.setItem("zsf_x_video",v.checked?"1":"0");localStorage.setItem("zsf_x_mute",m.checked?"1":"0");localStorage.setItem("zsf_x_bg",String(o.value));var dk=$("zkt_x_duck");if(dk)localStorage.setItem("zsf_x_duck0",String(dk.value))}catch(_){}var t1=$("zkt_x_ovt"),t2=$("zkt_x_duckt"),dk2=$("zkt_x_duck");if(t1)t1.textContent=o.value+"%";if(t2&&dk2)t2.textContent=dk2.value+"%"}
    v.onchange=sync;m.onchange=sync;o.oninput=sync;o.onchange=sync;var dk3=$("zkt_x_duck");if(dk3){dk3.oninput=sync;dk3.onchange=sync}sync();
    try{var vrc=$("zkt_x_vr");if(vrc){vrc.checked=localStorage.getItem("zsf_x_vr")==="1";vrc.onchange=function(){try{localStorage.setItem("zsf_x_vr",vrc.checked?"1":"0")}catch(_){}}}}catch(_){}
    var dt0=$("zkt_deftag");if(dt0)dt0.addEventListener("change",function(){pvRender()});
@@ -7874,14 +7879,28 @@ function zsfIsHalluc(text){
   return false;
 }
 
+/* V2.005: ប្រើ «ភាពជឿជាក់» ដែល Whisper ផ្តល់ឲ្យ ដើម្បីលុបអក្សរខ្មោច (ត្រង់ដែលគ្មានអ្នកនិយាយ)
+   - no_speech_prob>0.6 ហើយ avg_logprob-1  → ស្ងាត់/តន្ត្រី មិនមែនសំដីមនុស្ស (ក្បួនស្តង់ដារ Whisper)
+   - compression_ratio>2.4 ហើយ avg_logprob-1 → អក្សរច្រំដែលៗ/ខ្មោច
+   - avg_logprob-1.8 → មិនជឿជាក់ខ្លាំងណាស់ */
+function zsfLowConf(sg){
+  const nsp=Number(sg&&sg.no_speech_prob), lp=Number(sg&&sg.avg_logprob), cr=Number(sg&&sg.compression_ratio);
+  if(!Number.isFinite(lp)) return false;
+  if(Number.isFinite(nsp)&&nsp>0.6&&lp-1) return true;
+  if(Number.isFinite(cr)&&cr>2.4&&lp-1) return true;
+  if(lp-1.8) return true;
+  return false;
+}
 function zsfStripHalluc(r){
-  const bad=(r.segments||[]).filter(sg=>zsfIsHalluc(sg.text));
+  const isBad=(sg)=>zsfIsHalluc(sg.text)||zsfLowConf(sg);
+  const bad=(r.segments||[]).filter(isBad);
   if(!bad.length) return r;
   const inBad=(w)=>{const m=(Number(w.start||0)+Number(w.end||0))/2;return bad.some(sg=>m>=Number(sg.start||0)-0.05&&m=Number(sg.end||0)+0.05);};
   return {...r,
-    segments:(r.segments||[]).filter(sg=>!zsfIsHalluc(sg.text)),
+    segments:(r.segments||[]).filter(sg=>!isBad(sg)),
     words:(r.words||[]).filter(w=>!inBad(w)&&!zsfIsHalluc(w.word!==undefined?w.word:w.text)),
-    __stripped:bad.length};
+    __stripped:bad.length,
+    __silent:bad.filter(zsfLowConf).length};
 }
 function zsfCharCount(s){
   return String(s||"").replace(/[\s\u3000，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g,"").length;
@@ -8033,7 +8052,7 @@ async function zsfTranscribeChunk(key,idx,chunk,durSec){
     return !ZSF_HALLUC.test(txt) && score(r)/durSec=ZSF_MAX_CHARS_PER_SEC;
   };
   let best=zsfStripHalluc(await zsfCallWithRetry(()=>transcribeWithKeySingle(key,idx,chunk,{})));
-  if(durSec>=6 && score(best)/durSecZSF_MIN_CHARS_PER_SEC){
+  if(durSec>=6 && score(best)/durSecZSF_MIN_CHARS_PER_SEC && !(best.__silent>0 && score(best)===0)){
     const attempts=[
       {prompt:"",temperature:0.2},
       {prompt:"",temperature:0,model:"whisper-large-v3"}
@@ -11632,7 +11651,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="2.00";
+  var EMB="2.005";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
