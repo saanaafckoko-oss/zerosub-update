@@ -3992,16 +3992,23 @@ function zfAssemble(P,frames,asc,sr,nch){
  blobParts.push(newMoov);
  return new Blob(blobParts,{type:"video/mp4"});
 }
+function zfWhy(m){try{window.__zsfFastWhy=m}catch(e){}return null}
+function zfFastNote(m){
+ try{var nb=$("zkt_fastwhy");
+  if(!nb){nb=document.createElement("div");nb.id="zkt_fastwhy";nb.style.cssText="margin:8px 0;padding:10px;border:1px solid #f5c542;border-radius:10px;color:#f5c542;font-size:13px;line-height:1.5";
+   var vv=$("zkt_vid"),par=vv&&vv.parentNode?vv.parentNode:($("zkt_card")||document.body);par.insertBefore(nb,vv&&vv.parentNode?vv:null)}
+  nb.textContent=m}catch(e){}
+}
 async function exportVideoFast(master,sr,mute,ov){
  var __m=window.__zsfMedia||{},mf=__m.file||null;
- if(!mf||!master||!master.length)return null;
- if(!window.AudioEncoder||!window.AudioData)return null;
- var OAC=window.OfflineAudioContext||window.webkitOfflineAudioContext;if(!OAC)return null;
- if(!/\.(mp4|m4v)$/i.test(mf.name||"")&&!/mp4/i.test(mf.type||""))return null;
+ if(!mf||!master||!master.length)return zfWhy("គ្មានវីដេអូ ឬសំឡេងខ្មែរ");
+ if(!window.AudioEncoder||!window.AudioData)return zfWhy("Browser នេះមិនមាន AudioEncoder");
+ var OAC=window.OfflineAudioContext||window.webkitOfflineAudioContext;if(!OAC)return zfWhy("Browser នេះមិនមាន OfflineAudioContext");
+ if(!/\.(mp4|m4v)$/i.test(mf.name||"")&&!/mp4/i.test(mf.type||""))return zfWhy("វីដេអូមិនមែន .mp4 (ឈ្មោះ៖ "+(mf.name||"?")+") — ផ្លូវលឿនប្រើបានតែ MP4");
  var OUT=44100,NCH=2,cfg={codec:"mp4a.40.2",sampleRate:OUT,numberOfChannels:NCH,bitrate:192000,aac:{format:"aac"}};
  var sup=null;try{sup=await AudioEncoder.isConfigSupported(cfg)}catch(e){}
- if(!sup||!sup.supported)return null;
- var P;try{P=await zfProbe(mf)}catch(e){return null}
+ if(!sup||!sup.supported)return zfWhy("ទូរសព្ទ/Browser នេះមិនគាំទ្រ AAC encoder");
+ var P;try{P=await zfProbe(mf)}catch(e){return zfWhy("អានរចនាសម្ព័ន្ធ MP4 មិនបាន")}
  var useOrig=!mute&&ov>0,dur=P.sec,wl=null,enc=null;var VR=null;try{if($("zkt_x_vr").checked)VR=zfMakeVR(OUT)}catch(e){}
  try{if(navigator.wakeLock)wl=await navigator.wakeLock.request("screen")}catch(e){}
  function prog(p,m){st(m,p);try{window.zsfTtsProgress&&window.zsfTtsProgress(p,m)}catch(_){}}
@@ -4012,7 +4019,7 @@ async function exportVideoFast(master,sr,mute,ov){
    var hasAud=P.traks.some(function(t){return t.handler==="soun"});
    if(hasAud){
     orig=await zfOrigAdtsFast(P,function(f){prog(3+f*5,"⚡ កំពុងអានសំឡេងដើម "+Math.round(f*100)+"%…")});
-    if(!orig)return null;
+    if(!orig)return zfWhy("សំឡេងដើមក្នុងវីដេអូមិនមែន AAC (ដកស្រង់មិនបាន)");
    }
   }
   var duckPct=0;try{var dkv=parseFloat($("zkt_x_duck").value);if(dkv>=0&&dkv=100)duckPct=dkv}catch(e){}
@@ -4066,7 +4073,7 @@ async function exportVideoFast(master,sr,mute,ov){
    if(orig&&(!wCur||n0>=wCur.start+WIN)){
      var ws=Math.floor(n0/WIN)*WIN;
      wCur=(wNxt&&wNxt.start===ws)?await wNxt.p:await decodeWin(ws);
-     if(!wCur.ok){if(ws===0)return null;wFail++}
+     if(!wCur.ok){if(ws===0)return zfWhy("ឌីកូដសំឡេងដើមមិនបាន");wFail++}
      wNxt=ws+WINtotal?{start:ws+WIN,p:decodeWin(ws+WIN)}:null;
      o0=wCur.a;o1=wCur.b;
     }
@@ -4376,12 +4383,17 @@ async function exportAll(){
   window.__zsfTtsChain=false;
   busy=true;stopReq=false;
   var r=null;
+  window.__zsfFastWhy="";
   try{r=await exportVideoFast(lastMaster,lastSr,mute,ov)}catch(fe){
    if(stopReq||/^⛔/.test((fe&&fe.message)||""))throw fe;
    try{console.warn("fast export failed",fe)}catch(_){}
+   window.__zsfFastWhy="មានកំហុស៖ "+((fe&&fe.message)||fe);
    st("⚠️ ផ្លូវលឿនមិនដំណើរការ ("+((fe&&fe.message)||fe)+") — ប្តូរទៅផ្លូវធម្មតា…",3);
   }
-  if(!r)r=await exportVideo(lastMaster,lastSr,mute,ov);
+  if(!r){
+   zfFastNote("⚠️ ផ្លូវលឿនមិនដំណើរការ មូលហេតុ៖ "+(window.__zsfFastWhy||"មិនស្គាល់")+" — ប្តូរទៅផ្លូវធម្មតា (យឺត ស្មើនឹងរយៈពេលវីដេអូ)");
+   r=await exportVideo(lastMaster,lastSr,mute,ov);
+  }else{var __n=$("zkt_fastwhy");if(__n)__n.remove()}
    
   try{
    if(r&&r.blob&&r.blob.size>0&&r.blob.size=314572800){
@@ -11651,7 +11663,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="2.005";
+  var EMB="2.006";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
