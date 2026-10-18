@@ -3833,16 +3833,133 @@ function zfAudioTable(u8,trak){
  return{asc:asc,list:list};
 }
  
+/* V2.007: គាំទ្រ fragmented MP4 (វីដេអូដែលថតដោយ MediaRecorder មាន moof/mdat ច្រើន) — បម្លែង moov ឲ្យមាន sample table ពេញលេញ ដើម្បីប្រើផ្លូវលឿនបាន */
+async function zfDefrag(file,top,omv,mhdr){
+ var odv=new DataView(omv.buffer,omv.byteOffset,omv.byteLength),kids=zfBoxes(omv,mhdr,omv.length),trex={},T={},i;
+ kids.forEach(function(k){
+  if(k.type==="mvex")zfBoxes(omv,k.start+k.hdr,k.end).forEach(function(x){
+   if(x.type==="trex"){var c=x.start+x.hdr;trex[odv.getUint32(c+4)]={dur:odv.getUint32(c+12),size:odv.getUint32(c+16),flags:odv.getUint32(c+20)}}
+  });
+  if(k.type==="trak"){var ti=zfTrakInfo(omv,k);if(ti)T[ti.id]={box:k,handler:ti.handler,S:[],dts:0}}
+ });
+ var moofs=top.filter(function(x){return x.type==="moof"});
+ for(var mi=0;mimoofs.length;mi++){
+  var mf=moofs[mi],mb=new Uint8Array(await file.slice(mf.start,mf.end).arrayBuffer()),mdv=new DataView(mb.buffer);
+  var trafs=zfBoxes(mb,mf.hdr,mb.length).filter(function(x){return x.type==="traf"});
+  for(var ti2=0;ti2trafs.length;ti2++){
+   var tf=trafs[ti2],tk=zfBoxes(mb,tf.start+tf.hdr,tf.end),tfhd=null,truns=[];
+   tk.forEach(function(x){if(x.type==="tfhd")tfhd=x;else if(x.type==="trun")truns.push(x)});
+   if(!tfhd)continue;
+   var c=tfhd.start+tfhd.hdr,fl=mdv.getUint32(c)&0xFFFFFF,tid=mdv.getUint32(c+4),p=c+8,base=mf.start;
+   if(fl&1){base=mdv.getUint32(p)*4294967296+mdv.getUint32(p+4);p+=8}
+   if(fl&2)p+=4;
+   var tx=trex[tid]||{dur:0,size:0,flags:0},dD=tx.dur,dS=tx.size,dF=tx.flags;
+   if(fl&8){dD=mdv.getUint32(p);p+=4}
+   if(fl&0x10){dS=mdv.getUint32(p);p+=4}
+   if(fl&0x20){dF=mdv.getUint32(p);p+=4}
+   var TT=T[tid];if(!TT)continue;
+   var cur=base;
+   /* tfdt: ពេលវេលាចាប់ផ្តើមពិតរបស់ fragment — កែ duration សំណាកចុងក្រោយ កុំឲ្យម៉ោងរសាត់ (drift) */
+   tk.forEach(function(x){
+    if(x.type==="tfdt"){var tc=x.start+x.hdr,tv=mb[tc],bt=tv===1?mdv.getUint32(tc+4)*4294967296+mdv.getUint32(tc+8):mdv.getUint32(tc+4);
+     if(TT.S.length){var df=bt-TT.dts,L=TT.S[TT.S.length-1];if(df!==0&&L[2]+df>=1){L[2]+=df;TT.dts+=df}}
+     else TT.dts=bt;
+    }
+   });
+   for(var ri=0;ritruns.length;ri++){
+    var r=truns[ri],rc=r.start+r.hdr,ver=mb[rc],tfl=mdv.getUint32(rc)&0xFFFFFF,cnt=mdv.getUint32(rc+4),q=rc+8,off=cur,ffl=null;
+    if(tfl&1){off=base+mdv.getInt32(q);q+=4}
+    if(tfl&4){ffl=mdv.getUint32(q);q+=4}
+    for(i=0;icnt;i++){
+     var d=dD,s=dS,f=dF,co=0;
+     if(tfl&0x100){d=mdv.getUint32(q);q+=4}
+     if(tfl&0x200){s=mdv.getUint32(q);q+=4}
+     if(tfl&0x400){f=mdv.getUint32(q);q+=4}else if(i===0&&ffl!==null)f=ffl;
+     if(tfl&0x800){co=ver?mdv.getInt32(q):mdv.getUint32(q);q+=4}
+     TT.S.push([off,s,d,f,co]);TT.dts+=d;off+=s;
+    }
+    cur=off;
+   }
+  }
+ }
+ function tbl(type,n,hdrExtra,fill){var b=new Uint8Array(8+hdrExtra+n),dv=new DataView(b.buffer);return b}
+ function mk(S,handler,ts){
+  var n=S.length,dv,b,j,sumD=0,big=false;
+  for(j=0;jn;j++){sumD+=S[j][2];if(S[j][0]>4294967295)big=true}
+  /* stts */
+  var runs=[];for(j=0;jn;j++){var l=runs[runs.length-1];if(l&&l[1]===S[j][2])l[0]++;else runs.push([1,S[j][2]])}
+  b=new Uint8Array(8+runs.length*8);dv=new DataView(b.buffer);dv.setUint32(4,runs.length);runs.forEach(function(x,k){dv.setUint32(8+k*8,x[0]);dv.setUint32(12+k*8,x[1])});
+  var stts=zfB("stts",b);
+  /* stsz */
+  b=new Uint8Array(12+n*4);dv=new DataView(b.buffer);dv.setUint32(8,n);for(j=0;jn;j++)dv.setUint32(12+j*4,S[j][1]);
+  var stsz=zfB("stsz",b);
+  var stsc=zfB("stsc",zfN(32,0,32,1,32,1,32,1,32,1));
+  /* stco / co64 : 1 sample = 1 chunk */
+  b=new Uint8Array(8+n*(big?8:4));dv=new DataView(b.buffer);dv.setUint32(4,n);
+  for(j=0;jn;j++){if(big){dv.setUint32(8+j*8,Math.floor(S[j][0]/4294967296));dv.setUint32(12+j*8,S[j][0]%4294967296)}else dv.setUint32(8+j*4,S[j][0])}
+  var stco=zfB(big?"co64":"stco",b);
+  var extra=[];
+  if(handler==="vide"){
+   var sync=[];for(j=0;jn;j++)if(!(S[j][3]&0x10000))sync.push(j+1);
+   if(sync.length&&sync.lengthn){b=new Uint8Array(8+sync.length*4);dv=new DataView(b.buffer);dv.setUint32(4,sync.length);sync.forEach(function(x,k){dv.setUint32(8+k*4,x)});extra.push(zfB("stss",b))}
+   var anyC=false,neg=false;for(j=0;jn;j++){if(S[j][4]!==0)anyC=true;if(S[j][4]0)neg=true}
+   if(anyC){var cr=[];for(j=0;jn;j++){var cl=cr[cr.length-1];if(cl&&cl[1]===S[j][4])cl[0]++;else cr.push([1,S[j][4]])}
+    b=new Uint8Array(8+cr.length*8);dv=new DataView(b.buffer);dv.setUint32(0,neg?0x01000000:0);dv.setUint32(4,cr.length);cr.forEach(function(x,k){dv.setUint32(8+k*8,x[0]);dv.setInt32(12+k*8,x[1])});extra.push(zfB("ctts",b))}
+  }
+  return{sumD:sumD,boxes:[stts].concat(extra,[stsc,stsz,stco])};
+ }
+ var mvhd=kids.filter(function(k){return k.type==="mvhd"})[0],mc=mvhd.start+mvhd.hdr,mv1=omv[mc]===1,mts=odv.getUint32(mc+(mv1?20:12)),maxDur=0;
+ function setDur(u8,box,off32,off64,val){var dv=new DataView(u8.buffer),c=box.start+box.hdr;if(u8[c]===1){dv.setUint32(c+off64,Math.floor(val/4294967296));dv.setUint32(c+off64+4,val%4294967296)}else dv.setUint32(c+off32,val)}
+ var parts=[];
+ kids.forEach(function(k){
+  if(k.type==="mvex")return;
+  if(k.type!=="trak"){parts.push(omv.slice(k.start,k.end));return}
+  var ti=zfTrakInfo(omv,k),TT=ti&&T[ti.id];
+  if(!TT||!TT.S.length){parts.push(omv.slice(k.start,k.end));return}
+  var tcopy=omv.slice(k.start,k.end),sub=zfBoxes(tcopy,k.hdr,tcopy.length),tparts=[];
+  var mdiaB=sub.filter(function(x){return x.type==="mdia"})[0],mdhdB=zfBoxes(tcopy,mdiaB.start+mdiaB.hdr,mdiaB.end).filter(function(x){return x.type==="mdhd"})[0];
+  var mcc=mdhdB.start+mdhdB.hdr,tsT=new DataView(tcopy.buffer).getUint32(mcc+(tcopy[mcc]===1?20:12));
+  var res=mk(TT.S,TT.handler,tsT),movDur=Math.round(res.sumD/tsT*mts);if(movDur>maxDur)maxDur=movDur;
+  sub.forEach(function(x){
+   if(x.type==="tkhd"){var pc=tcopy.slice(x.start,x.end);setDur(pc,{start:0,hdr:x.hdr},20,28,movDur);tparts.push(pc)}
+   else if(x.type==="mdia"){
+    var md=tcopy.slice(x.start,x.end),mk2=zfBoxes(md,x.hdr,md.length),mp=[];
+    mk2.forEach(function(y){
+     if(y.type==="mdhd"){var pc2=md.slice(y.start,y.end);setDur(pc2,{start:0,hdr:y.hdr},16,24,res.sumD);mp.push(pc2)}
+     else if(y.type==="minf"){
+      var mi2=md.slice(y.start,y.end),mn=zfBoxes(mi2,y.hdr,mi2.length),np=[];
+      mn.forEach(function(z){
+       if(z.type==="stbl"){
+        var st=mi2.slice(z.start,z.end),sk=zfBoxes(st,z.hdr,st.length),stsd=sk.filter(function(w){return w.type==="stsd"})[0];
+        np.push(zfB.apply(null,["stbl",st.slice(stsd.start,stsd.end)].concat(res.boxes)));
+       }else np.push(mi2.slice(z.start,z.end));
+      });
+      mp.push(zfB.apply(null,["minf"].concat(np)));
+     }else mp.push(md.slice(y.start,y.end));
+    });
+    tparts.push(zfB.apply(null,["mdia"].concat(mp)));
+   }else tparts.push(tcopy.slice(x.start,x.end));
+  });
+  parts.push(zfB.apply(null,["trak"].concat(tparts)));
+ });
+ /* mvhd duration */
+ for(i=0;iparts.length;i++){
+  if(String.fromCharCode(parts[i][4],parts[i][5],parts[i][6],parts[i][7])==="mvhd"){setDur(parts[i],{start:0,hdr:8},16,24,maxDur);break}
+ }
+ return zfB.apply(null,["moov"].concat(parts));
+}
 async function zfProbe(file){
  var top=await zfTopBoxes(file);
  var ftyp=top.find(function(t){return t.type==="ftyp"}),moov=top.find(function(t){return t.type==="moov"});
  if(!ftyp||!moov)throw new Error("មិនមាន moov");
- if(top.some(function(t){return t.type==="moof"}))throw new Error("fragmented MP4");
+ var frag=top.some(function(t){return t.type==="moof"});
  var fb=new Uint8Array(await file.slice(ftyp.start+8,ftyp.start+12).arrayBuffer());
  if(String.fromCharCode(fb[0],fb[1],fb[2],fb[3])==="qt  ")throw new Error("QuickTime");
  if(moov.end-moov.start>64*1048576)throw new Error("moov ធំពេក");
  var mv=new Uint8Array(await file.slice(moov.start,moov.end).arrayBuffer());
- var kids=zfBoxes(mv,moov.hdr,mv.length),mvhd=null,traks=[];
+ var ohdr=mv.slice(0,moov.hdr),mh=moov.hdr;
+ if(frag){mv=await zfDefrag(file,top,mv,moov.hdr);mh=8}
+ var kids=zfBoxes(mv,mh,mv.length),mvhd=null,traks=[];
  kids.forEach(function(k){if(k.type==="mvhd")mvhd=k;else if(k.type==="trak"){var t=zfTrakInfo(mv,k);if(t)traks.push(t)}});
  if(!mvhd)throw new Error("មិនមាន mvhd");
  var dv=new DataView(mv.buffer),c=mvhd.start+mvhd.hdr,v1=mv[c]===1;
@@ -3852,7 +3969,7 @@ async function zfProbe(file){
  var vid=traks.filter(function(t){return t.handler==="vide"});
  if(!vid.length)throw new Error("គ្មាន video track");
  var maxId=0;traks.forEach(function(t){if(t.id>maxId)maxId=t.id});
- return{file:file,top:top,moov:moov,mv:mv,kids:kids,mvhd:mvhd,traks:traks,ts:ts,dur:dur,sec:dur/ts,nextIdOff:nextIdOff,maxId:maxId};
+ return{frag:frag,ohdr:ohdr,file:file,top:top,moov:moov,mv:mv,kids:kids,mvhd:mvhd,traks:traks,ts:ts,dur:dur,sec:dur/ts,nextIdOff:nextIdOff,maxId:maxId};
 }
  
 async function zfOrigAdts(P){
@@ -3985,9 +4102,14 @@ function zfAssemble(P,frames,asc,sr,nch){
  parts.push(trak);
  var newMoov=zfB.apply(null,["moov"].concat(parts));
   
- var oh=P.mv.slice(0,P.moov.hdr);oh[4]=0x66;oh[5]=0x72;oh[6]=0x65;oh[7]=0x65;
+ var oh=P.ohdr?P.ohdr.slice(0):P.mv.slice(0,P.moov.hdr);oh[4]=0x66;oh[5]=0x72;oh[6]=0x65;oh[7]=0x65;
  var mdatHdr=zfN(32,8+audioBytes);mdatHdr=zfCat([mdatHdr,new Uint8Array([0x6D,0x64,0x61,0x74])]);
- var blobParts=[P.file.slice(0,P.moov.start),oh,P.file.slice(P.moov.start+P.moov.hdr,N),mdatHdr];
+ var patches=[{a:P.moov.start,b:P.moov.start+P.moov.hdr,rep:oh}];
+ if(P.frag)P.top.forEach(function(m){if(m.type==="moof")patches.push({a:m.start+4,b:m.start+8,rep:new Uint8Array([0x66,0x72,0x65,0x65])})});
+ patches.sort(function(x,y){return x.a-y.a});
+ var blobParts=[],pcur=0;
+ patches.forEach(function(q){blobParts.push(P.file.slice(pcur,q.a));blobParts.push(q.rep);pcur=q.b});
+ blobParts.push(P.file.slice(pcur,N));blobParts.push(mdatHdr);
  frames.forEach(function(f){blobParts.push(f)});
  blobParts.push(newMoov);
  return new Blob(blobParts,{type:"video/mp4"});
@@ -11663,7 +11785,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="2.006";
+  var EMB="2.007";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
