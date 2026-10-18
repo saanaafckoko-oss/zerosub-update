@@ -8025,6 +8025,59 @@ function zsfLowConf(sg){
   if(lp-1.8) return true;
   return false;
 }
+/* V2.008: ជំនួយបន្ថែមកុំឱ្យមានអក្សរខ្មោច/ពាក្យស្ទួន */
+function zsfMeanLp(r){
+  let s=0,w=0;
+  (r&&r.segments||[]).forEach(function(sg){
+    const lp=Number(sg.avg_logprob), d=Math.max(0.2,Number(sg.end||0)-Number(sg.start||0));
+    if(Number.isFinite(lp)){ s+=lp*d; w+=d; }
+  });
+  return w? s/w : NaN;
+}
+function zsfConfOk(r,best){
+  const a=zsfMeanLp(r), b=zsfMeanLp(best);
+  if(!Number.isFinite(a)||!Number.isFinite(b)) return true;
+  return a>=b-0.25;
+}
+function zsfCleanGhost(m){
+  const rep={dup:0,silent:0,drop:[]};
+  const norm=function(t){ return String(t||"").replace(ZSF_PUNCT_RE,""); };
+  const segs=(m.segments||[]).slice().sort(function(a,b){return a.start-b.start;});
+  const dead=new Set();
+  let prev=null;
+  for(const sg of segs){
+    const t=norm(sg.text);
+    if(prev && t.length>=4 && t===prev.t && Number(sg.start)-prev.end3){ dead.add(sg); rep.dup++; rep.drop.push([Number(sg.start),"dup",t]); continue; }
+    prev={t:t,end:Number(sg.end)};
+  }
+  const prof=m.__profile;
+  if(prof&&prof.rms&&prof.rms.length>50){
+    const F=prof.frameSec, R=prof.rms, N=R.length, sm=new Float32Array(N);
+    for(let i=0;iN;i++){ let s=0,c=0; for(let k=-2;k=2;k++){ const j=i+k; if(j>=0&&jN){ s+=R[j]; c++; } } sm[i]=s/c; }
+    const sorted=Array.from(sm).sort(function(a,b){return a-b;});
+    const thr=Math.max(sorted[Math.floor(N*0.25)]*2.2,220)*0.8;
+    for(const sg of segs){
+      if(dead.has(sg)) continue;
+      const s0=Number(sg.start), e0=Number(sg.end);
+      if(!(e0-s0>=0.6)) continue;
+      const a=Math.max(0,Math.floor(s0/F)), b=Math.min(N-1,Math.floor(e0/F));
+      if(b=a) continue;
+      let hot=0; for(let i=a;i=b;i++){ if(sm[i]>=thr) hot++; }
+      const frac=hot/(b-a+1);
+      const lp=Number(sg.avg_logprob), nsp=Number(sg.no_speech_prob);
+      const strong=Number.isFinite(lp)&&lp>-0.5&&!(Number.isFinite(nsp)&&nsp>0.5);
+      if(frac0.12 && !strong){ dead.add(sg); rep.silent++; rep.drop.push([s0,"silent",norm(sg.text)]); }
+    }
+  }
+  if(!dead.size) return rep;
+  const live=segs.filter(function(g){return !dead.has(g);});
+  const mid=function(w){ return (Number(w.start)+Number(w.end))/2; };
+  const inLive=function(w){ const x=mid(w); return live.some(function(g){ return x>=Number(g.start)-0.05&&x=Number(g.end)+0.05; }); };
+  const inDead=function(w){ const x=mid(w); for(const g of dead){ if(x>=Number(g.start)-0.05&&x=Number(g.end)+0.05) return true; } return false; };
+  m.words=(m.words||[]).filter(function(w){ return !inDead(w) || inLive(w); });
+  m.segments=live;
+  return rep;
+}
 function zsfStripHalluc(r){
   const isBad=(sg)=>zsfIsHalluc(sg.text)||zsfLowConf(sg);
   const bad=(r.segments||[]).filter(isBad);
@@ -8194,7 +8247,7 @@ async function zsfTranscribeChunk(key,idx,chunk,durSec){
     for(const o of attempts){
       try{
         const r=zsfStripHalluc(await zsfCallWithRetry(()=>transcribeWithKeySingle(key,idx,chunk,o)));
-        if(okRetry(r) && score(r)>score(best)) best=r;
+        if(okRetry(r) && score(r)>score(best) && zsfConfOk(r,best)) best=r;
       }catch(e){ if(e.http===401||e.http===403) throw e; }
       if(score(best)/durSec>=ZSF_MIN_CHARS_PER_SEC) break;
     }
@@ -8967,9 +9020,14 @@ async function transcribeWithKey(key,idx,uploadFile){
           if(e&&(e.http===401||e.http===403)) throw e; console.warn("gap fill failed",e);
         }
       }
+      try{
+        const __gapOn=!window.__zsfSuper && ($("zsfGapFill")?$("zsfGapFill").checked:true);
+        if(!skipped.length && !__gapOn){ const __dd=zsfDropDense(merged); merged.__denseOnly=__dd.length; }
+      }catch(__de){ console.warn("dense drop failed",__de); }
       zsfSortMerged(merged);
       try{ merged.__normReport=zsfNormalizeMerged(merged); }catch(ne){ console.warn("normalize failed",ne); }
       try{ merged.__profile=zsfComputeRms(buf,plan); }catch(_){ merged.__profile=null; }
+      try{ merged.__ghostReport=zsfCleanGhost(merged); }catch(ge){ console.warn("ghost clean failed",ge); }
       merged.text=merged.segments.map(x=>String(x.text||"")).join(" ");
       if(skipped.length) throw new Error(`ផ្នែកសំឡេងទី ${skipped.join(", ")} ស្តាប់មិនបាន (ពិនិត្យ Key/Quota) — សូមសាកម្តងទៀត`+(lastChunkErr?` • មូលហេតុ: ${lastChunkErr.http?("HTTP "+lastChunkErr.http+" "):""}${String(lastChunkErr.message||"").slice(0,200)}`:""));
       return merged;
@@ -9730,6 +9788,7 @@ async function transcribe(){
         const gr=data.__gapReport;
         if(gr) extraNotes.push(`🔎 ចន្លោះត្រួតពិនិត្យ ${gr.gaps} • បំពេញបាន ${gr.filled} កន្លែង (+${gr.addedWords} ពាក្យ)`+(gr.denseFound?` • អត្ថបទបង្ហាប់ខុសកន្លែង ${gr.denseFound} (ត្រឡប់ដើមវិញ ${gr.denseRestored})`:"")+(gr.speechGaps?` • កន្លែងមានសំឡេងគ្មានអក្សរ ${gr.speechGaps} (បានស្តាប់ឡើងវិញ)`:"")+(gr.stillUncovered?` • ⚠️ នៅសល់កន្លែងសំឡេងគ្មានអក្សរ ${gr.stillUncovered} (ប្រហែលជាតន្ត្រី/ស្រែក/ដកដង្ហើម ឬអក្សរបាត់ — សូមពិនិត្យដោយដៃ)`:""));
         if(data.__normReport&&(data.__normReport.shifted||data.__normReport.addedSegments)) extraNotes.push(`🧹 សម្អាត timeline: ពាក្យត្រួតគ្នា ${data.__normReport.shifted}, segment បន្ថែម ${data.__normReport.addedSegments}`);
+        { const gh=data.__ghostReport; if(gh&&(gh.dup||gh.silent)) extraNotes.push(`👻 លុបអក្សរខ្មោច ${gh.dup+gh.silent} បន្ទាត់ (ស្ទួន ${gh.dup} • ត្រង់ស្ងាត់ ${gh.silent})`); }
         { const nOrph=zsfMergeOrphans(subtitles); if(nOrph) extraNotes.push(`🧩 ភ្ជាប់អក្សរតែមួយដែលដាច់ ${nOrph} បន្ទាត់`); }
         try{ const rc=data.__recon; if(rc&&(rc.added||rc.skipped)) extraNotes.push(`🧷 ពិនិត្យអក្សរបាត់៖ បំពេញត្រឡប់ ${rc.added} អក្សរ`+(rc.rebuilt?` • សង់ឡើងវិញពី segment ${rc.rebuilt} ឃ្លា`:"")+(rc.skipped?` • មិនប្រាកដ ${rc.skipped} (រំលង)`:"")); }catch(_){}
         try{ const g=window.__zsfG; if(g) extraNotes.push(`⏱ ទាញសំឡេង ${Math.round(window.__zsfExtSec||0)}s • Groq ${g.calls} ដង • ចម្រៀក ${g.parts||0} ប្រើ ${g.chunkSec||0}s • ពិនិត្យបាត់ ${g.gaps||0} កន្លែង ប្រើ ${g.gapSec||0}s • ជួប 429 ${g.r429} ដង រង់ចាំ ${Math.round(g.wait/1000)}s`); }catch(_){}
@@ -11785,7 +11844,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="2.007";
+  var EMB="2.008";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
