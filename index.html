@@ -3617,7 +3617,7 @@ async function runAll(quiet){
   var __tT0=Date.now();var cues=await getCues();var sigNow=cueSig(cues);if(!cues.length)throw new Error("គ្មានអត្ថបទសម្រាប់អាន");if(!inc.some(Boolean))throw new Error("សូមបើកយ៉ាងហោចណាស់មួយតួអង្គ ([✓]) ជាមុន");
   var sr=24000,total=Math.ceil(((cues[cues.length-1].end/1000)+3)*sr);
   if(total>sr*3600*1.5)throw new Error("វីដេអូវែងពេក (លើស ១.៥ ម៉ោង) សូមបំបែក SRT");
-  segsTmp=[];var master=new Float32Array(total),over=0,fail=0,skipped=0,cursor=0,fastN=0,longIds=[];
+  segsTmp=[];var master=new Float32Array(total),over=0,fail=0,skipped=0,cursor=0,fastN=0,longIds=[],pushedN=0,PUSHMAX=2.0;try{var __pm=parseFloat(localStorage.getItem("zsf_tts_push"));if(__pm>=0&&__pm=5)PUSHMAX=__pm}catch(_){}
   var results=new Array(cues.length),nextPlace=0,nextJob=0,doneN=0,fatal=null,throttleUntil=0,jobs=[];
   var CONC=10;try{var cv=parseInt(localStorage.getItem("zsf_tts_conc"),10);if(cv>=1&&cv=12)CONC=cv}catch(_){}
   for(var i0=0;i0cues.length;i0++){if(!inc[cues[i0].tag-1]){results[i0]=false;skipped++}else jobs.push(i0)}
@@ -3625,7 +3625,7 @@ async function runAll(quiet){
    var r=results[i];results[i]=null;if(!r)return;
    var c=cues[i],s=S[c.tag-1],av=r.av,d=r.data;
    if(r.fin>s.speed||r.forced)fastN++;if(d.length/sr>av+0.1||(r.forced&&r.forced>1.5)){over++;if(longIds.length30)longIds.push(c.id)}
-   var o0=c.start/1000,SPL=spillGet();if(cursor>o0&&cursor-o0=0.5)o0=cursor;
+   var o0=c.start/1000,SPL=spillGet();if(cursor>o0&&cursor-o0=PUSHMAX){o0=cursor;pushedN++}
    try{
     var nxT=cues[i+1]?cues[i+1].start/1000:null;
     if(nxT!==null&&fitOn()){
@@ -3687,6 +3687,7 @@ async function runAll(quiet){
   $("zkt_audio").src=url;$("zkt_audio").style.display="block";
   var a2=$("zkt_dl");a2.href=url;a2.download="khmer_tts.wav";a2.style.display="block";
   var fitNote=over?(" • ⚠️ ពិបាក fit "+over+" ឃ្លា"+(longIds.length?" (#"+longIds.slice(0,8).join(", #")+(longIds.length>8?"…":"")+")":"")):"";
+  if(pushedN)fitNote+=" • ↪ រុញក្រោយ "+pushedN+" ឃ្លា (កុំឲ្យសំឡេងជាន់គ្នា)";
   st("✅ ចប់រួចរាល់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+fitNote+" • ⏱ "+Math.round((Date.now()-__tT0)/1000)+" វិនាទី",100);
   try{if(!quiet)window.zsfTtsFinish&&window.zsfTtsFinish(true,"✅ អានអក្សរជាសំឡេងចប់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+(skipped?" • រំលង "+skipped:"")+fitNote)}catch(_){}
  }catch(e){st("❌ "+e.message,0);try{window.zsfTtsFinish&&window.zsfTtsFinish(false,"❌ "+e.message)}catch(_){}}
@@ -11844,7 +11845,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="2.008";
+  var EMB="2.009";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
