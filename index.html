@@ -3506,7 +3506,7 @@ async function getCues(){
    raw=parseFile(txtSrt);if(!raw.length)throw new Error("អត្ថបទ SRT មិនត្រឹមត្រូវ — រកមិនឃើញពេលវេលា (00:00:00,000 --> 00:00:02,000)");
  }else{
   if(typeof srtBlocks==="undefined"||!srtBlocks.length)throw new Error("មិនទាន់មាន SRT ក្នុង Tools ទេ — សូមជ្រើសឯកសារ SRT វិញ");
-  raw=srtBlocks.map(function(b){var tx=String(b.trans&&b.trans.trim()||b.text||""),p=String(b.time||"").split("-->");
+  raw=srtBlocks.map(function(b){var tx=String(b.trans&&b.trans.trim()||(b.repairSkip?"":b.text)||""),p=String(b.time||"").split("-->");
    var tg=/^\s*\[([1-4])\]/.exec(normTags(tx))||/^\s*\[([1-4])\]/.exec(normTags(String(b.text||"")));
    return{id:b.id,start:tms(p[0]),end:tms(p[1]),text:tx,tag:tg?+tg[1]:1}});
  }
@@ -4549,7 +4549,7 @@ async function exportAll(){
    try{setTimeout(function(){try{if(window.zsfDlHelp&&/Android|iPhone|iPad|iPod|Mobile|HarmonyOS/i.test(navigator.userAgent||""))window.zsfDlHelp(r.blob,a.download,null,window.zsfIsWebView?window.zsfIsWebView():false)}catch(_){}},2500)}catch(_){}
   try{setTimeout(function(){try{if(typeof showToast==="function")showToast("⬇️ ពិនិត្យថត Download — បើគ្មានវីដេអូ សូមចុចប៊ូតុង «ទាញយកវីដេអូ» ឬ «📤 រក្សាទុក/ចែករំលែក»",true)}catch(_){}},4000)}catch(_){}
   try{window.__zsfLastVidUrl=u;if(window.zsfAfterVideoExport)window.zsfAfterVideoExport(u)}catch(_){}
-  var fin="✅ នាំចេញវីដេអូរួចរាល់ • "+(Math.round(r.blob.size/1048576*10)/10)+" MB • "+ext.toUpperCase()+(r.fast?" • ⚡ ផ្លូវលឿន (វីដេអូដើម គុណភាពដដែល)":"")+(mute?" • សំឡេងដើមបិទ":" • សំឡេងដើម "+ov+"%")+(r.incomplete?" • ⚠️ វីដេអូអាចខ្លីជាងដើម (កុំចាកចេញពីទំព័រពេលនាំចេញ)":"");
+  var fin="✅ នាំចេញវីដេអូរួចរាល់ • "+(Math.round(r.blob.size/1048576*10)/10)+" MB • "+ext.toUpperCase()+(r.fast?" • ⚡ ផ្លូវលឿន (វីដេអូដើម គុណភាពដដែល)":"")+(mute?" • សំឡេងដើមបិទ":" • សំឡេងដើម "+ov+"%")+(r.incomplete?" • ⚠️ វីដេអូអាចខ្លីជាងដើម (កុំចាកចេញពីទំព័រពេលនាំចេញ)":"")+(window.zsfTimingText?window.zsfTimingText():"");
   st(fin,100);
   window.__zsfVidMode=true;try{window.zsfTtsFinish&&window.zsfTtsFinish(true,fin)}catch(_){}window.__zsfVidMode=false;
   try{vd.scrollIntoView({behavior:"smooth",block:"center"})}catch(_){}
@@ -5131,7 +5131,7 @@ function translationNeedsRepair(block){
   const tr=String(block?.trans||"").trim();
   /* V1.78: ប្រភពគ្មានអក្សរសោះ (♪ … — លេខសុទ្ធ) មិនត្រូវការបកប្រែ → កុំចាប់ជាបន្ទាត់ខុសជារៀងរហូត */
   if(!/\p{L}/u.test(normalizeTranslationForCheck(block?.text||"")))return false;
-  if(!tr)return true;
+  if(!tr)return !(block&&block.repairSkip);
   const clean=normalizeTranslationForCheck(tr);
   const hasKhmer=/[\u1780-\u17FF]/.test(clean);
   /* V1.78: បន្ទាត់ដែលបានទទួលយក (ខ្មែរ + ឡាតាំងតិចតួច) ក្រោយ AI ព្យាយាមហើយ — មានសុពលភាពតែអត្ថបទនោះប៉ុណ្ណោះ */
@@ -5838,7 +5838,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
   const timer=setTimeout(()=>controller.abort(),timeoutMs);
   try{
     const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:(String(prompt||"").indexOf("professional Khmer subtitle translator")>=0?0.4:0.12),topP:0.92}}),signal:controller.signal});
+    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:(String(prompt||"").indexOf("professional Khmer subtitle translator")>=0?0.4:0.12),topP:0.92},...(window.__zsfSafetyOff?{safetySettings:["HARM_CATEGORY_HARASSMENT","HARM_CATEGORY_HATE_SPEECH","HARM_CATEGORY_SEXUALLY_EXPLICIT","HARM_CATEGORY_DANGEROUS_CONTENT"].map(function(c){return{category:c,threshold:"BLOCK_NONE"}})}:{})}),signal:controller.signal});
     const raw=await res.text();
     let data=null; try{data=JSON.parse(raw)}catch(e){throw new Error("Gemini បានបញ្ជូនទិន្នន័យមិនត្រឹមត្រូវ (HTTP "+res.status+")")}
     if(!res.ok||data?.error){const er=new Error(data?.error?.message||("HTTP "+res.status));er.status=res.status;throw er}
@@ -5950,7 +5950,65 @@ async function zsfRepairFast(items,onProgress){
   if(!fixed&&lastErr&&items.length)throw lastErr;
   return fixed;
 }
-window.zsfAutoRepairAll=async function(){
+async function zsfFinishStuck(){
+  const stuck=getRepairCandidates();
+  if(!stuck.length)return 0;
+  const keys=(Array.isArray(userApiKeys)?userApiKeys:[]).filter(Boolean);
+  const INTERJ={"啊":"អា","呀":"អើយ","哦":"អូ","噢":"អូ","嗯":"អឹម","唉":"អ៊ើយ","哎":"អើយ","哈":"ហា","呵":"ហា","哼":"ហ៊ឹម","喂":"ហេ","哇":"វ៉ាវ","嘿":"ហេ","呃":"អឺ","额":"អឺ","咦":"អ៊ីយ៉ា","唔":"អឹម"};
+  const T0=Date.now();let fixed=0;
+  const models=[selections.geminiModel,"gemini-flash-latest","gemini-2.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
+  const hasKh=function(t){return /[\u1780-\u17FF]/.test(normalizeTranslationForCheck(t))};
+  for(const b of stuck){
+    let ok=false;
+    const bare=String(b.text||"").replace(/\[[^\]\r\n]{1,40}\]/g,"").replace(/[\s\p{P}\p{S}]/gu,"");
+    const chars=Array.from(bare);
+    if(chars.length&&chars.length=4&&chars.every(function(c){return INTERJ[c]})){
+      const mark=/[!！]/.test(b.text||"")?"!":(/[?？]/.test(b.text||"")?"?":"");
+      b.trans=chars.map(function(c){return INTERJ[c]}).join("")+mark;b.repairGaveUp=b.trans;
+      try{zsfEnforceTag(b)}catch(_){}
+      ok=true;fixed++;continue;
+    }
+    if(keys.length&&Date.now()-T090000){
+      const i=srtBlocks.indexOf(b);
+      const prev=srtBlocks.slice(Math.max(0,i-2),i).map(function(x){return normalizeTranslationForCheck(x.text||"")+" => "+normalizeTranslationForCheck(x.trans||"")}).join("\n");
+      const next=srtBlocks.slice(i+1,i+3).map(function(x){return normalizeTranslationForCheck(x.text||"")}).join("\n");
+      let story="";try{story=String(zsfStoryBlock()||"").slice(0,2500)}catch(_){}
+      const prompt="You are a professional Khmer subtitle translator for a Chinese short drama.\nTranslate ONLY the TARGET line into natural spoken Khmer (Khmer script only; keep character names consistent with the story notes). It may be an interjection, insult, threat or fight line: still translate it faithfully. If it is only a sound or exclamation, write the matching Khmer sound. Output ONLY the Khmer translation: no quotes, no notes, no Chinese, no explanation."+(story?("\n\nSTORY NOTES:"+story):"")+"\n\nPREVIOUS LINES (Chinese => Khmer):\n"+(prev||"-")+"\n\nNEXT LINES (Chinese):\n"+(next||"-")+"\n\nTARGET:\n"+normalizeTranslationForCheck(b.text||"");
+      loop:
+      for(let ki=0;kiMath.min(2,keys.length);ki++){
+        for(const md of models){
+          for(const safe of [true,false]){
+            if(Date.now()-T0>90000)break loop;
+            window.__zsfSafetyOff=safe;
+            try{
+              let raw=await requestGeminiRepairOnce(prompt,keys[(i+ki)%keys.length],md,25000);
+              raw=String(raw||"").replace(/```(?:text)?/gi,"").replace(/^\s*TARGET:\s*/i,"").replace(/^["“]+|["”]+$/g,"").trim();
+              if(raw&&hasKh(raw)){b.trans=raw;b.repairGaveUp=raw;try{zsfEnforceTag(b)}catch(_){}ok=true;fixed++;break loop}
+              break;
+            }catch(e){
+              if(safe&&e&&e.status===400)continue;
+              if(e&&(e.status===401||e.status===403)){break loop}
+              break;
+            }finally{window.__zsfSafetyOff=false}
+          }
+        }
+      }
+    }
+    if(!ok){b.repairSkip=true;b.trans="";delete b.repairBest;}
+  }
+  return fixed;
+}
+window.zsfTimingText=function(){
+  try{
+    const g=window.__zsfG||{},p=[];
+    if(g.chunkSec!=null)p.push("Whisper "+g.chunkSec+"s");
+    if(g.gapSec!=null)p.push("ពិនិត្យបាត់ "+g.gapSec+"s"+(g.gaps!=null?" ("+g.gaps+")":""));
+    if(g.trSec!=null)p.push("បកប្រែ "+g.trSec+"s");
+    if(g.repSec)p.push("ជួសជុល "+g.repSec+"s");
+    return p.length?" • ⏱ "+p.join(" • "):"";
+  }catch(_){return ""}
+};
+window.zsfAutoRepairAll=async function(){const __tRep0=Date.now();
   const keys=(Array.isArray(userApiKeys)?userApiKeys:[]).filter(Boolean);
   if(!keys.length||!srtBlocks.length)return false;
   for(let w=0;w30&&isTranslating;w++)await new Promise(r=>setTimeout(r,500));
@@ -5959,7 +6017,7 @@ window.zsfAutoRepairAll=async function(){
   let lastErr=null,kept=0;
   try{
     srtBlocks.forEach(b=>{
-      b.repairFails=0;delete b.repairBest;
+      b.repairFails=0;delete b.repairBest;delete b.repairSkip;
       /* ប្រភពជា ♪ / … / លេខសុទ្ធ → ចម្លងទៅជាអត្ថបទបកប្រែ មិនបាច់ឱ្យ AI បកប្រែ */
       if(!String(b.trans||"").trim()&&!/\p{L}/u.test(normalizeTranslationForCheck(b.text||"")))b.trans=String(b.text||"").trim();
     });
@@ -5985,7 +6043,9 @@ window.zsfAutoRepairAll=async function(){
         b.trans=cand;b.repairGaveUp=cand;try{zsfEnforceTag(b)}catch(_){}kept++;
       }
     });
+    try{ await zsfFinishStuck(); }catch(e){console.warn("stuck finish",e)}
   }finally{
+    try{window.__zsfG=window.__zsfG||{};window.__zsfG.repSec=(window.__zsfG.repSec||0)+Math.round((Date.now()-__tRep0)/1000)}catch(_){}
     isTranslating=false;
     try{renderEditor()}catch(_){}
     try{saveData()}catch(_){}
@@ -5993,6 +6053,7 @@ window.zsfAutoRepairAll=async function(){
   }
   const left=getRepairCandidates().length;
   try{toggleProgressBar(true,left?`⚠️ នៅសល់ ${left} បន្ទាត់មិនទាន់ជួសជុល`:(kept?`✅ រួចរាល់ (ទុក ${kept} បន្ទាត់ដែលមានអក្សរឡាតាំងតិចតួច)`:"✅ ជួសជុលបន្ទាត់ទាំងអស់រួចរាល់ — បន្ត Export"),100)}catch(_){}
+  try{const sk=srtBlocks.filter(b=>b.repairSkip&&!String(b.trans||"").trim());if(sk.length){const ids=sk.slice(0,8).map(b=>"#"+b.id).join(", ");toggleProgressBar(true,`⚠️ រំលង ${sk.length} បន្ទាត់ដែល AI បកប្រែមិនបាន (${ids}) — សំឡេងស្ងាត់ត្រង់នេះ អ្នកអាចវាយបកប្រែដោយដៃ`,100);showToast("⚠️ បន្ទាត់ "+ids+" បកប្រែមិនបាន — បានរំលង ដើម្បីបន្តអានសំឡេង",true)}}catch(_){}
   if(left&&lastErr){try{showToast("❌ "+friendlyError(lastErr),false)}catch(_){}}
   return left===0;
 };
@@ -8970,7 +9031,7 @@ async function transcribeWithKey(key,idx,uploadFile){
       const skipped=[];
       let lastChunkErr=null;
       let doneParts=0;
-      const __tc0=Date.now();
+      const __tc0=Date.now();try{window.__zsfG=window.__zsfG||{};window.__zsfG.gapSec=null;window.__zsfG.gaps=null}catch(_){}
       const partResults=await zsfPool(cuts.map((_,i)=>i),ZSF_PARALLEL,async(part)=>{
         const r=zsfChunkRange(plan,part);
         const chunkBuf=zsfBuildWav(buf,plan,r.aOff,r.aN);
@@ -11400,6 +11461,18 @@ async function callRetry(path,mk,tries){
   throw e0;
 }
 function normT(t){return String(t||"").replace(/\s+/g,"").replace(/\./g,",")}
+async function zsfFillPartMissing(ctx,lines,out,gl2){
+  var have={};out.forEach(function(o){have[normT(o.time)]=1});
+  var miss=lines.filter(function(l){return !have[normT(l.time)]});
+  if(!miss.length||miss.length>=lines.length)return out;
+  var res=await window.__zsfDirectAnalyze(miss,gl2,(ctx.rr=(ctx.rr||0)+1));
+  var add=res&&res.srt?parseSRT(res.srt):[];
+  if(!add.length)return out;
+  var all=out.concat(add.filter(function(o){return !have[normT(o.time)]}));
+  var order={};lines.forEach(function(l,i){order[normT(l.time)]=i});
+  all.sort(function(a,b){return (order[normT(a.time)]||0)-(order[normT(b.time)]||0)});
+  return all;
+}
 function blocksSrt(){
   var a=[],idx=[];
   try{(srtBlocks||[]).forEach(function(b,i){
@@ -11453,7 +11526,7 @@ async function analyzePart(ctx,lines,gl,P,tag,lo,hi,depth){
       var res=ctx.direct?await window.__zsfDirectAnalyze(lines,gl2,(ctx.rr=(ctx.rr||0)+1)):await call("/analyze",{method:"POST",headers:hdr({"Content-Type":"application/json"}),body:JSON.stringify({file:ctx.file,srt:srt,glossary:gl2})});
       var out=res&&res.srt?parseSRT(res.srt):[];
       if(!out.length)throw new Error("Gemini មិនបានផ្ញើ SRT មកវិញ");
-      if(out.length*2>lines.length)return out;
+      if(out.length*2>lines.length){if(ctx.direct&&out.lengthlines.length){try{out=await zsfFillPartMissing(ctx,lines,out,gl2)}catch(fe){}}return out;}
       throw new Error("Gemini ឆ្លើយមិនគ្រប់បន្ទាត់ ("+out.length+"/"+lines.length+")");
     }catch(e){
       err=e;
@@ -11488,7 +11561,7 @@ async function core(P,srt,tok){tok=tok||{c:false};
   if(!direct&&!document.body.classList.contains("zsf-admin"))throw new Error("ត្រូវការ Gemini API Key ផ្ទាល់ខ្លួន — សូមបង្កើត Key ខ្លួនឯងពី Google AI Studio");
   if(!direct&&!base())throw new Error("សូមដាក់ Worker URL មុន (ផ្នែក 03B)");
   ls("zsf_gem_url",base());ls("zsf_gem_acc",(($("zsfGemAcc")&&$("zsfGemAcc").value)||"").trim());
-  var ctx={f:f,file:null,up:0,direct:direct,tok:tok},__tL0=Date.now();
+  var ctx={f:f,file:null,up:0,direct:direct,tok:tok},__tL0=Date.now();try{window.__zsfG=window.__zsfG||{};window.__zsfG.repSec=0;window.__zsfG.trSec=null}catch(_){}
   try{
     var sig=(f.name||"")+":"+f.size+":"+(f.lastModified||0);
     if(direct){P("🎧 កំពុងរៀបចំសំឡេងសម្រាប់ Gemini (ផ្ញើពីទូរស័ព្ទផ្ទាល់ មិនឆ្លងកាត់ Worker)…",5)}
@@ -11520,7 +11593,7 @@ async function core(P,srt,tok){tok=tok||{c:false};
     }catch(e){stop=true;throw e;}finally{clearInterval(pt);}
     for(var gi2=0;N>gi2;gi2++)all=all.concat(results[gi2]||[]);
     var merged=all.map(function(o,i){return (i+1)+"\n"+o.time+"\n"+o.text+"\n"}).join("\n");
-    try{showToast("⏱ Gemini ស្តាប់សំឡេង និងបកប្រែ "+N+" ផ្នែក ចំណាយ "+Math.round((Date.now()-__tL0)/1000)+" វិនាទី",true)}catch(_){}
+    try{showToast("⏱ Gemini ស្តាប់សំឡេង និងបកប្រែ "+N+" ផ្នែក ចំណាយ "+Math.round((Date.now()-__tL0)/1000)+" វិនាទី",true)}catch(_){}try{window.__zsfG=window.__zsfG||{};window.__zsfG.trSec=Math.round((Date.now()-__tL0)/1000)}catch(_){}
     return {srt:merged,outCount:all.length};
   }catch(e){
     if(needReupload(e))upCache=null;
@@ -11848,7 +11921,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="2.012";
+  var EMB="2.013";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
