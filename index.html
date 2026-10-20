@@ -2913,7 +2913,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 label class="zkt-xc" style="display:none">input type="checkbox" id="zkt_x_video" checked/>span>🎬 ផ្គុំជាវីដេអូ/span>/label>
 label class="zkt-xc">input type="checkbox" id="zkt_x_mute" checked/>span>🔇 បិទសំឡេងដើម/span>/label>
 /div>
-div class="zkt-xorig" id="zkt_x_origrow" style="display:none">div class="zkt-xr">label for="zkt_x_origvol">🎼 សំឡេង Background (ពេលមិនអាន)/label>b id="zkt_x_ovt">100%/b>/div>input type="range" id="zkt_x_origvol" min="0" max="100" step="5" value="100"/>div class="zkt-xr">label for="zkt_x_duck">🗣️ Background ពេល TTS កំពុងអាន/label>b id="zkt_x_duckt">0%/b>/div>input type="range" id="zkt_x_duck" min="0" max="20" step="1" value="0"/>label class="zkt-xc" style="margin-top:6px">input type="checkbox" id="zkt_x_vr"/>span>🎤 កាត់សំឡេងតួអង្គចេញ (Beta)/span>/label>/div>
+div class="zkt-xorig" id="zkt_x_origrow" style="display:none">div class="zkt-xr">label for="zkt_x_origvol">🎼 សំឡេង Background (ពេលមិនអាន)/label>b id="zkt_x_ovt">100%/b>/div>input type="range" id="zkt_x_origvol" min="0" max="100" step="5" value="100"/>div class="zkt-xr">label for="zkt_x_duck">🗣️ Background ពេល TTS កំពុងអាន/label>b id="zkt_x_duckt">30%/b>/div>input type="range" id="zkt_x_duck" min="0" max="100" step="5" value="30"/>label class="zkt-xc" style="margin-top:6px">input type="checkbox" id="zkt_x_vr"/>span>🎤 កាត់សំឡេងតួអង្គចេញ (Beta)/span>/label>/div>
 div class="zkt-xnote">💡 ធីក «ផ្គុំជាវីដេអូ» = យកវីដេអូដែលដាក់នៅប្រអប់ខាងលើ ផ្គុំជាមួយសំឡេងខ្មែរ។ ធីក «បិទសំឡេងដើម» = សំឡេងចិនដើមនឹងមិនលាយចូលទេ។ ការនាំចេញចំណាយពេលស្មើនឹងប្រវែងវីដេអូ — កុំចាកចេញពីទំព័រ ឬបិទអេក្រង់។/div>
 /div>
 button class="btn-3d btn-full zkt-run" id="zkt_ext_run" type="button" style="margin-bottom:8px">📥🎬 Export ជាមួយ SRT ខ្មែរពីខាងក្រៅ/button>
@@ -3269,7 +3269,7 @@ var ROLEG=[
 ["podcast","🎙️ វិទ្យុ & ផតខាស្ត (Podcast Pro)",{dp:-5,speed:15,bass:2,vol:4,echo:0,eq:"podcast",auto:40}],
 ["news","📢 អ្នកអានព័ត៌មាន / ពិធីករ (News Anchor)",{dp:0,speed:22,bass:0,vol:6,echo:0,eq:"story",auto:50}]]}];
 var ROLEMAP={};ROLEG.forEach(function(g){g.l.forEach(function(r){ROLEMAP[r[0]]=r[2]})});
-function applyRole(id){var r=ROLEMAP[id];if(!r)return;var d=defS(cur),s=S[cur];s.pitch=Math.max(-80,Math.min(50,d.pitch+r.dp));s.speed=r.speed;s.bass=r.bass;s.vol=r.vol;s.echo=r.echo;s.eq=r.eq;s.auto=r.auto;s.hm=0}
+function applyRole(id){var r=ROLEMAP[id];if(!r)return;var d=defS(cur),s=S[cur];s.pitch=Math.max(-80,Math.min(50,d.pitch+r.dp));s.speed=r.speed;s.bass=r.bass;s.vol=r.vol;s.echo=r.echo;s.eq=r.eq;s.hm=0}
 function defS(i){return{voice:i%2?"km-KH-SreymomNeural":"km-KH-PisethNeural",hm:0,pitch:(i%2?-55:-2),bass:0,speed:20,vol:2,echo:0,auto:40,eq:"kclone",clone:1}}
 var CFG=[{k:"hm",t:"Volume High+Mid %",s:5,a:-50,b:100,u:"%"},{k:"pitch",t:"Pitch",s:1,a:-80,b:50,u:"Hz"},
 {k:"bass",t:"Bass dB",s:1,a:-10,b:15,u:"dB"},{k:"speed",t:"Speed",s:1,a:-50,b:100,u:"%"},
@@ -3280,10 +3280,13 @@ var DEFAULT_WURL="https://little-unit-043f.saanaafckoko.workers.dev";
 var S,cur=0,inc=[true,true,true,true],stopReq=false;
 try{var ji=JSON.parse(localStorage.getItem("zsf_tts_inc")||"null");if(Array.isArray(ji)&&ji.length===4)inc=ji.map(Boolean)}catch(e){}
 function load(){var FL="zsf_tts_v170";try{var j=JSON.parse(localStorage.getItem("zsf_khmer_tts_v1")||"null");if(Array.isArray(j)&&j.length===4){try{if(localStorage.getItem(FL)!=="1"){j.forEach(function(x){if(x&&x.speed===10)x.speed=20});localStorage.setItem(FL,"1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v171")!=="1"){j.forEach(function(x){if(x&&x.auto===40)x.auto=30});localStorage.setItem("zsf_tts_v171","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v172")!=="1"){j.forEach(function(x){if(x&&x.auto===30)x.auto=40});localStorage.setItem("zsf_tts_v172","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v193")!=="1"){try{localStorage.setItem("zsf_khmer_tts_v1_bak193",JSON.stringify(j))}catch(_){}var cl=function(v,a,b){return Math.max(a,Math.min(b,v))};j.forEach(function(x){if(!x)return;x.vol=cl(Math.round(((1+(+x.vol||0)/100)*0.852-1)*100),-80,100);x.bass=cl((+x.bass||0)+2,-10,15);x.hm=cl((+x.hm||0)-15,-50,100);x.clone=cl((x.clone===undefined||x.clone===null||isNaN(+x.clone)?1:+x.clone)*0.5,0,1)});localStorage.setItem("zsf_tts_v193","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v194")!=="1"){try{localStorage.setItem("zsf_khmer_tts_v1_bak194",JSON.stringify(j))}catch(_){}j.forEach(function(x){if(!x)return;x.clone=1;if(/Sreymom/i.test(x.voice||"")&&(+x.pitch===-2||+x.pitch===0))x.pitch=-55});localStorage.setItem("zsf_tts_v194","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v195")!=="1"){try{localStorage.setItem("zsf_khmer_tts_v1_bak195",JSON.stringify(j))}catch(_){}j.forEach(function(x){if(!x)return;x.eq="kclone";x.bass=0;x.hm=0;x.clone=1});localStorage.setItem("zsf_tts_v195","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}}catch(_){}return j}}catch(e){}try{localStorage.setItem(FL,"1");localStorage.setItem("zsf_tts_v171","1");localStorage.setItem("zsf_tts_v172","1");localStorage.setItem("zsf_tts_v193","1");localStorage.setItem("zsf_tts_v194","1")}catch(_){}return[0,1,2,3].map(defS)}
-function persist(){try{localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(S));if(document.body.classList.contains("zsf-admin")){localStorage.setItem("zsf_tts_key",$("zkt_key").value.trim());localStorage.setItem("zsf_tts_region",$("zkt_region").value.trim());localStorage.setItem("zsf_tts_mode",$("zkt_mode").value);localStorage.setItem("zsf_tts_wurl",$("zkt_wurl").value.trim())}}catch(e){}}
+function autoG(){var a=(typeof S!=="undefined"&&S&&S[0])?+S[0].auto:NaN;return isFinite(a)?a:30}
+function syncAuto(){try{var a=autoG();S.forEach(function(x){if(x)x.auto=a})}catch(_){}}
+function hintCalc(){try{var s=S[cur],b=1+s.speed/100,A=autoG(),cap=Math.min(b*(1+A/100),2.0);return 'br>🧮 ឃ្លាខ្លី = ×'+b.toFixed(2)+' • ឃ្លាវែងលឿនបានដល់ ×'+cap.toFixed(2)+' (ធម្មតា '+Math.round(s.speed)+'% × Auto '+Math.round(A)+'%)'}catch(_){return ""}}
+function persist(){syncAuto();try{localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(S));if(document.body.classList.contains("zsf-admin")){localStorage.setItem("zsf_tts_key",$("zkt_key").value.trim());localStorage.setItem("zsf_tts_region",$("zkt_region").value.trim());localStorage.setItem("zsf_tts_mode",$("zkt_mode").value);localStorage.setItem("zsf_tts_wurl",$("zkt_wurl").value.trim())}}catch(e){}}
 var audMode=false;
 function st(m,p){m=String(m==null?"":m).split(" • ").filter(function(x){return !/Auto|នៅតែវែង|ប្រើសំឡេងតួ|ឃ្លាលេខ|\[\d\]×/.test(x)}).join(" • ");if(/^\s*✅/.test(m))m="";$("zkt_stat").textContent=m;if(p!=null)$("zkt_bar").style.width=p+"%";if(audMode){var as=$("zkt_astat"),ab=$("zkt_abar");if(as)as.textContent=m;if(ab&&p!=null)ab.style.width=p+"%"}}
-var LBL={hm:"Volume High + Mid %",pitch:"ខ្ពស់ទាប (Pitch)",bass:"កម្រិតបាស (Bass)",speed:"ល្បឿន (Speed)",vol:"កម្រិតសំឡេង (Volume)",echo:"អេកូ (Echo)",auto:"Auto Speed %"};
+var LBL={hm:"Volume High + Mid %",pitch:"ខ្ពស់ទាប (Pitch)",bass:"កម្រិតបាស (Bass)",speed:"ល្បឿន (Speed)",vol:"កម្រិតសំឡេង (Volume)",echo:"អេកូ (Echo)",auto:"Auto Speed % (ប្រើដូចគ្នាទាំង ៤ តួ)"};
 var ORD=["pitch","bass","speed","vol","echo","auto","hm"];
 function cfgOf(k){return CFG.filter(function(x){return x.k===k})[0]}
 function eqShort(k){var t=String(EQN[k]||k).replace(/\s*\(.*$/,""),m=t.split(" ");if(m.length>1&&!/[\u1780-\u17FFA-Za-z0-9]/.test(m[0]))m.shift();return m.join(" ")}
@@ -3309,9 +3312,9 @@ function fmt(k,v){
  if(k==="auto")return Math.round(v)+"%";
  return sg+Math.round(a)+"%";
 }
-function drawSum(){var sm=$("zkt_vsum");if(sm)sm.textContent=S.map(function(x,i){return "["+(i+1)+"] "+(VOICES[x.voice]||x.voice)}).join("  •  ");
+function drawSum(){try{drawHint()}catch(_){}var sm=$("zkt_vsum");if(sm)sm.textContent=S.map(function(x,i){return "["+(i+1)+"] "+(VOICES[x.voice]||x.voice)}).join("  •  ");
  var cs=$("zkt_slots").querySelectorAll(".zpv-sm");cs.forEach(function(el,i){if(S[i])el.textContent=sumTxt(S[i])})}
-function drawHint(){var h=$("zkt_pillhint");if(h)h.innerHTML='🎯 កំពុងកំណត់ b>'+TAGN[cur]+'/b> — ប្រើជាមួយប្រយោគដែលមានស្លាក ['+(cur+1)+'] ប៉ុណ្ណោះbr>⚡ ល្បឿនធម្មតា = ឃ្លាខ្លីអានតាមនេះ • Auto Speed = កម្រិតលឿនបន្ថែមអតិបរមា (ឃ្លាវែងលឿនឡើងតាមការគណនា មិនលើសកម្រិតនេះ)'}
+function drawHint(){var h=$("zkt_pillhint");if(h)h.innerHTML='🎯 កំពុងកំណត់ b>'+TAGN[cur]+'/b> — ប្រើជាមួយប្រយោគដែលមានស្លាក ['+(cur+1)+'] ប៉ុណ្ណោះbr>⚡ ល្បឿនធម្មតា = ឃ្លាខ្លីអានតាមនេះ • Auto Speed = កម្រិតលឿនបន្ថែមអតិបរមា (ឃ្លាវែងលឿនឡើងតាមការគណនា មិនលើសកម្រិតនេះ)'+hintCalc()}
 function markPills(){var ps=$("zkt_slots").querySelectorAll(".zpv-card");ps.forEach(function(el,i){el.classList.toggle("on",i===cur)})}
 function drawPills(){
  $("zkt_slots").innerHTML=S.map(function(x,i){
@@ -3321,7 +3324,7 @@ function drawPills(){
 }
 function drawCtl(){
  var s=S[cur],h="";
- ORD.forEach(function(k){var c=cfgOf(k);if(!c)return;
+ ORD.forEach(function(k){var c=cfgOf(k);if(!c)return;if(k==="auto"&&cur>0){h+='div class="zpv-f zpv-fc">div class="zpv-lh">label>span class="zpv-li">'+ICO[k]+'/span>Auto Speed %/label>/div>div class="zpv-st">span class="zpv-v">b>🔗 តាម [1] = '+Math.round(autoG())+'%/b>/span>/div>/div>';return}
   var v=Math.round(s[k]*10)/10;
   var dv=defS(cur)[k],rs=(Math.round(dv*10)/10!==v)?'button type="button" class="zpv-rs" data-k="'+k+'" data-d="0" title="ត្រឡប់ទៅលំនាំដើម">↺ '+fmt(k,dv)+'/button>':'';
   h+='div class="zpv-f zpv-fc'+(k==="hm"?" zpv-wide":"")+'">div class="zpv-lh">label>span class="zpv-li">'+ICO[k]+'/span>'+LBL[k]+'/label>'+rs+'/div>div class="zpv-st">button type="button" data-k="'+k+'" data-d="-1"'+(v=c.a?" disabled":"")+'>−/button>span class="zpv-v">b>'+fmt(k,v)+'/b>/span>button type="button" data-k="'+k+'" data-d="1"'+(v>=c.b?" disabled":"")+'>+/button>/div>input type="range" class="zpv-rg" data-k="'+k+'" min="'+c.a+'" max="'+c.b+'" step="'+c.s+'" value="'+v+'" aria-label="'+LBL[k]+'">/div>';
@@ -3340,7 +3343,7 @@ function drawCtl(){
 try{if(localStorage.getItem("zsf_tts_v153")!=="1"){["zsf_tts_tail","zsf_tts_spill","zsf_tts_margin"].forEach(function(k){localStorage.removeItem(k)});localStorage.setItem("zsf_tts_v153","1")}}catch(_){}
 try{if(localStorage.getItem("zsf_tts_v159")!=="1"){localStorage.removeItem("zsf_tts_shift");localStorage.setItem("zsf_tts_v159","1")}}catch(_){}
 try{if(localStorage.getItem("zsf_tts_v165")!=="1"){localStorage.removeItem("zsf_tts_fmax");localStorage.setItem("zsf_tts_v165","1")}}catch(_){}try{if(localStorage.getItem("zsf_tts_v171f")!=="1"){localStorage.removeItem("zsf_tts_fmax");localStorage.setItem("zsf_tts_v171f","1")}}catch(_){}
-var FITD={fmax:1.8,tail:0.30,margin:0.20,shift:-0.15},FITR={fmax:[1.5,4,0.25],tail:[0.1,3,0.1],margin:[0,0.6,0.05],shift:[-1.5,1.5,0.05]},FITK={fmax:"zsf_tts_fmax",tail:"zsf_tts_tail",margin:"zsf_tts_margin",shift:"zsf_tts_shift"};
+var FITD={fmax:1.8,tail:0.30,margin:0.20,shift:0},FITR={fmax:[1.5,4,0.25],tail:[0.1,3,0.1],margin:[0,0.6,0.05],shift:[-1.5,1.5,0.05]},FITK={fmax:"zsf_tts_fmax",tail:"zsf_tts_tail",margin:"zsf_tts_margin",shift:"zsf_tts_shift2"};
 function fitGet(k){try{var v=parseFloat(localStorage.getItem(FITK[k]));if(v>=FITR[k][0]&&v=FITR[k][1])return v}catch(_){}return FITD[k]}
 function fitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch(_){return true}}
 function drawFit(){
@@ -3553,8 +3556,8 @@ async function renderSeg(text,s,targetSec){
   
  var r=await process(await synth(text,s),s,0);r.fin=s.speed;
  if(!(targetSec>0))return r;
- var base=1+s.speed/100,cap=Math.min(base*(1+s.auto/100),2.0),cur=base;
- if(s.auto>0){
+ var base=1+s.speed/100,cap=Math.min(base*(1+autoG()/100),2.0),cur=base;
+ if(autoG()>0){
   for(var it=0;it3;it++){
    var d=r.data.length/24000;
    if(d=targetSec*1.02)break;
@@ -4690,8 +4693,8 @@ function init(){
   })();
   (function(){
    var v=$("zkt_x_video"),m=$("zkt_x_mute"),o=$("zkt_x_origvol"),row=$("zkt_x_origrow");if(!v||!m||!o||!row)return;
-   try{var a=localStorage.getItem("zsf_x_video"),b=localStorage.getItem("zsf_x_mute"),c=localStorage.getItem("zsf_x_bg");v.checked=true; if(b!=null)m.checked=b==="1";if(c!=null&&c!=="")o.value=c;var dk0=$("zkt_x_duck"),d0=localStorage.getItem("zsf_x_duck0");if(dk0&&d0!=null&&d0!=="")dk0.value=d0}catch(_){}
-   function sync(){row.style.display=m.checked?"none":"flex";try{localStorage.setItem("zsf_x_video",v.checked?"1":"0");localStorage.setItem("zsf_x_mute",m.checked?"1":"0");localStorage.setItem("zsf_x_bg",String(o.value));var dk=$("zkt_x_duck");if(dk)localStorage.setItem("zsf_x_duck0",String(dk.value))}catch(_){}var t1=$("zkt_x_ovt"),t2=$("zkt_x_duckt"),dk2=$("zkt_x_duck");if(t1)t1.textContent=o.value+"%";if(t2&&dk2)t2.textContent=dk2.value+"%"}
+   try{var a=localStorage.getItem("zsf_x_video"),b=localStorage.getItem("zsf_x_mute"),c=localStorage.getItem("zsf_x_bg");v.checked=true; if(b!=null)m.checked=b==="1";if(c!=null&&c!=="")o.value=c;var dk0=$("zkt_x_duck"),d0=localStorage.getItem("zsf_x_duck1");if(dk0&&d0!=null&&d0!=="")dk0.value=d0}catch(_){}
+   function sync(){row.style.display=m.checked?"none":"flex";try{localStorage.setItem("zsf_x_video",v.checked?"1":"0");localStorage.setItem("zsf_x_mute",m.checked?"1":"0");localStorage.setItem("zsf_x_bg",String(o.value));var dk=$("zkt_x_duck");if(dk)localStorage.setItem("zsf_x_duck1",String(dk.value))}catch(_){}var t1=$("zkt_x_ovt"),t2=$("zkt_x_duckt"),dk2=$("zkt_x_duck");if(t1)t1.textContent=o.value+"%";if(t2&&dk2)t2.textContent=dk2.value+"%"}
    v.onchange=sync;m.onchange=sync;o.oninput=sync;o.onchange=sync;var dk3=$("zkt_x_duck");if(dk3){dk3.oninput=sync;dk3.onchange=sync}sync();
    try{var vrc=$("zkt_x_vr");if(vrc){vrc.checked=localStorage.getItem("zsf_x_vr")==="1";vrc.onchange=function(){try{localStorage.setItem("zsf_x_vr",vrc.checked?"1":"0")}catch(_){}}}}catch(_){}
    var dt0=$("zkt_deftag");if(dt0)dt0.addEventListener("change",function(){pvRender()});
@@ -6675,7 +6678,7 @@ function zsfActiveGenres(){
   const out=[];const sel=zsfGenreByValue(selections.genre);
   if(sel)out.push(sel);
   if(zsfBible&&Array.isArray(zsfBible.genres))zsfBible.genres.forEach(c=>{const g=zsfGenreByCode(c);if(g&&!out.includes(g))out.push(g);});
-  return out.slice(0,3);
+  return out.slice(0,1);
 }
 function zsfGenreLabel(){
   const gs=zsfActiveGenres();
@@ -6743,7 +6746,7 @@ function zsfCleanBible(j){
     const g=/^f/i.test(c.gender||"")?"ស្រី":/^m/i.test(c.gender||"")?"ប្រុស":"?";
     const e=/anc/i.test(c.era||"")?"បុរាណ":/mod/i.test(c.era||"")?"ទំនើប":"?";
     chars.push({zh,km,gender:g,era:e,role:zsfKmOnly(c.role_km)?zsfTxt(c.role_km,80):""});});
-  const genres=arr(j.genre_codes).map(x=>String(x||"").trim()).filter(c=>zsfGenreByCode(c)).filter((c,i,a)=>a.indexOf(c)===i).slice(0,3);
+  const genres=arr(j.genre_codes).map(x=>String(x||"").trim()).filter(c=>zsfGenreByCode(c)).filter((c,i,a)=>a.indexOf(c)===i).slice(0,1);
   return {
     genres,
     synopsis:zsfKmOnly(j.synopsis_km)?zsfTxt(j.synopsis_km,600):"",
@@ -6829,7 +6832,7 @@ async function zsfPrepareStoryBible(){
   const list=ZSF_GENRES.map(g=>g[0]+" = "+g[2]).join("\n");
   const mk=(hasVideo)=>`${hasVideo?"Watch the ATTACHED VIDEO completely (picture and sound). Use what you SEE (faces, clothes, who talks to whom, scenes) and what you HEAR to understand the story and every character. The subtitle text at the end is only extra reference and may contain speech-recognition mistakes.":"Read the subtitle text at the end (the whole episode or a sample of it)."}
 You are a story analyst for Chinese short dramas that will be subtitled/dubbed into Khmer. Do NOT translate the dialogue yet. Return ONE JSON object only (no markdown, no text outside the JSON), with these keys:
-- genre_codes: array of 1-3 codes (most important first) chosen ONLY from this list:
+- genre_codes: an array with EXACTLY ONE code: the single dominant genre/setting of the whole story (the premise that drives the plot). NEVER combine several genres; if the story seems to mix genres, pick only the one that matters most. Choose ONLY from this list:
 ${list}
 - synopsis_km: 3-5 sentences in Khmer summarising the whole story, its setting and the main conflict.
 - tone_km: a short Khmer phrase describing the emotional tone/atmosphere (e.g. serious and tense, funny, tender).
@@ -11845,7 +11848,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="2.009";
+  var EMB="2.012";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
