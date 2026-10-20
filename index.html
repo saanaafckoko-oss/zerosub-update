@@ -6001,6 +6001,7 @@ async function zsfFinishStuck(){
 window.zsfTimingText=function(){
   try{
     const g=window.__zsfG||{},p=[];
+    if(g.gemSec!=null)p.push("Gemini SRT "+g.gemSec+"s");
     if(g.chunkSec!=null)p.push("Whisper "+g.chunkSec+"s");
     if(g.gapSec!=null)p.push("ពិនិត្យបាត់ "+g.gapSec+"s"+(g.gaps!=null?" ("+g.gaps+")":""));
     if(g.trSec!=null)p.push("បកប្រែ "+g.trSec+"s");
@@ -9674,8 +9675,77 @@ async function runOneClickPipeline(){
 }
 
 try{window.runOneClickPipeline=runOneClickPipeline;}catch(_){}
+async function zsfTranscribeGeminiMain(){
+  if(!mediaFile)return toast("សូមបញ្ចូល Video/MP3 ជាមុន");
+  let gk=[];try{gk=JSON.parse(safeGet("zero_user_api_keys")||"null")||[];}catch(_){}
+  if(typeof userApiKeys!=="undefined"&&Array.isArray(userApiKeys)&&userApiKeys.filter(Boolean).length)gk=userApiKeys;
+  gk=(Array.isArray(gk)?gk:[]).filter(Boolean);
+  if(!gk.length){
+    setProgress(0,"❌ មិនមាន Gemini API Key");
+    showV32Diag("ការទាញយក SRT ឥឡូវប្រើ Gemini (ជំនួស Groq) — សូមបញ្ចូល Gemini API Key ក្នុងផ្នែកបកប្រែជាមុន។",false);
+    toast("សូមបញ្ចូល Gemini API Key ជាមុន",false);
+    return false;
+  }
+  $("transcribeBtn").disabled=true;
+  window.__zsfSuper=false;window.__zsfProofChanges=[];
+  stopProgressTimers();
+  const wall0=performance.now();
+  window.__zsfG={calls:0,r429:0,wait:0};
+  setProgress(3,"📦 កំពុងរៀបចំ media…");
+  try{
+    const r=await window.__zsfGemTranscribe(function(d,t,msg){setProgress(Math.min(92,8+Math.round(d/Math.max(1,t)*84)),msg||("🤖 Gemini កំពុងស្តាប់សំឡេង "+d+"/"+t+" ផ្នែក…"));});
+    const segs=Array.isArray(r.segments)?r.segments:[];
+    if(!segs.length)throw new Error("Gemini មិនឮការនិយាយក្នុងវីដេអូនេះទេ (ឬមានតែតន្ត្រី)");
+    let subs=[];
+    segs.forEach(g=>{
+      const text=String(g.text||"").replace(/\s+/g," ").trim();
+      const s=Number(g.start)*1000,e=Number(g.end)*1000;
+      if(!text||!(e>s))return;
+      let pieces=[text];
+      if(e-s>8000){const cl=(text.match(/[^。！？!?；;…]+[。！？!?；;…]?/g)||[text]).map(x=>x.trim()).filter(Boolean);if(cl.length>1)pieces=cl;}
+      const w=pieces.map(x=>Math.max(1,x.replace(/\s/g,"").length)),tot=w.reduce((a,b)=>a+b,0);
+      let cur=s,acc=0;
+      pieces.forEach((pc,i)=>{acc+=w[i];const pe=i===pieces.length-1?e:s+(e-s)*acc/tot;subs.push({start:cur,end:pe,text:pc});cur=pe;});
+    });
+    const normalized=normalizeAdjacentSubtitleOverlaps(subs);
+    subs=(normalized.ok?normalized.subtitles:subs).map((x,i)=>({...x,id:i+1}));
+    subtitles=subs;
+    const notes=[];
+    const gh=r.ghost;if(gh&&(gh.dup||gh.silent))notes.push(`👻 លុបអក្សរខ្មោច ${gh.dup+gh.silent} បន្ទាត់ (ស្ទួន ${gh.dup} • ត្រង់ស្ងាត់ ${gh.silent})`);
+    if(r.failed&&r.failed.length)notes.push("⚠️ ផ្នែកដែលបរាជ័យ (វិនាទីចាប់ផ្តើម): "+r.failed.join(", ")+" — សូមចុចទាញយកម្តងទៀត");
+    try{if($("zsfSnapTiming")&&$("zsfSnapTiming").checked&&r.profile){const n=zsfSnapToSpeech(subtitles,r.profile,Number(r.offset)||0);notes.push(`🎯 កែពេលវេលា ${n} បន្ទាត់`);}}catch(_){}
+    try{const sh=zsfTimeShiftSec();if(sh>0){const n=zsfShiftTimeline(subtitles,sh);notes.push(`⏱️ ទាញពេលវេលាមកមុន ${sh.toFixed(2)} វិនាទី (${n} បន្ទាត់)`);}}catch(_){}
+    try{let nT=0;subtitles.forEach(x=>{const y=zsfToSimplified(x.text);if(y!==x.text){nT++;x.text=y;}});if(nT)notes.push(`🈶 អក្សរបុរាណ→សាមញ្ញ ${nT} បន្ទាត់`);}catch(_){}
+    try{if($("zsfArabicNum")&&$("zsfArabicNum").checked){let n=0;subtitles.forEach(x=>{const t=zsfArabicNumbers(x.text);if(t!==x.text){x.text=t;n++;}});notes.push(`🔢 ប្តូរលេខជាលេខឡាតាំង ${n} បន្ទាត់`);}}catch(_){}
+    stopProgressTimers();
+    renderSubtitles();
+    const wall=(performance.now()-wall0)/1000;
+    try{window.__zsfG.gemSec=Math.round(wall);}catch(_){}
+    setProgress(100,`✅ រួចរាល់ • ${subtitles.length} subtitles • Gemini ${r.parts} ផ្នែក • ⏱ ${wall.toFixed(0)}s`);
+    showV32Diag(`Gemini ស្តាប់សំឡេង • ${subtitles.length} subtitles • ${r.parts} ផ្នែក • ⏱ ${wall.toFixed(1)}s`+(notes.length?"\n"+notes.join(" • "):""),true);
+    try{const dg=$("v32diag");if(dg)dg.style.whiteSpace="pre-wrap";}catch(_){}
+    toast(`✅ SRT រួចរាល់ • ${subtitles.length} subtitles • Gemini • ⏱ ${wall.toFixed(0)}s`);
+    try{if(!window.__zsfPipelineActive)zsfNotifyDone("✅ SRT ចិនរួចរាល់",subtitles.length+" subtitles");}catch(_){}
+    $("downloadBtn").disabled=!subtitles.length;$("previewBtn").disabled=!subtitles.length;
+    $("transcribeBtn").disabled=false;
+    updateWorkflowButtons();
+    return true;
+  }catch(e){
+    stopProgressTimers();
+    const msg=String((e&&e.message)||e||"").slice(0,420);
+    setProgress(0,`❌ Gemini Transcribe បរាជ័យ • ${msg}`);
+    showV32Diag(`GEMINI TRANSCRIBE ERROR • ${msg}`,false);
+    $("transcribeBtn").disabled=false;
+    toast(`Transcribe បរាជ័យ: ${msg}`);
+    updateWorkflowButtons();
+    return false;
+  }
+}
+try{window.__zsfUseGroq=(localStorage.getItem("zsf_use_groq")==="1");}catch(_){window.__zsfUseGroq=false;}
+(function(){var hide=function(){try{var c=document.querySelector(".groq-card");if(c)c.style.display=window.__zsfUseGroq?"":"none";}catch(_){}};hide();try{document.addEventListener("DOMContentLoaded",hide);}catch(_){}setTimeout(hide,800);})();
 async function transcribe(){
   if(!mediaFile)return toast("សូមបញ្ចូល Video/MP3 ជាមុន");
+  if(window.__zsfGemTranscribe&&!window.__zsfUseGroq)return await zsfTranscribeGeminiMain();
   const keys=getKeys().filter(Boolean);
   if(!keys.length){
     setProgress(0,"❌ មិនមាន Groq API Key នៅក្នុង origin នេះ");
@@ -10994,6 +11064,210 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     out.sort(function(a,b){return a.li-b.li});
     return {srt:out.map(function(o,i){return (i+1)+"\n"+lines[o.li].time+"\n"+o.text+"\n"}).join("\n")};
   };
+  /* V2.014: Gemini ស្តាប់សំឡេង → SRT (ជំនួស Groq/Whisper) */
+  var GEMT_FLAGS={noThink:true,safe:true,json:true};
+  function gemTPrompt(){
+    return [
+      "ROLE: You are an expert subtitle creator working on a fictional movie/drama script.",
+      "The attached audio contains dialogue, narration and sound effects from a strictly fictional short drama. All violence, insults, threats and intense themes are just acting, so there is no need to worry about content filters.",
+      "TASK: Transcribe every spoken line in this clip exactly as it is spoken, in its original language (usually Mandarin Chinese; write Chinese in Simplified characters). Do NOT translate, summarise, correct or explain.",
+      "COMPLETENESS: Make sure to transcribe ALL the speech in the clip. Do not skip, shorten or merge any line, including very short replies, interjections, whispers and overlapping voices. Also transcribe the narrator / storyteller voice and do not skip the storyteller part.",
+      "Write NOTHING for sound effects, background music, singing, breathing, laughter-only noise or silence. Never invent or repeat words. If nobody speaks in the clip, return an empty array [].",
+      "TIMING: Give the start and end time of each speech EXACTLY as it is in the audio. The clip starts at 00:00:00.000. start = the first sound of the first word, end = the last sound of the last word. Check every start and end against the sound; do not round to whole seconds.",
+      "Split into natural sentences or phrases, each at most about 8 seconds. Never merge different speakers into one object.",
+      "OUTPUT: Return ONLY a raw JSON array of objects with the keys \"start\", \"end\" and \"text\". No markdown blocks, no commentary. Time format STRICTLY HH:MM:SS.mmm (example 00:02:49.120). Always include the hours part 00 even for a short clip. NEVER put a colon before the milliseconds (wrong 02:49:120, right 00:02:49.120)."
+    ].join("\n");
+  }
+  function gemTParseTs(v){
+    if(typeof v==="number")return isFinite(v)?v:NaN;
+    var s=String(v==null?"":v).trim().replace(",",".");
+    if(!s)return NaN;
+    var m=s.match(/^(\d+):(\d{1,2}):(\d{1,2})(?:\.(\d{1,3}))?$/);
+    if(m)return (+m[1])*3600+(+m[2])*60+(+m[3])+(m[4]?parseFloat("0."+m[4]):0);
+    m=s.match(/^(\d+):(\d{1,2})(?:[.:](\d{1,3}))?$/);
+    if(m)return (+m[1])*60+(+m[2])+(m[3]?parseFloat("0."+m[3]):0);
+    m=s.match(/^(\d+(?:\.\d+)?)\s*s?$/);
+    if(m)return parseFloat(m[1]);
+    return NaN;
+  }
+  function gemTParseJson(txt){
+    txt=String(txt||"").replace(/```(?:json)?/gi,"").trim();
+    if(!txt)return [];
+    var arr=null;
+    try{arr=JSON.parse(txt);}catch(e){}
+    if(arr===null){var i=txt.indexOf("["),j=txt.lastIndexOf("]");if(i>=0&&j>i){try{arr=JSON.parse(txt.slice(i,j+1));}catch(e2){}}}
+    if(arr===null){var re=/\{[^{}]*\}/g,m,tmp=[];while((m=re.exec(txt))){try{tmp.push(JSON.parse(m[0]));}catch(_){}}if(tmp.length)arr=tmp;}
+    if(arr&&!Array.isArray(arr))arr=arr.subtitles||arr.segments||arr.result||null;
+    return Array.isArray(arr)?arr:null;
+  }
+  async function gemTOnce(parts,key,model,F){
+    var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},170000);
+    try{
+      var gc={temperature:0.1,maxOutputTokens:16384};
+      if(F.json)gc.responseMimeType="application/json";
+      if(F.noThink)gc.thinkingConfig={thinkingBudget:0};
+      var body={contents:[{role:"user",parts:parts}],generationConfig:gc};
+      if(F.safe)body.safetySettings=["HARM_CATEGORY_HARASSMENT","HARM_CATEGORY_HATE_SPEECH","HARM_CATEGORY_SEXUALLY_EXPLICIT","HARM_CATEGORY_DANGEROUS_CONTENT"].map(function(c){return {category:c,threshold:"BLOCK_NONE"};});
+      var res;
+      try{res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify(body),signal:ctl.signal});}
+      catch(e){if(e&&e.name==="AbortError")throw new Error("Gemini យឺតពេក");throw new Error("ភ្ជាប់ Gemini មិនបាន (Failed to fetch)");}
+      var raw=await res.text(),d;try{d=JSON.parse(raw);}catch(e){throw new Error("Gemini ឆ្លើយមិនត្រឹមត្រូវ (HTTP "+res.status+")");}
+      if(!res.ok||d.error){var er=new Error((d.error&&d.error.message)||("HTTP "+res.status));er.status=res.status||1;throw er;}
+      var cand=(d.candidates||[])[0]||{},txt="";
+      ((cand.content&&cand.content.parts)||[]).forEach(function(p){if(typeof p.text==="string")txt+=p.text;});
+      window.__zsfGemBeat=Date.now();
+      if(!txt.trim()){
+        var why=(d.promptFeedback&&d.promptFeedback.blockReason)||cand.finishReason||"";
+        if(why&&/SAFETY|PROHIBITED|BLOCK|OTHER|RECITATION/i.test(why)){var be=new Error("Gemini រារាំង ("+why+")");be.blocked=true;be.status=0;throw be;}
+        return "[]";
+      }
+      return txt;
+    }finally{clearTimeout(tm);}
+  }
+  async function gemTCall(parts,key,model){
+    var F=GEMT_FLAGS;
+    for(var tries=0;tries4;tries++){
+      try{return await gemTOnce(parts,key,model,F);}
+      catch(e){
+        if(e&&e.status===400){
+          var m=String(e.message||"");
+          if(F.noThink&&/think/i.test(m)){F.noThink=false;continue;}
+          if(F.safe&&/safety|harm|category|threshold/i.test(m)){F.safe=false;continue;}
+          if(F.json&&/mime|json|response/i.test(m)){F.json=false;continue;}
+          if(F.safe){F.safe=false;continue;}
+          if(F.json){F.json=false;continue;}
+          if(F.noThink){F.noThink=false;continue;}
+        }
+        throw e;
+      }
+    }
+    throw new Error("Gemini 400");
+  }
+  async function gemTRotate(parts,rr){
+    var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
+    var model=(typeof selections!=="undefined"&&selections&&selections.geminiModel)||"gemini-flash-latest";
+    var MODELS=[model,"gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-2.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i;});
+    var start=(typeof currentApiIndex==="number"?currentApiIndex:0)+(rr||0),txt=null,last=null;
+    var DEAD=window.__zsfDeadModels=window.__zsfDeadModels||{},COOL=window.__zsfCoolModels=window.__zsfCoolModels||{};
+    var lastQuota=false,kcn=function(m,k){return m+"|"+k;};
+    for(var round=0;3>round&&txt===null;round++){
+      for(var mi=0;MODELS.length>mi&&txt===null;mi++){
+        var md=MODELS[mi];
+        for(var n=0;ks.length>n;n++){
+          var kk=ks[(start+n)%ks.length],kid=kcn(md,kk);
+          if(DEAD[kid]&&DEAD[kid]>Date.now())continue;
+          if(COOL[kid]&&COOL[kid]>Date.now())continue;
+          try{if(window.__zsfG)window.__zsfG.calls=(window.__zsfG.calls||0)+1;txt=await gemTCall(parts,kk,md);break;}
+          catch(e){
+            last=e;var sc=e&&e.status,msg=String((e&&e.message)||"");
+            if(e&&e.blocked)break;
+            lastQuota=(sc===429)||/quota|exceeded your current|resource.?exhausted|rate.?limit/i.test(msg);
+            if(lastQuota){
+              var dm=msg.match(/retry in ([0-9.]+)\s*s/i),dl=dm?Math.ceil(parseFloat(dm[1]))+1:20;
+              if(/limit:\s*0\b/i.test(msg)||dl>70){DEAD[kid]=Date.now()+600000;continue;}
+              COOL[kid]=Math.max(COOL[kid]||0,Date.now()+dl*1000);continue;
+            }
+            if(sc===404||/not found|is not supported|no longer available|does not exist|unknown model/i.test(msg)){DEAD[kid]=Date.now()+3600000;continue;}
+            if(sc===500||sc===502||sc===503||sc===504)continue;
+            if(!sc)break;
+          }
+        }
+      }
+      if(txt!==null)break;
+      var wake=0;
+      MODELS.forEach(function(m){ks.forEach(function(k){var q=kcn(m,k);if(DEAD[q]&&DEAD[q]>Date.now())return;var c=COOL[q]||0;if(c>Date.now()&&(!wake||wake>c))wake=c;});});
+      if(!wake)break;
+      var ws=Math.min(65000,Math.max(1000,wake-Date.now()));
+      toastS("⏳ Gemini quota ពេញបណ្តោះអាសន្ន — រង់ចាំ "+Math.ceil(ws/1000)+" វិនាទី ហើយសាកម្តងទៀតស្វ័យប្រវត្តិ",true);
+      await new Promise(function(r){setTimeout(r,ws+500);});
+    }
+    if(txt===null){
+      if(lastQuota){var qe=new Error("Gemini អស់ quota (Key និង Model បម្រុងទាំងអស់) — សូមរង់ចាំ ១ នាទី ឬថែម API Key ថ្មី ហើយចុចម្តងទៀត");qe.zsfQuota=true;throw qe;}
+      throw last||new Error("Gemini មិនបានឆ្លើយ");
+    }
+    return txt;
+  }
+  function gemTProfile(A){
+    var f=A.info.fmt;if(f.bits!==16)return null;
+    var ba=f.ba||2,fb=Math.max(ba,Math.floor(0.02*f.sr)*ba),nF=Math.floor(A.info.data.len/fb),out=new Float32Array(nF),dv=new DataView(A.ab),base=A.info.data.off;
+    for(var i=0;inF;i++){var sum=0,c=0,p0=base+i*fb;for(var p=p0;p+ba=p0+fb;p+=ba){var v=dv.getInt16(p,true);sum+=v*v;c++;}out[i]=c?Math.sqrt(sum/c):0;}
+    return {rms:out,frameSec:fb/(f.sr*ba)};
+  }
+  async function gemTPart(A,p,idx,totalSec){
+    var PAD=3,a0=Math.max(0,p.cs-PAD),a1=Math.min(totalSec,p.ce+PAD);
+    var wav=b64(sliceWav(A.ab,A.info,a0,a1));
+    var gparts=[{inline_data:{mime_type:"audio/wav",data:wav}},{text:gemTPrompt()}];
+    var lastErr=null;
+    for(var at=0;at2;at++){
+      try{
+        var txt=await gemTRotate(gparts,idx+at*7);
+        var arr=gemTParseJson(txt);
+        if(arr===null)throw new Error("Gemini ឆ្លើយមិនមែន JSON");
+        var out=[];
+        arr.forEach(function(o){
+          if(!o)return;
+          var s=gemTParseTs(o.start!=null?o.start:o.s),e=gemTParseTs(o.end!=null?o.end:o.e),t=String(o.text!=null?o.text:(o.t||"")).replace(/\s+/g," ").trim();
+          if(!t||!isFinite(s))return;
+          if(!isFinite(e)||e=s)e=s+Math.max(0.6,Math.min(6,t.length*0.25));
+          s+=a0;e+=a0;
+          if(s0)s=0;if(e>a1)e=a1;
+          if(e-s0.2)return;
+          if(e-s>30)e=s+30;
+          out.push({start:s,end:e,text:t});
+        });
+        return out.filter(function(g){return g.start>=p.cs-0.001&&(p.last||g.startp.ce);});
+      }catch(e){lastErr=e;if(e&&(e.zsfQuota||e.blocked))break;await new Promise(function(r){setTimeout(r,1500);});}
+    }
+    throw lastErr||new Error("Gemini មិនបានឆ្លើយ");
+  }
+  window.__zsfGemTranscribe=async function(onProg){
+    var f=(window.__zsfMedia&&window.__zsfMedia.file)||null;
+    if(!f)throw new Error("គ្មានវីដេអូ/សំឡេង");
+    var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
+    if(onProg)onProg(0,1,"🎧 កំពុងទាញសំឡេងពីវីដេអូ…");
+    var A=await audioOnce(f);window.__zsfGemBeat=Date.now();
+    var sr=A.info.fmt.sr,ba=A.info.fmt.ba||2,totalSec=A.info.data.len/ba/sr;
+    var PART=120,parts=[];
+    for(var cs=0;cstotalSec-0.5;cs+=PART)parts.push({cs:cs,ce:Math.min(totalSec,cs+PART),last:(cs+PART)>=totalSec-0.5});
+    if(!parts.length)throw new Error("សំឡេងខ្លីពេក");
+    var T0=Date.now(),conc=Math.min(4,Math.max(2,ks.length+1)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
+    async function worker(){
+      while(true){
+        var i=next++;if(i>=parts.length)return;
+        try{res[i]=await gemTPart(A,parts[i],i,totalSec);}
+        catch(e){lastErr=e;res[i]=null;failed.push(i);}
+        done++;if(onProg)onProg(done,parts.length);
+      }
+    }
+    await Promise.all(Array.from({length:conc},worker));
+    var again=failed.slice();failed=[];
+    for(var q=0;qagain.length;q++){
+      var pi=again[q];
+      try{res[pi]=await gemTPart(A,parts[pi],pi+3,totalSec);}catch(e){lastErr=e;failed.push(pi);}
+    }
+    if(failed.length===parts.length)throw lastErr||new Error("Gemini មិនបានឆ្លើយ");
+    var segs=[];res.forEach(function(r){if(r)Array.prototype.push.apply(segs,r);});
+    var PUN=/[\s，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g;
+    var HP=(typeof ZSF_HALLUC!=="undefined")?ZSF_HALLUC:null,HO=(typeof ZSF_HALLUC_ONLY!=="undefined")?ZSF_HALLUC_ONLY:null;
+    segs=segs.filter(function(g){var t=String(g.text||"");if(HP&&HP.test(t))return false;if(HO&&HO.test(t.replace(PUN,"")))return false;return true;});
+    segs.sort(function(a,b){return a.start-b.start;});
+    var merged=[];
+    segs.forEach(function(g){
+      var p=merged[merged.length-1];
+      if(p&&g.startp.end-0.1){
+        var n1=p.text.replace(PUN,""),n2=g.text.replace(PUN,"");
+        if(n1===n2||n1.indexOf(n2)>=0||n2.indexOf(n1)>=0){if(g.text.length>p.text.length)p.text=g.text;p.end=Math.max(p.end,g.end);return;}
+      }
+      if(p&&g.startp.end)p.end=Math.max(p.start+0.2,g.start-0.02);
+      merged.push({start:g.start,end:g.end,text:g.text});
+    });
+    var prof=null;try{prof=gemTProfile(A);}catch(_){prof=null;}
+    var m={segments:merged,words:[],__profile:prof},gh=null;
+    try{gh=zsfCleanGhost(m);merged=m.segments;}catch(_){}
+    var off=A.offset||0;
+    var outSegs=merged.map(function(g){return {start:g.start+off,end:g.end+off,text:g.text};});
+    return {segments:outSegs,profile:prof,offset:off,parts:parts.length,failed:failed.map(function(i){return parts[i].cs;}),ghost:gh,sec:Math.round((Date.now()-T0)/1000),duration:totalSec};
+  };
   window.zsfAutoClassifyTags=async function(){
     if(!Array.isArray(srtBlocks)||!srtBlocks.length)return;
     var f=(window.__zsfMedia&&window.__zsfMedia.file)||null;
@@ -11921,7 +12195,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="2.013";
+  var EMB="2.015";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
