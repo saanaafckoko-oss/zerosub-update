@@ -14,7 +14,7 @@
 script id="zsf-boot">
  
 (function(){
-  window.__ZSF_VER=window.__ZSF_VER||"1.004";
+  window.__ZSF_VER=window.__ZSF_VER||"1.008";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 
@@ -2913,7 +2913,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 label class="zkt-xc" style="display:none">input type="checkbox" id="zkt_x_video" checked/>span>🎬 ផ្គុំជាវីដេអូ/span>/label>
 label class="zkt-xc">input type="checkbox" id="zkt_x_mute" checked/>span>🔇 បិទសំឡេងដើម/span>/label>
 /div>
-div class="zkt-xorig" id="zkt_x_origrow" style="display:none">div class="zkt-xr">label for="zkt_x_origvol">🎼 សំឡេង Background (ពេលមិនអាន)/label>b id="zkt_x_ovt">100%/b>/div>input type="range" id="zkt_x_origvol" min="0" max="100" step="5" value="100"/>div class="zkt-xr">label for="zkt_x_duck">🗣️ Background ពេល TTS កំពុងអាន/label>b id="zkt_x_duckt">30%/b>/div>input type="range" id="zkt_x_duck" min="0" max="100" step="5" value="30"/>label class="zkt-xc" style="margin-top:6px">input type="checkbox" id="zkt_x_vr"/>span>🎤 កាត់សំឡេងតួអង្គចេញ (Beta)/span>/label>/div>
+div class="zkt-xorig" id="zkt_x_origrow" style="display:none">div class="zkt-xr">label for="zkt_x_origvol">🎼 សំឡេង Background (ពេលមិនអាន)/label>b id="zkt_x_ovt">100%/b>/div>input type="range" id="zkt_x_origvol" min="0" max="100" step="5" value="100"/>div class="zkt-xr">label for="zkt_x_duck">🗣️ Background ពេល TTS កំពុងអាន/label>b id="zkt_x_duckt">0%/b>/div>input type="range" id="zkt_x_duck" min="0" max="100" step="5" value="0"/>label class="zkt-xc" style="margin-top:6px">input type="checkbox" id="zkt_x_vr"/>span>🎤 កាត់សំឡេងតួអង្គចេញ (Beta)/span>/label>/div>
 div class="zkt-xnote">💡 ធីក «ផ្គុំជាវីដេអូ» = យកវីដេអូដែលដាក់នៅប្រអប់ខាងលើ ផ្គុំជាមួយសំឡេងខ្មែរ។ ធីក «បិទសំឡេងដើម» = សំឡេងចិនដើមនឹងមិនលាយចូលទេ។ ការនាំចេញចំណាយពេលស្មើនឹងប្រវែងវីដេអូ — កុំចាកចេញពីទំព័រ ឬបិទអេក្រង់។/div>
 /div>
 button class="btn-3d btn-full zkt-run" id="zkt_ext_run" type="button" style="margin-bottom:8px">📥🎬 Export ជាមួយ SRT ខ្មែរពីខាងក្រៅ/button>
@@ -3379,10 +3379,10 @@ async function synthEdge(text,s){
    })(),30000,ctl);
   }catch(e){
    if(n===2)throw new Error(e&&e.message==="timeout"?"Worker ឆ្លើយតបយឺតពេក (30 វិនាទី) — Microsoft Edge TTS ប្រហែលមិនដំណើរការ":"ភ្ជាប់ Worker មិនបាន (ពិនិត្យ URL និងអ៊ីនធឺណិត)");
-   await sleep(600);continue;
+   await sleep(1500);continue;
   }
   if(out.ok)return out.ab;
-  if(out.status>=500&&n2){await sleep(600);continue}
+  if(out.status>=500&&n2){await sleep(1500);continue}
   throw new Error("Worker/Edge បរាជ័យ HTTP "+out.status+(out.msg?" — "+out.msg:""));
  }
 }
@@ -3401,12 +3401,12 @@ async function synth(text,s){
    })(),30000,ctl);
   }catch(e){
    if(n===2)throw new Error(e&&e.message==="timeout"?"Azure ឆ្លើយតបយឺតពេក (30 វិនាទី)":"បណ្តាញមានបញ្ហា ឬ Region/CORS មិនត្រឹមត្រូវ");
-   await sleep(600);continue;
+   await sleep(1500);continue;
   }
   if(out.ok)return out.ab;
   if(out.status===401||out.status===403)throw new Error("Key ឬ Region មិនត្រឹមត្រូវ (HTTP "+out.status+")");
   if(out.status===429){if(n===2)throw new Error("លើសកូតា/ហៅញឹកពេក (429)");await sleep(2500*(n+1));continue}
-  if(out.status>=500&&n2){await sleep(600);continue}
+  if(out.status>=500&&n2){await sleep(1500);continue}
   throw new Error("Azure បរាជ័យ HTTP "+out.status);
  }
 }
@@ -3620,7 +3620,7 @@ async function runAll(quiet){
   var __tT0=Date.now();var cues=await getCues();var sigNow=cueSig(cues);if(!cues.length)throw new Error("គ្មានអត្ថបទសម្រាប់អាន");if(!inc.some(Boolean))throw new Error("សូមបើកយ៉ាងហោចណាស់មួយតួអង្គ ([✓]) ជាមុន");
   var sr=24000,total=Math.ceil(((cues[cues.length-1].end/1000)+3)*sr);
   if(total>sr*3600*1.5)throw new Error("វីដេអូវែងពេក (លើស ១.៥ ម៉ោង) សូមបំបែក SRT");
-  segsTmp=[];var master=new Float32Array(total),over=0,fail=0,skipped=0,cursor=0,fastN=0,longIds=[],pushedN=0,PUSHMAX=2.0;try{var __pm=parseFloat(localStorage.getItem("zsf_tts_push"));if(__pm>=0&&__pm=5)PUSHMAX=__pm}catch(_){}
+  segsTmp=[];var master=new Float32Array(total),over=0,fail=0,skipped=0,cursor=0,fastN=0,longIds=[],pushedN=0,PUSHMAX=0.5;/* ពីមុន 2.0វិ = ឃ្លាបន្ទាប់ត្រូវរុញយឺតរហូត 2វិ បើឃ្លាមុនវែង (ខ្មែរវែងជាងចិន) → សំឡេងមិនត្រូវមាត់តួ */try{var __pm=parseFloat(localStorage.getItem("zsf_tts_push"));if(__pm>=0&&__pm=5)PUSHMAX=__pm}catch(_){}
   var results=new Array(cues.length),nextPlace=0,nextJob=0,doneN=0,fatal=null,throttleUntil=0,jobs=[];
   var CONC=10;try{var cv=parseInt(localStorage.getItem("zsf_tts_conc"),10);if(cv>=1&&cv=12)CONC=cv}catch(_){}
   for(var i0=0;i0cues.length;i0++){if(!inc[cues[i0].tag-1]){results[i0]=false;skipped++}else jobs.push(i0)}
@@ -4154,7 +4154,7 @@ async function exportVideoFast(master,sr,mute,ov){
    var shF=fitGet("shift"),sg=lastSegs.map(function(x){return[Math.max(0,x[0]+shF),Math.max(0,x[1]+shF)]}).sort(function(a,b){return a[0]-b[0]}),mg=[];
    sg.forEach(function(x){var l=mg[mg.length-1];if(l&&x[0]-l[1]0.8)l[1]=Math.max(l[1],x[1]);else mg.push([x[0],x[1]])});
    mg.forEach(function(x){
-    var last=pts[pts.length-1][0],a=Math.max(last,x[0]-0.15),b=x[1]+0.25,e=Math.max(b,a+0.12);
+    var last=pts[pts.length-1][0],a=Math.max(last,x[0]-0.30),b=x[1]+0.40,e=Math.max(b,a+0.12);
     pts.push([a,bg],[a+0.12,dk],[e,dk],[e+0.35,bg]);
    });
   }
@@ -4221,7 +4221,7 @@ async function exportVideoFast(master,sr,mute,ov){
    while(enc.encodeQueueSize>6)await sleep(4);
    var pc=3+(n0+n)/total*87;
    prog(pc,"⚡ កំពុងរៀបសំឡេង "+fmtT((n0+n)/OUT)+" / "+fmtT(dur));
-   if((n0/B)%4===3)await sleep(0);
+   await sleep(0);
   }
   await enc.flush();
   if(encErr)throw encErr;
@@ -4337,7 +4337,7 @@ async function exportVideo(master,sr,mute,ov){
    var t0=ac.currentTime-off,bgv=ov/100,dkv2=duckPct/100,sg=lastSegs.map(function(x){return[Math.max(0,x[0]+shS),Math.max(0,x[1]+shS)]}).sort(function(a,b){return a[0]-b[0]}),mg=[];
    sg.forEach(function(x){var l=mg[mg.length-1];if(l&&x[0]-l[1]0.8)l[1]=Math.max(l[1],x[1]);else mg.push([x[0],x[1]])});
    var gp=ogN.gain,tn=ac.currentTime;gp.cancelScheduledValues(0);gp.setValueAtTime(bgv,tn);
-   mg.forEach(function(x){var a=Math.max(tn,t0+x[0]-0.15),b=t0+x[1]+0.25;if(b=tn)return;
+   mg.forEach(function(x){var a=Math.max(tn,t0+x[0]-0.30),b=t0+x[1]+0.40;if(b=tn)return;
     gp.setValueAtTime(bgv,a);gp.linearRampToValueAtTime(dkv2,a+0.12);gp.setValueAtTime(dkv2,Math.max(b,a+0.12));gp.linearRampToValueAtTime(bgv,Math.max(b,a+0.12)+0.35)});
   }catch(e){}}
   tmr=setInterval(function(){
@@ -4693,8 +4693,8 @@ function init(){
   })();
   (function(){
    var v=$("zkt_x_video"),m=$("zkt_x_mute"),o=$("zkt_x_origvol"),row=$("zkt_x_origrow");if(!v||!m||!o||!row)return;
-   try{var a=localStorage.getItem("zsf_x_video"),b=localStorage.getItem("zsf_x_mute"),c=localStorage.getItem("zsf_x_bg");v.checked=true; if(b!=null)m.checked=b==="1";if(c!=null&&c!=="")o.value=c;var dk0=$("zkt_x_duck"),d0=localStorage.getItem("zsf_x_duck1");if(dk0&&d0!=null&&d0!=="")dk0.value=d0}catch(_){}
-   function sync(){row.style.display=m.checked?"none":"flex";try{localStorage.setItem("zsf_x_video",v.checked?"1":"0");localStorage.setItem("zsf_x_mute",m.checked?"1":"0");localStorage.setItem("zsf_x_bg",String(o.value));var dk=$("zkt_x_duck");if(dk)localStorage.setItem("zsf_x_duck1",String(dk.value))}catch(_){}var t1=$("zkt_x_ovt"),t2=$("zkt_x_duckt"),dk2=$("zkt_x_duck");if(t1)t1.textContent=o.value+"%";if(t2&&dk2)t2.textContent=dk2.value+"%"}
+   try{var a=localStorage.getItem("zsf_x_video"),b=localStorage.getItem("zsf_x_mute"),c=localStorage.getItem("zsf_x_bg");v.checked=true; if(b!=null)m.checked=b==="1";if(c!=null&&c!=="")o.value=c;var dk0=$("zkt_x_duck"),d0=localStorage.getItem("zsf_x_duck3");if(dk0&&d0!=null&&d0!=="")dk0.value=d0}catch(_){}
+   function sync(){row.style.display=m.checked?"none":"flex";try{localStorage.setItem("zsf_x_video",v.checked?"1":"0");localStorage.setItem("zsf_x_mute",m.checked?"1":"0");localStorage.setItem("zsf_x_bg",String(o.value));var dk=$("zkt_x_duck");if(dk)localStorage.setItem("zsf_x_duck3",String(dk.value))}catch(_){}var t1=$("zkt_x_ovt"),t2=$("zkt_x_duckt"),dk2=$("zkt_x_duck");if(t1)t1.textContent=o.value+"%";if(t2&&dk2)t2.textContent=dk2.value+"%"}
    v.onchange=sync;m.onchange=sync;o.oninput=sync;o.onchange=sync;var dk3=$("zkt_x_duck");if(dk3){dk3.oninput=sync;dk3.onchange=sync}sync();
    try{var vrc=$("zkt_x_vr");if(vrc){vrc.checked=localStorage.getItem("zsf_x_vr")==="1";vrc.onchange=function(){try{localStorage.setItem("zsf_x_vr",vrc.checked?"1":"0")}catch(_){}}}}catch(_){}
    var dt0=$("zkt_deftag");if(dt0)dt0.addEventListener("change",function(){pvRender()});
@@ -11224,7 +11224,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
           out.push({start:s,end:e,text:t});
         });
         return out.filter(function(g){return g.start>=p.cs-0.001&&(p.last||g.startp.ce);});
-      }catch(e){lastErr=e;if(e&&(e.zsfQuota||e.blocked))break;await new Promise(function(r){setTimeout(r,700);});}
+      }catch(e){lastErr=e;if(e&&(e.zsfQuota||e.blocked))break;await new Promise(function(r){setTimeout(r,1500);});}
     }
     throw lastErr||new Error("Gemini មិនបានឆ្លើយ");
   }
@@ -11238,7 +11238,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     var PART=120,parts=[];
     for(var cs=0;cstotalSec-0.5;cs+=PART)parts.push({cs:cs,ce:Math.min(totalSec,cs+PART),last:(cs+PART)>=totalSec-0.5});
     if(!parts.length)throw new Error("សំឡេងខ្លីពេក");
-    var T0=Date.now(),conc=Math.min(6,Math.max(3,ks.length*2+1)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
+    var T0=Date.now(),conc=Math.min(4,Math.max(2,ks.length+1)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
     async function worker(){
       while(true){
         var i=next++;if(i>=parts.length)return;
@@ -11497,7 +11497,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"1.004",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"1.008",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -12203,7 +12203,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.004";
+  var EMB="1.008";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
