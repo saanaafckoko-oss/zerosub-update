@@ -14,7 +14,7 @@
 script id="zsf-boot">
  
 (function(){
-  window.__ZSF_VER=window.__ZSF_VER||"1.018";
+  window.__ZSF_VER=window.__ZSF_VER||"1.019";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 
@@ -9375,7 +9375,7 @@ function buildDubbingSafeSegments(rawSegments, allWords, hints) {
       const combinedDur = weMs(p.words[p.words.length-1]) - wsMs(line.words[0]);
       const tinyPrev = cCount(textOf(line.words))  MIN_CHARS;
        
-      const softGap = PAUSE_MS; /* V1.018: slider គឺកម្រិតពិត — ឈប់ស្ងៀម ≥ slider ត្រូវកាត់ជានិច្ច */
+      const softGap = (line.kind === 'P') ? Math.round(PAUSE_MS*5/3) : PAUSE_MS;
       const canJoin = p.whole && line.whole && line.kind !== 'S' && line.kind !== 'H' && line.gapAfter  softGap &&
                       combinedChars = MERGE_MAX_CHARS && combinedDur = MAX_DURATION_MS;
        
@@ -9385,7 +9385,7 @@ function buildDubbingSafeSegments(rawSegments, allWords, hints) {
       const prevTxt = textOf(line.words);
       const shortJoin = p.whole && line.whole && line.kind === 'P' && cCount(prevTxt) = 4 && !/^[哈啊呵嘿哎嗯呀哦哇唉喂]+$/.test(prevTxt.replace(/[，、,。！？!?；：;:…\s]/g,'')) &&
                         line.gapAfter  1100 && combinedChars = MAX_CLAUSE_CHARS && combinedDur = MAX_DURATION_MS;    
-      if(canJoin || tinyJoin || tinyNext){ line.words.push(...p.words); line.kind = p.kind; line.gapAfter = p.gapAfter; }
+      if(canJoin || tinyJoin || shortJoin || tinyNext){ line.words.push(...p.words); line.kind = p.kind; line.gapAfter = p.gapAfter; }
       else { flushLine(); line = {words:[...p.words], kind:p.kind, whole:p.whole, gapAfter:p.gapAfter}; }
     }
     flushLine();
@@ -11572,7 +11572,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"1.018",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"1.019",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -12278,7 +12278,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.018";
+  var EMB="1.019";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
