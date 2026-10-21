@@ -3301,7 +3301,7 @@ function persist(){syncAuto();try{localStorage.setItem("zsf_khmer_tts_v1",JSON.s
 var audMode=false;
 function st(m,p){m=String(m==null?"":m).split(" • ").filter(function(x){return !/Auto|នៅតែវែង|ប្រើសំឡេងតួ|ឃ្លាលេខ|\[\d\]×/.test(x)}).join(" • ");if(/^\s*✅/.test(m))m="";$("zkt_stat").textContent=m;if(p!=null)$("zkt_bar").style.width=p+"%";if(audMode){var as=$("zkt_astat"),ab=$("zkt_abar");if(as)as.textContent=m;if(ab&&p!=null)ab.style.width=p+"%"}}
 var LBL={hm:"Volume High + Mid %",pitch:"ខ្ពស់ទាប (Pitch)",bass:"កម្រិតបាស (Bass)",speed:"ល្បឿន (Speed)",vol:"កម្រិតសំឡេង (Volume)",echo:"អេកូ (Echo)",auto:"Auto Speed % (ប្រើដូចគ្នាទាំង ៤ តួ)"};
-var ORD=["pitch","bass","speed","vol","echo","auto","hm"];
+var ORD=["hm","pitch","bass","speed","vol","echo","auto"];
 function cfgOf(k){return CFG.filter(function(x){return x.k===k})[0]}
 function eqShort(k){var t=String(EQN[k]||k).replace(/\s*\(.*$/,""),m=t.split(" ");if(m.length>1&&!/[\u1780-\u17FFA-Za-z0-9]/.test(m[0]))m.shift();return m.join(" ")}
 function nmOf(i){var n=S[i]&&S[i].name;n=n?String(n).trim():"";return n||("តួអង្គ ["+(i+1)+"]")}
@@ -3341,10 +3341,10 @@ function drawCtl(){
  ORD.forEach(function(k){var c=cfgOf(k);if(!c)return;if(k==="auto"&&cur>0){h+='div class="zpv-f zpv-fc">div class="zpv-lh">label>span class="zpv-li">'+ICO[k]+'/span>Auto Speed %/label>/div>div class="zpv-st">span class="zpv-v">b>🔗 តាម [1] = '+Math.round(autoG())+'%/b>/span>/div>/div>';return}
   var v=Math.round(s[k]*10)/10;
   var dv=defS(cur)[k],rs=(Math.round(dv*10)/10!==v)?'button type="button" class="zpv-rs" data-k="'+k+'" data-d="0" title="ត្រឡប់ទៅលំនាំដើម">↺ '+fmt(k,dv)+'/button>':'';
-  h+='div class="zpv-f zpv-fc'+(k==="hm"?" zpv-wide":"")+'">div class="zpv-lh">label>span class="zpv-li">'+ICO[k]+'/span>'+LBL[k]+'/label>'+rs+'/div>div class="zpv-st">button type="button" data-k="'+k+'" data-d="-1"'+(v=c.a?" disabled":"")+'>−/button>span class="zpv-v">b>'+fmt(k,v)+'/b>/span>button type="button" data-k="'+k+'" data-d="1"'+(v>=c.b?" disabled":"")+'>+/button>/div>input type="range" class="zpv-rg" data-k="'+k+'" min="'+c.a+'" max="'+c.b+'" step="'+c.s+'" value="'+v+'" aria-label="'+LBL[k]+'">/div>';
+  h+='div class="zpv-f zpv-fc'+""+'">div class="zpv-lh">label>span class="zpv-li">'+ICO[k]+'/span>'+LBL[k]+'/label>'+rs+'/div>div class="zpv-st">button type="button" data-k="'+k+'" data-d="-1"'+(v=c.a?" disabled":"")+'>−/button>span class="zpv-v">b>'+fmt(k,v)+'/b>/span>button type="button" data-k="'+k+'" data-d="1"'+(v>=c.b?" disabled":"")+'>+/button>/div>input type="range" class="zpv-rg" data-k="'+k+'" min="'+c.a+'" max="'+c.b+'" step="'+c.s+'" value="'+v+'" aria-label="'+LBL[k]+'">/div>';
  });
+ h+='div class="zpv-f">label>EQ Preset/label>div class="zpv-sel">select id="zkt_eq">'+Object.keys(EQN).map(function(k){return 'option value="'+k+'"'+(k===s.eq?" selected":"")+'>'+EQN[k]+'/option>'}).join("")+'/select>/div>/div>';
  h+='div class="zpv-f zpv-wide">label>🎭 Preset តួអង្គ (ជ្រើស → កំណត់ស្វ័យប្រវត្តិ)/label>div class="zpv-sel">select id="zkt_role">option value="">— ជ្រើសរើស —/option>'+ROLEG.map(function(g){return 'optgroup label="'+g.t+'">'+g.l.map(function(r){return 'option value="'+r[0]+'">'+r[1]+'/option>'}).join("")+'/optgroup>'}).join("")+'/select>/div>/div>';
- h+='div class="zpv-f zpv-wide">label>EQ Preset/label>div class="zpv-sel">select id="zkt_eq">'+Object.keys(EQN).map(function(k){return 'option value="'+k+'"'+(k===s.eq?" selected":"")+'>'+EQN[k]+'/option>'}).join("")+'/select>/div>/div>';
  var CL0=(s.clone===undefined||s.clone===null||isNaN(+s.clone))?1:+s.clone;
  h+='div class="zpv-f zpv-wide">label>ភាពថ្លា និងខ្យល់ ដូចសំឡេងគំរូ/label>div class="zpv-sel">select id="zkt_clone">'+[["0","បិទ"],["0.5","ស្រាល (50%)"],["1","ដូចគំរូ (100%)"]].map(function(o){return 'option value="'+o[0]+'"'+(+o[0]===CL0?" selected":"")+'>'+o[1]+'/option>'}).join("")+'/select>/div>/div>';
  $("zkt_ctl").innerHTML=h;
@@ -3638,6 +3638,23 @@ function availFor(arr,i){
  return Math.max(dur*0.6,0.3,dur-mg)+sp;
 }
 function zsfLead(){try{var e=document.getElementById("zkt_x_lead"),v=e?parseFloat(e.value):NaN;if(v>=0&&v=2)return v}catch(_){}try{var q=parseFloat(localStorage.getItem("zsf_x_lead"));if(q>=0&&q=2)return q}catch(_){}return 0.5}
+
+/* V1.018: Smart Ducking តាមសំឡេងខ្មែរពិតៗ (ដូច sidechaincompress: attack 150ms, release 200ms) */
+function zsfVoicePts(master,sr,bg,dk,shift){
+ var pts=[[0,bg]];try{
+  var hop=Math.max(1,Math.round(sr*0.01)),n=Math.floor(master.length/hop),act=new Uint8Array(n),thr=0.003;
+  for(var h=0;hn;h++){var a=h*hop,e=a+hop,sum=0;for(var k=a;ke;k++){var v=master[k];sum+=v*v}act[h]=Math.sqrt(sum/hop)>thr?1:0}
+  var segs=[],i=0,bridge=25;
+  while(in){if(!act[i]){i++;continue}var st=i,en=i,gap=0;
+   while(in){if(act[i]){en=i;gap=0}else{gap++;if(gap>bridge)break}i++}
+   segs.push([st*0.01,(en+1)*0.01])}
+  var ATT=0.15,REL=0.20;
+  segs.forEach(function(x){
+   var a=Math.max(pts[pts.length-1][0],x[0]+shift-ATT),b=Math.max(a+ATT,x[1]+shift);
+   pts.push([a,bg],[a+ATT,dk],[b,dk],[b+REL,bg]);
+  });
+ }catch(e){}
+ return pts}
 function zsfDuckMG(){return zsfLead()+0.4+0.35+0.12+0.05}
 function spillGet(){try{var v=parseFloat(localStorage.getItem("zsf_tts_spill"));if(v>=0&&v=2)return v}catch(_){}return 0.15}
 var busy=false,lastMaster=null,lastSr=24000,lastSig="",lastSegs=[],segsTmp=null;
@@ -4188,14 +4205,7 @@ async function exportVideoFast(master,sr,mute,ov){
   }
   var duckPct=0;try{var dkv=parseFloat($("zkt_x_duck").value);if(dkv>=0&&dkv=100)duckPct=dkv}catch(e){}
   var bg=ov/100,dk=duckPct/100,pts=[[0,bg]];
-  if(orig&&lastSegs&&lastSegs.length){
-   var shF=fitGet("shift"),sg=lastSegs.map(function(x){return[Math.max(0,x[0]+shF),Math.max(0,x[1]+shF)]}).sort(function(a,b){return a[0]-b[0]}),mg=[];
-   sg.forEach(function(x){var l=mg[mg.length-1];if(l&&x[0]-l[1]zsfDuckMG())l[1]=Math.max(l[1],x[1]);else mg.push([x[0],x[1]])});
-   mg.forEach(function(x){
-    var last=pts[pts.length-1][0],a=Math.max(last,x[0]-zsfLead()),b=x[1]+0.40,e=Math.max(b,a+0.12);
-    pts.push([a,bg],[a+0.12,dk],[e,dk],[e+0.35,bg]);
-   });
-  }
+  if(orig){pts=zsfVoicePts(master,sr,bg,dk,fitGet("shift"))  }
   var frames=[],asc=null,encErr=null;
   enc=new AudioEncoder({
    output:function(c,m){
@@ -4372,12 +4382,10 @@ async function exportVideo(master,sr,mute,ov){
   var shS=fitGet("shift"),bmax=Math.max(0,buf.duration-0.01);
   if(shS>=0)ts.start(ac.currentTime+shS,Math.min(off,bmax));else ts.start(0,Math.min(off-shS,bmax));
    
-  if(ogN&&lastSegs&&lastSegs.length){try{
-   var t0=ac.currentTime-off,bgv=ov/100,dkv2=duckPct/100,sg=lastSegs.map(function(x){return[Math.max(0,x[0]+shS),Math.max(0,x[1]+shS)]}).sort(function(a,b){return a[0]-b[0]}),mg=[];
-   sg.forEach(function(x){var l=mg[mg.length-1];if(l&&x[0]-l[1]zsfDuckMG())l[1]=Math.max(l[1],x[1]);else mg.push([x[0],x[1]])});
-   var gp=ogN.gain,tn=ac.currentTime;gp.cancelScheduledValues(0);gp.setValueAtTime(bgv,tn);
-   mg.forEach(function(x){var a=Math.max(tn,t0+x[0]-zsfLead()),b=t0+x[1]+0.40;if(b=tn)return;
-    gp.setValueAtTime(bgv,a);gp.linearRampToValueAtTime(dkv2,a+0.12);gp.setValueAtTime(dkv2,Math.max(b,a+0.12));gp.linearRampToValueAtTime(bgv,Math.max(b,a+0.12)+0.35)});
+  if(ogN){try{
+   var t0=ac.currentTime-off,bgv=ov/100,dkv2=duckPct/100,tn=ac.currentTime,pp=zsfVoicePts(master,sr,bgv,dkv2,shS);
+   var gp=ogN.gain;gp.cancelScheduledValues(0);gp.setValueAtTime(bgv,tn);
+   pp.forEach(function(q){var tt=t0+q[0];if(tt=tn)return;gp.linearRampToValueAtTime(q[1],tt)});
   }catch(e){}}
   tmr=setInterval(function(){
    var cur=v.currentTime||0,p=Math.min(97,3+cur/dur*94);
@@ -11765,7 +11773,7 @@ html body #zkt_card .zpv-fc{margin:0;padding:10px 10px 8px;border-radius:16px;ba
 #zkt_card .zpv-li{display:inline-flex;vertical-align:-3px;margin-right:6px;color:var(--accent-glow,#00e5ff)}
 #zkt_card .zpv-li .zpv-i{width:14px;height:14px}
 html body #zkt_card .zpv-fc .zpv-st{height:40px}
-html body #zkt_card input.zpv-rg{display:block;width:100%;height:22px;margin:8px 0 0;padding:0;border:0;background:transparent;box-shadow:none;accent-color:var(--accent-glow,#00e5ff);-webkit-appearance:auto;appearance:auto}
+html body #zkt_card input.zpv-rg{display:none!important}.zpv-rg{display:block;width:100%;height:22px;margin:8px 0 0;padding:0;border:0;background:transparent;box-shadow:none;accent-color:var(--accent-glow,#00e5ff);-webkit-appearance:auto;appearance:auto}
 #zkt_card .zpv-star .zpv-i{width:20px;height:20px;color:var(--accent-glow,#00e5ff)}
 /style>
 style id="zsf-v107-admbar">
