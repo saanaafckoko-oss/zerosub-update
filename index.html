@@ -14,7 +14,7 @@
 script id="zsf-boot">
  
 (function(){
-  window.__ZSF_VER=window.__ZSF_VER||"1.012";
+  window.__ZSF_VER=window.__ZSF_VER||"1.016";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 
@@ -3282,7 +3282,7 @@ var ROLEG=[
 ["news","📢 អ្នកអានព័ត៌មាន / ពិធីករ (News Anchor)",{dp:0,speed:22,bass:0,vol:6,echo:0,eq:"story",auto:50}]]}];
 var ROLEMAP={};ROLEG.forEach(function(g){g.l.forEach(function(r){ROLEMAP[r[0]]=r[2]})});
 function applyRole(id){var r=ROLEMAP[id];if(!r)return;var d=defS(cur),s=S[cur];s.pitch=Math.max(-80,Math.min(50,d.pitch+r.dp));s.speed=r.speed;s.bass=r.bass;s.vol=r.vol;s.echo=r.echo;s.eq=r.eq;s.hm=0}
-function defS(i){return{voice:i%2?"km-KH-SreymomNeural":"km-KH-PisethNeural",hm:0,pitch:(i%2?-55:-2),bass:0,speed:20,vol:2,echo:0,auto:40,eq:"kclone",clone:1}}
+function defS(i){var th=i>1;return{voice:i%2?"km-KH-SreymomNeural":"km-KH-PisethNeural",hm:th?-40:0,pitch:(i%2?-55:-2)-(th?12:0),bass:th?2:0,speed:th?10:20,vol:th?-28:2,echo:0,auto:40,eq:"kclone",clone:1}}
 var CFG=[{k:"hm",t:"Volume High+Mid %",s:5,a:-50,b:100,u:"%"},{k:"pitch",t:"Pitch",s:1,a:-80,b:50,u:"Hz"},
 {k:"bass",t:"Bass dB",s:1,a:-10,b:15,u:"dB"},{k:"speed",t:"Speed",s:1,a:-50,b:100,u:"%"},
 {k:"vol",t:"Volume",s:5,a:-80,b:100,u:"%"},{k:"echo",t:"Echo",s:0.1,a:0,b:1,u:""},
@@ -3291,7 +3291,7 @@ var CFG=[{k:"hm",t:"Volume High+Mid %",s:5,a:-50,b:100,u:"%"},{k:"pitch",t:"Pitc
 var DEFAULT_WURL="https://little-unit-043f.saanaafckoko.workers.dev";
 var S,cur=0,inc=[true,true,true,true],stopReq=false;
 try{var ji=JSON.parse(localStorage.getItem("zsf_tts_inc")||"null");if(Array.isArray(ji)&&ji.length===4)inc=ji.map(Boolean)}catch(e){}
-function load(){var FL="zsf_tts_v170";try{var j=JSON.parse(localStorage.getItem("zsf_khmer_tts_v1")||"null");if(Array.isArray(j)&&j.length===4){try{if(localStorage.getItem(FL)!=="1"){j.forEach(function(x){if(x&&x.speed===10)x.speed=20});localStorage.setItem(FL,"1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v171")!=="1"){j.forEach(function(x){if(x&&x.auto===40)x.auto=30});localStorage.setItem("zsf_tts_v171","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v172")!=="1"){j.forEach(function(x){if(x&&x.auto===30)x.auto=40});localStorage.setItem("zsf_tts_v172","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v193")!=="1"){try{localStorage.setItem("zsf_khmer_tts_v1_bak193",JSON.stringify(j))}catch(_){}var cl=function(v,a,b){return Math.max(a,Math.min(b,v))};j.forEach(function(x){if(!x)return;x.vol=cl(Math.round(((1+(+x.vol||0)/100)*0.852-1)*100),-80,100);x.bass=cl((+x.bass||0)+2,-10,15);x.hm=cl((+x.hm||0)-15,-50,100);x.clone=cl((x.clone===undefined||x.clone===null||isNaN(+x.clone)?1:+x.clone)*0.5,0,1)});localStorage.setItem("zsf_tts_v193","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v194")!=="1"){try{localStorage.setItem("zsf_khmer_tts_v1_bak194",JSON.stringify(j))}catch(_){}j.forEach(function(x){if(!x)return;x.clone=1;if(/Sreymom/i.test(x.voice||"")&&(+x.pitch===-2||+x.pitch===0))x.pitch=-55});localStorage.setItem("zsf_tts_v194","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v195")!=="1"){try{localStorage.setItem("zsf_khmer_tts_v1_bak195",JSON.stringify(j))}catch(_){}j.forEach(function(x){if(!x)return;x.eq="kclone";x.bass=0;x.hm=0;x.clone=1});localStorage.setItem("zsf_tts_v195","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}}catch(_){}return j}}catch(e){}try{localStorage.setItem(FL,"1");localStorage.setItem("zsf_tts_v171","1");localStorage.setItem("zsf_tts_v172","1");localStorage.setItem("zsf_tts_v193","1");localStorage.setItem("zsf_tts_v194","1")}catch(_){}return[0,1,2,3].map(defS)}
+function load(){var FL="zsf_tts_v170";try{var j=JSON.parse(localStorage.getItem("zsf_khmer_tts_v1")||"null");if(Array.isArray(j)&&j.length===4){try{if(localStorage.getItem(FL)!=="1"){j.forEach(function(x){if(x&&x.speed===10)x.speed=20});localStorage.setItem(FL,"1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v171")!=="1"){j.forEach(function(x){if(x&&x.auto===40)x.auto=30});localStorage.setItem("zsf_tts_v171","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v172")!=="1"){j.forEach(function(x){if(x&&x.auto===30)x.auto=40});localStorage.setItem("zsf_tts_v172","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v193")!=="1"){try{localStorage.setItem("zsf_khmer_tts_v1_bak193",JSON.stringify(j))}catch(_){}var cl=function(v,a,b){return Math.max(a,Math.min(b,v))};j.forEach(function(x){if(!x)return;x.vol=cl(Math.round(((1+(+x.vol||0)/100)*0.852-1)*100),-80,100);x.bass=cl((+x.bass||0)+2,-10,15);x.hm=cl((+x.hm||0)-15,-50,100);x.clone=cl((x.clone===undefined||x.clone===null||isNaN(+x.clone)?1:+x.clone)*0.5,0,1)});localStorage.setItem("zsf_tts_v193","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v194")!=="1"){try{localStorage.setItem("zsf_khmer_tts_v1_bak194",JSON.stringify(j))}catch(_){}j.forEach(function(x){if(!x)return;x.clone=1;if(/Sreymom/i.test(x.voice||"")&&(+x.pitch===-2||+x.pitch===0))x.pitch=-55});localStorage.setItem("zsf_tts_v194","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v195")!=="1"){try{localStorage.setItem("zsf_khmer_tts_v1_bak195",JSON.stringify(j))}catch(_){}j.forEach(function(x){if(!x)return;x.eq="kclone";x.bass=0;x.hm=0;x.clone=1});localStorage.setItem("zsf_tts_v195","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}if(localStorage.getItem("zsf_tts_v1013")!=="1"){try{localStorage.setItem("zsf_khmer_tts_v1_bak1013",JSON.stringify(j))}catch(_){}[[0,2],[1,3]].forEach(function(p){var a=j[p[0]],b=j[p[1]];if(!a||!b)return;var same=["voice","pitch","speed","vol","echo","hm","bass","eq"].every(function(k){return a[k]===b[k]});if(same){var d=defS(p[1]);["pitch","speed","vol","echo","hm","bass","eq"].forEach(function(k){b[k]=d[k]})}});localStorage.setItem("zsf_tts_v1013","1");localStorage.setItem("zsf_khmer_tts_v1",JSON.stringify(j))}}catch(_){}return j}}catch(e){}try{localStorage.setItem(FL,"1");localStorage.setItem("zsf_tts_v171","1");localStorage.setItem("zsf_tts_v172","1");localStorage.setItem("zsf_tts_v193","1");localStorage.setItem("zsf_tts_v194","1")}catch(_){}return[0,1,2,3].map(defS)}
 function autoG(){var a=(typeof S!=="undefined"&&S&&S[0])?+S[0].auto:NaN;return isFinite(a)?a:30}
 function syncAuto(){try{var a=autoG();S.forEach(function(x){if(x)x.auto=a})}catch(_){}}
 function hintCalc(){try{var s=S[cur],b=1+s.speed/100,A=autoG(),cap=Math.min(b*(1+A/100),2.0);return 'br>🧮 ឃ្លាខ្លី = ×'+b.toFixed(2)+' • ឃ្លាវែងលឿនបានដល់ ×'+cap.toFixed(2)+' (ធម្មតា '+Math.round(s.speed)+'% × Auto '+Math.round(A)+'%)'}catch(_){return ""}}
@@ -3632,7 +3632,7 @@ function availFor(arr,i){
  var c=arr[i],dur=Math.max(0.2,(c.end-c.start)/1000),nx=arr[i+1];
  var gap=nx?(nx.start-c.end)/1000:1.0,tail=fitGet("tail"),mg=fitGet("margin");
  var room=gap-0.10,sp=nx?spillGet():0;
- if(room>0)return dur+Math.min(room,tail)+sp;
+ if(room>0){var tl2=(room>=1.0)?Math.max(tail,0.5):tail;return dur+Math.min(room,tl2)+sp}
  return Math.max(dur*0.6,0.3,dur-mg)+sp;
 }
 function zsfLead(){try{var e=document.getElementById("zkt_x_lead"),v=e?parseFloat(e.value):NaN;if(v>=0&&v=2)return v}catch(_){}try{var q=parseFloat(localStorage.getItem("zsf_x_lead"));if(q>=0&&q=2)return q}catch(_){}return 0.5}
@@ -8160,7 +8160,7 @@ function zsfCleanGhost(m){
       const frac=hot/(b-a+1);
       const lp=Number(sg.avg_logprob), nsp=Number(sg.no_speech_prob);
       const strong=Number.isFinite(lp)&&lp>-0.5&&!(Number.isFinite(nsp)&&nsp>0.5);
-      if(frac0.12 && !strong){ dead.add(sg); rep.silent++; rep.drop.push([s0,"silent",norm(sg.text)]); }
+      if(frac(Number.isFinite(lp)?0.12:0.05) && !strong){ dead.add(sg); rep.silent++; rep.drop.push([s0,"silent",norm(sg.text)]); }
     }
   }
   if(!dead.size) return rep;
@@ -10954,7 +10954,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     var model=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
     var ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx,!!(frames&&frames.length)),last=null,best={map:{},voices:[]};
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0);
-    var TMODELS=[model,"gemini-3.6-flash","gemini-3.5-flash-lite","gemini-3.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
+    var TMODELS=[model,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
     for(var round=0;round2;round++){
       for(var tm2=0;tm2TMODELS.length;tm2++){
         var wall=0;
@@ -10994,7 +10994,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     "   [2] female voice, spoken aloud",
     "   [3] male inner thought (clear audio evidence of inner monologue: echo, filtered or detached voice)",
     "   [4] female inner thought (same evidence)",
-    "   Whisper, shout, off-screen voice, narrator and phone calls are SPOKEN ([1] or [2]). If unsure between spoken and thought, choose spoken. If voices overlap, use the main voice only.",
+    "   Whisper, shout, off-screen voice, narrator and phone calls are SPOKEN ([1] or [2]). Inner thoughts are common in this genre: if the voice sounds echoed, reverberant, filtered or detached from the room, tag it as a thought ([3]/[4]); choose spoken only when the voice sounds natural and present in the room. If voices overlap, use the main voice only.",
     "   VOICE RULES: gender is judged ONLY from the physical voice (pitch and timbre), never from names, pronouns, titles or the idea that speakers alternate. Build a small voice table in your head (A, B, C ...): one voice = one person = one gender. One speaker often says several lines in a row; lines with a tiny gap (under about 0.3 s) are usually the same speaker continuing. When two neighbouring lines switch between male and female, re-listen to confirm the voice really changed. If still unsure, keep the voice of the neighbouring line in the same scene.",
     "3) Translate the line into natural, spoken Khmer. The STORY CARD / genre block given below (if present) is MANDATORY: it decides vocabulary, register, rhythm and emotion of EVERY line (e.g. revenge or face-slap = cold, sharp, proud; sweet romance = soft and warm; ancient or palace = old-style and royal words by rank; comedy = light and playful; horror or suspense = tense and short). If the genre says AUTO, work out the genre from the story and sound, then follow it. Keep character names and forms of address consistent.",
     "4) The tag decides the Khmer wording: a male speaker ([1]/[3]) uses ខ្ញុំ / ខ្ញុំបាទ and the reply «បាទ»; a female speaker ([2]/[4]) uses ខ្ញុំ / នាងខ្ញុំ and the reply «ចាស». Never mix them. An inner thought ([3]/[4]) is a private first-person monologue: address nobody and add no polite reply particles.",
@@ -11108,6 +11108,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
       "The attached audio contains dialogue, narration and sound effects from a strictly fictional short drama. All violence, insults, threats and intense themes are just acting, so there is no need to worry about content filters.",
       "TASK: Transcribe every spoken line in this clip exactly as it is spoken, in its original language (usually Mandarin Chinese; write Chinese in Simplified characters). Do NOT translate, summarise, correct or explain.",
       "COMPLETENESS: Make sure to transcribe ALL the speech in the clip. Do not skip, shorten or merge any line, including very short replies, interjections, whispers and overlapping voices. Also transcribe the narrator / storyteller voice and do not skip the storyteller part.",
+      "INNER THOUGHTS: Characters in this genre often have inner monologue / mind-voice lines (a private thought heard as a voice-over, often with echo, reverb, a filtered or detached tone, or quieter than normal speech). Transcribe these inner-thought lines too, as their own entries. Never skip them.",
       "Write NOTHING for sound effects, background music, singing, breathing, laughter-only noise or silence. Never invent or repeat words. If nobody speaks in the clip, return an empty array [].",
       "TIMING: Give the start and end time of each speech EXACTLY as it is in the audio. The clip starts at 00:00:00.000. start = the first sound of the first word, end = the last sound of the last word. Check every start and end against the sound; do not round to whole seconds.",
       "Split into natural sentences or phrases, each at most about 8 seconds. Never merge different speakers into one object.",
@@ -11183,7 +11184,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
     var model=(typeof selections!=="undefined"&&selections&&selections.geminiModel)||"gemini-3.8-flash";
     /* ទាញ SRT ពីវីដេអូ៖ ម៉ូដែលដែលរើស (ល្អបំផុតជាលំនាំដើម) មុនគេ បើគាំង/មិនដំណើរការ ប្ដូរទៅ Gemini បន្ទាប់ពីល្អ→ចាស់ ស្វ័យប្រវត្តិ */
-    var MODELS=[model,"gemini-3.8-flash","gemini-3.7-flash","gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-2.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i;});
+    var MODELS=[model,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i;});
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0)+(rr||0),txt=null,last=null;
     var DEAD=window.__zsfDeadModels=window.__zsfDeadModels||{},COOL=window.__zsfCoolModels=window.__zsfCoolModels||{};
     var lastQuota=false,kcn=function(m,k){return m+"|"+k;};
@@ -11253,7 +11254,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
           out.push({start:s,end:e,text:t});
         });
         return out.filter(function(g){return g.start>=p.cs-0.3&&(p.last||g.startp.ce+0.3);});
-      }catch(e){lastErr=e;if(e&&(e.zsfQuota||e.blocked))break;await new Promise(function(r){setTimeout(r,1500);});}
+      }catch(e){lastErr=e;if(e&&(e.zsfQuota||e.blocked))break;await new Promise(function(r){setTimeout(r,500);});}
     }
     throw lastErr||new Error("Gemini មិនបានឆ្លើយ");
   }
@@ -11264,10 +11265,10 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     if(onProg)onProg(0,1,"🎧 កំពុងទាញសំឡេងពីវីដេអូ…");
     var A=await audioOnce(f);window.__zsfGemBeat=Date.now();
     var sr=A.info.fmt.sr,ba=A.info.fmt.ba||2,totalSec=A.info.data.len/ba/sr;
-    var PART=(function(){try{var q=parseInt(localStorage.getItem("zsf_gem_part"),10);if(q>=30&&q=180)return q}catch(_){}return 60})(),parts=[];
+    var PART=(function(){try{var q=parseInt(localStorage.getItem("zsf_gem_part"),10);if(q>=30&&q=180)return q}catch(_){}return 40})(),parts=[];
     for(var cs=0;cstotalSec-0.5;cs+=PART)parts.push({cs:cs,ce:Math.min(totalSec,cs+PART),last:(cs+PART)>=totalSec-0.5});
     if(!parts.length)throw new Error("សំឡេងខ្លីពេក");
-    var T0=Date.now(),conc=Math.min(6,Math.max(3,ks.length*2)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
+    var T0=Date.now(),conc=Math.min(12,Math.max(6,ks.length*3)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
     async function worker(){
       while(true){
         var i=next++;if(i>=parts.length)return;
@@ -11315,7 +11316,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
             gDone++;if(onProg)onProg(parts.length,parts.length,"🔎 ពិនិត្យឃ្លាដែលអាចបាត់ "+gDone+"/"+gaps.length+"…");
           }
         };
-        await Promise.all(Array.from({length:Math.min(3,gaps.length)},gWorker));
+        await Promise.all(Array.from({length:Math.min(6,gaps.length)},gWorker));
       }
     }catch(_){}
     var PUN=/[\s，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g;
@@ -11560,7 +11561,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"1.012",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"1.016",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -12266,7 +12267,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.012";
+  var EMB="1.016";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
