@@ -14,7 +14,7 @@
 script id="zsf-boot">
  
 (function(){
-  window.__ZSF_VER=window.__ZSF_VER||"1.14";
+  window.__ZSF_VER=window.__ZSF_VER||"1.004";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 
@@ -2743,7 +2743,7 @@ html body #fixedProgressStatus{white-space:normal!important;display:-webkit-box;
 label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfAiSeg" checked style="width:auto;margin-top:3px">span>✂️ ឱ្យ Gemini ជួយកាត់ឃ្លាតាមបែប CapCut (ត្រូវការ Gemini Key — បើមិនបានលទ្ធផល កម្មវិធីប្រើវចនានុក្រមចិនជំនួសដោយស្វ័យប្រវត្តិ)/span>/label>
 label hidden style="display:none!important">input type="checkbox" id="zsfArabicNum" style="width:auto;margin-top:3px">span>🔢 ប្តូរលេខចិន (二十, 三十万) ជាលេខឡាតាំង (20, 30万) ដូច CapCut/span>/label>
 label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfProofread" checked style="width:auto;margin-top:3px">span>✨ កែអក្សរចិនខុសតាមបរិបទដោយ Gemini (ត្រូវការ Gemini Key — មិនប៉ះពេលវេលា មិនប្តូរលេខបន្ទាត់)/span>/label>
-label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfSnapTiming" style="width:auto;margin-top:3px">span>🎯 កែពេលវេលា៖ កាត់ចំណុចស្ងាត់ចេញពីដើម/ចុងបន្ទាត់ តាមសំឡេងពិត/span>/label>
+label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;cursor:pointer">input type="checkbox" id="zsfSnapTiming" checked style="width:auto;margin-top:3px">span>🎯 កែពេលវេលា៖ កាត់ចំណុចស្ងាត់ចេញពីដើម/ចុងបន្ទាត់ តាមសំឡេងពិត/span>/label>
 label style="display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.4">span>⏱️ ទាញពេលវេលាទាំងអស់មកមុន (វិនាទី)៖/span>input type="number" id="zsfTimeShift" value="0" min="0" max="1.5" step="0.05" style="width:72px">span style="opacity:.7;font-size:12px">(0.4 = ត្រូវនឹងអក្សរដុតក្នុងវីដេអូសាកល្បង · បើបិទ 🎯 ប្រើ ~0.2 · 0 = មិនប្តូរ)/span>/label>
 div class="zpg" id="zsfPauseBox">span class="zpg-ico">⏱️/span>b class="zpg-lbl">ចន្លោះដង្ហើមកាត់ឃ្លា/b>output class="zpg-val" id="zsfPauseVal">0.30s/output>input type="range" id="zsfPauseGap" min="0.1" max="1.5" step="0.05" value="0.3" aria-label="ចន្លោះដង្ហើមកាត់ឃ្លា">div class="zpg-hint">span>តូច = កាត់ឃ្លាញឹក · ធំ = កាត់តិច/span>button type="button" id="zsfPauseReset">↺ លំនាំដើម 0.30s/button>/div>/div>
 /div>/details>
@@ -3379,10 +3379,10 @@ async function synthEdge(text,s){
    })(),30000,ctl);
   }catch(e){
    if(n===2)throw new Error(e&&e.message==="timeout"?"Worker ឆ្លើយតបយឺតពេក (30 វិនាទី) — Microsoft Edge TTS ប្រហែលមិនដំណើរការ":"ភ្ជាប់ Worker មិនបាន (ពិនិត្យ URL និងអ៊ីនធឺណិត)");
-   await sleep(1500);continue;
+   await sleep(600);continue;
   }
   if(out.ok)return out.ab;
-  if(out.status>=500&&n2){await sleep(1500);continue}
+  if(out.status>=500&&n2){await sleep(600);continue}
   throw new Error("Worker/Edge បរាជ័យ HTTP "+out.status+(out.msg?" — "+out.msg:""));
  }
 }
@@ -3401,12 +3401,12 @@ async function synth(text,s){
    })(),30000,ctl);
   }catch(e){
    if(n===2)throw new Error(e&&e.message==="timeout"?"Azure ឆ្លើយតបយឺតពេក (30 វិនាទី)":"បណ្តាញមានបញ្ហា ឬ Region/CORS មិនត្រឹមត្រូវ");
-   await sleep(1500);continue;
+   await sleep(600);continue;
   }
   if(out.ok)return out.ab;
   if(out.status===401||out.status===403)throw new Error("Key ឬ Region មិនត្រឹមត្រូវ (HTTP "+out.status+")");
   if(out.status===429){if(n===2)throw new Error("លើសកូតា/ហៅញឹកពេក (429)");await sleep(2500*(n+1));continue}
-  if(out.status>=500&&n2){await sleep(1500);continue}
+  if(out.status>=500&&n2){await sleep(600);continue}
   throw new Error("Azure បរាជ័យ HTTP "+out.status);
  }
 }
@@ -3639,7 +3639,7 @@ async function runAll(quiet){
      }
     }
    }catch(_){}
-   var o=Math.floor(o0*sr);
+   var o=Math.max(0,Math.floor((o0-0.03)*sr));/* 0.03 = ភាពស្ងាត់ដើមក្នុង process() */
    for(var k=0;kd.length&&o+ktotal;k++)master[o+k]+=d[k];
    cursor=o0+d.length/sr+0.04;
    if(segsTmp)segsTmp.push([Math.min(o0,c.start/1000),Math.max(o0+d.length/sr,c.end/1000)]);
@@ -4221,7 +4221,7 @@ async function exportVideoFast(master,sr,mute,ov){
    while(enc.encodeQueueSize>6)await sleep(4);
    var pc=3+(n0+n)/total*87;
    prog(pc,"⚡ កំពុងរៀបសំឡេង "+fmtT((n0+n)/OUT)+" / "+fmtT(dur));
-   await sleep(0);
+   if((n0/B)%4===3)await sleep(0);
   }
   await enc.flush();
   if(encErr)throw encErr;
@@ -4808,7 +4808,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 const FLAG_UN="🌐", FLAG_CN="🇨🇳", FLAG_GB="🇬🇧", FLAG_TH="🇹🇭", FLAG_KR="🇰🇷";
 const dict={km:{auth_desc:"សូមបញ្ចូលកូនសោ (Key) ដើម្បីដំណើរការកម្មវិធី",btn_activate:"🔑 ដំណើរការ (ACTIVATE)",btn_tele:"✈️ ទាក់ទងទិញកូនសោតាម Telegram",admin_panel_title:"គ្រប់គ្រងប្រព័ន្ធ (Admin)",sec1_title:"⭐ កំណត់ការបកប្រែ (Translation)",btn_logout:"🚪",confirm_logout:"តើអ្នកចង់ចាកចេញមែនទេ?",btn_upload_txt:"📄 📥 ទាញចូលឯកសារ SRT",lbl_keep_tags:"🎭 AI ចាប់សំឡេង ប្រុស/ស្រី/គិតក្នុងចិត្ត [1]-[4]",sec2_title:"📝 ពិនិត្យ និងបកប្រែ",btn_auto_translate:"🚀 បកប្រែដោយ AI",btn_download:"📥 ទាញយកឯកសារ (Download)",expire_prefix:"🔑 សល់",days_left:" ថ្ងៃ",expired:"⚠️ ផុតកំណត់ហើយ!",txt_key_list:"📋 បញ្ជីកូនសោអតិថិជន៖",part_info:"ទំព័រ {p} ({s} - {e})",lbl_stat_total:"បន្ទាត់សរុប",lbl_stat_trans:"បានបកប្រែ",txt_loading:"🤖 AI កំពុងបកប្រែ... សូមរង់ចាំបន្តិច!",lbl_api_btn:"⚙ កំណត់ Gemini API Key ផ្ទាល់ខ្លួន",lbl_api_title:"បញ្ចូល API Key (ឆ្លាស់គ្នាប្រើ)",link_create_api:"🔗 បង្កើត API",btn_test_api:"Test",btn_save_api:"💾 រក្សាទុក (Save)",lang_auto:"ការបកប្រែ: Auto",lang_cn:"ចិន (ZH) ➡️ ខ្មែរ",lang_en:"អង់គ្លេស (EN) ➡️ ខ្មែរ",lang_th:"ថៃ (TH) ➡️ ខ្មែរ",lang_kr:"កូរ៉េ (KR) ➡️ ខ្មែរ"},en:{auth_desc:"Please enter your Key to activate",btn_activate:"🔑 ACTIVATE",btn_tele:"✈ Contact via Telegram",admin_panel_title:"System Management (Admin)",sec1_title:"⭐ Translation Settings",btn_logout:"🚪",confirm_logout:"Do you want to logout?",btn_upload_txt:"📄 📥 Upload SRT File",lbl_keep_tags:"🎭 AI detect male/female/thought voices [1]-[4]",sec2_title:"📝 Review & Translate",btn_auto_translate:"🚀 Translate with AI",btn_download:"📥 Download SRT File",expire_prefix:"🔑 ",days_left:" Days Left",expired:"⚠️ Expired!",txt_key_list:"📋 Generated Keys:",part_info:"Page {p} ({s} - {e})",lbl_stat_total:"Total Lines",lbl_stat_trans:"Translated",txt_loading:"🤖 AI Translating... Please wait!",lbl_api_btn:"⚙ Gemini API Key Settings",lbl_api_title:"Enter API Keys (Rotation)",link_create_api:"🔗 Create API",btn_test_api:"Test",btn_save_api:"💾 Save Keys",lang_auto:"Translate: Auto",lang_cn:"Chinese (ZH) ➡️ Khmer",lang_en:"English (EN) ➡️ Khmer",lang_th:"Thai (TH) ➡️ Khmer",lang_kr:"Korean (KR) ➡️ Khmer"}};
 const selectOptions={geminiModel:[
-{value:"gemini-3.8-flash",text:"⚡ Gemini 3.8 Flash (លឿន & ឆ្លាត)"},{value:"gemini-3.7-flash",text:"⚡ Gemini 3.7 Flash"},{value:"gemini-3.6-flash",text:"⚡ Gemini 3.6 Flash"},{value:"gemini-3.5-flash",text:"⚡ Gemini 3.5 Flash"},{value:"gemini-3.5-flash-lite",text:"🍃 Gemini 3.5 Flash-Lite"},{value:"gemini-3.1-flash-lite",text:"🍃 Gemini 3.1 Flash-Lite"},{value:"gemini-2.5-flash",text:"⏳ Gemini 2.5 Flash"}],languageFrom:[{value:"ស្វ័យប្រវត្តិ",text:"ការបកប្រែ: Auto",flag:FLAG_UN},{value:"ភាសាចិន",text:"ចិន (ZH) ➡️ ខ្មែរ",flag:FLAG_CN},{value:"ភាសាអង់គ្លេស",text:"អង់គ្លេស (EN) ➡️ ខ្មែរ",flag:FLAG_GB},{value:"ភាសាថៃ",text:"ថៃ (TH) ➡️ ខ្មែរ",flag:FLAG_TH},{value:"ភាសាកូរ៉េ",text:"កូរ៉េ (KR) ➡️ ខ្មែរ",flag:FLAG_KR}],genre:[
+{value:"gemini-3.8-flash",text:"⭐ Gemini 3.8 Flash (ល្អបំផុត • ណែនាំ)"},{value:"gemini-3.7-flash",text:"⚡ Gemini 3.7 Flash"},{value:"gemini-3.6-flash",text:"⚡ Gemini 3.6 Flash"},{value:"gemini-3.5-flash",text:"⚡ Gemini 3.5 Flash"},{value:"gemini-3.5-flash-lite",text:"🍃 Gemini 3.5 Flash-Lite"},{value:"gemini-3.1-flash-lite",text:"🍃 Gemini 3.1 Flash-Lite"},{value:"gemini-2.5-flash",text:"⏳ Gemini 2.5 Flash"}],languageFrom:[{value:"ស្វ័យប្រវត្តិ",text:"ការបកប្រែ: Auto",flag:FLAG_UN},{value:"ភាសាចិន",text:"ចិន (ZH) ➡️ ខ្មែរ",flag:FLAG_CN},{value:"ភាសាអង់គ្លេស",text:"អង់គ្លេស (EN) ➡️ ខ្មែរ",flag:FLAG_GB},{value:"ភាសាថៃ",text:"ថៃ (TH) ➡️ ខ្មែរ",flag:FLAG_TH},{value:"ភាសាកូរ៉េ",text:"កូរ៉េ (KR) ➡️ ខ្មែរ",flag:FLAG_KR}],genre:[
 {value:"AUTO",text:"🤖 ស្វ័យប្រវត្តិ — AI ចាប់ប្រភេទរឿងពី SRT (ណែនាំ)"},
 {value:"វាយមុខ/សងសឹក",text:"🔥 វាយមុខ/សងសឹក (Revenge)"},
 {value:"ឆ្លងភពពីបុរាណមកសម័យថ្មី",text:"🌀 ឆ្លងភព (បុរាណ ➡ សម័យទំនើប)"},
@@ -8563,7 +8563,8 @@ function zsfSnapToSpeech(subs,prof,offsetSec){
   const sm=new Float32Array(N);                    
   for(let i=0;iN;i++){let s=0,c=0;for(let k=-2;k=2;k++){const j=i+k;if(j>=0&&jN){s+=R[j];c++;}}sm[i]=s/c;}
   let changed=0;
-  for(const sub of subs){
+  for(let si=0;sisubs.length;si++){
+    const sub=subs[si];
     const s=Number(sub.start)/1000-off, e=Number(sub.end)/1000-off;
     if(!(e>s)) continue;
     const fs=Math.max(0,Math.floor(s/F)), fe=Math.min(N-1,Math.floor(e/F));
@@ -8576,6 +8577,12 @@ function zsfSnapToSpeech(subs,prof,offsetSec){
     const lead=(a-fs)*F, trail=(fe-b)*F;
     let ns=s, ne=e;
     if(lead>=0.35) ns=Math.min(s+4,Math.max(s,a*F-0.08));
+    else if(a===fs){
+      /* សំឡេងនិយាយចាប់ផ្តើមហើយ មុនពេលបន្ទាត់ចាប់ផ្តើម = ពេលវេលាយឺត → ទាញមកត្រង់ដើមសំឡេងពិត (មិនលើស 0.35វិ ហើយមិនជាន់បន្ទាត់មុន) */
+      const prevE=si>0?Number(subs[si-1].end)/1000-off:0, lim=Math.max(0,fs-Math.round(0.35/F));
+      let j=fs; while(j>lim&&sm[j-1]>=thr) j--;
+      if(jfs&&j>lim){ const cand=Math.max(prevE+0.02,j*F+0.02); if(cands-0.03) ns=cand; }
+    }
     if(trail>=0.5) ne=Math.max(e-4,Math.min(e,b*F+0.25));
     if(ne-ns0.4) continue;
     if(ns!==s||ne!==e){ sub.start=(ns+off)*1000; sub.end=(ne+off)*1000; changed++; }
@@ -11119,7 +11126,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
       if(!txt.trim()){
         var why=(d.promptFeedback&&d.promptFeedback.blockReason)||cand.finishReason||"";
         if(why&&/SAFETY|PROHIBITED|BLOCK|OTHER|RECITATION/i.test(why)){var be=new Error("Gemini រារាំង ("+why+")");be.blocked=true;be.status=0;throw be;}
-        return "[]";
+        var ee=new Error("Gemini ឆ្លើយទទេ");ee.status=503;throw ee;
       }
       return txt;
     }finally{clearTimeout(tm);}
@@ -11145,8 +11152,9 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
   }
   async function gemTRotate(parts,rr){
     var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
-    var model=(typeof selections!=="undefined"&&selections&&selections.geminiModel)||"gemini-flash-latest";
-    var MODELS=[model,"gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-2.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i;});
+    var model=(typeof selections!=="undefined"&&selections&&selections.geminiModel)||"gemini-3.8-flash";
+    /* ទាញ SRT ពីវីដេអូ៖ ម៉ូដែលដែលរើស (ល្អបំផុតជាលំនាំដើម) មុនគេ បើគាំង/មិនដំណើរការ ប្ដូរទៅ Gemini បន្ទាប់ពីល្អ→ចាស់ ស្វ័យប្រវត្តិ */
+    var MODELS=[model,"gemini-3.8-flash","gemini-3.7-flash","gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-2.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i;});
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0)+(rr||0),txt=null,last=null;
     var DEAD=window.__zsfDeadModels=window.__zsfDeadModels||{},COOL=window.__zsfCoolModels=window.__zsfCoolModels||{};
     var lastQuota=false,kcn=function(m,k){return m+"|"+k;};
@@ -11157,7 +11165,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
           var kk=ks[(start+n)%ks.length],kid=kcn(md,kk);
           if(DEAD[kid]&&DEAD[kid]>Date.now())continue;
           if(COOL[kid]&&COOL[kid]>Date.now())continue;
-          try{if(window.__zsfG)window.__zsfG.calls=(window.__zsfG.calls||0)+1;txt=await gemTCall(parts,kk,md);break;}
+          try{if(window.__zsfG)window.__zsfG.calls=(window.__zsfG.calls||0)+1;txt=await gemTCall(parts,kk,md);if(md!==model&&window.__zsfGemSwitchMsg!==md){window.__zsfGemSwitchMsg=md;toastS("🔄 Gemini \""+model+"\" មិនដំណើរការ — ប្ដូរទៅ "+md+" ស្វ័យប្រវត្តិ",true);}break;}
           catch(e){
             last=e;var sc=e&&e.status,msg=String((e&&e.message)||"");
             if(e&&e.blocked)break;
@@ -11216,7 +11224,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
           out.push({start:s,end:e,text:t});
         });
         return out.filter(function(g){return g.start>=p.cs-0.001&&(p.last||g.startp.ce);});
-      }catch(e){lastErr=e;if(e&&(e.zsfQuota||e.blocked))break;await new Promise(function(r){setTimeout(r,1500);});}
+      }catch(e){lastErr=e;if(e&&(e.zsfQuota||e.blocked))break;await new Promise(function(r){setTimeout(r,700);});}
     }
     throw lastErr||new Error("Gemini មិនបានឆ្លើយ");
   }
@@ -11230,7 +11238,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     var PART=120,parts=[];
     for(var cs=0;cstotalSec-0.5;cs+=PART)parts.push({cs:cs,ce:Math.min(totalSec,cs+PART),last:(cs+PART)>=totalSec-0.5});
     if(!parts.length)throw new Error("សំឡេងខ្លីពេក");
-    var T0=Date.now(),conc=Math.min(4,Math.max(2,ks.length+1)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
+    var T0=Date.now(),conc=Math.min(6,Math.max(3,ks.length*2+1)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
     async function worker(){
       while(true){
         var i=next++;if(i>=parts.length)return;
@@ -11489,7 +11497,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"1.12",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"1.004",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -12195,7 +12203,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="2.015";
+  var EMB="1.004";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
