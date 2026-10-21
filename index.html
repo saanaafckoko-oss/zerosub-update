@@ -14,7 +14,7 @@
 script id="zsf-boot">
  
 (function(){
-  window.__ZSF_VER=window.__ZSF_VER||"1.008";
+  window.__ZSF_VER=window.__ZSF_VER||"1.009";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 
@@ -3510,12 +3510,12 @@ async function getCues(){
    var tg=/^\s*\[([1-4])\]/.exec(normTags(tx))||/^\s*\[([1-4])\]/.exec(normTags(String(b.text||"")));
    return{id:b.id,start:tms(p[0]),end:tms(p[1]),text:tx,tag:tg?+tg[1]:1}});
  }
- var out=[],counts=[0,0,0,0],untagged=0;
+ var out=[],counts=[0,0,0,0],untagged=0;window.__zsfDropIds=[];
  raw.forEach(function(c){
   var r=splitSegs(c.text,isFile?def:(c.tag||1));
   if(!r.found)untagged++;
   var segs=r.segs.map(function(sg){return{tag:sg.tag,text:sg.text.replace(/\s+/g," ").trim()}}).filter(function(sg){return sg.text});
-  if(!segs.length)return;
+  if(!segs.length){try{window.__zsfDropIds.push(c.id)}catch(_){}return}
   var total=0;segs.forEach(function(sg){sg.len=Math.max(1,Array.from(sg.text.replace(/[\s,.!?;:។៕"'“”()\-]/g,"")).length);total+=sg.len});
   var dur=Math.max(0,c.end-c.start),cum=0;
   segs.forEach(function(sg,k){
@@ -3620,10 +3620,10 @@ async function runAll(quiet){
   var __tT0=Date.now();var cues=await getCues();var sigNow=cueSig(cues);if(!cues.length)throw new Error("គ្មានអត្ថបទសម្រាប់អាន");if(!inc.some(Boolean))throw new Error("សូមបើកយ៉ាងហោចណាស់មួយតួអង្គ ([✓]) ជាមុន");
   var sr=24000,total=Math.ceil(((cues[cues.length-1].end/1000)+3)*sr);
   if(total>sr*3600*1.5)throw new Error("វីដេអូវែងពេក (លើស ១.៥ ម៉ោង) សូមបំបែក SRT");
-  segsTmp=[];var master=new Float32Array(total),over=0,fail=0,skipped=0,cursor=0,fastN=0,longIds=[],pushedN=0,PUSHMAX=0.5;/* ពីមុន 2.0វិ = ឃ្លាបន្ទាប់ត្រូវរុញយឺតរហូត 2វិ បើឃ្លាមុនវែង (ខ្មែរវែងជាងចិន) → សំឡេងមិនត្រូវមាត់តួ */try{var __pm=parseFloat(localStorage.getItem("zsf_tts_push"));if(__pm>=0&&__pm=5)PUSHMAX=__pm}catch(_){}
+  segsTmp=[];var master=new Float32Array(total),over=0,fail=0,skipped=0,cursor=0,fastN=0,longIds=[],pushedN=0,skipIds=[],failIds=[],PUSHMAX=0.5;/* ពីមុន 2.0វិ = ឃ្លាបន្ទាប់ត្រូវរុញយឺតរហូត 2វិ បើឃ្លាមុនវែង (ខ្មែរវែងជាងចិន) → សំឡេងមិនត្រូវមាត់តួ */try{var __pm=parseFloat(localStorage.getItem("zsf_tts_push"));if(__pm>=0&&__pm=5)PUSHMAX=__pm}catch(_){}
   var results=new Array(cues.length),nextPlace=0,nextJob=0,doneN=0,fatal=null,throttleUntil=0,jobs=[];
   var CONC=10;try{var cv=parseInt(localStorage.getItem("zsf_tts_conc"),10);if(cv>=1&&cv=12)CONC=cv}catch(_){}
-  for(var i0=0;i0cues.length;i0++){if(!inc[cues[i0].tag-1]){results[i0]=false;skipped++}else jobs.push(i0)}
+  for(var i0=0;i0cues.length;i0++){if(!inc[cues[i0].tag-1]){results[i0]=false;skipped++;skipIds.push(cues[i0].id)}else jobs.push(i0)}
   var place=function(i){
    var r=results[i];results[i]=null;if(!r)return;
    var c=cues[i],s=S[c.tag-1],av=r.av,d=r.data;
@@ -3658,7 +3658,7 @@ async function runAll(quiet){
     if(fatal||stopReq)return;
     var kk=nextJob++;if(kk>=jobs.length)return;
     var i=jobs[kk],c=cues[i],s=S[c.tag-1],av=availFor(cues,i),r=null;
-    for(var tr=0;tr4;tr++){
+    for(var tr=0;tr6;tr++){
      if(fatal||stopReq)return;
      var w=throttleUntil-Date.now();if(w>0)await sleep(w);
      try{r=await renderSeg(c.text,s,av);break}
@@ -3666,11 +3666,11 @@ async function runAll(quiet){
       var msg=(e&&e.message)||"";window.__zsfLastTtsErr=String(msg||e).slice(0,160);
       if(/429/.test(msg)){throttleUntil=Date.now()+4000*(tr+1);continue}
       if(/Key|កូតា|Worker URL/.test(msg)){fatal=e;return}
-      if(tr2){await sleep(800);continue}
+      if(tr4){await sleep(1200*(tr+1));continue}
       console.warn("cue "+c.id,e);break
      }
     }
-    if(r){r.av=av;results[i]=r}else{results[i]=false;fail++}
+    if(r){r.av=av;results[i]=r}else{results[i]=false;fail++;failIds.push(c.id)}
     doneN++;
     if(doneN===fail&&fail>=6&&!fatal)fatal=new Error("❌ អានសំឡេងមិនបាន៖ ៦ ឃ្លាដំបូងបរាជ័យទាំងអស់ — Microsoft Edge TTS (Worker) ប្រហែលមិនដំណើរការ។ សូមប្តូរទៅ «Azure (ត្រូវការ Key)» ក្នុងការកំណត់ Key ហើយសាកម្តងទៀត"+(window.__zsfLastTtsErr?"\n🔎 មូលហេតុពិត: "+window.__zsfLastTtsErr:""));
     st("កំពុងបង្កើត "+doneN+"/"+jobs.length,(doneN/Math.max(1,jobs.length))*100);
@@ -3690,6 +3690,7 @@ async function runAll(quiet){
   $("zkt_audio").src=url;$("zkt_audio").style.display="block";
   var a2=$("zkt_dl");a2.href=url;a2.download="khmer_tts.wav";a2.style.display="block";
   var fitNote=over?(" • ⚠️ ពិបាក fit "+over+" ឃ្លា"+(longIds.length?" (#"+longIds.slice(0,8).join(", #")+(longIds.length>8?"…":"")+")":"")):"";
+  try{var __dr=window.__zsfDropIds||[];if(failIds.length)fitNote+=" • ❌ អានមិនបាន #"+failIds.slice(0,15).join(", #")+(failIds.length>15?"…":"");if(skipIds.length)fitNote+=" • ⏭ រំលង (តួអង្គត្រូវបានបិទ) #"+skipIds.slice(0,15).join(", #")+(skipIds.length>15?"…":"");if(__dr.length)fitNote+=" • 🈳 គ្មានអត្ថបទខ្មែរ #"+__dr.slice(0,15).join(", #")+(__dr.length>15?"…":"")}catch(_){}
   if(pushedN)fitNote+=" • ↪ រុញក្រោយ "+pushedN+" ឃ្លា (កុំឲ្យសំឡេងជាន់គ្នា)";
   st("✅ ចប់រួចរាល់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+fitNote+" • ⏱ "+Math.round((Date.now()-__tT0)/1000)+" វិនាទី",100);
   try{if(!quiet)window.zsfTtsFinish&&window.zsfTtsFinish(true,"✅ អានអក្សរជាសំឡេងចប់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+(skipped?" • រំលង "+skipped:"")+fitNote)}catch(_){}
@@ -11497,7 +11498,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"1.008",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"1.009",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -12203,7 +12204,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.008";
+  var EMB="1.009";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
