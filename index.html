@@ -14,7 +14,7 @@
 script id="zsf-boot">
  
 (function(){
-  window.__ZSF_VER=window.__ZSF_VER||"2.0";
+  window.__ZSF_VER=window.__ZSF_VER||"2.1";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 
@@ -3541,7 +3541,7 @@ async function getCues(){
  raw.forEach(function(c){
   var r=splitSegs(c.text,isFile?def:(c.tag||1));
   if(!r.found)untagged++;
-  var segs=r.segs.map(function(sg){return{tag:sg.tag,text:sg.text.replace(/\s+/g," ").trim()}}).filter(function(sg){return sg.text});
+  var segs=r.segs.map(function(sg){return{tag:sg.tag,text:sg.text.replace(/\s+/g," ").trim()}}).filter(function(sg){return sg.text&&!(/[\u4E00-\u9FFF]/.test(sg.text)&&!/[\u1780-\u17FF]/.test(sg.text))});
   if(!segs.length){try{window.__zsfDropIds.push(c.id)}catch(_){}return}
   var total=0;segs.forEach(function(sg){sg.len=Math.max(1,Array.from(sg.text.replace(/[\s,.!?;:។៕"'“”()\-]/g,"")).length);total+=sg.len});
   var dur=Math.max(0,c.end-c.start),cum=0;
@@ -3736,6 +3736,20 @@ async function runAll(quiet){
   if(fatal)throw fatal;
   if(stopReq)throw new Error("⛔ បានបញ្ឈប់");
   flush();
+  /* V2.0 retry: ឃ្លាដែលអានមិនបាន (Worker ដាច់/យឺត) ព្យាយាមម្តងទៀត ៣ជុំ មុនបោះបង់ — កុំឱ្យសំឡេងចិនដើមលាន់ឡើងជំនួស */
+  try{for(var rd=0;rd3&&failIds.length&&!stopReq;rd++){
+   st("កំពុងព្យាយាមម្តងទៀត "+failIds.length+" ឃ្លាដែលអានមិនបាន…",95);
+   await sleep(3000*(rd+1));var still=[];
+   for(var fi=0;fifailIds.length;fi++){
+    if(stopReq){still.push(failIds[fi]);continue}
+    var ci=-1;for(var qq=0;qqcues.length;qq++){if(cues[qq].id===failIds[fi]){ci=qq;break}}
+    if(ci0)continue;
+    var cc=cues[ci],ss=S[cc.tag-1],av2=availFor(cues,ci),rr=null;
+    try{rr=await renderSeg(cc.text,ss,av2)}catch(e){window.__zsfLastTtsErr=String((e&&e.message)||e).slice(0,160);rr=null}
+    if(rr){rr.av=av2;results[ci]=rr;place(ci);fail--}else still.push(failIds[fi]);
+   }
+   failIds=still;
+  }}catch(e){console.warn("retry-pass",e)}
   var pk=0;for(var j=0;jmaster.length;j++){var a=Math.abs(master[j]);if(a>pk)pk=a}
   if(pk>1){var m=0.98/pk;for(var j2=0;j2master.length;j2++)master[j2]*=m}
   lastMaster=master;lastSegs=segsTmp||[];lastSr=sr;lastSig=sigNow;okRun=true;try{if($("zkt_src").value==="file")pvMark(longIds)}catch(_){}
@@ -3743,7 +3757,7 @@ async function runAll(quiet){
   $("zkt_audio").src=url;$("zkt_audio").style.display="block";
   var a2=$("zkt_dl");a2.href=url;a2.download="khmer_tts.wav";a2.style.display="block";
   var fitNote=over?(" • ⚠️ ពិបាក fit "+over+" ឃ្លា"+(longIds.length?" (#"+longIds.slice(0,8).join(", #")+(longIds.length>8?"…":"")+")":"")):"";
-  try{var __dr=window.__zsfDropIds||[];if(failIds.length)fitNote+=" • ❌ អានមិនបាន #"+failIds.slice(0,15).join(", #")+(failIds.length>15?"…":"");if(skipIds.length)fitNote+=" • ⏭ រំលង (តួអង្គត្រូវបានបិទ) #"+skipIds.slice(0,15).join(", #")+(skipIds.length>15?"…":"");if(__dr.length)fitNote+=" • 🈳 គ្មានអត្ថបទខ្មែរ #"+__dr.slice(0,15).join(", #")+(__dr.length>15?"…":"")}catch(_){}
+  try{var __dr=window.__zsfDropIds||[];if(failIds.length)fitNote+=" • ❌ អានមិនបាន #"+failIds.slice(0,15).join(", #")+(failIds.length>15?"…":"");if(skipIds.length)fitNote+=" • ⏭ រំលង (តួអង្គត្រូវបានបិទ) #"+skipIds.slice(0,15).join(", #")+(skipIds.length>15?"…":"");if(__dr.length)fitNote+=" • ⚠️ មិនទាន់បកប្រែជាខ្មែរ (នៅជាអក្សរចិន — សំឡេងចិនដើមនឹងឮ) #"+__dr.slice(0,15).join(", #")+(__dr.length>15?"…":"")}catch(_){}
   if(pushedN)fitNote+=" • ↪ រុញក្រោយ "+pushedN+" ឃ្លា (កុំឲ្យសំឡេងជាន់គ្នា)";
   st("✅ ចប់រួចរាល់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+fitNote+" • ⏱ "+Math.round((Date.now()-__tT0)/1000)+" វិនាទី",100);
   try{if(!quiet)window.zsfTtsFinish&&window.zsfTtsFinish(true,"✅ អានអក្សរជាសំឡេងចប់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+(skipped?" • រំលង "+skipped:"")+fitNote)}catch(_){}
@@ -11580,7 +11594,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"2.0",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"2.1",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -12286,7 +12300,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="2.0";
+  var EMB="2.1";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
