@@ -14,7 +14,7 @@
 script id="zsf-boot">
  
 (function(){
-  window.__ZSF_VER=window.__ZSF_VER||"1.026";
+  window.__ZSF_VER=window.__ZSF_VER||"1.027";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 
@@ -11074,7 +11074,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     "   [2] female voice, spoken aloud",
     "   [3] male inner thought (clear audio evidence of inner monologue: echo, filtered or detached voice)",
     "   [4] female inner thought (same evidence)",
-    "   Whisper, shout, off-screen voice, narrator and phone calls are SPOKEN ([1] or [2]). Inner thoughts are common in this genre: if the voice sounds echoed, reverberant, filtered or detached from the room, tag it as a thought ([3]/[4]); choose spoken only when the voice sounds natural and present in the room. If voices overlap, use the main voice only.",
+    "   Whisper, shout, off-screen voice, narrator and phone calls are SPOKEN ([1] or [2]). If unsure between spoken and thought, choose spoken. If voices overlap, use the main voice only.",
     "   VOICE RULES: gender is judged ONLY from the physical voice (pitch and timbre), never from names, pronouns, titles or the idea that speakers alternate. Build a small voice table in your head (A, B, C ...): one voice = one person = one gender. One speaker often says several lines in a row; lines with a tiny gap (under about 0.3 s) are usually the same speaker continuing. When two neighbouring lines switch between male and female, re-listen to confirm the voice really changed. If still unsure, keep the voice of the neighbouring line in the same scene.",
     "3) Translate the line into natural, spoken Khmer. The STORY CARD / genre block given below (if present) is MANDATORY: it decides vocabulary, register, rhythm and emotion of EVERY line (e.g. revenge or face-slap = cold, sharp, proud; sweet romance = soft and warm; ancient or palace = old-style and royal words by rank; comedy = light and playful; horror or suspense = tense and short). If the genre says AUTO, work out the genre from the story and sound, then follow it. Keep character names and forms of address consistent.",
     "4) The tag decides the Khmer wording: a male speaker ([1]/[3]) uses ខ្ញុំ / ខ្ញុំបាទ and the reply «បាទ»; a female speaker ([2]/[4]) uses ខ្ញុំ / នាងខ្ញុំ and the reply «ចាស». Never mix them. An inner thought ([3]/[4]) is a private first-person monologue: address nobody and add no polite reply particles.",
@@ -11641,7 +11641,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"1.026",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"1.027",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -11887,13 +11887,12 @@ async function callRetry(path,mk,tries){
   throw e0;
 }
 function normT(t){return String(t||"").replace(/\s+/g,"").replace(/\./g,",")}
-function zsfKhOnly(out,lines){try{var src={};lines.forEach(function(l){src[normT(l.time)]=l});return out.filter(function(o){var l=src[normT(o.time)];if(!l)return true;return !(/[\u3400-\u9FFF]/.test(String(l.text||""))&&!/[\u1780-\u17FF]/.test(String(o.text||"")))})}catch(e){return out}}
 async function zsfFillPartMissing(ctx,lines,out,gl2){
   var have={};out.forEach(function(o){have[normT(o.time)]=1});
   var miss=lines.filter(function(l){return !have[normT(l.time)]});
   if(!miss.length||miss.length>=lines.length)return out;
   var res=await window.__zsfDirectAnalyze(miss,gl2,(ctx.rr=(ctx.rr||0)+1));
-  var add=res&&res.srt?zsfKhOnly(parseSRT(res.srt),lines):[];
+  var add=res&&res.srt?parseSRT(res.srt):[];
   if(!add.length)return out;
   var all=out.concat(add.filter(function(o){return !have[normT(o.time)]}));
   var order={};lines.forEach(function(l,i){order[normT(l.time)]=i});
@@ -11953,7 +11952,7 @@ async function analyzePart(ctx,lines,gl,P,tag,lo,hi,depth){
       var res=ctx.direct?await window.__zsfDirectAnalyze(lines,gl2,(ctx.rr=(ctx.rr||0)+1)):await call("/analyze",{method:"POST",headers:hdr({"Content-Type":"application/json"}),body:JSON.stringify({file:ctx.file,srt:srt,glossary:gl2})});
       var out=res&&res.srt?parseSRT(res.srt):[];
       if(!out.length)throw new Error("Gemini មិនបានផ្ញើ SRT មកវិញ");
-      out=zsfKhOnly(out,lines);if(ctx.direct){for(var fr=0;2>fr&&out.lengthlines.length;fr++){try{out=await zsfFillPartMissing(ctx,lines,out,gl2)}catch(fe){break}}}if(ctx.direct?(out.length*5>=lines.length*4):(out.length*2>lines.length))return out;
+      if(out.length*2>lines.length){if(ctx.direct&&out.lengthlines.length){try{out=await zsfFillPartMissing(ctx,lines,out,gl2)}catch(fe){}}return out;}
       throw new Error("Gemini ឆ្លើយមិនគ្រប់បន្ទាត់ ("+out.length+"/"+lines.length+")");
     }catch(e){
       err=e;
@@ -11996,10 +11995,10 @@ async function core(P,srt,tok){tok=tok||{c:false};
       ctx.file=upCache.file;P("♻️ វីដេអូបានផ្ញើរួចហើយ — មិនបាច់ផ្ញើម្តងទៀត",66);
     }else ctx.file=await uploadVideo(f,P);
     var gl="";try{gl=($("zsfGlossary")&&$("zsfGlossary").value||"").trim()}catch(e){}
-    var blocks=parseSRT(srt),groups=direct?splitGroups(blocks,60,18):splitGroups(blocks),N=groups.length,all=[];
+    var blocks=parseSRT(srt),groups=direct?splitGroups(blocks,120,40):splitGroups(blocks),N=groups.length,all=[];
     if(!N)throw new Error("មិនទាន់មាន SRT ចិន — សូមបង្កើត ឬនាំចូល SRT មុន");
      
-    var cMax=Math.max(4,Math.min(10,4+(ks.length-1)*2));try{var cv=parseInt(localStorage.getItem("zsf_gem_conc"),10);if(cv>=1&&cv=12)cMax=cv}catch(_){}var conc=direct?Math.max(1,Math.min(cMax,N)):1,results=new Array(N),nextI=0,doneN=0,active=0,creep=0,lastPc=68,note="",stop=false;
+    var conc=direct?Math.max(1,Math.min(4,N)):1,results=new Array(N),nextI=0,doneN=0,active=0,creep=0,lastPc=68,note="",stop=false;
     var label=function(){return (direct?"🤖 Gemini កំពុងស្តាប់សំឡេង និងបកប្រែ… ":"🤖 Gemini កំពុងមើលវីដេអូ និងបកប្រែ… ")+"ចប់ "+doneN+"/"+N+" ផ្នែក"+(conc>1?(" • ធ្វើ "+active+" ក្នុងពេលតែមួយ"):"")+(note?(" • "+note):"")};
     var show=function(){var pc=Math.max(lastPc,68+((doneN+creep)/N)*28);lastPc=Math.min(96,pc);P(label(),lastPc)};
     var sub=function(m){if(/^(✂️|♻️)/.test(m))note=String(m).slice(0,40)};
@@ -12348,7 +12347,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.026";
+  var EMB="1.027";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
