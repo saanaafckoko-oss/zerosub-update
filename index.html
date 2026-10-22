@@ -14,7 +14,7 @@
 script id="zsf-boot">
  
 (function(){
-  window.__ZSF_VER=window.__ZSF_VER||"1.027";
+  window.__ZSF_VER=window.__ZSF_VER||"1.020";
   try{localStorage.removeItem("zsf_pkg_html");localStorage.removeItem("zsf_pkg_ver")}catch(e){}
 })();
 
@@ -3537,9 +3537,8 @@ async function getCues(){
    var tg=/^\s*\[([1-4])\]/.exec(normTags(tx))||/^\s*\[([1-4])\]/.exec(normTags(String(b.text||"")));
    return{id:b.id,start:tms(p[0]),end:tms(p[1]),text:tx,tag:tg?+tg[1]:1}});
  }
- var out=[],counts=[0,0,0,0],untagged=0;window.__zsfDropIds=[];window.__zsfUntransIds=[];
+ var out=[],counts=[0,0,0,0],untagged=0;window.__zsfDropIds=[];
  raw.forEach(function(c){
-  try{if(!isFile&&!/[\u1780-\u17FF]/.test(String(c.text||""))&&/[\u3400-\u9FFF\u3040-\u30FF\uAC00-\uD7AF]/.test(String(c.text||""))){window.__zsfUntransIds.push(c.id);return}}catch(_){}
   var r=splitSegs(c.text,isFile?def:(c.tag||1));
   if(!r.found)untagged++;
   var segs=r.segs.map(function(sg){return{tag:sg.tag,text:sg.text.replace(/\s+/g," ").trim()}}).filter(function(sg){return sg.text});
@@ -3671,7 +3670,7 @@ async function runAll(quiet){
  if(busy)return false;var okRun=false;busy=true;stopReq=false;persist();$("zkt_dl").style.display="none";
  try{window.zsfTtsProgress&&window.zsfTtsProgress(0,"កំពុងរៀបចំអត្ថបទសម្រាប់អាន…")}catch(_){}
  try{
-  var __tT0=Date.now();try{if($("zkt_src").value!=="file"&&window.zsfEnsureAllTranslated&&typeof srtBlocks!=="undefined"&&srtBlocks.length&&srtBlocks.some(window.zsfIsChinese)){st("🧹 កំពុងបកប្រែបន្ទាត់ចិនឡើងវិញ មុនអានសំឡេង…",0);await window.zsfEnsureAllTranslated(function(m,p){st(m,p)})}}catch(e){throw e}var cues=await getCues();var sigNow=cueSig(cues);if(!cues.length)throw new Error("គ្មានអត្ថបទសម្រាប់អាន");if(!inc.some(Boolean))throw new Error("សូមបើកយ៉ាងហោចណាស់មួយតួអង្គ ([✓]) ជាមុន");
+  var __tT0=Date.now();var cues=await getCues();var sigNow=cueSig(cues);if(!cues.length)throw new Error("គ្មានអត្ថបទសម្រាប់អាន");if(!inc.some(Boolean))throw new Error("សូមបើកយ៉ាងហោចណាស់មួយតួអង្គ ([✓]) ជាមុន");
   var sr=24000,total=Math.ceil(((cues[cues.length-1].end/1000)+3)*sr);
   if(total>sr*3600*1.5)throw new Error("វីដេអូវែងពេក (លើស ១.៥ ម៉ោង) សូមបំបែក SRT");
   segsTmp=[];var master=new Float32Array(total),over=0,fail=0,skipped=0,cursor=0,fastN=0,longIds=[],pushedN=0,skipIds=[],failIds=[],PUSHMAX=0.5;/* ពីមុន 2.0វិ = ឃ្លាបន្ទាប់ត្រូវរុញយឺតរហូត 2វិ បើឃ្លាមុនវែង (ខ្មែរវែងជាងចិន) → សំឡេងមិនត្រូវមាត់តួ */try{var __pm=parseFloat(localStorage.getItem("zsf_tts_push"));if(__pm>=0&&__pm=5)PUSHMAX=__pm}catch(_){}
@@ -3717,7 +3716,7 @@ async function runAll(quiet){
      var w=throttleUntil-Date.now();if(w>0)await sleep(w);
      try{r=await renderSeg(c.text,s,av);break}
      catch(e){
-      var msg=(e&&e.message)||"";window.__zsfLastTtsErr=String(msg||e).slice(0,300);
+      var msg=(e&&e.message)||"";window.__zsfLastTtsErr=String(msg||e).slice(0,160);
       if(/429/.test(msg)){throttleUntil=Date.now()+4000*(tr+1);continue}
       if(/Key|កូតា|Worker URL/.test(msg)){fatal=e;return}
       if(tr4){await sleep(1200*(tr+1));continue}
@@ -3726,7 +3725,7 @@ async function runAll(quiet){
     }
     if(r){r.av=av;results[i]=r}else{results[i]=false;fail++;failIds.push(c.id)}
     doneN++;
-    if(doneN===fail&&fail>=6&&!fatal)fatal=new Error("❌ អានសំឡេងមិនបាន៖ "+(window.__zsfLastTtsErr?"🔎 "+window.__zsfLastTtsErr+" — ":"")+"៦ ឃ្លាដំបូងបរាជ័យទាំងអស់ — Microsoft Edge TTS (Worker) ប្រហែលមិនដំណើរការ។ សូមប្តូរទៅ «Azure (ត្រូវការ Key)» ក្នុងការកំណត់ Key ហើយសាកម្តងទៀត");
+    if(doneN===fail&&fail>=6&&!fatal)fatal=new Error("❌ អានសំឡេងមិនបាន៖ ៦ ឃ្លាដំបូងបរាជ័យទាំងអស់ — Microsoft Edge TTS (Worker) ប្រហែលមិនដំណើរការ។ សូមប្តូរទៅ «Azure (ត្រូវការ Key)» ក្នុងការកំណត់ Key ហើយសាកម្តងទៀត"+(window.__zsfLastTtsErr?"\n🔎 មូលហេតុពិត: "+window.__zsfLastTtsErr:""));
     st("កំពុងបង្កើត "+doneN+"/"+jobs.length,(doneN/Math.max(1,jobs.length))*100);
     try{window.zsfTtsProgress&&window.zsfTtsProgress((doneN/Math.max(1,jobs.length))*100,"កំពុងបង្កើតសំឡេង "+doneN+"/"+jobs.length)}catch(_){}
     flush();
@@ -3744,7 +3743,7 @@ async function runAll(quiet){
   $("zkt_audio").src=url;$("zkt_audio").style.display="block";
   var a2=$("zkt_dl");a2.href=url;a2.download="khmer_tts.wav";a2.style.display="block";
   var fitNote=over?(" • ⚠️ ពិបាក fit "+over+" ឃ្លា"+(longIds.length?" (#"+longIds.slice(0,8).join(", #")+(longIds.length>8?"…":"")+")":"")):"";
-  try{var __dr=window.__zsfDropIds||[];if(failIds.length)fitNote+=" • ❌ អានមិនបាន #"+failIds.slice(0,15).join(", #")+(failIds.length>15?"…":"");if(skipIds.length)fitNote+=" • ⏭ រំលង (តួអង្គត្រូវបានបិទ) #"+skipIds.slice(0,15).join(", #")+(skipIds.length>15?"…":"");if(__dr.length)fitNote+=" • 🈳 គ្មានអត្ថបទខ្មែរ #"+__dr.slice(0,15).join(", #")+(__dr.length>15?"…":"");var __ut=window.__zsfUntransIds||[];if(__ut.length)fitNote+=" • 🈲 រំលង (មិនទាន់បកប្រែ) #"+__ut.slice(0,15).join(", #")+(__ut.length>15?"…":"")+" — សូមចុច «ស្វែងរក និងជួសជុល» រួចអានម្តងទៀត"}catch(_){}
+  try{var __dr=window.__zsfDropIds||[];if(failIds.length)fitNote+=" • ❌ អានមិនបាន #"+failIds.slice(0,15).join(", #")+(failIds.length>15?"…":"");if(skipIds.length)fitNote+=" • ⏭ រំលង (តួអង្គត្រូវបានបិទ) #"+skipIds.slice(0,15).join(", #")+(skipIds.length>15?"…":"");if(__dr.length)fitNote+=" • 🈳 គ្មានអត្ថបទខ្មែរ #"+__dr.slice(0,15).join(", #")+(__dr.length>15?"…":"")}catch(_){}
   if(pushedN)fitNote+=" • ↪ រុញក្រោយ "+pushedN+" ឃ្លា (កុំឲ្យសំឡេងជាន់គ្នា)";
   st("✅ ចប់រួចរាល់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+fitNote+" • ⏱ "+Math.round((Date.now()-__tT0)/1000)+" វិនាទី",100);
   try{if(!quiet)window.zsfTtsFinish&&window.zsfTtsFinish(true,"✅ អានអក្សរជាសំឡេងចប់ • "+cues.length+" ប្រយោគ"+(fail?" • បរាជ័យ "+fail:"")+(skipped?" • រំលង "+skipped:"")+fitNote)}catch(_){}
@@ -4539,8 +4538,7 @@ async function exportAll(){
      await runOneClickPipeline();
      if(typeof srtBlocks==="undefined"||!srtBlocks.length)throw new Error("ដំណាក់កាល ១-២ មិនបានចប់ — "+(window.zsfPipeReason?window.zsfPipeReason():"សូមមើលសារកំហុសខាងលើ"));
      if(trMiss()&&window.zsfAutoRepairAll){st("🧹 រកឃើញបន្ទាត់មិនទាន់បកប្រែ — កំពុងជួសជុលស្វ័យប្រវត្តិ…",0);try{await window.zsfAutoRepairAll()}catch(e){}}
-     if(window.zsfEnsureAllTranslated&&srtBlocks.some(window.zsfIsChinese)){await window.zsfEnsureAllTranslated(function(m,p){st(m,p)})}
-     if(srtBlocks.some(window.zsfIsChinese))throw new Error("ការបកប្រែនៅមិនទាន់ចប់ទាំងអស់"+(window.__zsfGemErr?(" — "+window.__zsfGemErr):" — សូមចុច Export 1 Click ម្តងទៀត ដើម្បីបន្ត"));
+     if(trMiss())throw new Error("ការបកប្រែនៅមិនទាន់ចប់ទាំងអស់"+(window.__zsfGemErr?(" — "+window.__zsfGemErr):" — សូមចុច Export 1 Click ម្តងទៀត ដើម្បីបន្ត"));
      window.__zsfPipeFile=mf2;
      setSrcTab("cur");
      st("ដំណាក់កាល ៣៖ បង្កើតសំឡេងខ្មែរ…",0);
@@ -4819,7 +4817,8 @@ function init(){
     await runOneClickPipeline();
     if(!withTts)return;
     if(typeof srtBlocks==="undefined"||!srtBlocks.length)throw new Error("ដំណាក់កាល ១-២ មិនបានចប់ — "+(window.zsfPipeReason?window.zsfPipeReason():"សូមមើលសារកំហុសខាងលើ"));
-    if(window.zsfEnsureAllTranslated&&srtBlocks.some(window.zsfIsChinese)){st("🧹 រកឃើញបន្ទាត់ចិនមិនទាន់បកប្រែ — កំពុងបកប្រែឡើងវិញ…",0);await window.zsfEnsureAllTranslated(function(m,p){st(m,p)})}
+    var miss=typeof translationNeedsRepair==="function"?srtBlocks.some(translationNeedsRepair):srtBlocks.some(function(x){return !(x.trans&&String(x.trans).trim())});
+    if(miss)throw new Error("ការបកប្រែនៅមិនទាន់ចប់ទាំងអស់ — សូមបកប្រែឱ្យចប់ រួចចុច 'បង្កើតសំឡេងទាំងមូល'");
     setSrcTab("cur");
     st("ដំណាក់កាល ៣៖ បង្កើតសំឡេងខ្មែរ…",0);
     await runAll();
@@ -5946,7 +5945,7 @@ async function zsfRepairFast(items,onProgress){
   const keys=userApiKeys.filter(Boolean);
   if(!keys.length)throw new Error("សូមបញ្ចូល Gemini API Key ជាមុនសិន");
   /* V1.78: ក្រុមធំជាង (10) = prompt តិចជាង · ស្របគ្នាច្រើនជាង · ព្យាយាមអតិបរមា 2 ដងក្នុងមួយក្រុម (មិនវិលគ្រប់ Key) */
-  const SIZE=items.length<=12?3:10,ATT=2,groups=[];
+  const SIZE=10,ATT=2,groups=[];
   for(let i=0;iitems.length;i+=SIZE)groups.push(items.slice(i,i+SIZE));
   const CONC=Math.max(1,Math.min(groups.length,Math.max(4,Math.min(8,keys.length*2))));
   let next=0,done=0,fixed=0,lastErr=null;
@@ -6060,7 +6059,7 @@ window.zsfTimingText=function(){
 window.zsfAutoRepairAll=async function(){const __tRep0=Date.now();
   const keys=(Array.isArray(userApiKeys)?userApiKeys:[]).filter(Boolean);
   if(!keys.length||!srtBlocks.length)return false;
-  for(let w=0;w30&&isTranslating;w++)await new Promise(r=>setTimeout(r,500));
+  for(let w=0;w!==30&&isTranslating;w++)await new Promise(r=>setTimeout(r,500));
   if(isTranslating)return false;
   isTranslating=true;
   let lastErr=null,kept=0;
@@ -6105,66 +6104,6 @@ window.zsfAutoRepairAll=async function(){const __tRep0=Date.now();
   try{const sk=srtBlocks.filter(b=>b.repairSkip&&!String(b.trans||"").trim());if(sk.length){const ids=sk.slice(0,8).map(b=>"#"+b.id).join(", ");toggleProgressBar(true,`⚠️ រំលង ${sk.length} បន្ទាត់ដែល AI បកប្រែមិនបាន (${ids}) — សំឡេងស្ងាត់ត្រង់នេះ អ្នកអាចវាយបកប្រែដោយដៃ`,100);showToast("⚠️ បន្ទាត់ "+ids+" បកប្រែមិនបាន — បានរំលង ដើម្បីបន្តអានសំឡេង",true)}}catch(_){}
   if(left&&lastErr){try{showToast("❌ "+friendlyError(lastErr),false)}catch(_){}}
   return left===0;
-};
-
-/* V1.023: ចាប់តែបន្ទាត់ដែលនៅជាភាសាចិន/ទទេ (មិនពិនិត្យបន្ទាត់ខ្មែរដែលបកប្រែរួច) → បកប្រែឡើងវិញរហូតជោគជ័យ ទើបអានសំឡេង */
-const ZSF_CJK=/[㐀-鿿぀-ヿ가-힯]/;
-function zsfIsChinese(b){
-  const src=normalizeTranslationForCheck(String((b&&b.text)||""));
-  if(!ZSF_CJK.test(src)&&!/\p{L}/u.test(src))return false;
-  const tr=normalizeTranslationForCheck(String((b&&b.trans)||"")).trim();
-  if(!tr)return /\p{L}/u.test(src);
-  if(ZSF_CJK.test(tr))return true;
-  return !/[ក-៿]/.test(tr)&&ZSF_CJK.test(src);
-}
-window.zsfIsChinese=zsfIsChinese;
-window.zsfEnsureAllTranslated=async function(onMsg){
-  if(typeof srtBlocks==="undefined"||!srtBlocks.length)return true;
-  let miss=srtBlocks.filter(zsfIsChinese);
-  if(!miss.length)return true;
-  const keys=(Array.isArray(userApiKeys)?userApiKeys:[]).filter(Boolean);
-  if(!keys.length)throw new Error("មាន "+miss.length+" បន្ទាត់នៅជាភាសាចិន (#"+miss.slice(0,10).map(b=>b.id).join(", #")+") — សូមបញ្ចូល Gemini API Key ដើម្បីបកប្រែ");
-  for(let w=0;w30&&isTranslating;w++)await new Promise(r=>setTimeout(r,500));
-  if(isTranslating)throw new Error("កំពុងបកប្រែ — សូមរង់ចាំឱ្យចប់សិន");
-  const MAXA=10;
-  isTranslating=true;
-  try{
-    for(let att=1;att=MAXA;att++){
-      miss=srtBlocks.filter(zsfIsChinese);
-      if(!miss.length)break;
-      const ids=miss.slice(0,8).map(b=>"#"+b.id).join(" ")+(miss.length>8?" …":"");
-      const msg="🧹 រកឃើញ "+miss.length+" បន្ទាត់នៅជាភាសាចិន ("+ids+") — បកប្រែឡើងវិញ លើកទី "+att+"/"+MAXA;
-      try{toggleProgressBar(true,msg,3)}catch(_){}
-      try{onMsg&&onMsg(msg,0)}catch(_){}
-      await new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));
-      miss.forEach(b=>{b.repairFails=0;delete b.repairBest;delete b.repairSkip;});
-      try{
-        await zsfRepairFast(miss,(d,t)=>{try{toggleProgressBar(true,"🛠️ បកប្រែបន្ទាត់ចិនឡើងវិញ "+d+"/"+t+" • លើកទី "+att+"/"+MAXA,Math.max(3,Math.round(d/t*100)))}catch(_){}});
-      }catch(e){if(/401|403|api key/i.test(String((e&&e.message)||e)))throw e;}
-      srtBlocks.filter(zsfIsChinese).forEach(b=>{
-        const c=String(b.repairBest||"").trim();
-        if(c&&/[ក-៿]/.test(c)&&!ZSF_CJK.test(c)){b.trans=c;b.repairGaveUp=c;try{zsfEnforceTag(b)}catch(_){}}
-      });
-      if(srtBlocks.some(zsfIsChinese)){
-        try{await zsfFinishStuck()}catch(e){console.warn("stuck finish",e)}
-      }
-      try{renderEditor();saveData()}catch(_){}
-      if(!srtBlocks.some(zsfIsChinese))break;
-      await new Promise(r=>setTimeout(r,Math.min(6000,1200*att)));
-    }
-  }finally{
-    isTranslating=false;
-    try{renderEditor()}catch(_){}
-    try{saveData()}catch(_){}
-    try{updateLineCounts()}catch(_){}
-  }
-  const left=srtBlocks.filter(zsfIsChinese);
-  if(left.length){
-    try{toggleProgressBar(true,"⚠️ នៅសល់ "+left.length+" បន្ទាត់បកប្រែមិនបាន",100)}catch(_){}
-    throw new Error("បន្ទាត់ #"+left.slice(0,10).map(b=>b.id).join(", #")+" នៅបកប្រែមិនបាន ក្រោយព្យាយាម "+MAXA+" ដង — សូមចុចលេខបន្ទាត់ ហើយបកប្រែដោយដៃ ឬសាកម្តងទៀត");
-  }
-  try{toggleProgressBar(true,"✅ បកប្រែបន្ទាត់ចិនរួចរាល់ទាំងអស់ — ចាប់ផ្តើមអានសំឡេង",100)}catch(_){}
-  return true;
 };
 function downloadBlobFile(blob,name){
   const safeName=(String(name||"subtitle.srt").replace(/[\\/:*?">|]/g,"_").trim()||"subtitle.srt");
@@ -11074,7 +11013,7 @@ html body #fixedProgressFn{gap:5px;flex-wrap:nowrap}
     "   [2] female voice, spoken aloud",
     "   [3] male inner thought (clear audio evidence of inner monologue: echo, filtered or detached voice)",
     "   [4] female inner thought (same evidence)",
-    "   Whisper, shout, off-screen voice, narrator and phone calls are SPOKEN ([1] or [2]). If unsure between spoken and thought, choose spoken. If voices overlap, use the main voice only.",
+    "   Whisper, shout, off-screen voice, narrator and phone calls are SPOKEN ([1] or [2]). Inner thoughts are common in this genre: if the voice sounds echoed, reverberant, filtered or detached from the room, tag it as a thought ([3]/[4]); choose spoken only when the voice sounds natural and present in the room. If voices overlap, use the main voice only.",
     "   VOICE RULES: gender is judged ONLY from the physical voice (pitch and timbre), never from names, pronouns, titles or the idea that speakers alternate. Build a small voice table in your head (A, B, C ...): one voice = one person = one gender. One speaker often says several lines in a row; lines with a tiny gap (under about 0.3 s) are usually the same speaker continuing. When two neighbouring lines switch between male and female, re-listen to confirm the voice really changed. If still unsure, keep the voice of the neighbouring line in the same scene.",
     "3) Translate the line into natural, spoken Khmer. The STORY CARD / genre block given below (if present) is MANDATORY: it decides vocabulary, register, rhythm and emotion of EVERY line (e.g. revenge or face-slap = cold, sharp, proud; sweet romance = soft and warm; ancient or palace = old-style and royal words by rank; comedy = light and playful; horror or suspense = tense and short). If the genre says AUTO, work out the genre from the story and sound, then follow it. Keep character names and forms of address consistent.",
     "4) The tag decides the Khmer wording: a male speaker ([1]/[3]) uses ខ្ញុំ / ខ្ញុំបាទ and the reply «បាទ»; a female speaker ([2]/[4]) uses ខ្ញុំ / នាងខ្ញុំ and the reply «ចាស». Never mix them. An inner thought ([3]/[4]) is a private first-person monologue: address nobody and add no polite reply particles.",
@@ -11641,7 +11580,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"1.027",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"1.020",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -12347,7 +12286,7 @@ window.zsfVideoPoster=function(v){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.027";
+  var EMB="1.020";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
