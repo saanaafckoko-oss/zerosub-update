@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"2.7";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"2.9";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -628,21 +628,7 @@ body:not(.zf-admin) #zfAdm{display:none!important}
 header>h1 class="zf-brand">span class="zf-logo" role="img" aria-label="ZERO FLASH">/span>span class="zf-name">ZERO FLASH/span>span class="zf-pro">PRO/span>/h1>button class="ic" id="pal" aria-label="ពណ៌">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">path d="M12 2a10 10 0 1 0 0 20c1.2 0 2-.9 2-2 0-.6-.3-1-.6-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.3A4.8 4.8 0 0 0 22 10.4C22 5.7 17.5 2 12 2z"/>circle cx="7.5" cy="11" r="1.5" style="fill:var(--dk,#10172b)"/>circle cx="10" cy="7" r="1.5" style="fill:var(--dk,#10172b)"/>circle cx="15" cy="7" r="1.5" style="fill:var(--dk,#10172b)"/>circle cx="18" cy="11" r="1.5" style="fill:var(--dk,#10172b)"/>/svg>/button>button class="ic" id="dn" type="button" aria-label="ភ្លឺ / ងងឹត">/button>button class="ic" style="color:#cbd" id="out" aria-label="Logout">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M9 4H5.5A2.5 2.5 0 0 0 3 6.5v11A2.5 2.5 0 0 0 5.5 20H9"/>path d="M16 16.5l4.5-4.5L16 7.5M20.5 12H9"/>/svg>/button>/header>
 div class="zf-chips">span class="zf-chip ok">i class="zf-dot">/i>span id="zfSt">🔑 កំពុងពិនិត្យកូនសោ.../span>/span>span class="zf-chip" id="zfExp">📅 ផុតកំណត់: --/--/----/span>/div>
 main>
-section class="card" id="zfAdm" style="display:none">
-div class="zf-hd">div class="t">👑 គ្រប់គ្រងកូនសោ (Admin)/div>span class="badge" id="zfCnt">0/span>
-button class="b gold" id="zfTog" type="button" aria-expanded="true">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">path d="M6 15l6-6 6 6"/>/svg>span id="zfTogT">បិទ/span>/button>/div>
-div id="zfBody">
-div class="card in">div class="t">➕ បង្កើតកូនសោអ្នកប្រើប្រាស់/div>
-div class="lbl">ចំនួនថ្ងៃ/div>
-div class="row">input class="sel2" id="zfDays" type="number" min="1" inputmode="numeric" placeholder="ថ្ងៃ (Days)">button class="b acc" id="zfGen" type="button">🔑 បង្កើត Key/button>/div>
-div class="zf-q" id="zfQ">button class="b gold" data-n="7" type="button">7/button>button class="b gold" data-n="15" type="button">15/button>button class="b gold" data-n="30" type="button">30/button>button class="b gold" data-n="90" type="button">90/button>/div>
-div class="zf-out hide" id="zfOut">code id="zfNew">/code>button class="b" id="zfCopyNew" type="button">📋 ចម្លង/button>/div>
-p class="zf-note">ក្រោយបង្កើត Key → ចុច «Export keys.json» រួចផ្ទុកឡើង GitHub ដើម្បីឱ្យទូរសព្ទផ្សេងប្រើបាន។/p>/div>
-div class="card in">div class="zf-lh">div class="t">📋 បញ្ជីកូនសោអតិថិជន/div>
-button class="b gold" id="zfTog2" type="button" aria-expanded="false">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">path d="M6 15l6-6 6 6"/>/svg>span id="zfTog2T">បើក/span>/button>/div>
-div id="zfLBody" class="hide">button class="b blue" id="zfExport" type="button" style="width:100%;margin-top:10px">📤 Export keys.json/button>
-div id="zfList">/div>/div>/div>
-/div>/section>
+section id="zfAdm" style="display:none">/section>
 div id="gprog">div id="gprogTxt">/div>div class="bar">div id="gprogBar">/div>/div>/div>
 
 section class="card">
@@ -729,14 +715,6 @@ body:not(.zf-admin) #zfAdm{display:none!important}
  /div>
 /section>
 
-section class="card" id="dlCard">
- div class="plat">div class="grp">
-  span class="sq" style="color:#ef4444;border-color:#b91c1c;background:#3b1212">奥/span>span class="sq" style="color:#f59e0b;border-color:#92400e;background:#3a2308;font-size:11px">DF/span>span class="sq" style="color:#facc15;border-color:#a16207;background:#3a3008">至/span>span class="sq" style="color:#ec4899;border-color:#9d174d;background:#3a0f26">九/span>span class="sq" style="color:#a78bfa;border-color:#6d28d9;background:#241344">锦/span>span class="sq" style="color:#38bdf8;border-color:#0369a1;background:#0b2a3d;font-size:11px">AI/span>/div>
-  div class="grp">span class="sq" style="background:#ff0000;border-color:#ff0000;color:#fff">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">path d="M8 5v14l11-7z"/>/svg>/span>span class="sq" style="background:linear-gradient(135deg,#25f4ee,#fe2c55);border-color:transparent;color:#fff">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M9 18V5.5l11-2V16"/>circle cx="6" cy="18" r="3" fill="currentColor"/>circle cx="17" cy="16" r="3" fill="currentColor"/>/svg>/span>span class="sq" style="background:#1877f2;border-color:#1877f2;color:#fff;font-size:17px">f/span>span class="sq" style="background:#0ea5e9;border-color:#0ea5e9;color:#fff">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">circle cx="12" cy="12" r="9.5"/>path d="M2.5 12h19M12 2.5c3.2 3 3.2 16 0 19M12 2.5c-3.2 3-3.2 16 0 19"/>/svg>/span>/div>/div>
- div class="linkbar">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/>path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>/svg>input type="text" id="dlUrl" placeholder="https://youtu.be/... (YouTube, ..." autocomplete="off">button class="b sky" id="dlPaste">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">rect x="5" y="4.5" width="14" height="17" rx="2.5"/>path d="M9 4.5V3h6v1.5M9 10h6M9 14h6"/>/svg> Paste/button>/div>
- div class="row">select class="sel2" id="dlQ">option>🎬 720p HD/option>option>🎬 1080p FHD/option>option>🎬 480p/option>option>🎬 360p/option>/select>button class="b tg on" id="dlThumb">span class="box">svg class="i" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">path d="M5 12.5l4.5 4.5L19 7"/>/svg>/span> SRT &amp; Thumbnail/button>/div>
- div class="row">button class="b blue" id="dlGo">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M12 3v12M7 10.5l5 5 5-5M4.5 20h15"/>/svg> Download/button>button class="b" id="dlSave">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.5h7.5A2.5 2.5 0 0 1 21 10v7.5a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/>/svg> 📁 Save file/button>/div>
-/section>
 
 /main>
 
@@ -918,9 +896,6 @@ $("#tryV").onclick=async()=>{const b=$("#tryV"),old=b.innerHTML;
 let RP=S.get("rp",[]);const rpc=()=>$("#rpn").textContent=RP.length;rpc();
 $("#rpIn").onclick=()=>{const i=document.createElement("input");i.type="file";i.accept=".txt,.csv";i.onchange=async()=>{const t=await i.files[0].text();RP=t.split(/\r?\n/).map(l=>l.split(/=>|=|,|\t/)).filter(a=>a.length>=2&&a[0].trim()).map(a=>[a[0].trim(),a.slice(1).join("=").trim()]);S.set("rp",RP);rpc()};i.click()};
 $("#rpOut").onclick=()=>save("replace-words.txt",RP.map(a=>a.join("=")).join("\n"));
-$("#dlPaste").onclick=async()=>{try{$("#dlUrl").value=await navigator.clipboard.readText()}catch(e){alert("មិនអាច Paste បាន — សូមចុចលើប្រអប់ ហើយ Paste ដោយដៃ")}};
-$("#dlThumb").onclick=e=>e.currentTarget.classList.toggle("on");
-$("#dlGo").onclick=$("#dlSave").onclick=()=>alert("ត្រូវ backend ទាញវីដេអូពីតំណ (មិនទាន់ភ្ជាប់)");
 setInterval(()=>{if($("#srtText").value.trim())$("#srtArea").classList.remove("hide")},500);
 /script>script>
 /* ===== Real features ===== */
@@ -3263,7 +3238,7 @@ async function restoreKeys(){
   var r=await readDBid("keys");if(!r||!r.gen)return;var ch=false;
   Object.keys(r.gen).forEach(function(k){if(!(k in gen)){gen[k]=r.gen[k];ch=true}});
   if(r.meta){var m=meta();Object.keys(r.meta).forEach(function(k){if(!m[k]){m[k]=r.meta[k];ch=true}});lset("zero_key_meta",JSON.stringify(m))}
-  if(ch){lset("zero_generated_keys",JSON.stringify(gen));renderList()}
+  if(ch){lset("zero_generated_keys",JSON.stringify(gen))}
  }catch(e){}
 }
 async function persist(r){
@@ -3308,7 +3283,7 @@ function unlock(exp){
  if(admin){
   lset("zsf_keys_owner","admin");
   st.textContent="👑 ADMIN VIP";ex.textContent="📅 ផុតកំណត់: គ្មានកំណត់";
-  $("zfAdm").style.display="block";renderList();applyOpen();
+  
  }else{
   $("zfAdm").style.display="none";
   var d=Math.max(0,Math.ceil((Number(exp)-Date.now())/86400000)),dt=new Date(Number(exp));
@@ -3380,62 +3355,6 @@ function ask(msg){
 }
 
 /* ---------- Admin box ---------- */
-function applyList(){
- var open=lget("zf_list_open")==="1";
- $("zfLBody").classList.toggle("hide",!open);$("zfTog2").classList.toggle("closed",!open);
- $("zfTog2").setAttribute("aria-expanded",open?"true":"false");$("zfTog2T").textContent=open?"បិទ":"បើក";
-}
-function applyOpen(){applyList();
- var open=lget("zf_adm_open")!=="0";
- $("zfBody").classList.toggle("hide",!open);$("zfTog").classList.toggle("closed",!open);
- $("zfTog").setAttribute("aria-expanded",open?"true":"false");$("zfTogT").textContent=open?"បិទ":"បើក";
-}
-function genKey(){
- var days=parseInt($("zfDays").value,10);
- if(!(days>0)){toast("⚠️ សូមបញ្ចូលចំនួនថ្ងៃ",false);$("zfDays").focus();return}
- var AL="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
- function rk(n){var o="",a=new Uint32Array(n);if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(a);else for(var j=0;jn;j++)a[j]=Math.floor(Math.random()*4294967296);for(var i=0;in;i++)o+=AL[a[i]%AL.length];return o}
- var key;do{key="ZERO-"+rk(6)+"-"+rk(4)}while(gen[key]);
- gen[key]=days;saveGen();
- $("zfNew").textContent=key;$("zfOut").classList.remove("hide");
- renderList();toast("✅ បានបង្កើត Key "+days+" ថ្ងៃ — ចុច Export keys.json រួចផ្ទុកឡើង GitHub",true);
-}
-function copyText(t,okMsg){
- function fb(){try{var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0;left:-9999px";document.body.appendChild(a);a.focus();a.select();a.setSelectionRange(0,t.length);var ok=document.execCommand("copy");a.remove();toast(ok?okMsg:"⚠️ មិនអាចចម្លងបានទេ",ok)}catch(e){toast("⚠️ មិនអាចចម្លងបានទេ",false)}}
- try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){toast(okMsg,true)}).catch(fb);else fb()}catch(e){fb()}
-}
-function renderList(){
- var c=$("zfList"),ent=Object.keys(gen),m=meta(),now=Date.now();
- $("zfCnt").textContent=String(ent.length);
- if(!ent.length){c.innerHTML='div class="zf-empty">មិនទាន់មាន Key/div>';return}
- c.innerHTML=ent.map(function(k){
-  var d=gen[k],mm=m[k],cls="un",st="⚪ មិនទាន់ប្រើ";
-  if(mm&&mm.exp){var left=Math.max(0,Math.ceil((mm.exp-now)/86400000));if(mm.exp>now){cls="on";st="🟢 កំពុងប្រើ • នៅសល់ "+left+" ថ្ងៃ"}else{cls="ex";st="🔴 ផុតកំណត់"}}
-  var e=esc(k);
-  return 'div class="zf-row '+cls+'" data-k="'+e+'">div class="zf-r1">code>'+e+'/code>span class="zf-d">'+esc(String(d))+'d/span>/div>'
-   +'div class="zf-st '+cls+'">'+st+'/div>'
-   +'div class="zf-ra">button class="b" data-a="copy" type="button">📋 ចម្លង/button>button class="b" data-a="add" type="button">➕ ថ្ងៃ/button>button class="b" data-a="del" type="button">🗑️ លុប/button>/div>'
-   +'div class="zf-add">button class="b gold" data-a="p" data-n="7" type="button">+7/button>button class="b gold" data-a="p" data-n="15" type="button">+15/button>button class="b gold" data-a="p" data-n="30" type="button">+30/button>button class="b gold" data-a="p" data-n="90" type="button">+90/button>input class="sel2" type="number" min="1" inputmode="numeric" placeholder="ថ្ងៃ">button class="b acc" data-a="pc" type="button">បន្ថែម/button>/div>/div>';
- }).join("");
-}
-function addDays(k,n){
- if(!(n>0)){toast("⚠️ សូមបញ្ចូលចំនួនថ្ងៃ",false);return}
- if(!(k in gen))return;
- gen[k]=(Number(gen[k])||0)+n;saveGen();
- var m=meta();if(m[k]&&m[k].exp){m[k].exp=Math.max(Number(m[k].exp),Date.now())+n*86400000;lset("zero_key_meta",JSON.stringify(m))}
- toast("✅ បានបន្ថែម "+n+" ថ្ងៃ ទៅ "+k+" (សរុប "+gen[k]+" ថ្ងៃ)",true);renderList();
-}
-async function exportKeys(){
- var ent=Object.keys(gen);
- if(!ent.length){toast("⚠️ មិនទាន់មាន Key ក្នុងបញ្ជី",false);return}
- toast("⏳ កំពុងបង្កើត keys.json…",true);
- var o={v:1,k:{}};for(var i=0;ient.length;i++)o.k[await keyHash(ent[i])]=Number(gen[ent[i]])||0;
- var txt=JSON.stringify(o),a=document.createElement("a");
- a.href=URL.createObjectURL(new Blob([txt],{type:"application/json"}));a.download="keys.json";document.body.appendChild(a);a.click();
- setTimeout(function(){try{a.remove()}catch(e){}},1500);
- try{if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(txt)}catch(e){}
- toast("✅ keys.json រួចរាល់ ("+ent.length+" Key) — ផ្ទុកឡើង GitHub ជំនួស keys.json ចាស់",true);
-}
 
 /* ---------- Day / Night ---------- */
 var SUN='svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">circle cx="12" cy="12" r="4"/>path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>/svg>';
@@ -3456,22 +3375,6 @@ $("dn").onclick=toggleMode;$("zfDn").onclick=toggleMode;
 setMode(document.documentElement.getAttribute("data-mode")==="light"?"light":"dark");
 $("out").onclick=async function(){if(await ask("ចាកចេញពីកម្មវិធីមែនទេ?")){await clearLogin();lockUI();window.scrollTo(0,0)}};
 $("zfExp").onclick=null;
-$("zfTog").onclick=function(){lset("zf_adm_open",$("zfBody").classList.contains("hide")?"1":"0");applyOpen()};
-$("zfGen").onclick=genKey;
-$("zfTog2").onclick=function(){lset("zf_list_open",$("zfLBody").classList.contains("hide")?"1":"0");applyList()};
-$("zfCopyNew").onclick=function(){copyText($("zfNew").textContent,"📋 បានចម្លង Key")};
-$("zfExport").onclick=exportKeys;
-Array.prototype.forEach.call(document.querySelectorAll("#zfQ .b"),function(b){b.onclick=function(){$("zfDays").value=b.dataset.n}});
-$("zfList").addEventListener("click",async function(e){
- var b=e.target.closest("button[data-a]");if(!b)return;
- var row=b.closest(".zf-row"),k=row&&row.getAttribute("data-k"),a=b.dataset.a;
- if(a==="copy")copyText(k,"📋 បានចម្លង Key៖ "+k);
- else if(a==="add")row.querySelector(".zf-add").classList.toggle("open");
- else if(a==="p")addDays(k,parseInt(b.dataset.n,10));
- else if(a==="pc")addDays(k,parseInt(row.querySelector(".zf-add input").value||"0",10));
- else if(a==="del"){if(await ask("លុប Key នេះមែនទេ?\n\n"+k)){delete gen[k];saveGen();renderList()}}
-});
-setInterval(function(){if(document.body.classList.contains("zf-admin")&&!document.querySelector(".zf-add.open"))renderList()},30000);
 try{var dr=lget("zero_last_key_draft");if(dr)$("zfKey").value=dr}catch(e){}
 restoreKeys();
 restore();
@@ -3480,7 +3383,7 @@ restore();
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"2.7",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"2.9",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
