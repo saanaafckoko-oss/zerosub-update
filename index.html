@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"2.9";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"3.0";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -1345,8 +1345,8 @@ function fxReader(f){let base=-1,buf=null;const W=820;
   if(!buf||obase||o+l>base+buf.length){base=o;buf=new Uint8Array(await f.slice(o,Math.min(f.size,o+W)).arrayBuffer())}
   return buf.subarray(o-base,o-base+l)}}
 async function fxPickVideo(w,h,fps){
- for(const codec of ["avc1.640028","avc1.4d0028","avc1.42e028"]){
-  const cfg={codec,width:w,height:h,bitrate:6e6,framerate:Math.round(fps)||30,latencyMode:"quality",avc:{format:"avc"}};
+ for(const hw of ["prefer-hardware","no-preference"])for(const codec of ["avc1.640028","avc1.4d0028","avc1.42e028"]){
+  const cfg={codec,width:w,height:h,bitrate:6e6,framerate:Math.round(fps)||30,latencyMode:"realtime",hardwareAcceleration:hw,avc:{format:"avc"}};
   try{const r=await VideoEncoder.isConfigSupported(cfg);if(r&&r.supported)return cfg}catch(e){}}
  return null}
 async function fxPickAudio(){
@@ -1402,6 +1402,7 @@ async function doExportFast(){
   if(!dub){btn.textContent="🎙 កំពុងបង្កើតសំឡេងខ្មែរ...";dub=await buildDub(btn);window.__preDub=dub}
   if(!dub.out.length){const e=new Error("បង្កើតសំឡេង TTS មិនបាន — ពិនិត្យអ៊ីនធឺណិត ឬ TTS Worker");e.fatal=true;throw e}}
  let bed=null;
+ if(voiceOn){await fxEnsureBgm(btn)}
  if(voiceOn&&bgmBuf)bed=bgmBuf;
  else{if(file.size>4e8)throw new Error("ឯកសារធំពេកសម្រាប់ Export លឿន");bed=await AC.decodeAudioData(await file.arrayBuffer())}
  /* ---- វីដេអូ ---- */
@@ -1461,15 +1462,370 @@ async function doExportFast(){
  if(err)throw err;
  /* ---- Mux ---- */
  const blob=SPMP4.mux({w,h,vdesc,v:vs,fpsHint:dm.fps,a:{kind:ae.kind,sr:SR,ch:2,desc:adesc,fs:ae.fs,s:as},durUs:Math.round(durS*1e6)});
- dlBlob("export.mp4",blob);window.__preDub=null;btn.innerHTML=old;
+ dlBlob(fxOutName("mp4"),blob);window.__preDub=null;btn.innerHTML=old;
  const sec=(performance.now()-T0)/1000;
  showToast(`⚡ Export លឿនរួច ${sec.toFixed(0)}s (${(durS/sec).toFixed(1)}× លឿនជាងពេលវីដេអូ)`+(dub?` • សំឡេងខ្មែរ ${dub.out.length}/${dub.total} ឃ្លា`+(dub.sped?` • បង្កើនល្បឿន ${dub.sped}`:"")+(delayed?` • ពន្យារ ${delayed} ឃ្លា`:"")+(dub.fail?` • បរាជ័យ ${dub.fail}`:""):""),!(dub&&dub.fail));
  return true}
 
+/* ===== V3.0 : កូដ Export/ផ្គុំវីដេអូ + កាត់សំឡេងតួអង្គ ពី ZERO SUB FLASH ចាស់ ===== */
+function zfBoxes(u8,start,end){
+ var dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength),r=[],p=start;
+ while(p+8=end){
+  var sz=dv.getUint32(p),t=String.fromCharCode(u8[p+4],u8[p+5],u8[p+6],u8[p+7]),h=8;
+  if(sz===1){if(p+16>end)break;sz=dv.getUint32(p+8)*4294967296+dv.getUint32(p+12);h=16}else if(sz===0)sz=end-p;
+  if(szh||p+sz>end)break;
+  r.push({type:t,start:p,end:p+sz,hdr:h});p+=sz;
+ }
+ return r;
+}
+function zfKid(u8,box,type){var k=zfBoxes(u8,box.start+box.hdr,box.end);for(var i=0;ik.length;i++)if(k[i].type===type)return k[i];return null}
+function zfPath(u8,box,arr){var b=box;for(var i=0;iarr.length&&b;i++)b=zfKid(u8,b,arr[i]);return b}
+async function zfTopBoxes(file){
+ var r=[],p=0,N=file.size;
+ while(p+8=N){
+  var h=new Uint8Array(await file.slice(p,p+16).arrayBuffer()),dv=new DataView(h.buffer);
+  var sz=dv.getUint32(0),t=String.fromCharCode(h[4],h[5],h[6],h[7]),hd=8;
+  if(sz===1){if(h.length16)break;sz=dv.getUint32(8)*4294967296+dv.getUint32(12);hd=16}else if(sz===0)sz=N-p;
+  if(szhd||p+sz>N)break;
+  r.push({type:t,start:p,end:p+sz,hdr:hd});p+=sz;
+ }
+ return r;
+}
+function zfTrakInfo(u8,trak){
+ var tkhd=zfKid(u8,trak,"tkhd"),mdia=zfKid(u8,trak,"mdia");if(!tkhd||!mdia)return null;
+ var hdlr=zfKid(u8,mdia,"hdlr");if(!hdlr)return null;
+ var c=tkhd.start+tkhd.hdr,v=u8[c],dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength);
+ var id=dv.getUint32(c+(v?20:12));
+ var hc=hdlr.start+hdlr.hdr+8,handler=String.fromCharCode(u8[hc],u8[hc+1],u8[hc+2],u8[hc+3]);
+ return{box:trak,id:id,handler:handler};
+}
+async function zfDefrag(file,top,omv,mhdr){
+ var odv=new DataView(omv.buffer,omv.byteOffset,omv.byteLength),kids=zfBoxes(omv,mhdr,omv.length),trex={},T={},i;
+ kids.forEach(function(k){
+  if(k.type==="mvex")zfBoxes(omv,k.start+k.hdr,k.end).forEach(function(x){
+   if(x.type==="trex"){var c=x.start+x.hdr;trex[odv.getUint32(c+4)]={dur:odv.getUint32(c+12),size:odv.getUint32(c+16),flags:odv.getUint32(c+20)}}
+  });
+  if(k.type==="trak"){var ti=zfTrakInfo(omv,k);if(ti)T[ti.id]={box:k,handler:ti.handler,S:[],dts:0}}
+ });
+ var moofs=top.filter(function(x){return x.type==="moof"});
+ for(var mi=0;mimoofs.length;mi++){
+  var mf=moofs[mi],mb=new Uint8Array(await file.slice(mf.start,mf.end).arrayBuffer()),mdv=new DataView(mb.buffer);
+  var trafs=zfBoxes(mb,mf.hdr,mb.length).filter(function(x){return x.type==="traf"});
+  for(var ti2=0;ti2trafs.length;ti2++){
+   var tf=trafs[ti2],tk=zfBoxes(mb,tf.start+tf.hdr,tf.end),tfhd=null,truns=[];
+   tk.forEach(function(x){if(x.type==="tfhd")tfhd=x;else if(x.type==="trun")truns.push(x)});
+   if(!tfhd)continue;
+   var c=tfhd.start+tfhd.hdr,fl=mdv.getUint32(c)&0xFFFFFF,tid=mdv.getUint32(c+4),p=c+8,base=mf.start;
+   if(fl&1){base=mdv.getUint32(p)*4294967296+mdv.getUint32(p+4);p+=8}
+   if(fl&2)p+=4;
+   var tx=trex[tid]||{dur:0,size:0,flags:0},dD=tx.dur,dS=tx.size,dF=tx.flags;
+   if(fl&8){dD=mdv.getUint32(p);p+=4}
+   if(fl&0x10){dS=mdv.getUint32(p);p+=4}
+   if(fl&0x20){dF=mdv.getUint32(p);p+=4}
+   var TT=T[tid];if(!TT)continue;
+   var cur=base;
+   /* tfdt: ពេលវេលាចាប់ផ្តើមពិតរបស់ fragment — កែ duration សំណាកចុងក្រោយ កុំឲ្យម៉ោងរសាត់ (drift) */
+   tk.forEach(function(x){
+    if(x.type==="tfdt"){var tc=x.start+x.hdr,tv=mb[tc],bt=tv===1?mdv.getUint32(tc+4)*4294967296+mdv.getUint32(tc+8):mdv.getUint32(tc+4);
+     if(TT.S.length){var df=bt-TT.dts,L=TT.S[TT.S.length-1];if(df!==0&&L[2]+df>=1){L[2]+=df;TT.dts+=df}}
+     else TT.dts=bt;
+    }
+   });
+   for(var ri=0;ritruns.length;ri++){
+    var r=truns[ri],rc=r.start+r.hdr,ver=mb[rc],tfl=mdv.getUint32(rc)&0xFFFFFF,cnt=mdv.getUint32(rc+4),q=rc+8,off=cur,ffl=null;
+    if(tfl&1){off=base+mdv.getInt32(q);q+=4}
+    if(tfl&4){ffl=mdv.getUint32(q);q+=4}
+    for(i=0;icnt;i++){
+     var d=dD,s=dS,f=dF,co=0;
+     if(tfl&0x100){d=mdv.getUint32(q);q+=4}
+     if(tfl&0x200){s=mdv.getUint32(q);q+=4}
+     if(tfl&0x400){f=mdv.getUint32(q);q+=4}else if(i===0&&ffl!==null)f=ffl;
+     if(tfl&0x800){co=ver?mdv.getInt32(q):mdv.getUint32(q);q+=4}
+     TT.S.push([off,s,d,f,co]);TT.dts+=d;off+=s;
+    }
+    cur=off;
+   }
+  }
+ }
+ function tbl(type,n,hdrExtra,fill){var b=new Uint8Array(8+hdrExtra+n),dv=new DataView(b.buffer);return b}
+ function mk(S,handler,ts){
+  var n=S.length,dv,b,j,sumD=0,big=false;
+  for(j=0;jn;j++){sumD+=S[j][2];if(S[j][0]>4294967295)big=true}
+  /* stts */
+  var runs=[];for(j=0;jn;j++){var l=runs[runs.length-1];if(l&&l[1]===S[j][2])l[0]++;else runs.push([1,S[j][2]])}
+  b=new Uint8Array(8+runs.length*8);dv=new DataView(b.buffer);dv.setUint32(4,runs.length);runs.forEach(function(x,k){dv.setUint32(8+k*8,x[0]);dv.setUint32(12+k*8,x[1])});
+  var stts=zfB("stts",b);
+  /* stsz */
+  b=new Uint8Array(12+n*4);dv=new DataView(b.buffer);dv.setUint32(8,n);for(j=0;jn;j++)dv.setUint32(12+j*4,S[j][1]);
+  var stsz=zfB("stsz",b);
+  var stsc=zfB("stsc",zfN(32,0,32,1,32,1,32,1,32,1));
+  /* stco / co64 : 1 sample = 1 chunk */
+  b=new Uint8Array(8+n*(big?8:4));dv=new DataView(b.buffer);dv.setUint32(4,n);
+  for(j=0;jn;j++){if(big){dv.setUint32(8+j*8,Math.floor(S[j][0]/4294967296));dv.setUint32(12+j*8,S[j][0]%4294967296)}else dv.setUint32(8+j*4,S[j][0])}
+  var stco=zfB(big?"co64":"stco",b);
+  var extra=[];
+  if(handler==="vide"){
+   var sync=[];for(j=0;jn;j++)if(!(S[j][3]&0x10000))sync.push(j+1);
+   if(sync.length&&sync.lengthn){b=new Uint8Array(8+sync.length*4);dv=new DataView(b.buffer);dv.setUint32(4,sync.length);sync.forEach(function(x,k){dv.setUint32(8+k*4,x)});extra.push(zfB("stss",b))}
+   var anyC=false,neg=false;for(j=0;jn;j++){if(S[j][4]!==0)anyC=true;if(S[j][4]0)neg=true}
+   if(anyC){var cr=[];for(j=0;jn;j++){var cl=cr[cr.length-1];if(cl&&cl[1]===S[j][4])cl[0]++;else cr.push([1,S[j][4]])}
+    b=new Uint8Array(8+cr.length*8);dv=new DataView(b.buffer);dv.setUint32(0,neg?0x01000000:0);dv.setUint32(4,cr.length);cr.forEach(function(x,k){dv.setUint32(8+k*8,x[0]);dv.setInt32(12+k*8,x[1])});extra.push(zfB("ctts",b))}
+  }
+  return{sumD:sumD,boxes:[stts].concat(extra,[stsc,stsz,stco])};
+ }
+ var mvhd=kids.filter(function(k){return k.type==="mvhd"})[0],mc=mvhd.start+mvhd.hdr,mv1=omv[mc]===1,mts=odv.getUint32(mc+(mv1?20:12)),maxDur=0;
+ function setDur(u8,box,off32,off64,val){var dv=new DataView(u8.buffer),c=box.start+box.hdr;if(u8[c]===1){dv.setUint32(c+off64,Math.floor(val/4294967296));dv.setUint32(c+off64+4,val%4294967296)}else dv.setUint32(c+off32,val)}
+ var parts=[];
+ kids.forEach(function(k){
+  if(k.type==="mvex")return;
+  if(k.type!=="trak"){parts.push(omv.slice(k.start,k.end));return}
+  var ti=zfTrakInfo(omv,k),TT=ti&&T[ti.id];
+  if(!TT||!TT.S.length){parts.push(omv.slice(k.start,k.end));return}
+  var tcopy=omv.slice(k.start,k.end),sub=zfBoxes(tcopy,k.hdr,tcopy.length),tparts=[];
+  var mdiaB=sub.filter(function(x){return x.type==="mdia"})[0],mdhdB=zfBoxes(tcopy,mdiaB.start+mdiaB.hdr,mdiaB.end).filter(function(x){return x.type==="mdhd"})[0];
+  var mcc=mdhdB.start+mdhdB.hdr,tsT=new DataView(tcopy.buffer).getUint32(mcc+(tcopy[mcc]===1?20:12));
+  var res=mk(TT.S,TT.handler,tsT),movDur=Math.round(res.sumD/tsT*mts);if(movDur>maxDur)maxDur=movDur;
+  sub.forEach(function(x){
+   if(x.type==="tkhd"){var pc=tcopy.slice(x.start,x.end);setDur(pc,{start:0,hdr:x.hdr},20,28,movDur);tparts.push(pc)}
+   else if(x.type==="mdia"){
+    var md=tcopy.slice(x.start,x.end),mk2=zfBoxes(md,x.hdr,md.length),mp=[];
+    mk2.forEach(function(y){
+     if(y.type==="mdhd"){var pc2=md.slice(y.start,y.end);setDur(pc2,{start:0,hdr:y.hdr},16,24,res.sumD);mp.push(pc2)}
+     else if(y.type==="minf"){
+      var mi2=md.slice(y.start,y.end),mn=zfBoxes(mi2,y.hdr,mi2.length),np=[];
+      mn.forEach(function(z){
+       if(z.type==="stbl"){
+        var st=mi2.slice(z.start,z.end),sk=zfBoxes(st,z.hdr,st.length),stsd=sk.filter(function(w){return w.type==="stsd"})[0];
+        np.push(zfB.apply(null,["stbl",st.slice(stsd.start,stsd.end)].concat(res.boxes)));
+       }else np.push(mi2.slice(z.start,z.end));
+      });
+      mp.push(zfB.apply(null,["minf"].concat(np)));
+     }else mp.push(md.slice(y.start,y.end));
+    });
+    tparts.push(zfB.apply(null,["mdia"].concat(mp)));
+   }else tparts.push(tcopy.slice(x.start,x.end));
+  });
+  parts.push(zfB.apply(null,["trak"].concat(tparts)));
+ });
+ /* mvhd duration */
+ for(i=0;iparts.length;i++){
+  if(String.fromCharCode(parts[i][4],parts[i][5],parts[i][6],parts[i][7])==="mvhd"){setDur(parts[i],{start:0,hdr:8},16,24,maxDur);break}
+ }
+ return zfB.apply(null,["moov"].concat(parts));
+}
+async function zfProbe(file){
+ var top=await zfTopBoxes(file);
+ var ftyp=top.find(function(t){return t.type==="ftyp"}),moov=top.find(function(t){return t.type==="moov"});
+ if(!ftyp||!moov)throw new Error("មិនមាន moov");
+ var frag=top.some(function(t){return t.type==="moof"});
+ var fb=new Uint8Array(await file.slice(ftyp.start+8,ftyp.start+12).arrayBuffer());
+ if(String.fromCharCode(fb[0],fb[1],fb[2],fb[3])==="qt  ")throw new Error("QuickTime");
+ if(moov.end-moov.start>64*1048576)throw new Error("moov ធំពេក");
+ var mv=new Uint8Array(await file.slice(moov.start,moov.end).arrayBuffer());
+ var ohdr=mv.slice(0,moov.hdr),mh=moov.hdr;
+ if(frag){mv=await zfDefrag(file,top,mv,moov.hdr);mh=8}
+ var kids=zfBoxes(mv,mh,mv.length),mvhd=null,traks=[];
+ kids.forEach(function(k){if(k.type==="mvhd")mvhd=k;else if(k.type==="trak"){var t=zfTrakInfo(mv,k);if(t)traks.push(t)}});
+ if(!mvhd)throw new Error("មិនមាន mvhd");
+ var dv=new DataView(mv.buffer),c=mvhd.start+mvhd.hdr,v1=mv[c]===1;
+ var ts=dv.getUint32(c+(v1?20:12)),dur=v1?dv.getUint32(c+24)*4294967296+dv.getUint32(c+28):dv.getUint32(c+16);
+ var nextIdOff=c+(v1?108:96);
+ if(!ts||!dur)throw new Error("mvhd ទទេ");
+ var vid=traks.filter(function(t){return t.handler==="vide"});
+ if(!vid.length)throw new Error("គ្មាន video track");
+ var maxId=0;traks.forEach(function(t){if(t.id>maxId)maxId=t.id});
+ return{frag:frag,ohdr:ohdr,file:file,top:top,moov:moov,mv:mv,kids:kids,mvhd:mvhd,traks:traks,ts:ts,dur:dur,sec:dur/ts,nextIdOff:nextIdOff,maxId:maxId};
+}
+function zfB(type){
+ var parts=Array.prototype.slice.call(arguments,1),n=8;
+ parts.forEach(function(p){n+=p.length});
+ var o=new Uint8Array(n),dv=new DataView(o.buffer);
+ dv.setUint32(0,n);for(var i=0;i4;i++)o[4+i]=type.charCodeAt(i);
+ var q=8;parts.forEach(function(p){o.set(p,q);q+=p.length});
+ return o;
+}
+function zfN(){ 
+ var a=arguments,n=0,i;
+ for(i=0;ia.length;i+=2)n+=a[i]/8;
+ var o=new Uint8Array(n),dv=new DataView(o.buffer),p=0;
+ for(i=0;ia.length;i+=2){
+  if(a[i]===32)dv.setUint32(p,a[i+1]>>>0);else if(a[i]===16)dv.setUint16(p,a[i+1]);else o[p]=a[i+1];
+  p+=a[i]/8;
+ }
+ return o;
+}
+function zfCat(arr){var n=0;arr.forEach(function(a){n+=a.length});var o=new Uint8Array(n),p=0;arr.forEach(function(a){o.set(a,p);p+=a.length});return o}
+function zfAssemble(P,frames,asc,sr,nch){
+ var N=P.file.size,nf=frames.length,audioBytes=0;
+ frames.forEach(function(f){audioBytes+=f.length});
+ var base=N+8,CH=43,i;
+ var co64=base+audioBytes>4294967295;
+  
+ var dsi=zfCat([new Uint8Array([5,asc.length]),asc]);
+ var dcd=zfCat([new Uint8Array([4,13+dsi.length,0x40,0x15,0,0,0]),zfN(32,0,32,0),dsi]);
+ var esd=zfCat([new Uint8Array([3,3+dcd.length+3,0,1,0]),dcd,new Uint8Array([6,1,2])]);
+ var esds=zfB("esds",zfN(32,0),esd);
+ var mp4a=zfB("mp4a",new Uint8Array(6),zfN(16,1),new Uint8Array(8),zfN(16,nch,16,16,16,0,16,0,32,(sr16)>>>0),esds);
+ var stsd=zfB("stsd",zfN(32,0,32,1),mp4a);
+ var stts=zfB("stts",zfN(32,0,32,1,32,nf,32,1024));
+ var nChunks=Math.ceil(nf/CH),rem=nf-(nChunks-1)*CH,runs=[zfN(32,1,32,CH,32,1)];
+ if(nChunks>1&&rem!==CH)runs.push(zfN(32,nChunks,32,rem,32,1));
+ var stsc=zfB("stsc",zfN(32,0,32,runs.length),zfCat(runs));
+ var sz=new Uint8Array(12+nf*4),sdv=new DataView(sz.buffer);
+ sdv.setUint32(8,nf);for(i=0;inf;i++)sdv.setUint32(12+i*4,frames[i].length);
+ var stsz=zfB("stsz",sz);
+ var off=new Uint8Array(8+nChunks*(co64?8:4)),odv=new DataView(off.buffer),cur=base;
+ odv.setUint32(4,nChunks);
+ for(i=0;inf;i++){
+  if(i%CH===0){var ci=i/CH;if(co64){odv.setUint32(8+ci*8,Math.floor(cur/4294967296));odv.setUint32(12+ci*8,cur%4294967296)}else odv.setUint32(8+ci*4,cur)}
+  cur+=frames[i].length;
+ }
+ var stco=zfB(co64?"co64":"stco",off);
+ var stbl=zfB("stbl",stsd,stts,stsc,stsz,stco);
+ var dinf=zfB("dinf",zfB("dref",zfN(32,0,32,1),new Uint8Array([0,0,0,12,0x75,0x72,0x6C,0x20,0,0,0,1])));
+ var minf=zfB("minf",zfB("smhd",zfN(32,0,32,0)),dinf,stbl);
+ var mdSamples=nf*1024;
+ var mdhd=zfB("mdhd",zfN(32,0,32,0,32,0,32,sr,32,mdSamples,16,0x55C4,16,0));
+ var name=new TextEncoder().encode("SoundHandler\0");
+ var hdlr=zfB("hdlr",zfN(32,0,32,0),new Uint8Array([0x73,0x6F,0x75,0x6E]),new Uint8Array(12),name);
+ var mdia=zfB("mdia",mdhd,hdlr,minf);
+ var mdur=Math.round(mdSamples/sr*P.ts),newId=P.maxId+1;
+ var mat=zfN(32,0x10000,32,0,32,0,32,0,32,0x10000,32,0,32,0,32,0,32,0x40000000);
+ var tkhd=zfB("tkhd",zfN(32,3,32,0,32,0,32,newId,32,0,32,mdur),new Uint8Array(8),zfN(16,0,16,0,16,0x0100,16,0),mat,zfN(32,0,32,0));
+ var prim=1024,edts=zfB("edts",zfB("elst",zfN(32,0,32,1,32,Math.max(1,Math.round((mdSamples-prim)/sr*P.ts)),32,prim,16,1,16,0)));var trak=zfB("trak",tkhd,edts,mdia);
+  
+ var mv=P.mv,drop={};
+ P.traks.forEach(function(t){if(t.handler==="soun")drop[t.box.start]=1});
+ var parts=[],p=P.moov.hdr;
+ P.kids.forEach(function(k){
+  if(drop[k.start])return;
+  var piece=mv.slice(k.start,k.end);
+  if(k.type==="mvhd"){var dv=new DataView(piece.buffer),o=P.nextIdOff-k.start;if(dv.getUint32(o)=newId)dv.setUint32(o,newId+1)}
+  parts.push(piece);
+ });
+ parts.push(trak);
+ var newMoov=zfB.apply(null,["moov"].concat(parts));
+  
+ var oh=P.ohdr?P.ohdr.slice(0):P.mv.slice(0,P.moov.hdr);oh[4]=0x66;oh[5]=0x72;oh[6]=0x65;oh[7]=0x65;
+ var mdatHdr=zfN(32,8+audioBytes);mdatHdr=zfCat([mdatHdr,new Uint8Array([0x6D,0x64,0x61,0x74])]);
+ var patches=[{a:P.moov.start,b:P.moov.start+P.moov.hdr,rep:oh}];
+ if(P.frag)P.top.forEach(function(m){if(m.type==="moof")patches.push({a:m.start+4,b:m.start+8,rep:new Uint8Array([0x66,0x72,0x65,0x65])})});
+ patches.sort(function(x,y){return x.a-y.a});
+ var blobParts=[],pcur=0;
+ patches.forEach(function(q){blobParts.push(P.file.slice(pcur,q.a));blobParts.push(q.rep);pcur=q.b});
+ blobParts.push(P.file.slice(pcur,N));blobParts.push(mdatHdr);
+ frames.forEach(function(f){blobParts.push(f)});
+ blobParts.push(newMoov);
+ return new Blob(blobParts,{type:"video/mp4"});
+}
+function zfMakeVR(sr){
+ function bq(b0,b1,b2,a0,a1,a2){return{b0:b0/a0,b1:b1/a0,b2:b2/a0,a1:a1/a0,a2:a2/a0,x1:0,x2:0,y1:0,y2:0}}
+ function run(k,x){var y=k.b0*x+k.b1*k.x1+k.b2*k.x2-k.a1*k.y1-k.a2*k.y2;k.x2=k.x1;k.x1=x;k.y2=k.y1;k.y1=y;return y}
+ function lp(f,q){var w=2*Math.PI*f/sr,c=Math.cos(w),a=Math.sin(w)/(2*q);return bq((1-c)/2,1-c,(1-c)/2,1+a,-2*c,1-a)}
+ function hp(f,q){var w=2*Math.PI*f/sr,c=Math.cos(w),a=Math.sin(w)/(2*q);return bq((1+c)/2,-(1+c),(1+c)/2,1+a,-2*c,1-a)}
+ function pk(f,q,g){var A=Math.pow(10,g/40),w=2*Math.PI*f/sr,c=Math.cos(w),a=Math.sin(w)/(2*q);return bq(1+a*A,-2*c,1-a*A,1+a/A,-2*c,1-a/A)}
+ function hs(f,g){var A=Math.pow(10,g/40),w=2*Math.PI*f/sr,c=Math.cos(w),s=Math.sin(w),a=s/2*Math.SQRT2,r=2*Math.sqrt(A)*a;
+  return bq(A*((A+1)+(A-1)*c+r),-2*A*((A-1)+(A+1)*c),A*((A+1)+(A-1)*c-r),(A+1)-(A-1)*c+r,2*((A-1)-(A+1)*c),(A+1)-(A-1)*c-r)}
+ var Q=0.7071,bL=lp(90,Q),bR=lp(90,Q),hL=hp(90,Q),hR=hp(90,Q),e1=pk(1000,1000/1800,-14),e2=pk(2800,2800/1600,-10),sh=hs(4500,-9),lo=lp(6000,Q);
+ /* V2.002: ផ្លូវបំពេញ (mid) — ពេល Background នៅកណ្ដាល (mono/ចំកណ្ដាល) L-R ស្ទើរសូន្យ ធ្វើឲ្យស្ងាត់។ ដូច្នេះបន្ថែមផ្នែកកណ្ដាលដែលបានបន្ថយសំឡេងមនុស្ស (300-3400Hz) */
+ var hM=hp(90,Q),m0=pk(500,0.6,-8),m1=pk(1000,1000/1800,-14),m2=pk(2800,2800/1600,-10),m3=hs(4500,-9),mlo=lp(6000,Q),Es=0,Em=0;
+ function f(x0,x1){
+  var m=run(hL,x0)-run(hR,x1);
+  var md=run(hM,(x0+x1)*0.5);
+  Es+=(m*m*0.25-Es)*0.0002;Em+=(md*md-Em)*0.0002;
+  var w=Es/(Es+Em+1e-9),fill=0.1+0.55*(1-w);
+  m=run(e1,m);m=run(e2,m);m=run(sh,m);m=run(lo,m);m*=1.25;
+  var q=run(m0,md);q=run(m1,q);q=run(m2,q);q=run(m3,q);q=run(mlo,q);
+  f.l=0.4*run(bL,x0)+0.6*m+fill*q;f.r=0.4*run(bR,x1)+0.6*m+fill*q;
+ }
+ f.l=0;f.r=0;return f;
+}
+/* ឈ្មោះឯកសារចេញ = ឈ្មោះវីដេអូដើម (រក្សាឈ្មោះដដែល) */
+function fxOutName(ext){var b="export";try{b=baseName(file)||"export"}catch(e){}return b+"."+ext}
+/* កាត់សំឡេងតួអង្គចេញ (ទុក Background) ដោយ JS សុទ្ធ — កូដ zfMakeVR ពីកំណែចាស់ មិនពឹង FFmpeg/CDN */
+async function makeBgmJS(prog){
+ prog(2,"🎶 កំពុងអានសំឡេងវីដេអូ...");
+ AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+ if(file.size>6e8)throw new Error("ឯកសារធំពេកសម្រាប់កាត់ក្នុង JS");
+ var ab=await AC.decodeAudioData(await file.arrayBuffer());
+ var sr=ab.sampleRate,n=ab.length,L=ab.getChannelData(0),R=ab.numberOfChannels>1?ab.getChannelData(1):L;
+ var out=AC.createBuffer(2,n,sr),oL=out.getChannelData(0),oR=out.getChannelData(1),vr=zfMakeVR(sr),STEP=sr*4;
+ for(var i=0;in;i++){
+  vr(L[i],R[i]);
+  var a=vr.l,b=vr.r;
+  oL[i]=a>1?1:a-1?-1:a;oR[i]=b>1?1:b-1?-1:b;
+  if(i%STEP===STEP-1){prog(5+i/n*88,"🎶 កំពុងកាត់សំឡេងតួអង្គចេញ "+Math.round(i/n*100)+"%...");await new Promise(function(r){setTimeout(r,0)})}
+ }
+ bgmBuf=out;window.__bgmAutoBuf=out;window.__bgmFile=file;
+ prog(100,"✅ ភ្លេងអមរួចរាល់");
+ return out;
+}
+async function fxEnsureBgm(btn){
+ if(bgmBuf)return;
+ try{await makeBgm(function(p){btn.textContent="🎶 កំពុងកាត់សំឡេងតួអង្គចេញ "+Math.round(p)+"%..."})}
+ catch(e){console.warn("bgm",e)}
+}
+/* Export លឿនបំផុត (ដូចកំណែចាស់) ៖ មិន decode/encode វីដេអូឡើងវិញ — ទុក video ដើមទាំងស្រុង, Encode តែសំឡេង AAC រួច zfAssemble ជំនួស audio track */
+async function doExportCopy(){
+ const on=i=>!$$("#opts .b")[i].classList.contains("off"),btn=$("#exp"),old=btn.innerHTML,T0=performance.now();
+ if(!/\.(mp4|m4v)$/i.test(file.name||"")&&!/mp4/i.test(file.type||""))throw new Error("វីដេអូមិនមែន MP4");
+ if(typeof AudioEncoder!=="function"||typeof AudioData!=="function"||typeof OfflineAudioContext!=="function")throw new Error("Browser មិនមាន AudioEncoder");
+ btn.textContent="⚡ កំពុងរៀបចំ Export លឿន...";
+ const ae=await fxPickAudio();
+ if(!ae||ae.kind!=="aac")throw new Error("AAC encoder មិនមាន");
+ const P=await zfProbe(file);
+ AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+ const voiceOn=on(3)&&cues.length>0,base=$("#bgm").value/100;
+ let dub=null;
+ if(voiceOn){
+  dub=window.__preDub||null;
+  if(!dub){btn.textContent="🎙 កំពុងបង្កើតសំឡេងខ្មែរ...";dub=await buildDub(btn);window.__preDub=dub}
+  if(!dub.out.length){const e=new Error("បង្កើតសំឡេង TTS មិនបាន — ពិនិត្យអ៊ីនធឺណិត ឬ TTS Worker");e.fatal=true;throw e}
+  await fxEnsureBgm(btn)}
+ let bed=null;
+ if(voiceOn&&bgmBuf)bed=bgmBuf;
+ else{
+  if(file.size>4e8)throw new Error("ឯកសារធំពេកសម្រាប់ Export លឿន");
+  try{bed=await AC.decodeAudioData(await file.arrayBuffer())}catch(e){bed=null}}
+ const SR=ae.sr,durS=P.sec,total=Math.max(1,Math.round(durS*SR));
+ const {plan,delayed}=voiceOn?fxPlan(dub.out):{plan:[],delayed:0};
+ let wl=null;try{if(navigator.wakeLock)wl=await navigator.wakeLock.request("screen")}catch(e){}
+ const frames=[];let asc=null,err=null;
+ const aenc=new AudioEncoder({output:(ch,meta)=>{const d=new Uint8Array(ch.byteLength);ch.copyTo(d);frames.push(d);
+  if(!asc&&meta&&meta.decoderConfig&&meta.decoderConfig.description)asc=fxCopy(meta.decoderConfig.description)},error:e=>{err=err||e}});
+ try{
+  aenc.configure({codec:ae.codec,sampleRate:SR,numberOfChannels:2,bitrate:ae.bitrate});
+  const B=fxBounds(total,SR,plan,150);
+  for(let k=0;k+1B.length;k++){
+   if(err)throw err;
+   const buf=await fxRenderWin(B[k],B[k+1],SR,bed,voiceOn?base:1,plan,base,voiceOn);
+   const n=buf.length,pl=new Float32Array(n*2);
+   pl.set(buf.getChannelData(0),0);pl.set(buf.numberOfChannels>1?buf.getChannelData(1):buf.getChannelData(0),n);
+   aenc.encode(new AudioData({format:"f32-planar",sampleRate:SR,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(B[k]*1e6/SR),data:pl}));
+   while(aenc.encodeQueueSize>8&&!err)await fxWait(1);
+   btn.textContent="កំពុង Export "+Math.min(95,Math.round((k+1)/(B.length-1)*95))+"%...";
+  }
+  await aenc.flush();if(err)throw err;
+ }finally{try{aenc.close()}catch(e){}try{if(wl)wl.release()}catch(e){}}
+ if(!frames.length)throw new Error("Encode សំឡេងមិនបាន");
+ if(!asc)asc=new Uint8Array([0x12,0x10]);
+ btn.textContent="កំពុង Export 96%... (ផ្គុំវីដេអូ)";
+ const blob=zfAssemble(P,frames,asc,SR,2);
+ if(!blob.size)throw new Error("វីដេអូទទេ");
+ dlBlob(fxOutName("mp4"),blob);window.__preDub=null;btn.innerHTML=old;
+ const sec=(performance.now()-T0)/1000;
+ showToast(`⚡ Export លឿនរួច ${sec.toFixed(0)}s`+(dub?` • សំឡេងខ្មែរ ${dub.out.length}/${dub.total} ឃ្លា`+(dub.sped?` • បង្កើនល្បឿន ${dub.sped}`:"")+(delayed?` • ពន្យារ ${delayed} ឃ្លា`:"")+(dub.fail?` • បរាជ័យ ${dub.fail}`:""):""),!(dub&&dub.fail));
+ return true}
+
+
 async function doExport(){
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
+ const btn=$("#exp"),old=btn.innerHTML,on=i=>!$$("#opts .b")[i].classList.contains("off");
+ if(!on(0)&&!on(4)&&typeof AudioEncoder==="function"){
+  try{if(await doExportCopy())return}
+  catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("copy export:",e);showToast("⚠ Export លឿនបំផុតមិនបាន ("+String((e&&e.message)||e).slice(0,60)+") — ប្រើវិធីបន្ទាប់",false)}
+ }else if(on(0)||on(4)){showToast("ℹ បិទ Subtitle និង Eff ដើម្បី Export លឿនបំផុត (មិនបម្លែងវីដេអូឡើងវិញ)",true)}
  if(fxSupported()){
-  const btn=$("#exp"),old=btn.innerHTML;
   try{if(await doExportFast())return}
   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("fast export:",e);showToast("⚠ Export លឿនមិនបាន ("+String((e&&e.message)||e).slice(0,70)+") — ប្រើវិធីធម្មតា",false)}
  }
@@ -1486,7 +1842,7 @@ async function doExportRT(){
  if(voiceOn){
   if(window.__preDub){dub=window.__preDub;window.__preDub=null}else{btn.textContent="🎙 កំពុងបង្កើតសំឡេងខ្មែរ...";dub=await buildDub(btn)}
   if(!dub.out.length)throw new Error("បង្កើតសំឡេង TTS មិនបាន — ពិនិត្យអ៊ីនធឺណិត ឬ TTS Worker");
-  dubBus=AC.createGain();dubBus.connect(dst);
+  await fxEnsureBgm(btn);dubBus=AC.createGain();dubBus.connect(dst);
   bgG=AC.createGain();bgG.gain.value=base;bgG.connect(dst);
   if(bgmBuf){V.muted=true;bs=AC.createBufferSource();bs.buffer=bgmBuf;bs.connect(bgG)}
   else{V.muted=false;ELSRC=ELSRC||AC.createMediaElementSource(V);ELSRC.disconnect();ELSRC.connect(bgG)}
@@ -1509,7 +1865,7 @@ async function doExportRT(){
  let delayed=0;if(dub)delayed=scheduleDub(dub.out,t0,dubBus,bgG,base);
  draw();await fin;
  V.onended=null;V.muted=false;if(ELSRC){ELSRC.disconnect();ELSRC.connect(AC.destination)}
- dlBlob("export."+(mt.includes("mp4")?"mp4":"webm"),new Blob(ch,{type:mt}));btn.innerHTML=old;
+ dlBlob(fxOutName(mt.includes("mp4")?"mp4":"webm"),new Blob(ch,{type:mt}));btn.innerHTML=old;
  if(dub)showToast(`✅ Export រួច • សំឡេងខ្មែរ ${dub.out.length}/${dub.total} ឃ្លា`+(dub.sped?` • បង្កើនល្បឿន ${dub.sped}`:"")+(delayed?` • ពន្យារ ${delayed} ឃ្លា (វែងជាងពេលក្នុង SRT)`:"")+(dub.fail?` • បរាជ័យ ${dub.fail}`:""),!dub.fail)}
 $("#exp").onclick=()=>doExport().catch(x=>{alert("Export: "+x.message);$("#exp").innerHTML=ICO.note+" 🎬 នាំចេញវីដេអូរហ័ស Export 1 Click"});
 /script>
@@ -2903,6 +3259,10 @@ $("#asr").onclick=zsfTranscribeGroqMain;
 var BGM_MAIN="[0:a]aformat=sample_fmts=fltp:channel_layouts=stereo,asplit=2[a1][a2];[a1]lowpass=f=90[bass];[a2]highpass=f=90,pan=stereo|c0=c0-c1|c1=c1-c0,equalizer=f=1000:width_type=h:w=1800:g=-14,equalizer=f=2800:width_type=h:w=1600:g=-10,treble=g=-9:f=4500,lowpass=f=6000,volume=1.25[midhigh];[bass][midhigh]amix=inputs=2:weights=0.8|1.2[out]";
 var BGM_FALLBACK="aformat=sample_fmts=fltp:channel_layouts=stereo,pan=stereo|c0=c0-c1|c1=c1-c0,equalizer=f=1000:width_type=h:w=1800:g=-14,equalizer=f=2800:width_type=h:w=1600:g=-10,treble=g=-9:f=4500,lowpass=f=6000,volume=1.25";
 async function makeBgm(prog){
+ try{return await makeBgmJS(prog)}
+ catch(e){console.warn("makeBgmJS",e);prog(3,"🎶 ប្តូរទៅ FFmpeg...");return await makeBgmFF(prog)}
+}
+async function makeBgmFF(prog){
  prog(2,"🎶 កំពុងរៀបចំបង្កើតសំឡេង Background ស្អាត (Smart Ducking 100% Offline)...");
  var f=await ff(),src=new File([file],"src."+ext(file),{type:file.type}),inName="b_in."+ext(file),mounted=false;
  try{await f.createDir("/bin");await f.mount("WORKERFS",{files:[src]},"/bin");inName="/bin/"+src.name;mounted=true}
@@ -3383,7 +3743,7 @@ restore();
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"2.9",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"3.0",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -3501,7 +3861,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="2.7";
+  var EMB="3.0";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
