@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"4.5";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"4.7";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -915,9 +915,9 @@ $("#voc").onclick=()=>alert("ត្រូវ backend ញែកសំឡេងច
 $("#tryV").onclick=async()=>{const b=$("#tryV"),old=b.innerHTML;
  try{b.textContent="⏳ ...";
  const voice=(slot%2===0)?"km-KH-PisethNeural":"km-KH-SreymomNeural";
- const r=await fetch(TTS_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:"សួស្តី នេះជាការសាកល្បងសំឡេង",voice:voice,rate:0,pitch:Math.round(v("pitch"))})});
+ const r=await fetch(TTS_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:"សួស្តី នេះជាការសាកល្បងសំឡេង",voice:voice,rate:Math.round(v("speed")),pitch:Math.round(v("pitch"))})});
  if(!r.ok){let m="";try{m=(await r.json()).error}catch(e){}throw new Error(m||("HTTP "+r.status))}
- let blob=await r.blob();try{const t=clampTempo(1+v("speed")/100);if(Math.abs(t-1)>.01)blob=new Blob([await stretchRaw(await blob.arrayBuffer(),t)],{type:"audio/wav"})}catch(e){}await playFx(blob,presetOf(slot));
+ let blob=await r.blob();try{const t=clampTempo(1+v("speed")/100);if(false)blob=new Blob([await stretchRaw(await blob.arrayBuffer(),t)],{type:"audio/wav"})}catch(e){}await playFx(blob,presetOf(slot));
  }catch(e){alert("មានបញ្ហា: "+e.message)}finally{b.innerHTML=old}};
 /* words replace + downloader UI + srt area */
 let RP=S.get("rp",[]);const rpc=()=>$("#rpn").textContent=RP.length;rpc();
@@ -1151,9 +1151,9 @@ function wsolaStretch(buf,tempo){
  const n=Math.max(1,Math.round(len/tempo)),out=AC.createBuffer(X.length,n,sr);
  for(let c=0;cX.length;c++)out.getChannelData(c).set(O[c].subarray(0,n));
  return out}
-function ttsBuf(text,slot,pitch){
- const ck=voiceOfSlot(slot)+"|"+pitch+"|"+text;let pr=__ttsCache.get(ck);
- if(!pr){pr=(async()=>trimSilence(await AC.decodeAudioData(await ttsRaw(text,slot,0,pitch))))();
+function ttsBuf(text,slot,pitch,rate){rate=Math.round(rate||0);
+ const ck=voiceOfSlot(slot)+"|"+pitch+"|"+rate+"|"+text;let pr=__ttsCache.get(ck);
+ if(!pr){pr=(async()=>trimSilence(await AC.decodeAudioData(await ttsRaw(text,slot,rate,pitch))))();
   if(__ttsCache.size>1500)__ttsCache.clear();__ttsCache.set(ck,pr);pr.catch(()=>__ttsCache.delete(ck))}
  return pr}
 function tempoPlan(p,dur,slotD){
@@ -1161,25 +1161,64 @@ function tempoPlan(p,dur,slotD){
  if(slotD&&p.auto>0){const need=dur/base/slotD;
   if(need>1.03){const cap=clampTempo(1+(p.speed+p.auto)/100);t=Math.min(cap,clampTempo(base*need));boost=t>base+.005}}
  return{tempo:t,boost}}
-async function dubAudio(text,slot,p,slotD){
- const pitch=Math.round(p.pitch);let buf=await ttsBuf(text,slot,pitch);
+
+/* ===== v4.7 : Speed + Auto Speed ចម្លងតាមកូដចាស់ (renderSeg) =====
+   ល្បឿនធម្មតា = ផ្ញើ rate ទៅ Edge TTS ផ្ទាល់ (សំឡេងធម្មជាតិ មិនមែន stretch ក្រោយ)
+   Auto Speed  = បើវែងជាងពេលដែលមាន → បង្កើត TTS ម្តងទៀតលឿនជាងមុន (រហូត ៣ដង) ត្រឹម cap = min(base×(1+Auto%), 2.0)
+   បន្ទាប់មក force-fit (WSOLA) រហូតដល់ ×1.8 សរុប ។ ពេលដាក់ចូលវីដេអូ ៖ រុញបានអតិបរមា 0.5s ហើយបន្តឹងមិនឱ្យជាន់ឃ្លាបន្ទាប់ */
+function zsfFit(k,d){try{const v=parseFloat(localStorage.getItem("zsf_tts_"+k));if(isFinite(v))return v}catch(e){}return d}
+function zsfFitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch(e){return true}}
+function zsfAvail(q,dur,nx){
+ const tail=zsfFit("tail",.30),mg=zsfFit("margin",.20),sp=nx?zsfFit("spill",.15):0,gap=nx?(nx.s-q.e):1.0,room=gap-.10;
+ if(room>0){const tl=(room>=1.0)?Math.max(tail,.5):tail;return dur+Math.min(room,tl)+sp}
+ return Math.max(dur*.6,.3,dur-mg)+sp}
+/* ពិនិត្យម្តងថា TTS Worker គាំទ្រ rate ពិតឬអត់ (បើមិនគាំទ្រ → ប្រើវិធី stretch ចាស់) */
+async function zsfProbeRate(slot){
+ if(window.__zsfRateOK!==undefined)return window.__zsfRateOK;
+ try{const T="សួស្តី នេះជាការសាកល្បងសំឡេង ខ្ញុំសូមអរគុណច្រើន",a=await AC.decodeAudioData(await ttsRaw(T,slot,0,0)),b=await AC.decodeAudioData(await ttsRaw(T,slot,60,0));
+  window.__zsfRateOK=(b.durationa.duration*.85)}catch(e){return true}
+ return window.__zsfRateOK}
+async function dubAudioLocal(text,slot,p,slotD){
+ const pitch=Math.round(p.pitch);let buf=await ttsBuf(text,slot,pitch,0);
  const pl=tempoPlan(p,buf.duration,slotD);
  if(Math.abs(pl.tempo-1)>.01){
   try{buf=wsolaStretch(buf,pl.tempo)}
   catch(e){try{buf=trimSilence(await ttsFetch(text,slot,Math.round(pl.tempo*100-100),pitch))}catch(e2){throw e2}}}
- return{buf,boost:pl.boost}}
+ return{buf,boost:pl.boost,tt:pl.tempo}}
+async function dubAudio(text,slot,p,slotD){
+ if(window.__zsfRateOK===false)return dubAudioLocal(text,slot,p,slotD);
+ const pitch=Math.round(p.pitch),base=clampTempo(1+p.speed/100),auto=+p.auto||0;
+ let cur=base,buf;
+ try{buf=await ttsBuf(text,slot,pitch,Math.round((base-1)*100))}catch(e){return dubAudioLocal(text,slot,p,slotD)}
+ if(!(slotD>0))return{buf,boost:false,tt:cur};
+ if(auto>0){const cap=Math.min(base*(1+auto/100),2.0);
+  for(let it=0;it3;it++){
+   const d=buf.duration;if(d=slotD*1.02)break;
+   const tot=Math.min(cur*(d/slotD)*1.02,cap);if(tot=cur*1.015)break;
+   let nb;try{nb=await ttsBuf(text,slot,pitch,Math.round((tot-1)*100))}catch(e){break}
+   buf=nb;cur=tot}}
+ let forced=1;
+ if(zsfFitOn()&&buf.duration>slotD){
+  const FM=zsfFit("fmax",1.8);let allow=Math.max(1,FM/Math.max(cur,1)),need=Math.min(buf.duration/(slotD*.97),allow);
+  for(let f=0;f2&&need>1.01;f++){
+   try{buf=wsolaStretch(buf,need)}catch(e){break}
+   forced*=need;const nl=buf.duration;if(nl=slotD)break;
+   need=Math.min(nl/(slotD*.97),Math.max(1,allow/need))}}
+ return{buf,boost:cur>base+.005||forced>1.01,tt:cur*forced}}
 async function buildDub(btn){
  await fxEnsureSpeech();try{fxSpeechZones()}catch(e){}
  const jobs=cues.map(q=>({q,slot:slotOfText(q.t),text:q.t.replace(/\[[1-4]\]\s*/g,"").trim()})).filter(j=>j.text);
  const out=[];let next=0,done=0,fail=0,sped=0;
+ try{await zsfProbeRate(jobs.length?jobs[0].slot:1)}catch(e){}
+ const __cs=cues.slice().sort((a,b)=>a.s-b.s),__ix=new Map(__cs.map((c,i)=>[c,i]));
  async function wk(){
   while(nextjobs.length){
    const j=jobs[next++],p=presetOf(j.slot);
    try{
     const D0=j.q.e-j.q.s,sd=(j.q._on!=null&&j.q._off>j.q._on+.3&&Math.abs(j.q._on-j.q.s)=.8)?Math.max(D0*.6,Math.min(D0*1.6,j.q._off-j.q._on)):D0;
-    const r=await dubAudio(j.text,j.slot,p,Math.max(.3,sd));
+    const r=await dubAudio(j.text,j.slot,p,zsfAvail(j.q,Math.max(.2,sd),__cs[(__ix.get(j.q)||0)+1]));
     if(r.boost)sped++;
-    out.push({q:j.q,slot:j.slot,buf:r.buf,p});
+    out.push({q:j.q,slot:j.slot,buf:r.buf,p,tt:r.tt});
    }catch(e){fail++}
    done++;btn.textContent=`🎙 កំពុងបង្កើតសំឡេងខ្មែរ ${done}/${jobs.length}`;
   }
@@ -1189,10 +1228,24 @@ async function buildDub(btn){
  return{out,fail,sped,total:jobs.length};
 }
 /* កំណត់ពេលចាក់ ៖ ចាប់ផ្តើមត្រង់ពេល SRT; បើឃ្លាមុនមិនទាន់ចប់ រង់ចាំវាចប់សិន (មិនឱ្យជាន់គ្នា) ។ ពេលនិយាយ BGM/សំឡេងដើម = 0% ក្រៅពីនោះតាម slider */
+
+function zsfPlaceItems(items){
+ const PUSH=zsfFit("push",.5),SPL=zsfFit("spill",.15),FM=zsfFit("fmax",1.8),ON=zsfFitOn();
+ let cursor=0,delayed=0;const st=[];
+ items.forEach((it,i)=>{
+  const b0=it.buf0||(it.buf0=it.buf);let buf=b0,o0=fxOn(it.q);
+  if(cursor>o0&&cursor-o0=PUSH){o0=cursor;delayed++}
+  const nx=items[i+1];
+  if(ON&&nx){const lim=fxOn(nx.q)+SPL-.1-o0,dl=b0.duration;
+   if(lim>.3&&dl>lim*1.02){const tt=it.tt||1,al=Math.max(1,FM/Math.max(tt,1)),nd=Math.min(dl/lim,al);
+    if(nd>1.01){try{buf=wsolaStretch(b0,nd)}catch(e){buf=b0}}}}
+  it.buf=buf;st.push(o0);cursor=o0+buf.duration+.04});
+ return{st,delayed}}
 function scheduleDub(items,t0,bus,bgG,base){
  let prevEnd=0,delayed=0;try{fxSpeechZones()}catch(e){}
- items.forEach(it=>{
-  const o=fxOn(it.q),st=Math.max(o,prevEnd+.05);if(st>o+.05)delayed++;
+ const __P=zsfPlaceItems(items);delayed=__P.delayed;
+ items.forEach((it,__i)=>{
+  const st=__P.st[__i];
   const src=AC.createBufferSource();src.buffer=it.buf;fxChain(AC,src,it.p,bus);src.start(t0+st);
   const en=st+it.buf.duration;prevEnd=en;
   prevEnd=en;
@@ -1388,7 +1441,7 @@ const fxCopy=d=>{if(!d)return null;return d.byteLength!==undefined&&d.buffer?new
 const fxOn=q=>(q._on!=null&&Math.abs(q._on-q.s)=.8)?q._on:q.s;
 function fxPlan(items){let prevEnd=0,delayed=0;
  try{fxSpeechZones()}catch(e){}
- const plan=items.map(it=>{const o=fxOn(it.q),st=Math.max(o,prevEnd+.05);if(st>o+.05)delayed++;const en=st+it.buf.duration;prevEnd=en;return{it,st,en}});
+ const __P=zsfPlaceItems(items);delayed=__P.delayed;const plan=items.map((it,__i)=>{const st=__P.st[__i],en=st+it.buf.duration;return{it,st,en}});
  return{plan,delayed}}
 /* កាត់ជាផ្នែកៗ (កុំឱ្យស៊ី RAM) ត្រង់ចន្លោះស្ងាត់ មិនកាត់ពាក់កណ្តាលឃ្លា/ Echo */
 function fxBounds(total,SR,plan,W){
@@ -2056,7 +2109,7 @@ function extractVideoAudioV32Prototype(f){
     try{
       ffm=await ff();var e=ext(f);inn="a_in."+e;
       await ffm.writeFile(inn,await FFmpegUtil.fetchFile(f));
-      var code=await ffm.exec(["-i",inn,"-vn","-ac","1","-ar","16000","-c:a","pcm_s16le","a_out.wav"]);
+      var code=await ffm.exec(["-i",inn,"-vn","-ac","1","-af","aresample=16000:async=1:first_pts=0","-c:a","pcm_s16le","a_out.wav"]);
       if(code!==0)throw new Error("ffmpeg "+code);
       var d=await ffm.readFile("a_out.wav");
       try{await ffm.deleteFile(inn);await ffm.deleteFile("a_out.wav")}catch(x){}
@@ -3304,12 +3357,13 @@ async function groqCall(blob,keys,st){
  for(var round=0;round2;round++){
   for(var n=0;nkeys.length;n++){
    var k=keys[(st.ki+n)%keys.length];
-   var fd=new FormData();fd.append("file",blob,"audio.wav");fd.append("model",model);fd.append("response_format","verbose_json");fd.append("temperature","0");if(lang!=="auto")fd.append("language",lang);
+   var fd=new FormData();fd.append("file",blob,"audio.wav");fd.append("model",model);fd.append("response_format","verbose_json");fd.append("temperature","0");if(!window.__zsfNoWords){fd.append("timestamp_granularities[]","word");fd.append("timestamp_granularities[]","segment")}if(lang!=="auto")fd.append("language",lang);
    var r,j;
    try{r=await fetch("https://api.groq.com/openai/v1/audio/transcriptions",{method:"POST",headers:{Authorization:"Bearer "+k},body:fd});j=await r.json()}
    catch(e){lastErr=new Error("បណ្ដាញ៖ "+e.message);continue}
    if(r.ok){st.ki=(st.ki+n)%keys.length;return j}
    lastErr=new Error((j&&j.error&&j.error.message)||("HTTP "+r.status));
+   if(r.status===400&&!window.__zsfNoWords&&/timestamp|granular/i.test(String(lastErr.message))){window.__zsfNoWords=true;n--;continue}
    if(r.status===429||r.status===401||r.status===403||r.status>=500)continue;
    throw lastErr;
   }
@@ -3322,11 +3376,23 @@ function planCuts(pcm){
  var n=pcm.length>>1,dv=new DataView(pcm.buffer,pcm.byteOffset,n*2),FR=800,nf=Math.floor(n/FR),e=new Float32Array(nf),f,k;
  for(f=0;fnf;f++){var sum=0,o=f*FR;for(k=0;kFR;k++){var v=dv.getInt16((o+k)*2,true)/32768;sum+=v*v}e[f]=Math.sqrt(sum/FR)}
  var sm=new Float32Array(nf);for(f=0;fnf;f++){var a=0,c=0;for(k=-2;k=1;k++){if(e[f+k]!==undefined){a+=e[f+k];c++}}sm[f]=a/c}
- var MIN=60*20,MAX=90*20,cuts=[0],st=0;
+ var MIN=15*20,MAX=30*20,cuts=[0],st=0;
  while(nf-st>MAX){var best=st+MAX,bv=Infinity;for(f=st+MIN;f=st+MAX&&fnf;f++){if(sm[f]bv){bv=sm[f];best=f}}cuts.push(best);st=best}
  if(cuts.length>1&&nf-st3*20)cuts.pop();
  var res=[];for(f=0;fcuts.length;f++){var s0=cuts[f]*FR,s1=(f+1cuts.length?cuts[f+1]*FR:n);res.push([s0,s1])}
  return res}
+
+/* ===== v4.6 : cue ពេលវេលា = ពាក្យដំបូង → ពាក្យចុងក្រោយ (word timestamps) ដើម្បីត្រូវពេលវីដេអូដើម ===== */
+function zsfGroqCues(j,o){
+ var segs=(j.segments||[]).filter(function(s){return !(s.no_speech_prob>0.85)}),W=(j.words||[]).filter(function(w){return isFinite(w.start)&&isFinite(w.end)&&w.end>=w.start}),out=[],g=segs.map(function(){return []});
+ W.forEach(function(w){var m=(w.start+w.end)/2,bi=-1,bd=1e9;
+  segs.forEach(function(s,i){var d=(m>=s.start&&m=s.end)?0:Math.min(Math.abs(m-s.start),Math.abs(m-s.end));if(dbd){bd=d;bi=i}});
+  if(bi>=0&&bd=1.0)g[bi].push(w)});
+ segs.forEach(function(s,i){var t=String(s.text||"").trim();if(!t)return;
+  var a=s.start,b=s.end,ws=g[i];
+  if(ws.length){var wa=ws[0].start,wb=ws[ws.length-1].end;if(wb>wa&&wa>=s.start-1&&wb=s.end+1){a=wa;b=wb}}
+  out.push({s:a+o,e:b+o,t:t})});
+ return out}
 async function groqTranscribe(prog){
  var keys=G.filter(Boolean);
  if(!keys.length){$("#gqbox").classList.remove("hide");throw new Error("សូមបញ្ចូល Groq Key ជាមុន")}
@@ -3334,10 +3400,10 @@ async function groqTranscribe(prog){
  prog(3,"🎧 កំពុងទាញសំឡេងពីវីដេអូ...");
  var wav=await extractVideoAudioV32Prototype(file);
  var u8=new Uint8Array(await wav.arrayBuffer()),off=wavDataOffset(u8),pcm=u8.subarray(off,off+((u8.length-off)&~1));
- prog(8,"🎵 វិភាគរកចន្លោះស្ងាត់ដកដង្ហើម (Silence Points 60s - 90s)...");
+ prog(8,"🎵 វិភាគរកចន្លោះស្ងាត់ដកដង្ហើម (Silence Points 15s - 30s)...");
  await sleep(30);
  var plan=planCuts(pcm),total=plan.length;
- prog(10,"🎵 បានបំបែកជា "+total+" កង់ (ចន្លោះ: 60s-90s ចំកន្លែងស្ងាត់)...");
+ prog(10,"🎵 បានបំបែកជា "+total+" កង់ (ចន្លោះ: 15s-30s ចំកន្លែងស្ងាត់)...");
  await sleep(400);
  var C=Math.max(1,Math.min(keys.length,4,total)),idx=0,done=0,err=null,res=new Array(total);
  prog(12,"⚡ ទាញយកអក្សរ (ដំណើរការ "+C+" Keys ដំណាលគ្នា)...");
@@ -3349,7 +3415,7 @@ async function groqTranscribe(prog){
    if(!part){res[i]=[];done++;continue}
    try{
     var j=await groqCall(wavChunk(part),keys,st),o=plan[i][0]/16000,arr=[];
-    (j.segments||[]).forEach(function(s){if(s.no_speech_prob>0.85)return;arr.push({s:s.start+o,e:s.end+o,t:String(s.text||"").trim()})});
+    arr=zsfGroqCues(j,o);
     res[i]=arr;
    }catch(e){err=e;return}
    done++;prog(12+Math.round(done/total*86),"⚡ ទាញយកអក្សរ ("+done+"/"+total+")");
@@ -3360,7 +3426,9 @@ async function groqTranscribe(prog){
  if(err)throw err;
  var segs=[].concat.apply([],res.map(function(x){return x||[]}));
  var gap=+$("#gap").value,H=(typeof ZSF_HALLUC!=="undefined")?ZSF_HALLUC:null;
- var out=segs.filter(function(x){return x.t&&!(H&&H.test(x.t))}).map(function(x){return {s:x.s,e:Math.max(x.s+.3,x.e-gap),t:x.t}});
+ var out=segs.filter(function(x){return x.t&&!(H&&H.test(x.t))}).map(function(x){return {s:x.s,e:Math.max(x.s+.25,x.e),t:x.t}});
+ out.sort(function(a,b){return a.s-b.s});
+ for(var q=0;qout.length-1;q++){if(out[q+1].sout[q].e)out[q].e=Math.max(out[q].s+.2,out[q+1].s-.02)}
  if(!out.length)throw new Error("Groq មិនឮការនិយាយក្នុងវីដេអូនេះទេ");
  return out;
 }
@@ -4174,7 +4242,7 @@ restore();
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"4.5",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-newbot/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"4.7",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-newbot/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -4414,7 +4482,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="4.5";
+  var EMB="4.7";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
