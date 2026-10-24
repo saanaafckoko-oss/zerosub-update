@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"3.0";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"3.7";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -668,7 +668,7 @@ body:not(.zf-admin) #zfAdm{display:none!important}
  div id="oldSrt">textarea id="srtText" rows="6" placeholder="SRT នឹងបង្ហាញនៅទីនេះ" style="margin-top:10px">/textarea>
  div class="row">button class="b" id="dlSrt">ទាញយក SRT/button>button class="b" id="clr">សម្អាត/button>/div>/div>
  button class="b big" id="aiGen">⚡ 🚀 ចាប់ផ្ដើម បង្កើតសំឡេង AI/button>
- div class="cuh0">b id="cueN">⁝ 0 បន្ទាត់/b>button class="b" id="cuDiv">svg viewBox="0 0 24 24" fill="currentColor" stroke="none">circle cx="9" cy="8" r="3.6"/>path d="M2.5 20c0-3.6 2.8-6 6.5-6s6.5 2.4 6.5 6z"/>path d="M16.8 6.2a4.2 4.2 0 0 1 0 5.6M19.4 3.8a7.6 7.6 0 0 1 0 10.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>/svg> ចែកតួ/button>button class="b" id="cuExp">svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">path d="M12 4v11M7.500 10.500L12 15l4.500-4.500M5 19.500h14"/>/svg> នាំចេញ .srt/button>button class="b" id="cuClr">svg viewBox="0 0 24 24" fill="currentColor" stroke="none">rect x="2.5" y="6" width="12" height="2" rx=".7"/>rect x="6" y="3.2" width="5" height="2.6" rx=".9"/>path d="M3.8 9.2h9.4l-.8 10.2a1.6 1.6 0 0 1-1.6 1.4H6.2a1.6 1.6 0 0 1-1.6-1.4z"/>path d="M17 9h4.5M17 13h4.5M17 17h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>/svg> លុប SRT/button>/div>
+ div class="cuh0">b id="cueN">⁝ 0 បន្ទាត់/b>button class="b" id="cuDiv">svg viewBox="0 0 24 24" fill="currentColor" stroke="none">circle cx="9" cy="8" r="3.6"/>path d="M2.5 20c0-3.6 2.8-6 6.5-6s6.5 2.4 6.5 6z"/>path d="M16.8 6.2a4.2 4.2 0 0 1 0 5.6M19.4 3.8a7.6 7.6 0 0 1 0 10.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>/svg> ចែកតួ/button>button class="b" id="cuExp">svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">path d="M12 4v11M7.500 10.500L12 15l4.500-4.500M5 19.500h14"/>/svg> នាំចេញ .srt/button>button class="b" id="cuClr">svg viewBox="0 0 24 24" fill="currentColor" stroke="none">rect x="2.5" y="6" width="12" height="2" rx=".7"/>rect x="6" y="3.6" width="5" height="2.6" rx=".9"/>path d="M3.8 9.2h9.4l-.8 10.2a1.6 1.6 0 0 1-1.6 1.4H6.2a1.6 1.6 0 0 1-1.6-1.4z"/>path d="M17 9h4.5M17 13h4.5M17 17h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>/svg> លុប SRT/button>/div>
  div id="cueList">/div>
  /div>
 /section>
@@ -681,7 +681,7 @@ body:not(.zf-admin) #zfAdm{display:none!important}
  div class="tabs" id="tabs">button class="b grn" data-t="export">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M7 7V5.5A2.5 2.5 0 0 1 9.5 3h9A2.5 2.5 0 0 1 21 5.5v9a2.5 2.5 0 0 1-2.5 2.5H17"/>rect x="3" y="7" width="14" height="14" rx="2.5" fill="currentColor" stroke="none"/>path d="M8.7 11.3l5 2.7-5 2.7z" style="fill:var(--dk,#10172b)" stroke="none"/>/svg> Export/button>button class="b gold" data-t="cut">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">circle cx="6" cy="6" r="3"/>circle cx="6" cy="18" r="3"/>path d="M20 4L8.3 15.7M14.5 14.5L20 20M8.3 8.3L12 12"/>/svg> កាត់វីដេអូ/button>button class="b" data-t="asr">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">rect x="2.5" y="5" width="19" height="14" rx="3" fill="currentColor" stroke="none"/>path d="M6.5 10.5h5M14.5 10.5h3M6.5 14h2.5M12 14h5.5" style="stroke:var(--dk,#10172b)" stroke-width="1.8" fill="none" stroke-linecap="round"/>/svg> ទាញអក្សរ/button>button class="b" data-t="bgm">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M4 10v4M8 6.5v11M12 3v18M16 7v10M20 10v4"/>/svg> BGM Eff/button>/div>
 
  div class="pane on" id="p-export">
-  div class="seg" style="margin-bottom:12px;padding:6px;gap:6px">button class="b" id="aT">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M4 3.5h16A1.5 1.5 0 0 1 21.5 5v11a1.5 1.5 0 0 1-1.5 1.5h-5.5L12 21l-2.5-3.5H4A1.5 1.5 0 0 1 2.5 16V5A1.5 1.5 0 0 1 4 3.5z" fill="currentColor" stroke="none"/>path d="M12 7v7M8.5 10.5h7" stroke="#5b2fd0" stroke-width="2" fill="none" stroke-linecap="round"/>/svg> + អក្សរ/button>button class="b" id="aL">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">rect x="3" y="3.5" width="18" height="17" rx="2.5" fill="currentColor" stroke="none"/>circle cx="12" cy="10" r="2.4" fill="#1d4ed8"/>path d="M7.5 17c.6-2.4 2.3-3.6 4.5-3.6s3.9 1.2 4.5 3.6z" fill="#1d4ed8"/>/svg> + Logo/button>button class="b" id="aB">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">circle cx="6" cy="6" r="1.2"/>circle cx="12" cy="6" r="1.2"/>circle cx="18" cy="6" r="1.2"/>circle cx="6" cy="12" r="1.2"/>circle cx="12" cy="12" r="1.2"/>circle cx="18" cy="12" r="1.2"/>circle cx="6" cy="18" r="1.2"/>circle cx="12" cy="18" r="1.2"/>circle cx="18" cy="18" r="1.2"/>/svg> + Blur/button>button class="b gold" id="aS">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">circle cx="12" cy="12" r="3"/>path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>/svg> Setting/button>/div>
+  div class="seg" style="margin-bottom:12px;padding:6px;gap:6px">button class="b" id="aT">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M4 3.5h16A1.5 1.5 0 0 1 21.5 5v11a1.5 1.5 0 0 1-1.5 1.5h-5.5L12 21l-2.5-3.5H4A1.5 1.5 0 0 1 2.5 16V5A1.5 1.5 0 0 1 4 3.5z" fill="currentColor" stroke="none"/>path d="M12 7v7M8.5 10.5h7" stroke="#5b2fd0" stroke-width="2" fill="none" stroke-linecap="round"/>/svg> + អក្សរ/button>button class="b" id="aL">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">rect x="3" y="3.6" width="18" height="17" rx="2.5" fill="currentColor" stroke="none"/>circle cx="12" cy="10" r="2.4" fill="#1d4ed8"/>path d="M7.5 17c.6-2.4 2.3-3.6 4.5-3.6s3.9 1.2 4.5 3.6z" fill="#1d4ed8"/>/svg> + Logo/button>button class="b" id="aB">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">circle cx="6" cy="6" r="1.2"/>circle cx="12" cy="6" r="1.2"/>circle cx="18" cy="6" r="1.2"/>circle cx="6" cy="12" r="1.2"/>circle cx="12" cy="12" r="1.2"/>circle cx="18" cy="12" r="1.2"/>circle cx="6" cy="18" r="1.2"/>circle cx="12" cy="18" r="1.2"/>circle cx="18" cy="18" r="1.2"/>/svg> + Blur/button>button class="b gold" id="aS">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">circle cx="12" cy="12" r="3"/>path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>/svg> Setting/button>/div>
   div class="stage">div class="empty" id="noVid">div class="ico">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M7.5 7V5.5A2.5 2.5 0 0 1 10 3h9a2.5 2.5 0 0 1 2.5 2.5v9a2.5 2.5 0 0 1-2.5 2.5h-1.5"/>rect x="2.5" y="7.5" width="14" height="13.5" rx="2.5" fill="currentColor" stroke="none"/>path d="M7.8 11.2l5 2.9-5 2.9z" style="fill:var(--dk,#10172b)" stroke="none"/>/svg>/div>b>មិនទាន់មានវីដេអូសម្រាប់ Export នៅឡើយទេ/b>សូមចុច «📥 Brow file» ខាងលើដើម្បីជ្រើសរើសវីដេអូ ឬចុច «✂️ កាត់វីដេអូ» ខាងលើដើម្បីកាត់/ផ្តុំវីដេអូ/div>video id="vid" playsinline class="hide">/video>div id="sub">/div>button class="play hide" id="bigPlay">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">path d="M8 5v14l11-7z"/>/svg>/button>/div>
   div class="time hide" id="tbar">span id="tc">00:00/span>input type="range" id="seek" min="0" max="100" value="0" step="0.1">i id="td">00:00/i>/div>
   div class="row hide" id="pbar">button class="b teal" id="play">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">path d="M7 4.5v15l13-7.5z"/>/svg> Play/button>button class="b" id="stop" style="color:#f87171;border-color:#7a2b3a">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">rect x="5" y="5" width="14" height="14" rx="2.5"/>/svg> Stop/button>/div>
@@ -742,7 +742,7 @@ const IC=(d)=>`svg viewBox="0 0 24 24" width="20" height="20" fill="none" str
 const STEP_ICON={
  vol:IC('path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/>'),
  pitch:IC('path d="M4 7h9M17 7h3M4 17h3M11 17h9"/>circle cx="15" cy="7" r="2"/>circle cx="9" cy="17" r="2"/>'),
- bass:IC('rect x="5" y="2.5" width="14" height="19" rx="3"/>circle cx="12" cy="14.5" r="3.5"/>circle cx="12" cy="7" r="1"/>'),
+ bass:IC('rect x="5" y="2.5" width="14" height="19" rx="3"/>circle cx="12" cy="14.5" r="3.6"/>circle cx="12" cy="7" r="1"/>'),
  speed:IC('path d="M4 17a8 8 0 1 1 16 0"/>path d="M12 17l4-5"/>'),
  level:IC('path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/>path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/>'),
  echo:IC('path d="M3 8c3-3 5 3 9 0s6 3 9 0M3 13c3-3 5 3 9 0s6 3 9 0M3 18c3-3 5 3 9 0s6 3 9 0"/>'),
@@ -1142,13 +1142,15 @@ async function dubAudio(text,slot,p,slotD){
   catch(e){try{buf=trimSilence(await ttsFetch(text,slot,Math.round(pl.tempo*100-100),pitch))}catch(e2){throw e2}}}
  return{buf,boost:pl.boost}}
 async function buildDub(btn){
+ await fxEnsureSpeech();try{fxSpeechZones()}catch(e){}
  const jobs=cues.map(q=>({q,slot:slotOfText(q.t),text:q.t.replace(/\[[1-4]\]\s*/g,"").trim()})).filter(j=>j.text);
  const out=[];let next=0,done=0,fail=0,sped=0;
  async function wk(){
   while(nextjobs.length){
    const j=jobs[next++],p=presetOf(j.slot);
    try{
-    const r=await dubAudio(j.text,j.slot,p,Math.max(.3,j.q.e-j.q.s));
+    const D0=j.q.e-j.q.s,sd=(j.q._on!=null&&j.q._off>j.q._on+.3&&Math.abs(j.q._on-j.q.s)=.8)?Math.max(D0*.6,Math.min(D0*1.6,j.q._off-j.q._on)):D0;
+    const r=await dubAudio(j.text,j.slot,p,Math.max(.3,sd));
     if(r.boost)sped++;
     out.push({q:j.q,slot:j.slot,buf:r.buf,p});
    }catch(e){fail++}
@@ -1161,13 +1163,14 @@ async function buildDub(btn){
 }
 /* កំណត់ពេលចាក់ ៖ ចាប់ផ្តើមត្រង់ពេល SRT; បើឃ្លាមុនមិនទាន់ចប់ រង់ចាំវាចប់សិន (មិនឱ្យជាន់គ្នា) ។ ពេលនិយាយ BGM/សំឡេងដើម = 0% ក្រៅពីនោះតាម slider */
 function scheduleDub(items,t0,bus,bgG,base){
- let prevEnd=0,delayed=0;
+ let prevEnd=0,delayed=0;try{fxSpeechZones()}catch(e){}
  items.forEach(it=>{
-  const st=Math.max(it.q.s,prevEnd+.05);if(st>it.q.s+.05)delayed++;
+  const o=fxOn(it.q),st=Math.max(o,prevEnd+.05);if(st>o+.05)delayed++;
   const src=AC.createBufferSource();src.buffer=it.buf;fxChain(AC,src,it.p,bus);src.start(t0+st);
   const en=st+it.buf.duration;prevEnd=en;
-  if(bgG){bgG.gain.setTargetAtTime(0,Math.max(0,t0+st-.12),.04);bgG.gain.setTargetAtTime(base,t0+en,.07)}
+  prevEnd=en;
  });
+ if(bgG){for(const z of fxZones(items)){bgG.gain.setTargetAtTime(0,Math.max(0,t0+z[0]-.1),.04);bgG.gain.setTargetAtTime(base,t0+z[1],.07)}}
  return delayed;
 }
 /* ===== SPMP4 : MP4 demux (H.264) + MP4 mux (H.264 + AAC/Opus) — គ្មាន library ក្រៅ ===== */
@@ -1355,8 +1358,10 @@ async function fxPickAudio(){
  return null}
 const fxCopy=d=>{if(!d)return null;return d.byteLength!==undefined&&d.buffer?new Uint8Array(d.buffer.slice(d.byteOffset,d.byteOffset+d.byteLength)):new Uint8Array(d.slice(0))};
 /* ទីតាំងចាក់សំឡេងខ្មែរ (ដូច scheduleDub ៖ មិនឱ្យជាន់គ្នា) */
+const fxOn=q=>(q._on!=null&&Math.abs(q._on-q.s)=.8)?q._on:q.s;
 function fxPlan(items){let prevEnd=0,delayed=0;
- const plan=items.map(it=>{const st=Math.max(it.q.s,prevEnd+.05);if(st>it.q.s+.05)delayed++;const en=st+it.buf.duration;prevEnd=en;return{it,st,en}});
+ try{fxSpeechZones()}catch(e){}
+ const plan=items.map(it=>{const o=fxOn(it.q),st=Math.max(o,prevEnd+.05);if(st>o+.05)delayed++;const en=st+it.buf.duration;prevEnd=en;return{it,st,en}});
  return{plan,delayed}}
 /* កាត់ជាផ្នែកៗ (កុំឱ្យស៊ី RAM) ត្រង់ចន្លោះស្ងាត់ មិនកាត់ពាក់កណ្តាលឃ្លា/ Echo */
 function fxBounds(total,SR,plan,W){
@@ -1367,17 +1372,63 @@ function fxBounds(total,SR,plan,W){
   if(t>=dur-.5)break;
   b.push(Math.round(t*SR));t+=W}
  b.push(total);return b}
-async function fxRenderWin(s0,s1,SR,bed,bedGain,plan,base,duck){
+/* V3.3 : zones = ជួរពេលដែលតួអង្គដើមនិយាយ (តាម SRT) + ពេលសំឡេងខ្មែរចាក់ → BGM ស្ងាត់ទាំងស្រុងក្នុងជួរទាំងនោះ, ក្រៅពីនោះឮតាម % BGM */
+/* V3.4 : វិភាគសំឡេងនិយាយក្នុងវីដេអូដើមផ្ទាល់ (ថាមពលក្នុងប្រេកង់សំឡេងមនុស្ស 300-3400Hz នៃ channel កណ្ដាល) → BGM ស្ងាត់ពេលតួអង្គនិយាយ រហូតដល់គាត់ឈប់ */
+function fxAnalyze(ab){
+ const sr=ab.sampleRate,L=ab.getChannelData(0),R=ab.numberOfChannels>1?ab.getChannelData(1):L,N=ab.length,fl=Math.max(1,Math.round(sr*.02)),nf=Math.floor(N/fl),e=new Float32Array(nf);
+ const bq=(b0,b1,b2,a0,a1,a2)=>({b0:b0/a0,b1:b1/a0,b2:b2/a0,a1:a1/a0,a2:a2/a0,x1:0,x2:0,y1:0,y2:0});
+ const run=(k,x)=>{const y=k.b0*x+k.b1*k.x1+k.b2*k.x2-k.a1*k.y1-k.a2*k.y2;k.x2=k.x1;k.x1=x;k.y2=k.y1;k.y1=y;return y};
+ const Q=.7071,wh=2*Math.PI*300/sr,ch=Math.cos(wh),ah=Math.sin(wh)/(2*Q),wl=2*Math.PI*3400/sr,cl=Math.cos(wl),al=Math.sin(wl)/(2*Q);
+ const hp=bq((1+ch)/2,-(1+ch),(1+ch)/2,1+ah,-2*ch,1-ah),lp=bq((1-cl)/2,1-cl,(1-cl)/2,1+al,-2*cl,1-al);
+ let acc=0,c=0,f=0;
+ for(let i=0;inf*fl;i++){const y=run(lp,run(hp,(L[i]+R[i])*.5));acc+=y*y;if(++c===fl){e[f++]=acc/fl;acc=0;c=0}}
+ return{fs:fl/sr,e,file}}
+async function fxEnsureSpeech(){
+ if(window.__spEn&&window.__spEn.file===file)return;
+ try{if(file.size>4e8)return;AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  const ab=await AC.decodeAudioData(await file.arrayBuffer());window.__spEn=fxAnalyze(ab)}catch(e){console.warn("speech analyze",e)}}
+function fxSpeechZones(){
+ const SP=window.__spEn;if(!SP||SP.file!==file||!SP.e.length)return null;
+ const fs=SP.fs,e=SP.e,n=e.length,db=new Float32Array(n);
+ for(let i=0;in;i++)db[i]=10*Math.log10(e[i]+1e-10);
+ const srt=Array.from(db).sort((a,b)=>a-b),floor=srt[Math.floor(n*.1)],out=[];
+ for(const q of cues){
+  q._on=null;q._off=null;
+  if(!String(q.t||"").replace(/\[[1-4]\]/g,"").trim())continue;
+  const i0=Math.max(0,Math.floor((q.s-.7)/fs)),i1=Math.min(n,Math.ceil((q.e+1)/fs));
+  if(i1-i03){out.push([q.s,q.e]);continue}
+  const w=Array.from(db.subarray(i0,i1)).sort((a,b)=>a-b),p90=w[Math.floor(w.length*.9)],thr=Math.max(floor+8,p90-18);
+  let st=-1,found=false;
+  for(let i=i0;i=i1;i++){const on=ii1&&db[i]>thr;
+   if(on&&st0)st=i;
+   if(!on&&st>=0){out.push([st*fs,i*fs]);if(q._on===null)q._on=st*fs;q._off=i*fs;st=-1;found=true}}
+  if(!found)out.push([q.s,q.e])}
+ return out.map(z=>[Math.max(0,z[0]-.12),z[1]+.25])}
+function fxZones(items){
+ let raw=fxSpeechZones();
+ if(!raw){raw=[];for(const q of cues){if(String(q.t||"").replace(/\[[1-4]\]/g,"").trim())raw.push([Math.max(0,q.s-.06),q.e+.06])}}
+ raw=raw.slice();
+ /* V3.5 : តាមសំឡេងដើមតែប៉ុណ្ណោះ — មិនយកពេលសំឡេងខ្មែរមកគិតទេ */
+ raw.sort((a,b)=>a[0]-b[0]);
+ const z=[];for(const r of raw){const l=z[z.length-1];if(l&&r[0]=l[1]+.35)l[1]=Math.max(l[1],r[1]);else z.push([r[0],r[1]])}
+ return z}
+async function fxRenderWin(s0,s1,SR,bed,bedGain,plan,base,duck,zones){
  const ws=s0/SR,we=s1/SR,oc=new OfflineAudioContext(2,s1-s0,SR);
  const bg=oc.createGain(),bus=oc.createGain();bg.connect(oc.destination);bus.connect(oc.destination);
- let init=bedGain;if(duck)for(const x of plan)if(x.st-.12=ws&&wsx.en)init=0;
- bg.gain.value=init;
+ const zs=duck?(zones||plan.map(x=>[x.st-.06,x.en+.06])):[];
+ let init=bedGain;for(const z of zs)if(z[0]=ws&&wsz[1])init=0;
+ bg.gain.setValueAtTime(init,0);
  if(bed){const bs=oc.createBufferSource();bs.buffer=bed;bs.connect(bg);bs.start(0,ws,we-ws)}
  for(const x of plan){
   if(x.en=ws||x.st>=we)continue;
   const src=oc.createBufferSource();src.buffer=x.it.buf;fxChain(oc,src,x.it.p,bus);
-  const rel=x.st-ws;if(rel>=0)src.start(rel);else src.start(0,-rel);
-  if(duck){bg.gain.setTargetAtTime(0,Math.max(0,rel-.12),.04);bg.gain.setTargetAtTime(base,Math.max(0,x.en-ws),.07)}}
+  const rel=x.st-ws;if(rel>=0)src.start(rel);else src.start(0,-rel)}
+ const g=bg.gain,dur=we-ws;
+ for(const z of zs){
+  if(z[1]=ws||z[0]>=we)continue;
+  const a=z[0]-ws,b=z[1]-ws;
+  if(a-.1>0){g.setValueAtTime(bedGain,a-.1);g.linearRampToValueAtTime(0,a)}
+  if(bdur){g.setValueAtTime(0,Math.max(0,b));g.linearRampToValueAtTime(bedGain,b+.15)}}
  return oc.startRendering()}
 
 async function doExportFast(){
@@ -1412,25 +1463,41 @@ async function doExportFast(){
  const enc=new VideoEncoder({output:(ch,meta)=>{const d=new Uint8Array(ch.byteLength);ch.copyTo(d);vs.push({d,t:ch.timestamp,k:ch.type==="key"});
   if(!vdesc&&meta&&meta.decoderConfig&&meta.decoderConfig.description)vdesc=fxCopy(meta.decoderConfig.description)},error:e=>{err=err||e}});
  enc.configure(vcfg);
- const gop=Math.max(1,Math.round(dm.fps*2)),fdur=Math.round(1e6/dm.fps),o4=on(4),o0=on(0);
+ const gop=Math.max(1,Math.round(dm.fps*2)),fdur=Math.round(1e6/dm.fps),o4=on(4)&&!!(O.blur||O.logo||O.text),o0=false; /* V3.2 : មិនដុត Subtitle ក្នុងវីដេអូទៀតទេ */
+ /* V3.1 : បន្ថយការងារក្នុងមួយ frame — ឃ្លា Subtitle/Logo/Text គូរទុកម្តងហើយប្រើឡើងវិញ, Blur ដោយ downscale (លឿនជាង filter), frame ដែលមិនមានអ្វីត្រូវគូរ → encode ត្រង់ៗ មិនឆ្លងកាត់ canvas */
+ const cuesS=cues.slice().sort((a,b)=>a.s-b.s);let ci=0,capCv=null,capQ=null,ovCv=null,bcv=null;
+ const mkCv=()=>{const z=document.createElement("canvas");z.width=w;z.height=h;return z};
+ const capOv=q=>{if(capQ!==q){capQ=q;if(!capCv)capCv=mkCv();const cc=capCv.getContext("2d");cc.clearRect(0,0,w,h);caption(cc,q.t,w/2,h*(1-O.sb),w,O.fs*h)}return capCv};
+ if(o4&&(O.logo||O.text)){ovCv=mkCv();const oc=ovCv.getContext("2d");
+  if(O.logo){const lw=w*.2;oc.drawImage(O.logo,w-lw-16,16,lw,lw*O.logo.height/O.logo.width)}
+  if(O.text)caption(oc,O.text,w/2,h*.12,w,O.fs*h)}
+ const direct0=rot===0&&!o4;
  const dec=new VideoDecoder({output:fr=>{
   try{
    const t=fr.timestamp/1e6;if(fr.timestamp0)return;
-   c.fillStyle="#000";c.fillRect(0,0,w,h);put(fr);
-   if(o4){
-    if(O.blur){c.save();c.beginPath();c.rect(0,h*.78,w,h*.2);c.clip();c.filter="blur(16px)";put(fr);c.restore()}
-    if(O.logo){const lw=w*.2;c.drawImage(O.logo,w-lw-16,16,lw,lw*O.logo.height/O.logo.width)}
-    if(O.text)caption(c,O.text,w/2,h*.12,w,O.fs*h)}
-   if(o0){const q=cues.find(x=>t>=x.s&&t=x.e);if(q)caption(c,q.t,w/2,h*(1-O.sb),w,O.fs*h)}
-   const vf=new VideoFrame(cv,{timestamp:fr.timestamp,duration:fdur});
-   enc.encode(vf,{keyFrame:nOut%gop===0});vf.close();nOut++;lastT=t;
+   let q=null;
+   if(o0){while(cicuesS.length&&cuesS[ci].et)ci++;const cq=cuesS[ci];if(cq&&t>=cq.s&&t=cq.e)q=cq}
+   if(direct0&&!q&&fr.displayWidth===w&&fr.displayHeight===h){
+    enc.encode(fr,{keyFrame:nOut%gop===0})}
+   else{
+    c.fillStyle="#000";c.fillRect(0,0,w,h);put(fr);
+    if(o4&&O.blur){const y=Math.round(h*.78),hh=Math.max(8,Math.round(h*.2)),sw=Math.max(8,w>>3),sh=Math.max(4,hh>>3);
+     if(!bcv){bcv=document.createElement("canvas");bcv.width=sw;bcv.height=sh}
+     const bc=bcv.getContext("2d");bc.drawImage(cv,0,y,w,hh,0,0,sw,sh);c.imageSmoothingEnabled=true;c.imageSmoothingQuality="high";c.drawImage(bcv,0,0,sw,sh,0,y,w,hh)}
+    if(ovCv)c.drawImage(ovCv,0,0);
+    if(q)c.drawImage(capOv(q),0,0);
+    const vf=new VideoFrame(cv,{timestamp:fr.timestamp,duration:fdur});
+    enc.encode(vf,{keyFrame:nOut%gop===0});vf.close()}
+   nOut++;lastT=t;
    if(nOut%12===0){vp=Math.min(1,t/dur);upd()}
   }catch(e){err=err||e}finally{fr.close()}},error:e=>{err=err||e}});
  dec.configure(dcfg);
- let vp=0,ap=0;const upd=()=>{btn.textContent="កំពុង Export "+Math.min(99,Math.round(92*vp+7*ap))+"%..."};
+ let vp=0,ap=0;const upd=()=>{const el=(performance.now()-T0)/1000,eta=vp>.03?Math.round(el/vp*(1-vp)):0;btn.textContent="កំពុង Export "+Math.min(99,Math.round(92*vp+7*ap))+"%..."+(eta>0?" • នៅសល់ ~"+(eta>=90?Math.round(eta/60)+" នាទី":eta+" វិនាទី"):"")};
  let mc=0;for(const z of dm.samples)if(z.cts>mc)mc=z.cts;
  const durS=Math.max(dur,(mc-dm.start)/dm.ts+fdur/1e6),SR=ae.sr,total=Math.round(durS*SR);
  const {plan,delayed}=voiceOn?fxPlan(dub.out):{plan:[],delayed:0};
+ if(voiceOn)await fxEnsureSpeech();
+ const zonesA=voiceOn?fxZones(dub.out):[],zonesP=zonesA.map(z=>({st:z[0],en:z[1]}));
  const as=[];let adesc=null;
  const vidTask=async()=>{
  const rd=fxReader(file),S=dm.samples;
@@ -1448,9 +1515,9 @@ async function doExportFast(){
  const aenc=new AudioEncoder({output:(ch,meta)=>{const d=new Uint8Array(ch.byteLength);ch.copyTo(d);as.push({d,t:ch.timestamp});
   if(!adesc&&meta&&meta.decoderConfig&&meta.decoderConfig.description)adesc=fxCopy(meta.decoderConfig.description)},error:e=>{err=err||e}});
  aenc.configure({codec:ae.codec,sampleRate:SR,numberOfChannels:2,bitrate:ae.bitrate});
- const B=fxBounds(total,SR,plan,150);
+ const B=fxBounds(total,SR,voiceOn?zonesP.concat(plan):plan,150);
  for(let k=0;k+1B.length;k++){
-  const buf=await fxRenderWin(B[k],B[k+1],SR,bed,voiceOn?base:1,plan,base,voiceOn);
+  const buf=await fxRenderWin(B[k],B[k+1],SR,bed,voiceOn?base:1,plan,base,voiceOn,zonesA);
   const n=buf.length,pl=new Float32Array(n*2);pl.set(buf.getChannelData(0),0);pl.set(buf.numberOfChannels>1?buf.getChannelData(1):buf.getChannelData(0),n);
   aenc.encode(new AudioData({format:"f32-planar",sampleRate:SR,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(B[k]*1e6/SR),data:pl}));
   while(aenc.encodeQueueSize>8&&!err)await fxWait(1);
@@ -1741,6 +1808,19 @@ function zfMakeVR(sr){
  f.l=0;f.r=0;return f;
 }
 /* ឈ្មោះឯកសារចេញ = ឈ្មោះវីដេអូដើម (រក្សាឈ្មោះដដែល) */
+function zfVRGraph(ac,src,out){
+ var sp=ac.createChannelSplitter(2);src.connect(sp);
+ function nf(type,fr,q,g){var b=ac.createBiquadFilter();b.type=type;b.frequency.value=fr;if(q!=null)b.Q.value=q;if(g!=null)b.gain.value=g;return b}
+ var hl=nf("highpass",90,0.7071),hr=nf("highpass",90,0.7071),inv=ac.createGain(),sum=ac.createGain();inv.gain.value=-1;
+ sp.connect(hl,0);sp.connect(hr,1);hl.connect(sum);hr.connect(inv);inv.connect(sum);
+ var e1=nf("peaking",1000,1000/1800,-14),e2=nf("peaking",2800,2800/1600,-10),sh=nf("highshelf",4500,null,-9),lo=nf("lowpass",6000,0.7071),mg=ac.createGain();mg.gain.value=0.75;
+ sum.connect(e1);e1.connect(e2);e2.connect(sh);sh.connect(lo);lo.connect(mg);mg.connect(out);
+ var bl=nf("lowpass",90,0.7071),br=nf("lowpass",90,0.7071),bg=ac.createGain();bg.gain.value=0.4;
+ sp.connect(bl,0);sp.connect(br,1);bl.connect(bg);br.connect(bg);bg.connect(out);
+ var md=ac.createGain();md.gain.value=0.5;sp.connect(md,0);sp.connect(md,1);
+ var mh=nf("highpass",90,0.7071),k0=nf("peaking",500,0.6,-8),k1=nf("peaking",1000,1000/1800,-14),k2=nf("peaking",2800,2800/1600,-10),k3=nf("highshelf",4500,null,-9),k4=nf("lowpass",6000,0.7071),kg=ac.createGain();kg.gain.value=0.4;
+ md.connect(mh);mh.connect(k0);k0.connect(k1);k1.connect(k2);k2.connect(k3);k3.connect(k4);k4.connect(kg);kg.connect(out);
+}
 function fxOutName(ext){var b="export";try{b=baseName(file)||"export"}catch(e){}return b+"."+ext}
 /* កាត់សំឡេងតួអង្គចេញ (ទុក Background) ដោយ JS សុទ្ធ — កូដ zfMakeVR ពីកំណែចាស់ មិនពឹង FFmpeg/CDN */
 async function makeBgmJS(prog){
@@ -1748,7 +1828,19 @@ async function makeBgmJS(prog){
  AC=AC||new(window.AudioContext||window.webkitAudioContext)();
  if(file.size>6e8)throw new Error("ឯកសារធំពេកសម្រាប់កាត់ក្នុង JS");
  var ab=await AC.decodeAudioData(await file.arrayBuffer());
+ try{window.__spEn=fxAnalyze(ab)}catch(e){}
  var sr=ab.sampleRate,n=ab.length,L=ab.getChannelData(0),R=ab.numberOfChannels>1?ab.getChannelData(1):L;
+ /* V3.5 : Filter ដើមរបស់កំណែចាស់ (zfVRGraph) រត់ក្នុង Web Audio ដើម — លឿនជាង loop JS ច្រើនដង */
+ try{
+  var OC=window.OfflineAudioContext||window.webkitOfflineAudioContext,oc=new OC(2,n,sr),sb=oc.createBufferSource();
+  if(ab.numberOfChannels>=2)sb.buffer=ab;else{var b2=AC.createBuffer(2,n,sr);b2.copyToChannel(L,0);b2.copyToChannel(L,1);sb.buffer=b2}
+  zfVRGraph(oc,sb,oc.destination);sb.start(0);
+  prog(40,"🎶 កំពុងកាត់សំឡេងតួអង្គចេញ...");
+  var og=await oc.startRendering();
+  bgmBuf=og;window.__bgmAutoBuf=og;window.__bgmFile=file;
+  prog(100,"✅ ភ្លេងអមរួចរាល់");
+  return og;
+ }catch(e){console.warn("VR graph failed → JS loop",e)}
  var out=AC.createBuffer(2,n,sr),oL=out.getChannelData(0),oR=out.getChannelData(1),vr=zfMakeVR(sr),STEP=sr*4;
  for(var i=0;in;i++){
   vr(L[i],R[i]);
@@ -1789,16 +1881,18 @@ async function doExportCopy(){
   try{bed=await AC.decodeAudioData(await file.arrayBuffer())}catch(e){bed=null}}
  const SR=ae.sr,durS=P.sec,total=Math.max(1,Math.round(durS*SR));
  const {plan,delayed}=voiceOn?fxPlan(dub.out):{plan:[],delayed:0};
+ if(voiceOn)await fxEnsureSpeech();
+ const zonesA=voiceOn?fxZones(dub.out):[],zonesP=zonesA.map(z=>({st:z[0],en:z[1]}));
  let wl=null;try{if(navigator.wakeLock)wl=await navigator.wakeLock.request("screen")}catch(e){}
  const frames=[];let asc=null,err=null;
  const aenc=new AudioEncoder({output:(ch,meta)=>{const d=new Uint8Array(ch.byteLength);ch.copyTo(d);frames.push(d);
   if(!asc&&meta&&meta.decoderConfig&&meta.decoderConfig.description)asc=fxCopy(meta.decoderConfig.description)},error:e=>{err=err||e}});
  try{
   aenc.configure({codec:ae.codec,sampleRate:SR,numberOfChannels:2,bitrate:ae.bitrate});
-  const B=fxBounds(total,SR,plan,150);
+  const B=fxBounds(total,SR,voiceOn?zonesP.concat(plan):plan,150);
   for(let k=0;k+1B.length;k++){
    if(err)throw err;
-   const buf=await fxRenderWin(B[k],B[k+1],SR,bed,voiceOn?base:1,plan,base,voiceOn);
+   const buf=await fxRenderWin(B[k],B[k+1],SR,bed,voiceOn?base:1,plan,base,voiceOn,zonesA);
    const n=buf.length,pl=new Float32Array(n*2);
    pl.set(buf.getChannelData(0),0);pl.set(buf.numberOfChannels>1?buf.getChannelData(1):buf.getChannelData(0),n);
    aenc.encode(new AudioData({format:"f32-planar",sampleRate:SR,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(B[k]*1e6/SR),data:pl}));
@@ -1821,10 +1915,11 @@ async function doExportCopy(){
 async function doExport(){
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
  const btn=$("#exp"),old=btn.innerHTML,on=i=>!$$("#opts .b")[i].classList.contains("off");
- if(!on(0)&&!on(4)&&typeof AudioEncoder==="function"){
+ const eff=on(4)&&!!(O.blur||O.logo||O.text);
+ if(!eff&&typeof AudioEncoder==="function"){
   try{if(await doExportCopy())return}
   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("copy export:",e);showToast("⚠ Export លឿនបំផុតមិនបាន ("+String((e&&e.message)||e).slice(0,60)+") — ប្រើវិធីបន្ទាប់",false)}
- }else if(on(0)||on(4)){showToast("ℹ បិទ Subtitle និង Eff ដើម្បី Export លឿនបំផុត (មិនបម្លែងវីដេអូឡើងវិញ)",true)}
+ }else if(eff){showToast("ℹ បិទ Eff (Blur/Logo/Text) ដើម្បី Export លឿនបំផុត",true)}
  if(fxSupported()){
   try{if(await doExportFast())return}
   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("fast export:",e);showToast("⚠ Export លឿនមិនបាន ("+String((e&&e.message)||e).slice(0,70)+") — ប្រើវិធីធម្មតា",false)}
@@ -1842,7 +1937,7 @@ async function doExportRT(){
  if(voiceOn){
   if(window.__preDub){dub=window.__preDub;window.__preDub=null}else{btn.textContent="🎙 កំពុងបង្កើតសំឡេងខ្មែរ...";dub=await buildDub(btn)}
   if(!dub.out.length)throw new Error("បង្កើតសំឡេង TTS មិនបាន — ពិនិត្យអ៊ីនធឺណិត ឬ TTS Worker");
-  await fxEnsureBgm(btn);dubBus=AC.createGain();dubBus.connect(dst);
+  await fxEnsureBgm(btn);await fxEnsureSpeech();dubBus=AC.createGain();dubBus.connect(dst);
   bgG=AC.createGain();bgG.gain.value=base;bgG.connect(dst);
   if(bgmBuf){V.muted=true;bs=AC.createBufferSource();bs.buffer=bgmBuf;bs.connect(bgG)}
   else{V.muted=false;ELSRC=ELSRC||AC.createMediaElementSource(V);ELSRC.disconnect();ELSRC.connect(bgG)}
@@ -1857,7 +1952,6 @@ async function doExportRT(){
   if(on(4)){if(O.blur){c.save();c.beginPath();c.rect(0,h*.78,w,h*.2);c.clip();c.filter="blur(16px)";c.drawImage(V,0,0,w,h);c.restore()}
    if(O.logo){const lw=w*.2;c.drawImage(O.logo,w-lw-16,16,lw,lw*O.logo.height/O.logo.width)}
    if(O.text)caption(c,O.text,w/2,h*.12,w,O.fs*h)}
-  if(on(0)){const t=V.currentTime,q=cues.find(x=>t>=x.s&&t=x.e);if(q)caption(c,q.t,w/2,h*(1-O.sb),w,O.fs*h)}
   btn.textContent=`កំពុង Export ${Math.round(V.currentTime/V.duration*100)}%...`;
   if(!stop)requestAnimationFrame(draw)};
  V.onended=()=>{stop=true;rec.stop()};
@@ -3161,7 +3255,7 @@ var g=document.getElementById("gap"),b=document.getElementById("bgm");
 if(g){g.min=.05;g.max=.5;g.step=.05;if(+g.value>.5)g.value=.5}
 if(b){b.min=5;b.max=60;b.step=5}
 mk("gap",9,"cy");mk("bgm",11,"mg");
-var ip=document.querySelector("#p-bgm .ip2");if(ip)ip.innerHTML='svg viewBox="0 0 24 24" fill="currentColor">circle cx="8" cy="18" r="3.5"/>rect x="11" y="3" width="2.6" height="15"/>path d="M13.6 3c2 3.5 5 3.5 5 8-1.5-2.5-3-3-5-3z"/>/svg>';
+var ip=document.querySelector("#p-bgm .ip2");if(ip)ip.innerHTML='svg viewBox="0 0 24 24" fill="currentColor">circle cx="8" cy="18" r="3.6"/>rect x="11" y="3" width="2.6" height="15"/>path d="M13.6 3c2 3.5 5 3.5 5 8-1.5-2.5-3-3-5-3z"/>/svg>';
 })()/script>script>
 /* ===== V16: Groq (4 Keys ដំណាលគ្នា) + បកប្រែ + អានសំឡេង + ភ្លេងអម (FFmpeg ដូច APK) + 1-Click ៥ Step ===== */
 (function(){
@@ -3423,6 +3517,287 @@ $("#exp").onclick=async function(){
   window.__expRunning=false;window.__pipe=false;window.__fstep=0;window.__pmap=null;running=false;btn.disabled=false;btn.innerHTML=old;
  }
 };
+
+/* ===== V3.6 : Gemini ភ្ជាប់ត្រង់ (ដូចកូដចាស់) ៖ ផ្ទុកវីដេអូឡើង Gemini Files API ដោយ Key របស់អ្នក → ១ សំណើ វិភាគវីដេអូ + បកប្រែ + ដាក់ tag [1]-[4]។ គ្មាន Worker, គ្មានអ្វីបង្ហាញក្នុង UI ===== */
+var gdCache=null;
+async function gdVideoPart(key,media,prog){
+ var sig=(media.name||"v")+":"+media.size+":"+(media.lastModified||0)+":"+key.slice(-6);
+ if(gdCache&&gdCache.sig===sig&&Date.now()-gdCache.t40*3600*1000)return gdCache.part;
+ var type=String(media.type||"").toLowerCase();
+ if(!/^(video|audio)\//.test(type)){var n=String(media.name||"").toLowerCase();type=/\.m4a$/.test(n)?"audio/mp4":/\.mov$/.test(n)?"video/quicktime":/\.webm$/.test(n)?"video/webm":"video/mp4"}
+ var base="https://generativelanguage.googleapis.com",mb=(media.size/1048576).toFixed(1);
+ prog(6,"☁ កំពុងផ្ទុកវីដេអូឡើង Gemini ("+mb+" MB)...");
+ var start=await fetch(base+"/upload/v1beta/files",{method:"POST",headers:{"x-goog-api-key":key,"X-Goog-Upload-Protocol":"resumable","X-Goog-Upload-Command":"start","X-Goog-Upload-Header-Content-Length":String(media.size),"X-Goog-Upload-Header-Content-Type":type,"Content-Type":"application/json"},body:JSON.stringify({file:{display_name:"zsf_video"}})});
+ if(!start.ok)throw new Error("upload start HTTP "+start.status);
+ var upUrl=start.headers.get("x-goog-upload-url");if(!upUrl)throw new Error("no upload url");
+ var up=await fetch(upUrl,{method:"POST",headers:{"Content-Length":String(media.size),"X-Goog-Upload-Offset":"0","X-Goog-Upload-Command":"upload, finalize"},body:media});
+ if(!up.ok)throw new Error("upload HTTP "+up.status);
+ var f=(await up.json()).file;
+ prog(30,"☁ Gemini កំពុងរៀបចំវីដេអូ...");
+ for(var i=0;i180&&f&&f.state&&f.state!=="ACTIVE";i++){
+  if(f.state==="FAILED")throw new Error("video processing failed");
+  await new Promise(function(r){setTimeout(r,1000)});
+  var r=await fetch(base+"/v1beta/"+f.name,{headers:{"x-goog-api-key":key}});
+  if(!r.ok)throw new Error("poll HTTP "+r.status);
+  f=await r.json();prog(30+Math.min(15,i/4),"☁ Gemini កំពុងរៀបចំវីដេអូ...")}
+ if(!f||f.state!=="ACTIVE")throw new Error("video not ready");
+ var part={fileData:{mimeType:f.mimeType||type,fileUri:f.uri}};
+ gdCache={sig:sig,part:part,t:Date.now()};
+ return part}
+async function gdGenerate(parts,key,model){
+ var ctrl=new AbortController(),tm=setTimeout(function(){ctrl.abort()},240000);
+ try{
+  var res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify({contents:[{role:"user",parts:parts}],generationConfig:{temperature:.2,topP:.9,responseMimeType:"application/json",maxOutputTokens:32768,mediaResolution:"MEDIA_RESOLUTION_LOW"}}),signal:ctrl.signal});
+  var data=null;try{data=await res.json()}catch(e){}
+  if(!res.ok||(data&&data.error)){var er=new Error((data&&data.error&&data.error.message)||("HTTP "+res.status));er.status=res.status;throw er}
+  var c=data&&data.candidates&&data.candidates[0],t=((c&&c.content&&c.content.parts)||[]).map(function(p){return p.text||""}).join("").trim();
+  if(!t)throw new Error("empty response");
+  return t}
+ finally{clearTimeout(tm)}}
+function gdParse(raw){
+ var s=String(raw).replace(/^\s*```(?:json)?/i,"").replace(/```\s*$/,"").trim(),j=null;
+ try{j=JSON.parse(s)}catch(e){var a=s.indexOf("["),b=s.lastIndexOf("]");if(a>=0&&b>a){try{j=JSON.parse(s.slice(a,b+1))}catch(e2){}}}
+ if(j&&!Array.isArray(j))j=j.lines||j.items||j.entries||null;
+ if(!Array.isArray(j)){j=[];var re=/\{[^{}]*"n"\s*:\s*\d+[^{}]*\}/g,m;while((m=re.exec(s))){try{j.push(JSON.parse(m[0]))}catch(e3){}}}
+ return j}
+/* ===== V3.7 : សៀវភៅរឿង (បង្កប់ទាំងស្រុង មិនបង្ហាញក្នុង UI) + បកប្រែតាមវិធីកូដចាស់ ៖ AI ស្តាប់សំឡេង + អាន SRT → ចាប់ប្រភេទរឿង តួអង្គ ពាក្យហៅគ្នា → បកប្រែខ្មែរ + tag [1]-[4] ===== */
+var ZSF_GENRES=[
+ ["revenge","វាយមុខ/សងសឹក","face-slapping / revenge: hero humiliated then strikes back","វាយមុខ/សងសឹក៖ សម្លេងត្រជាក់ មានអំណាច និងមោទនភាព។ តួឯកនិយាយខ្លី ដាច់ណាត់ ចំអក ឬគំរាមស្ងាត់ៗ; តួអាក្រក់អួតអាង ក្រអឺតក្រទម មើលងាយអ្នកដទៃ។ ពេលតួឯកវាយបក ពាក្យត្រូវមានទម្ងន់ និងចាប់ចិត្តអ្នកមើល។"],
+ ["cross_a2m","ឆ្លងភពពីបុរាណមកសម័យថ្មី","ancient person arrives in the modern world","ឆ្លងភពពីបុរាណមកសម័យថ្មី៖ តួមកពីបុរាណនៅតែប្រើពាក្យបុរាណ គួរសម និងងឿងឆ្ងល់នឹងរបស់សម័យទំនើប; តួសម័យទំនើបនិយាយភាសាសន្ទនាធម្មតា។ ពេលយល់ច្រឡំរវាងសម័យ ត្រូវរក្សាអារម្មណ៍កំប្លែង ឬភ្ញាក់ផ្អើលឱ្យត្រូវគ្នា។"],
+ ["cross_m2a","ឆ្លងភពពីសម័យថ្មីទៅបុរាណ","modern person travels to ancient times (or contact between modern and ancient eras)","ឆ្លងសម័យ (ទំនើប ↔ បុរាណ)៖ តួសម័យទំនើបនិយាយភាសាសន្ទនាទំនើបធម្មតា; តួបុរាណ (ស្តេច មន្ត្រី ប្រជាជន) និយាយពាក្យបុរាណតាមឋានៈ។ ត្រូវបែងចែកភាសាពីរសម័យឱ្យច្បាស់តាមអ្នកនិយាយ។"],
+ ["rebirth","ត្រឡប់អតីតកាល/កើតឡើងវិញ","rebirth / returning to the past","ត្រឡប់អតីតកាល/កើតឡើងវិញ៖ តួឯកដឹងអនាគត មានភាពស្ងប់ មានទំនុកចិត្ត និងសោកស្តាយអតីតកាល; ពាក្យនិយាយអំពីអតីត/អនាគតត្រូវមានជម្រៅ មិនប្រកាន់ទម្រង់ហួសហេតុ។"],
+ ["billionaire","ប្រព័ន្ធជំនួយក្លាយជាមហាសេដ្ឋី","billionaire system: hero gets money/rewards from a system","ប្រព័ន្ធក្លាយជាមហាសេដ្ឋី៖ សារប្រព័ន្ធប្រើរចនាប័ទ្មខ្លី ផ្លូវការ ដូចសេចក្តីជូនដំណឹង (ឧ. ប្រព័ន្ធ៖ ... / ទទួលបានរង្វាន់ ...) ហើយប្រើពាក្យថេរដដែលគ្រប់ពេល; ចំនួនទឹកប្រាក់រក្សាលេខឱ្យច្បាស់; តួឯកភ្ញាក់ផ្អើល រីករាយ ឬអួតបន្តិច; អ្នកដទៃស្រឡាំងកាំង។"],
+ ["system","ប្រព័ន្ធជំនួយ","system / game-like assistant","ប្រព័ន្ធជំនួយ៖ សារប្រព័ន្ធ ភារកិច្ច រង្វាន់ កម្រិត ត្រូវប្រើពាក្យថេរតែមួយ ខ្លី ច្បាស់ ដូចសេចក្តីជូនដំណឹងប្រព័ន្ធ; សំឡេងគិតក្នុងចិត្តតួឯក និងសំឡេងប្រព័ន្ធត្រូវខុសគ្នា។"],
+ ["system_comedy","ប្រព័ន្ធជំនួយ កំប្លែងសប្បាយ","comedic system story","ប្រព័ន្ធកំប្លែង៖ សម្លេងរហ័សរហួន លេងសើច ចំអកអ្នកដទៃ ឬចំអកប្រព័ន្ធ; ប្រើពាក្យសន្ទនាសាមញ្ញ ចំហរ ហើយមិនបន្ថែមព័ត៌មានថ្មី។"],
+ ["treasure","ប្រព័ន្ធជំនួយស្វែងរកទ្រព្យសម្បត្តិ","treasure / antiques / appraisal story","ស្វែងរកទ្រព្យ/កំណប់/វត្ថុបុរាណ៖ អារម្មណ៍រំភើប ឆ្ងល់ ពេលរកឃើញវត្ថុមានតម្លៃ; ឈ្មោះវត្ថុបុរាណ តម្លៃ អាយុកាល និងពាក្យអ្នកជំនាញ ត្រូវរក្សាឱ្យត្រឹមត្រូវ និងថេរ; អ្នកជំនាញនិយាយទាក់ទាញ អ្នកមិនដឹងនិយាយសាមញ្ញ។"],
+ ["comedy","កំប្លែងសប្បាយ","comedy","កំប្លែង៖ សន្ទនារហ័ស ធម្មជាតិ មានចង្វាក់កំប្លែង (រៀបចំ → ចំណុចសើច); កុំបកប្រែរឹងពេក ឱ្យត្រូវអារម្មណ៍កំប្លែងរបស់ខ្មែរ ប៉ុន្តែមិនបន្ថែមព័ត៌មានថ្មី។"],
+ ["wuxia","ក្បាច់គុន/អ្នកលេងគុន","martial arts / wuxia","ក្បាច់គុន៖ ពាក្យយុទ្ធជន ខ្លាំងក្លា ដាច់ណាត់; ពាក្យហៅគ្នាតាមឋានៈក្នុងសាខាគុន (លោកគ្រូ ម្ចាស់សាខា ខ្ញុំអ្នកតូច ...); ក្បាច់ ថាមពលខាងក្នុង សាខាគុន ត្រូវប្រើពាក្យថេរ; ប្រយោគខ្លី មានស្មារតីក្លាហាន។"],
+ ["ancient","បុរាណចិន/រាជវាំង","ancient China / imperial court","បុរាណចិន/រាជវាំង៖ ប្រើភាសាបុរាណសមរម្យ មានឋានានុក្រម៖ ស្តេច = ព្រះអង្គ/ព្រះបាទ; និយាយទៅស្តេចប្រើ 'ទូលបង្គំ/បពិត្រព្រះអង្គ'; ស្តេចហៅខ្លួនឯង (朕) = 'យើង'; មន្ត្រី អ្នកបម្រើ និងប្រជាជនប្រើពាក្យគោរពតាមឋានៈ។ ជៀសវាងពាក្យសម័យទំនើប។"],
+ ["fantasy","វេទមន្ត និងអភូតហេតុ","fantasy / magic","វេទមន្ត/អភូតហេតុ៖ ពាក្យអាថ៌កំបាំង ពិសិដ្ឋ ឥទ្ធិពល វេទមន្ត ត្រូវប្រើពាក្យថេរតែមួយ; សម្លេងអស្ចារ្យ អាថ៌កំបាំង។"],
+ ["xianxia","ទេវកថា និងព្រះ","xianxia / cultivation / gods","ទេវកថា/ហាត់ធម៌ (Xianxia)៖ ពាក្យឋានទេព ឋានមនុស្ស កម្រិតហាត់ធម៌ ថាមពលវិញ្ញាណ ត្រូវប្រើពាក្យថេរ; រក្សាភាពឧត្តុង្គឧត្តម និងអំណាច។"],
+ ["history_war","ប្រវត្តិសាស្ត្រ និងសង្គ្រាម","historical / war","ប្រវត្តិសាស្ត្រ/សង្គ្រាម៖ ពាក្យផ្លូវការ តឹងរឹង មានឋានៈយោធា (មេទ័ព ទាហាន) និងពាក្យបញ្ជា; ប្រយោគខ្លី មានអំណាច; រក្សាឈ្មោះអ្នកដឹកនាំ ទីកន្លែង និងព្រឹត្តិការណ៍ប្រវត្តិសាស្ត្រឱ្យស៊ីសង្វាក់។"],
+ ["romance","ស្នេហាមនោសញ្ចេតនា","romance","ស្នេហា៖ ពាក្យទន់ភ្លន់ មានអារម្មណ៍ ហៅគ្នា បង/អូន ឱ្យស៊ីសង្វាក់តាមទំនាក់ទំនង; ពេលឈ្លោះប្រើពាក្យប្រកាន់ស្រពោន; ជៀសវាងពាក្យរឹងពេក។"],
+ ["ceo","CEO/ជំនួញ/មហាសេដ្ឋីសម័យទំនើប","modern CEO / business","ជំនួញ/CEO៖ ភាសាផ្លូវការ ឆ្លាតវៃក្នុងពេលប្រជុំ; CEO និយាយខ្លី ត្រជាក់ មានអំណាច; បុគ្គលិកនិយាយគួរសម; រក្សាពាក្យបច្ចេកទេសជំនួញ។"],
+ ["family","ដ្រាម៉ា និងជីវិតគ្រួសារ","family drama","ដ្រាម៉ាគ្រួសារ៖ ពាក្យហៅគ្នាតាមឋានៈក្នុងគ្រួសារ (ឪពុក ម្តាយ កូន បងប្អូន ជីដូនជីតា ក្មួយ) ឱ្យត្រូវ; អារម្មណ៍ជ្រៅ ទុក្ខព្រួយ ឈ្លោះប្រកែក ត្រូវធម្មជាតិ។"],
+ ["school","យុវវ័យ និងសាលារៀន","youth / school","សាលា/យុវវ័យ៖ ភាសាក្មេងៗ សន្ទនារហ័ស ពាក្យសាលា (លោកគ្រូ មិត្តរួមថ្នាក់ ប្រឡង); កុំប្រើពាក្យបុរាណ ឬផ្លូវការហួសហេតុ។"],
+ ["crime","ស៊ើបអង្កេត និងបទល្មើស","detective / crime","ស៊ើបអង្កេត/បទល្មើស៖ ពាក្យតឹងរឹង ត្រជាក់ អាថ៌កំបាំង; ពាក្យច្បាប់ និងប៉ូលីសប្រើឱ្យត្រឹមត្រូវ; ប្រយោគខ្លីពេលសួរចម្លើយ។"],
+ ["sports","កីឡា និងការប្រកួតប្រជែង","sports / competition","កីឡា/ការប្រកួត៖ ពាក្យមានថាមពល និងស្មារតីប្រកួត; ពាក្យបច្ចេកទេសកីឡារក្សាឱ្យត្រឹមត្រូវ; អ្នកអត្ថាធិប្បាយនិយាយលឿន។"],
+ ["scifi","វិទ្យាសាស្ត្រ និងការរស់រាន","sci-fi / survival","វិទ្យាសាស្ត្រ/រស់រាន៖ ពាក្យបច្ចេកទេស ឧបករណ៍ បច្ចេកវិទ្យា ប្រើឱ្យថេរ; សម្លេងតឹងតែង បន្ទាន់ ពេលរស់រាន។"],
+ ["horror","រន្ធត់ព្រឺក្បាល","horror","រន្ធត់៖ ប្រយោគខ្លី ស្ងាត់ ព្រឺរោម; ជៀសវាងពាក្យកំប្លែង; បង្កើតភាពតានតឹងតាមរយៈពាក្យ។"],
+ ["modern","សាច់រឿងសម័យទំនើប","modern daily life","សម័យទំនើប៖ ភាសាសន្ទនាខ្មែរសម័យទំនើប ធម្មជាតិ រហ័ស ដូចមនុស្សនិយាយពិតៗ; កុំប្រើពាក្យបុរាណ ឬផ្លូវការហួសហេតុ។"]
+];
+var ZSF_ERA_RULE="ក្បួនសម័យ៖ បើរឿងមានតួអង្គច្រើនសម័យ (បុរាណ និងទំនើប) ត្រូវប្រើភាសាតាមសម័យរបស់អ្នកនិយាយនីមួយៗ — តួបុរាណ (ឃើញពាក្យដូចជា 朕 陛下 臣 咱 草民 在下 ឬឋានៈចាស់ៗ) ប្រើពាក្យបុរាណ/រាជសព្ទតាមឋានៈ; តួទំនើបប្រើភាសាសន្ទនាធម្មតា។ ពាក្យហៅគ្នា និងពាក្យខ្លួនឯងរបស់តួអង្គម្នាក់ៗត្រូវថេរ មិនប្តូរពាក់កណ្តាលរឿង។";
+var gBible=null,gBibleSig="",gBibleFail={};
+function gGenreByCode(c){return ZSF_GENRES.find(function(g){return g[0]===c})||null}
+function gTxt(x,max){return String(x==null?"":x).replace(/[\r\n]+/g," ").replace(/\s{2,}/g," ").trim().slice(0,max||80)}
+function gKmOnly(t){t=String(t||"");return /[ក-៿]/.test(t)&&!/[㐀-鿿぀-ヿ가-힯]/.test(t)}
+function gParseJson(raw){
+ var t=String(raw||"").replace(/```json|```/gi,"").trim(),a=t.indexOf("{"),b=t.lastIndexOf("}");
+ if(a0||b=a)throw new Error("no json");
+ return JSON.parse(t.slice(a,b+1))}
+function gCleanBible(j){
+ var arr=function(x){return Array.isArray(x)?x:[]};
+ var ZH=/^[㐀-鿿·]{1,8}$/;
+ var pairs=function(x,max,re){var seen={},out=[];arr(x).forEach(function(p){var zh=gTxt(p&&p.zh,12),km=gTxt(p&&p.km,40);if(!zh||!re.test(zh)||seen[zh]||!gKmOnly(km))return;seen[zh]=1;out.push({zh:zh,km:km})});return out.slice(0,max)};
+ var chars=[],seen={};
+ arr(j.characters).forEach(function(c){
+  var zh=gTxt(c&&c.zh,10),km=gTxt(c&&c.km,40);
+  if(!zh||!ZH.test(zh)||seen[zh]||!gKmOnly(km))return;seen[zh]=1;
+  var g=/^f/i.test(c.gender||"")?"ស្រី":/^m/i.test(c.gender||"")?"ប្រុស":"?";
+  var e=/anc/i.test(c.era||"")?"បុរាណ":/mod/i.test(c.era||"")?"ទំនើប":"?";
+  chars.push({zh:zh,km:km,gender:g,era:e,role:gKmOnly(c.role_km)?gTxt(c.role_km,80):""})});
+ var genres=arr(j.genre_codes).map(function(x){return String(x||"").trim()}).filter(function(c){return gGenreByCode(c)}).filter(function(c,i,a){return a.indexOf(c)===i}).slice(0,1);
+ return {genres:genres,
+  synopsis:gKmOnly(j.synopsis_km)?gTxt(j.synopsis_km,600):"",
+  tone:gKmOnly(j.tone_km)?gTxt(j.tone_km,160):"",
+  characters:chars.slice(0,16),
+  places:pairs(j.places,12,ZH),
+  terms:pairs(j.terms,14,/^[㐀-鿿·A-Za-z0-9]{1,10}$/),
+  address:pairs(j.address,16,ZH),
+  keep_latin:arr(j.keep_latin).map(function(x){return gTxt(x,30)}).filter(function(x){return /^[A-Za-z][A-Za-z0-9'’&+\-. ]*$/.test(x)}).slice(0,30)}}
+/* ត្រូវបានហៅដោយកូដចាស់ (__zsfDirectAnalyze) តាមឈ្មោះ zsfStoryBlock — បញ្ចូលក្នុងសំណើ Gemini តែប៉ុណ្ណោះ មិនបង្ហាញក្នុង UI */
+window.zsfStoryBlock=function(){
+ var o="";
+ try{
+  var b=gBible,g=b&&b.genres&&b.genres.length?gGenreByCode(b.genres[0]):null;
+  o+="\n\n=== សៀវភៅរឿង (ត្រូវគោរពតាមនេះគ្រប់បន្ទាត់) ===";
+  o+="\nប្រភេទ/បរិយាកាសរឿង: "+(g?(g[1]+" (AI ចាប់បាន)"):"កំណត់តាមបរិបទក្នុងរឿង (ស្វ័យប្រវត្តិ)");
+  if(b){
+   if(b.synopsis)o+="\nសង្ខេបរឿង: "+b.synopsis;
+   if(b.tone)o+="\nសម្លេងរឿង: "+b.tone;
+  }
+  if(g)o+="\nការណែនាំតាមប្រភេទ:\n- "+g[3];
+  o+="\n"+ZSF_ERA_RULE;
+  if(b){
+   if(b.characters.length)o+="\nតួអង្គ (ឈ្មោះ = ខ្មែរ | ភេទ | សម័យ | តួនាទី): "+b.characters.map(function(c){return c.zh+"="+c.km+" | "+(c.gender||"?")+" | "+(c.era||"?")+" | "+(c.role||"")}).join(" ; ");
+   if(b.address.length)o+="\nពាក្យហៅគ្នា/ពាក្យខ្លួនឯង/ឋានៈ (ប្រើដូចគ្នាគ្រប់បន្ទាត់): "+b.address.map(function(a){return a.zh+"="+a.km}).join(" ; ");
+   if(b.places.length)o+="\nទីកន្លែង (ប្រើដូចគ្នា): "+b.places.map(function(a){return a.zh+"="+a.km}).join(" ; ");
+   if(b.terms.length)o+="\nពាក្យពិសេសរបស់រឿង (ប្រើដូចគ្នា): "+b.terms.map(function(a){return a.zh+"="+a.km}).join(" ; ");
+   if(b.keep_latin.length)o+="\nពាក្យអង់គ្លេស/បច្ចេកទេសដែលត្រូវរក្សាជាអក្សរឡាតាំងដដែល: "+b.keep_latin.join(", ")+"។";
+  }
+ }catch(e){console.warn("story block",e)}
+ return o};
+function gWithTimeout(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error("timeout"))},ms)})])}
+/* AI មើលវីដេអូ (បើតូច) + អាន SRT ទាំងមូល → ចាប់ប្រភេទរឿង តួអង្គ (ភេទ សម័យ តួនាទី) ពាក្យហៅគ្នា ពាក្យពិសេស។ មិនដែល throw — បរាជ័យ = null (បកប្រែបន្តតាមបរិបទដោយ AI) */
+async function gPrepareBible(keys,prog){
+ var all=cues.map(function(c){return String(c.t||"").replace(/^\s*\[[1-4]\]\s*/,"").replace(/\s+/g," ")}).join("\n");
+ if(!all.trim())return null;
+ var sig=all.length+":"+all.slice(0,60)+":"+all.slice(-60);
+ if(gBible&&gBibleSig===sig)return gBible;
+ if(gBibleSig===sig&&(gBibleFail[sig]||0)>=2)return null;
+ gBible=null;gBibleSig=sig;
+ var sample=all;
+ if(all.length>9000)sample=all.slice(0,4500)+"\n...\n"+all.slice(Math.floor(all.length/2)-1000,Math.floor(all.length/2)+1000)+"\n...\n"+all.slice(-2500);
+ var list=ZSF_GENRES.map(function(g){return g[0]+" = "+g[2]}).join("\n");
+ var mk=function(hasVideo){return (hasVideo?"Watch the ATTACHED VIDEO completely (picture and sound). Use what you SEE (faces, clothes, who talks to whom, scenes) and what you HEAR to understand the story and every character. The subtitle text at the end is only extra reference and may contain speech-recognition mistakes.":"Read the subtitle text at the end (the whole episode or a sample of it).")+"\n"+
+"You are a story analyst for Chinese short dramas that will be subtitled/dubbed into Khmer. Do NOT translate the dialogue yet. Return ONE JSON object only (no markdown, no text outside the JSON), with these keys:\n"+
+"- genre_codes: an array with EXACTLY ONE code: the single dominant genre/setting of the whole story (the premise that drives the plot). NEVER combine several genres; if the story seems to mix genres, pick only the one that matters most. Choose ONLY from this list:\n"+list+"\n"+
+"- synopsis_km: 3-5 sentences in Khmer summarising the whole story, its setting and the main conflict.\n"+
+"- tone_km: a short Khmer phrase describing the emotional tone/atmosphere (e.g. serious and tense, funny, tender).\n"+
+"- characters: up to 14 characters: {zh, km, gender (M/F/?), era (ancient/modern/other), role_km}. km = natural Khmer transliteration of the Chinese pronunciation (e.g. 陈凡 = ឆិនហ្វាន). role_km = short Khmer role AND relationship to the others (e.g. ម្ចាស់ហាងសៀវភៅ ប្តីរបស់លីណា). Decide gender from what you see/hear and keep names identical for the whole story. Use the correct Chinese characters even if the subtitle has small speech-recognition typos. If a name is never spoken, use a role name.\n"+
+"- places: up to 10 place names {zh, km} (Khmer transliteration or the usual Khmer name).\n"+
+"- terms: up to 12 recurring story-specific terms, titles, items or concepts {zh, km} with ONE fixed Khmer rendering that fits the genre.\n"+
+"- address: up to 14 forms of address / self-reference / titles used between characters (e.g. 陛下, 店家, 咱, 朕, 大哥, 少爷, 老板) {zh, km} with ONE fixed Khmer rendering suited to who speaks to whom and the era.\n"+
+"- keep_latin: English/Latin words or brand/technical terms that really appear and should stay in Latin letters (empty array if none; ignore obvious recognition errors).\n"+
+"All km values must be written in Khmer script only (no Chinese, no Latin letters).\n\nSUBTITLE TEXT:\n"+sample};
+ var m0=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
+ var models=[m0,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
+ /* វីដេអូតូច (≤ 60MB) → ឱ្យ AI មើលផ្ទាល់ ; ធំជាងនេះ ឬយឺតជាង ៦០ វិនាទី → អាន SRT តែម្យ៉ាង (លឿន) */
+ var vpart=null;
+ if(file&&file.size=60*1048576&&/^video\//.test(String(file.type||"video/mp4"))){
+  try{vpart=await gWithTimeout(gdVideoPart(keys[0],file,function(){}),60000)}catch(e){console.warn("story video → text only",e);vpart=null}}
+ for(var n=0;n2;n++){
+  var key=keys[n%keys.length];
+  for(var mi=0;mimodels.length;mi++){
+   try{
+    var raw=null;
+    if(vpart){try{raw=await gdGenerate([vpart,{text:mk(true)}],key,models[mi])}catch(ve){console.warn("story video analysis → text only",ve);vpart=null;raw=null}}
+    if(raw===null)raw=await gdGenerate([{text:mk(false)}],key,models[mi]);
+    var b=gCleanBible(gParseJson(raw));
+    if(b.genres.length||b.characters.length||b.terms.length||b.address.length){gBible=b;gBibleSig=sig;return b}
+   }catch(e){console.warn("story bible",models[mi],e);if(e&&(e.status===404||e.status===400))continue;if(e&&e.status===429)break}
+  }
+ }
+ gBibleFail[sig]=(gBibleFail[sig]||0)+1;
+ return null}
+function gNormT(t){return String(t||"").replace(/\s+/g,"").replace(/\./g,",")}
+function gParseSrtOut(srt,lines){
+ var used={},res=new Array(lines.length).fill(null),tidx={};
+ lines.forEach(function(l,i){var k=gNormT(l.time);(tidx[k]=tidx[k]||[]).push(i)});
+ String(srt||"").replace(/\r\n?/g,"\n").trim().split(/\n\s*\n+/).forEach(function(bl,k){
+  var L=bl.split("\n"),ti=-1;
+  for(var q=0;qL.length;q++){if(L[q].indexOf("-->")>=0){ti=q;break}}
+  if(ti0)return;
+  var body=L.slice(ti+1).join(" ").trim();if(!body)return;
+  var cand=tidx[gNormT(L[ti])]||[],li=-1;
+  for(var z=0;zcand.length;z++){if(!used[cand[z]]){li=cand[z];break}}
+  if(li0){var num=parseInt(L.slice(0,ti).join(" ").replace(/\D/g,""),10);if(num>=1&&num=lines.length&&!used[num-1])li=num-1}
+  if(li0)return;
+  used[li]=1;res[li]=body});
+ return res}
+function gGroups(lines,maxSec,maxLines){
+ var G=[],cur=[],t0=0;
+ lines.forEach(function(l,i){
+  if(cur.length&&(l.s-t0>maxSec||cur.length>=maxLines)){G.push(cur);cur=[]}
+  if(!cur.length)t0=l.s;
+  cur.push(i)});
+ if(cur.length)G.push(cur);
+ return G}
+async function gemDirectRun(prog){
+ prog=prog||function(){};
+ var keys=K.filter(Boolean);
+ if(!keys.length)throw new Error("គ្មាន Gemini API Key");
+ if(!file||!cues.length)throw new Error("គ្មានទិន្នន័យ");
+ if($("#target").value!=="km")return await gemDirectRunV36(prog); /* ភាសាផ្សេងពីខ្មែរ → វិធីមុន */
+ if(typeof window.__zsfDirectAnalyze!=="function")throw new Error("គ្មានម៉ាស៊ីនបកប្រែ");
+ var wantTag=!$$("#opts .b")[2].classList.contains("off"),tv=$("#target").value,TAGRE=/^\s*\[[1-4]\]\s*/;
+ var N=cues.length;
+ var lines=cues.map(function(c){return {s:c.s,time:s2t(c.s)+" --> "+s2t(c.e),text:String(c.t||"").replace(TAGRE,"").replace(/\n+/g," ").trim()||"…"}});
+ /* ១) សៀវភៅរឿង (លាក់) */
+ prog(3,"📖 កំពុងអានរឿងទាំងមូល...");
+ var bible=await gPrepareBible(keys,prog);
+ if(bible)showToast("✓ ការបកប្រែចាប់តាមបរិបទសាច់រឿងរបស់ SRT ដោយផ្ទាល់",true);
+ /* ២) បកប្រែជាផ្នែកៗ (ស្តាប់សំឡេង + អាន SRT) ដូចកូដចាស់ */
+ var groups=gGroups(lines,120,40),out=new Array(N).fill(null),doneLines=0,rr=0,stop=false;
+ prog(10,"🤖 Gemini កំពុងស្តាប់សំឡេង និងបកប្រែ...");
+ async function part(idxs,depth){
+  var sub=idxs.map(function(i){return lines[i]}),canSplit=idxs.length>=8&&depth3,err=null;
+  for(var at=0;at3;at++){
+   try{
+    var r=await window.__zsfDirectAnalyze(sub,"",(rr=rr+1));
+    var got=gParseSrtOut(r&&r.srt,sub),cnt=got.filter(Boolean).length;
+    if(cnt*2>sub.length){got.forEach(function(t,k){if(t&&!out[idxs[k]])out[idxs[k]]=t});doneLines+=idxs.length;prog(10+80*doneLines/N,"🤖 Gemini បកប្រែ "+Math.min(doneLines,N)+"/"+N+" ឃ្លា...");return}
+    err=new Error("Gemini ឆ្លើយមិនគ្រប់ ("+cnt+"/"+sub.length+")")
+   }catch(e){err=e;if(e&&(e.zsfQuota||/quota|resource.?exhausted/i.test(String(e.message||""))))throw e}
+   if(canSplit)break;
+   await new Promise(function(z){setTimeout(z,3000*(at+1))})}
+  if(canSplit){var h=Math.ceil(idxs.length/2);await part(idxs.slice(0,h),depth+1);await part(idxs.slice(h),depth+1);return}
+  throw err||new Error("Gemini បរាជ័យ")}
+ var gi=0,fatal=null;
+ async function wk(){while(!stop&&gigroups.length){var g=groups[gi++];try{await part(g,0)}catch(e){fatal=e;stop=true}}}
+ var ws=[];for(var w=0;wMath.min(4,groups.length);w++)ws.push(wk());
+ await Promise.all(ws);
+ var have=out.filter(Boolean).length;
+ if(fatal&&haveN*.2)throw fatal;
+ /* ៣) ឃ្លាដែលខ្វះ → Google តែឃ្លានោះ */
+ var miss=[];for(var q=0;qN;q++)if(!out[q])miss.push(q);
+ if(miss.length){
+  try{var gt=await googleTr(miss.map(function(i){return lines[i].text}),tv);miss.forEach(function(i,x){if(gt[x])out[i]=gt[x]})}catch(e){}}
+ var res=cues.map(function(c,i){
+  var t=out[i]||String(c.t||"").replace(TAGRE,"");
+  if(wantTag){if(!TAGRE.test(t)){var tg=(i&&/^\s*\[([1-4])\]/.test(cues[i-1].t))?+RegExp.$1:1;t="["+tg+"] "+t}}
+  else t=t.replace(/\[[1-4]\]\s*/g,"").trim();
+  return {s:c.s,e:c.e,t:t}});
+ setC(res);
+ window.__workerTagged=wantTag&&res.some(function(c){return TAGRE.test(c.t)});
+ prog(100,"✅ Gemini បកប្រែរួច "+res.length+" ឃ្លា"+(window.__workerTagged?" • មាន tag [1]-[4]":""));
+ return res.length}
+async function gemDirectRunV36(prog){
+ prog=prog||function(){};
+ var keys=K.filter(Boolean);
+ if(!keys.length)throw new Error("គ្មាន Gemini API Key");
+ if(!file||!cues.length)throw new Error("គ្មានទិន្នន័យ");
+ var wantTag=!$$("#opts .b")[2].classList.contains("off"),target=$("#target").selectedOptions[0].text,tv=$("#target").value,ctxT=$("#ctx")?$("#ctx").value:"";
+ var m0=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
+ var models=[m0,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
+ var media=file;
+ if(file.size>150*1048576){try{media=await gemWorkerMedia(prog)}catch(e){media=file}}
+ if(media.size>400*1048576)throw new Error("វីដេអូធំពេក");
+ var part=null,key=null,lastErr=null;
+ for(var ki=0;kikeys.length&&!part;ki++){try{part=await gdVideoPart(keys[ki],media,prog);key=keys[ki]}catch(e){lastErr=e;console.warn("gd upload",e)}}
+ if(!part)throw lastErr||new Error("ផ្ទុកវីដេអូមិនបាន");
+ var N=cues.length,B=120,batches=[],out=new Array(N).fill(null),tagOf=new Array(N).fill(0),done=0;
+ for(var a=0;aN;a+=B)batches.push([a,Math.min(N,a+B)]);
+ var tagRules=wantTag?("\nVOICE TAGS: tag each entry with exactly one of: 1 = male voice spoken aloud, 2 = female voice spoken aloud, 3 = male inner thought, 4 = female inner thought. Judge gender ONLY from the physical voice you hear at that timestamp (pitch and timbre), never from names, pronouns or the idea that speakers alternate. Use inner thought (3/4) only with clear audio evidence (echo, filtered or detached voice); whispering, shouting, phone calls, off-screen voices and narrators are spoken (1/2). If one entry contains two different speakers, write the tag before each part inside \"t\" like \"[1] ... [2] ...\" and set \"tag\" to the first part's tag."):"";
+ async function runBatch(a,b){
+  var lines=[];for(var i=a;ib;i++)lines.push((i+1)+" | "+s2t(cues[i].s)+" --> "+s2t(cues[i].e)+" | "+String(cues[i].t).replace(/^\s*\[[1-4]\]\s*/,"").replace(/\n/g," "));
+  var prompt="ROLE: expert Chinese short-drama translator (Chinese to "+target+"), strict SRT editor and voice analyst.\nYou are given the full ATTACHED VIDEO (picture and sound) and part of its ORIGINAL SRT (speech-recognition output, may contain mistakes; times are positions in the video). Use the video to understand who speaks, to whom, and the story. For EVERY listed entry write the "+target+" translation.\nTRANSLATION RULES: natural spoken "+target+" suitable for dubbing, concise (similar length to the original speech), consistent names and terms, correct forms of address, no explanations. Keep every entry separate (never merge or split). Story context: "+(ctxT||"-")+"."+tagRules+"\nOUTPUT: ONE JSON array only, no markdown: "+(wantTag?'[{"n":entry number>,"tag":1-4>,"t":"translation>"}]':'[{"n":entry number>,"t":"translation>"}]')+". Include EVERY entry number listed, in order.\nENTRIES (number | time | original text):\n"+lines.join("\n");
+  var last=null;
+  for(var mi=0;mimodels.length;mi++){
+   try{
+    var js=gdParse(await gdGenerate([part,{text:prompt}],key,models[mi])),got=0;
+    js.forEach(function(it){var n=+it.n-1;if(n>=a&&nb&&it.t&&String(it.t).trim()&&!out[n]){out[n]=String(it.t).trim();tagOf[n]=+it.tag||0;got++}});
+    if(got>=(b-a)*.8){done+=b-a;prog(50+45*done/N,"🤖 Gemini បកប្រែ "+Math.min(done,N)+"/"+N+" ឃ្លា...");return}
+    last=new Error("Gemini ឆ្លើយមិនគ្រប់ ("+got+"/"+(b-a)+")")}
+   catch(e){last=e;console.warn("gd batch",models[mi],e)}}
+  throw last||new Error("Gemini បរាជ័យ")}
+ prog(50,"🤖 Gemini កំពុងវិភាគវីដេអូ និងបកប្រែ...");
+ await runBatch(batches[0][0],batches[0][1]);
+ var bi=1,wk=async function(){while(bibatches.length){var x=batches[bi++];await runBatch(x[0],x[1])}};
+ await Promise.all([wk(),wk(),wk()]);
+ var miss=[];for(var q=0;qN;q++)if(!out[q])miss.push(q);
+ if(miss.length){
+  try{var g=await googleTr(miss.map(function(i){return String(cues[i].t).replace(/^\s*\[[1-4]\]\s*/,"").replace(/\n/g," ")}),tv);miss.forEach(function(i,x){if(g[x])out[i]=g[x]})}catch(e){}}
+ var res=cues.map(function(c,i){
+  var t=out[i]||String(c.t).replace(/^\s*\[[1-4]\]\s*/,"");
+  if(wantTag){if(!/^\s*\[[1-4]\]/.test(t)){var tg=tagOf[i]>=1&&tagOf[i]=4?tagOf[i]:(i&&/^\s*\[([1-4])\]/.test(cues[i-1].t)?+RegExp.$1:1);t="["+tg+"] "+t}}
+  else t=t.replace(/\[[1-4]\]\s*/g,"").trim();
+  return {s:c.s,e:c.e,t:t}});
+ setC(res);
+ window.__workerTagged=wantTag&&res.some(function(c){return /^\s*\[[1-4]\]/.test(c.t)});
+ prog(100,"✅ Gemini បកប្រែរួច "+res.length+" ឃ្លា"+(window.__workerTagged?" • មាន tag [1]-[4]":""));
+ return res.length}
+
 /* ---------- 03B · Gemini Worker : វិភាគវីដេអូ + SRT → បកប្រែខ្មែរ + ដាក់ tag [1]-[4] (URL បង្កប់ក្នុងកូដ) ---------- */
 var GEM_WORKER_URL="https://sweet-firefly-faa0.saanaafckoko.workers.dev";
 var GEM_WORKER_MAX=90*1024*1024; /* លើសនេះ → ផ្ញើតែសំឡេង (m4a តូច) */
@@ -3443,6 +3818,10 @@ async function gemWorkerMedia(prog){
 }
 /* ផ្ញើ Video + SRT ទៅ Worker → ទទួល SRT ខ្មែរ (មាន tag [1]-[4]) ; បរាជ័យ → throw (អ្នកហៅ fallback ទៅ translateAll) */
 async function gemWorkerRun(prog){
+ try{return await gemDirectRun(prog)}
+ catch(e){console.warn("gemini direct",e);showToast("⚠ Gemini ត្រង់: "+String((e&&e.message)||e).slice(0,90)+" — សាកវិធីបម្រុង",false)}
+ return await gemWorkerRunOld(prog)}
+async function gemWorkerRunOld(prog){
  if(!GEM_WORKER_URL||!file||!cues.length)throw new Error("គ្មានទិន្នន័យ");
  prog=prog||function(){};
  var media=await gemWorkerMedia(prog),orig=cues.map(function(c){return {s:c.s,e:c.e,t:c.t}});
@@ -3454,7 +3833,7 @@ async function gemWorkerRun(prog){
  fd.append("context",$("#ctx")?$("#ctx").value:"");
  fd.append("model",(typeof selections!=="undefined"&&selections.geminiModel)||"");
  prog(15,"🤖 កំពុងផ្ញើ Video + SRT ទៅ Gemini ("+(media.size/1048576).toFixed(1)+" MB)...");
- var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},10*60*1000),r;
+ var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},2*60*1000),r;
  try{r=await fetch(GEM_WORKER_URL,{method:"POST",body:fd,signal:ctl.signal})}
  catch(e){throw new Error(e.name==="AbortError"?"Worker ឆ្លើយយូរពេក":"ភ្ជាប់ Worker មិនបាន")}
  finally{clearTimeout(tm)}
@@ -3743,7 +4122,7 @@ restore();
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"3.0",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"3.7",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -3861,7 +4240,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="3.0";
+  var EMB="3.7";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
