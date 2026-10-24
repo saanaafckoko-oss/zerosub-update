@@ -3981,7 +3981,7 @@ function wipeAdminKeys(){
   ldel("zsf_keys_owner");return true;
  }catch(e){return false}
 }
-var WORKER_KEY_URL="https://patient-tree-c791.saanaafckoko.workers.dev/check";
+var WORKER_KEY_URL="https://soft-glitter-2121.saanaafckoko.workers.dev/check";
 async function workerCheck(k){
  var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){try{ctl&&ctl.abort()}catch(e){}},12000);
  try{
@@ -4174,7 +4174,7 @@ restore();
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"4.4",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"4.4",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-newbot/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -4498,7 +4498,7 @@ restore();
     setTimeout(function(){go(null)},120000);
     firstRun().then(go,function(){go(null)});
   });
-  var FIRST_BASE="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/";
+  var FIRST_BASE="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-newbot/main/";
   function firstDone(){try{return localStorage.getItem("zsf_first_upd")==="1"}catch(e){return false}}
   function firstMark(){try{localStorage.setItem("zsf_first_upd","1")}catch(e){}}
   function splash(msg,pct){
