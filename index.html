@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"5.7";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"5.8";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -926,7 +926,47 @@ $("#rpOut").onclick=()=>save("replace-words.txt",RP.map(a=>a.join("=")).join("\n
 setInterval(()=>{if($("#srtText").value.trim())$("#srtArea").classList.remove("hide")},500);
 /script>script>
 /* ===== Real features ===== */
-const dlBlob=(n,b)=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=n;a.style.display="none";(document.body||document.documentElement).appendChild(a);try{if(typeof showToast==="function")showToast("📥 កំពុងរក្សាទុកវីដេអូចូល Download ("+(b.size/1048576).toFixed(0)+"MB)... សូមរង់ចាំ កុំបិទ App",true)}catch(e){}a.click();setTimeout(()=>{try{a.remove()}catch(e){}},3000);setTimeout(()=>URL.revokeObjectURL(a.href),900000)};
+/* V5.8: រក្សាទុកវីដេអូលឿន — អានជាដុំ 6MB ដោយ FileReader (base64 ក្នុងម៉ាស៊ីន មិនប្រើ loop JS) អានដុំបន្ទាប់ពេលកំពុងសរសេរដុំមុន ហើយបង្ហាញភាគរយ/ល្បឿនពិត */
+async function zsFastSave(name,b){
+ var N=window.ZSNative;
+ if(window.ZSFApp||!N||typeof N.putFile!=="function"||typeof N.saveToDownloads!=="function")return false;
+ var CH=6*1024*1024,total=b.size,tmp="zsdl_"+Date.now()+".bin",t0=performance.now(),wrote=0;
+ if(!total)return false;
+ var rd=function(o){return new Promise(function(res,rej){var fr=new FileReader();fr.onload=function(){var s=String(fr.result);res(s.slice(s.indexOf(",")+1))};fr.onerror=function(){rej(fr.error||new Error("read"))};fr.readAsDataURL(b.slice(o,Math.min(total,o+CH)))})};
+ var mb=function(x){return (x/1048576).toFixed(0)};
+ var say=function(p,m){try{setProgress(p,m)}catch(e){}try{showToast(m,true)}catch(e){}};
+ var next=null;
+ try{
+  next=rd(0);
+  for(var o=0;ototal;o+=CH){
+   var s=await next;next=null;
+   if(o+CHtotal){next=rd(o+CH);next.catch(function(){})}
+   if(N.putFile(tmp,s,o>0)!==true)throw new Error("putFile");
+   wrote=Math.min(total,o+CH);
+   var sec=Math.max(.1,(performance.now()-t0)/1000);
+   say(Math.min(98,Math.round(wrote/total*100)),"📥 កំពុងរក្សាទុកវីដេអូ "+mb(wrote)+"/"+mb(total)+" MB • "+(wrote/1048576/sec).toFixed(1)+" MB/s");
+  }
+  say(99,"📥 កំពុងចម្លងចូល Download...");
+  var r=await new Promise(function(res){
+   var cb="zsFastCb"+Date.now(),tm=setTimeout(function(){delete window[cb];res({ok:false,error:"timeout"})},10*60*1000);
+   window[cb]=function(x){clearTimeout(tm);delete window[cb];res(x||{ok:false})};
+   try{N.saveToDownloads(name,b.type||"video/mp4",tmp,cb)}catch(e){clearTimeout(tm);delete window[cb];res({ok:false,error:String(e)})}
+  });
+  try{N.deleteFile(tmp)}catch(e){}
+  if(!r||!r.ok)throw new Error((r&&r.error)||"saveToDownloads");
+  try{setProgress(100,"✅ រក្សាទុករួច")}catch(e){}
+  try{showToast("✅ រក្សាទុករួចក្នុង Downloads: "+name+" ("+mb(total)+" MB)",true)}catch(e){}
+  return true;
+ }catch(err){
+  try{N.deleteFile(tmp)}catch(e){}
+  try{setProgress(0,"❌ រក្សាទុកមិនបាន: "+String(err&&err.message||err))}catch(e){}
+  try{showToast("❌ រក្សាទុកមិនបាន: "+String(err&&err.message||err)+(wrote?" (ទំហំទូរសព្ទពេញ?)":""),false)}catch(e){}
+  return wrote>0;   /* បើបរាជ័យមុនសរសេរអ្វីទាំងអស់ → ត្រឡប់ទៅវិធីចាស់ */
+ }
+}
+
+const zsDlLegacy=(n,b)=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=n;a.style.display="none";(document.body||document.documentElement).appendChild(a);try{if(typeof showToast==="function")showToast("📥 កំពុងរក្សាទុកវីដេអូចូល Download ("+(b.size/1048576).toFixed(0)+"MB)... សូមរង់ចាំ កុំបិទ App",true)}catch(e){}a.click();setTimeout(()=>{try{a.remove()}catch(e){}},3000);setTimeout(()=>URL.revokeObjectURL(a.href),900000)};
+const dlBlob=(n,b)=>{zsFastSave(n,b).then(ok=>{if(!ok)zsDlLegacy(n,b)}).catch(()=>zsDlLegacy(n,b))};
 let FF=null,mode="split",mergeFiles=[],bgmBuf=null,AC=null,ELSRC=null;
 const O={text:"",logo:null,blur:false,fs:.05,sb:.1};
 const say=m=>$("#splitOut").innerHTML=m;
@@ -4374,7 +4414,7 @@ restore();
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"5.7",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"5.8",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -4620,7 +4660,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="5.7";
+  var EMB="5.8";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
