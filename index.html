@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"5.3";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"5.4";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -2908,7 +2908,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     return k.filter(Boolean);}
   function fmtT(ms){ms=Math.max(0,Math.round(ms));var m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000),x=ms%1000;return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")+"."+String(x).padStart(3,"0");}
   function times(b){var p=String(b.time||"").split("-->");return {s:srtToMs((p[0]||"").trim()),e:srtToMs((p[1]||p[0]||"").trim())};}
-  function prog(t,p){try{toggleProgressBar(true,t,p)}catch(_){}}
+  function prog(t,p,real){try{if(real)setProgress(p,t);else toggleProgressBar(true,t,p)}catch(_){}}
 
   async function getAudio(f){
     if(cache.has(f))return cache.get(f);
@@ -3025,7 +3025,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     p.push({text:prompt});return p;
   }
   async function callGemini(prompt,wavB64,key,model,frames){
-    var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},150000);
+    var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},90000);
     try{
       var res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},
         body:JSON.stringify({contents:[{role:"user",parts:buildParts(prompt,wavB64,frames)}],generationConfig:{temperature:0,responseMimeType:"application/json"}}),signal:ctl.signal});
@@ -3058,26 +3058,39 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     });
     return {map:map,voices:voices,low:low};
   }
+  var zsfTagCool={};
   async function classifyChunk(lines,ctx,wavB64,frames){
     var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
     var model=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
     var ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx,!!(frames&&frames.length)),last=null,best={map:{},voices:[]};
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0);
-    var TMODELS=[model,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
+    var TMODELS=[model,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
+    var t0=Date.now(),BUDGET=150000,cooled=function(k,m){var u=zsfTagCool[k+"|"+m]||zsfTagCool[k+"|*"];return !!u&&Date.now()u};
+    /* v5.4 : ប្តូរ Model ស្វ័យប្រវត្តិពេលអស់ quota / មមាញឹក / យឺត; ប្តូរ Key ពេល Key ខុស; កំណត់ពេលអតិបរមា ១៥០ វិនាទីក្នុងមួយក្រុម */
+    outer:
     for(var round=0;round2;round++){
+      var tried=0;
       for(var tm2=0;tm2TMODELS.length;tm2++){
-        var wall=0;
         for(var n=0;nks.length;n++){
+          if(window.__zsfTagAbort||Date.now()-t0>BUDGET)break outer;
+          var key=ks[(start+n)%ks.length],m=TMODELS[tm2];
+          if(cooled(key,m))continue;
+          tried++;
           try{
-            var pr=parseTags(await callGemini(prompt,wavB64,ks[(start+n)%ks.length],TMODELS[tm2],frames),ids),c=Object.keys(pr.map).length;
+            var pr=parseTags(await callGemini(prompt,wavB64,key,m,frames),ids),c=Object.keys(pr.map).length;
             if(c>=Object.keys(best.map).length)best=pr;
             if(c===ids.size||c>0.8*ids.size)return pr;
             last=new Error("AI ឆ្លើយមិនគ្រប់បន្ទាត់");
-          }catch(e){last=e;if(e&&(e.status===404||e.status===429))wall++;}
+          }catch(e){
+            last=e;var st=e&&e.status;
+            if(st===429){zsfTagCool[key+"|"+m]=Date.now()+90000;continue}
+            if(st===401||st===403){zsfTagCool[key+"|*"]=Date.now()+600000;continue}
+            break;
+          }
         }
-        if(wallks.length)break;
       }
-      await new Promise(function(r){setTimeout(r,1500)});
+      if(!tried)break;
+      await new Promise(function(r){setTimeout(r,3000)});
     }
     if(Object.keys(best.map).length)return best;throw last||new Error("ចាត់ថ្នាក់មិនបាន");
   }
@@ -3216,8 +3229,8 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     var key=(f.name||"")+"|"+f.size+"|"+srtBlocks.length;
     if(key===lastKey&&!window.__zsfForceTag)return;window.__zsfForceTag=false;  
     if(!keys().length)return;
-    var __tTag0=Date.now();
-    prog("🎭 កំពុងរៀបចំសំឡេង សម្រាប់ចាប់ប្រុស/ស្រី...",1);
+    var __tTag0=Date.now();window.__zsfTagAbort=false;
+    prog("🎭 កំពុងរៀបចំសំឡេង សម្រាប់ចាប់ប្រុស/ស្រី...",3,true);
     var A=await getAudio(f),bps=A.info.fmt.sr*(A.info.fmt.ba||2);
     var V=null;try{V=await openVideo(f);}catch(_){V=null;}
     var maxLines=V?16:24;
@@ -3238,19 +3251,19 @@ var prep=function(g){return (async function(){try{
       }catch(e){console.warn("prep failed",e);return null;}})();};
     var prepP=groups.length?prep(0):null;
     var tagConc=5;try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=6)tagConc=tcv}catch(_){}
-    var inflight=[];
+    var inflight=[],gDone=0;
     var runGroup=async function(g,P0,ctx0){
       var idxs=groups[g];
-      prog("🎭 AI កំពុងស្តាប់សំឡេង ប្រុស/ស្រី • ក្រុម "+(g+1)+"/"+groups.length,2+8*g/groups.length);
+      prog("🎭 AI កំពុងស្តាប់សំឡេង ប្រុស/ស្រី • ក្រុម "+(g+1)+"/"+groups.length,5+80*gDone/groups.length,true);
       try{
         if(!P0)throw new Error("prep");
         var rs=await classifyChunk(P0.lines,ctx0,P0.wav,P0.fr),map=rs.map;profile=mergeProf(profile,rs.voices);Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});
         idxs.forEach(function(i){var b=srtBlocks[i],tg=map[String(b.id)];if(tg){b.text=applyTag(b.text,tg);done++;}else failed++;});
       }catch(e){console.warn("tag chunk failed",e);failed+=idxs.length;}
-      var tail=idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");ctx=profText(profile)+(tail?((profile.length?". ":"")+"Tags of the last lines before this clip (id=tag): "+tail):"");
+      gDone++;prog("🎭 AI បានស្តាប់ "+gDone+"/"+groups.length+" ក្រុម",5+80*gDone/groups.length,true);var tail=idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");ctx=profText(profile)+(tail?((profile.length?". ":"")+"Tags of the last lines before this clip (id=tag): "+tail):"");
     };
     for(var g=0;ggroups.length;g++){
-      var P0=await prepP;
+      if(window.__zsfTagAbort)break;var P0=await prepP;
       prepP=(g+1groups.length)?prep(g+1):null;
       var rec={done:false,p:null};
       rec.p=runGroup(g,P0,ctx).then(function(){this.done=true}.bind(rec));
@@ -3275,13 +3288,13 @@ var prep=function(g){return (async function(){try{
         }
       }
       srtBlocks.forEach(function(b,i){var m=TAG_RE.exec(b.text||"");if(m&&+m[1]>=3)sus[i]=1;});
-      var sl=Object.keys(sus).map(Number).sort(function(a,b){return a-b}).slice(0,40),wins=[];
+      var sl=Object.keys(sus).map(Number).sort(function(a,b){return a-b}).slice(0,24),wins=[];var __rcT0=Date.now();
       sl.forEach(function(i){var a0=Math.max(0,i-2),b0=Math.min(srtBlocks.length-1,i+2),L=wins[wins.length-1];
         if(L&&a0=L.b+1){L.b=Math.max(L.b,b0);L.t.push(i);}else wins.push({a:a0,b:b0,t:[i]});});
       for(var w=0;wwins.length;w++){
-        var W=wins[w],widx=[];for(var z=W.a;z=W.b;z++)widx.push(z);
+        if(window.__zsfTagAbort||Date.now()-__rcT0>120000){toastS("⏱ ឈប់ពិនិត្យឡើងវិញ (យូរពេក) — ប្រើលទ្ធផលដែលមានស្រាប់",true);break;}var W=wins[w],widx=[];for(var z=W.a;z=W.b;z++)widx.push(z);
         if(widx.length>40)continue;
-        prog("🎭 ពិនិត្យឡើងវិញបន្ទាត់មិនច្បាស់ "+(w+1)+"/"+wins.length,10);
+        prog("🎭 ពិនិត្យឡើងវិញបន្ទាត់មិនច្បាស់ "+(w+1)+"/"+wins.length,85+14*w/wins.length,true);
         var c0=Math.max(0,times(srtBlocks[widx[0]]).s-PAD*1000),c1=times(srtBlocks[widx[widx.length-1]]).e;
         var wv=b64(sliceWav(A.ab,A.info,Math.max(0,c0/1000-A.offset),(c1/1000+PAD)-A.offset));
         var wl=widx.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-c0)+" --> "+fmtT(t.e-c0),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,"")};});
@@ -3425,7 +3438,7 @@ window.setProgress=function(p,msg,fs){msg=msg||"";const b=q("#pbot"),pi=q("#pinl
 const pm=window.__pmap;if(pm&&!bad)n=pm[0]+n*(pm[1]-pm[0])/100;
 pc=n;b.style.display="block";document.body.classList.add("pb");
 const st=fs||window.__fstep||(/បកប្រែ|🧠/.test(msg)?2:/ចាប់ប្រុស|ចែកតួ|🎭/.test(msg)?3:/ភ្លេង|🎶/.test(msg)?5:/សំឡេង|Dub|TTS|🎙 កំពុងបង្កើត/.test(msg)&&!/ទាញ|ស្តាប់|Gemini ស្តាប់/.test(msg)?4:1),fin=n>=100&&!bad,okm=/^(✅|⏭|⚠)/.test(msg),
-txt=(bad||okm)?msg:"⚡ Step "+st+"/6: "+LBL[st-1]+" ("+Math.round(raw)+"%)...",pct=Math.round(n)+"%";
+txt=(bad||okm)?msg:"⚡ Step "+st+"/6: "+LBL[st-1]+" ("+Math.round(raw)+"%)..."+(st===3&&/🎭/.test(msg)?" • "+msg.replace(/^🎭\s*/,"").slice(0,70):""),pct=Math.round(n)+"%";
 q("#pbTx").textContent=txt;q("#pbPc").textContent=pct;q("#pbFill").style.width=n+"%";
 if(pi){pi.style.display=window.__pipe?"block":"none";q("#piTx").textContent="Export 1-Click (Step "+st+"/6)";q("#piPc").textContent=pct;q("#piFill").style.width=n+"%";q("#piMsg").textContent=txt}
 if(window.__pipe){const eb=q("#exp");if(eb)eb.innerHTML=ICO.playstack+" ⚡ កំពុងដំណើរការ 1-Click ("+pct+")..."}
@@ -3732,7 +3745,7 @@ $("#exp").onclick=async function(){
   /* Step 3 : ចែកតួ ប្រុស/ស្រី */
   phase(3);
   if(on(2)&&window.__workerTagged&&cues.some(function(c){return /^\s*\[[1-4]\]/.test(c.t)})){setProgress(100,"✅ ចែកតួរួចរាល់ (Gemini Worker)")}
-  else if(on(2)&&c!=="keep"&&K.filter(Boolean).length){setProgress(0,"🎭 កំពុងចាប់ប្រុស/ស្រី...");await tagSpeakers();setProgress(100,"✅ ចែកតួរួចរាល់")}
+  else if(on(2)&&c!=="keep"&&K.filter(Boolean).length){setProgress(0,"🎭 កំពុងចាប់ប្រុស/ស្រី...");var __tw=null;await Promise.race([tagSpeakers(),new Promise(function(r){__tw=setTimeout(function(){window.__zsfTagAbort=true;try{showToast("⏱ ចែកតួយូរពេក (៨ នាទី) — បន្តជំហានបន្ទាប់ដោយប្រើលទ្ធផលដែលមាន",true)}catch(e){}r()},480000)})]);clearTimeout(__tw);setProgress(100,"✅ ចែកតួរួចរាល់")}
   else setProgress(100,"⏭ រំលងការចែកតួ");
   if(on(2)){var tc=[0,0,0,0,0];cues.forEach(function(q){var m=/^\s*\[([1-4])\]/.exec(q.t);if(m)tc[+m[1]]++});
    if(tc[1]+tc[2]+tc[3]+tc[4])zsfDone("✓ ចែកតួរួច: ប្រុស "+tc[1]+" • ស្រី "+tc[2]+" • គិតក្នុងចិត្តប្រុស "+tc[3]+" • គិតក្នុងចិត្តស្រី "+tc[4],false);
@@ -4374,7 +4387,7 @@ restore();
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"5.3",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"5.4",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -4620,7 +4633,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="5.3";
+  var EMB="5.4";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
