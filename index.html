@@ -893,7 +893,7 @@ $("#gemBtn").onclick=async()=>{
  if(!cues.length)return alert("សូមនាំចូល SRT ជាមុន");const keys=K.filter(Boolean);if(!keys.length){$("#gbox").classList.remove("hide");return alert("សូមបញ្ចូល Gemini Key")}
  const btn=$("#gemBtn");btn.textContent="កំពុងបកប្រែ...";
  try{const out=[];let ki=0;for(let i=0;icues.length;i+=40){const part=cues.slice(i,i+40);
-  const pr=`Translate each numbered line to ${$("#target").selectedOptions[0].text}. Story context: ${$("#ctx").value}. Keep numbering, one line per item. NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. Output only numbered lines.\n`+part.map((c,j)=>`${j+1}. ${c.t.replace(/\n/g," ")}`).join("\n");
+  const pr=`Translate each numbered line to ${$("#target").selectedOptions[0].text}. Story context: ${$("#ctx").value}. Keep numbering, one line per item. NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). COMPLETE MEANING: translate every sentence fully and faithfully. Never shorten, summarize, merge or drop any word, name, number, emotion or piece of information just to make the line shorter; the line may be as long as the meaning needs. Only choose the most natural, compact Khmer wording when it loses nothing. NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. Output only numbered lines.\n`+part.map((c,j)=>`${j+1}. ${c.t.replace(/\n/g," ")}`).join("\n");
   const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GM[gmodel][1]}:generateContent?key=${keys[ki++%keys.length]}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:pr}]}]})});
   const j=await r.json();if(!r.ok)throw new Error(j.error?.message||r.status);
   const ls=(j.candidates[0].content.parts[0].text||"").split("\n").map(l=>l.replace(/^\s*\d+[.)]\s*/,"").trim()).filter(Boolean);
@@ -1276,7 +1276,7 @@ async function dubAudio(text,slot,p,slotD){
    buf=nb;cur=tot}}
  let forced=1;
  if(zsfFitOn()&&buf.duration>slotD){
-  const FM=zsfFit("fmax",1.8);let allow=Math.max(1,FM/Math.max(cur,1)),need=Math.min(buf.duration/(slotD*.97),allow);
+  const FM=zsfFit("fmax",2.0);let allow=Math.max(1,FM/Math.max(cur,1)),need=Math.min(buf.duration/(slotD*.97),allow);
   for(let f=0;f2&&need>1.01;f++){
    try{buf=wsolaStretch(buf,need)}catch(e){break}
    forced*=need;const nl=buf.duration;if(nl=slotD)break;
@@ -1292,7 +1292,7 @@ async function buildDub(btn){
   while(nextjobs.length){
    const j=jobs[next++],p=presetOf(j.slot);
    try{
-    const D0=j.q.e-j.q.s,sd=(j.q._on!=null&&j.q._off>j.q._on+.3&&Math.abs(j.q._on-j.q.s)=.8)?Math.max(D0*.6,Math.min(D0*1.6,j.q._off-j.q._on)):D0;
+    const D0=j.q.e-j.q.s,sd=(j.q._on!=null&&j.q._off>j.q._on+.3&&j.q._on-j.q.s>=-.8&&j.q._on-j.q.s=2.2)?Math.max(D0*.6,Math.min(D0*1.6,j.q._off-j.q._on)):D0;
     const r=await dubAudio(j.text,j.slot,p,zsfAvail(j.q,Math.max(.2,sd),__cs[(__ix.get(j.q)||0)+1]));
     if(r.boost)sped++;
     out.push({q:j.q,slot:j.slot,buf:r.buf,p,tt:r.tt});
@@ -1308,7 +1308,7 @@ async function buildDub(btn){
 
 function zsfPlaceItems(items){
  /* V5.9: គ្មានជាន់ឃ្លា/ជាន់កន្ទុយទៀត — ឃ្លាបន្ទាប់ចាប់ផ្តើមបន្ទាប់ពីឃ្លាមុនចប់ជានិច្ច (+ចន្លោះ GAP) · ពន្យារសំឡេងទាំងមូលតាម DLY ឱ្យត្រូវមាត់ */
- const SPL=zsfFit("spill2",0),FM=zsfFit("fmax",1.8),ON=zsfFitOn(),DLY=zsfFit("delay",.15),GAP=zsfFit("gap2",.08);
+ const SPL=zsfFit("spill2",0),FM=zsfFit("fmax",2.0),ON=zsfFitOn(),DLY=zsfFit("delay",.15),GAP=zsfFit("gap2",.08);
  let cursor=0,delayed=0;const st=[];
  items.forEach((it,i)=>{
   const b0=it.buf0||(it.buf0=it.buf);let buf=b0,o0=Math.max(0,fxOn(it.q)+DLY);
@@ -1516,7 +1516,7 @@ async function fxPickAudio(){
  return null}
 const fxCopy=d=>{if(!d)return null;return d.byteLength!==undefined&&d.buffer?new Uint8Array(d.buffer.slice(d.byteOffset,d.byteOffset+d.byteLength)):new Uint8Array(d.slice(0))};
 /* ទីតាំងចាក់សំឡេងខ្មែរ (ដូច scheduleDub ៖ មិនឱ្យជាន់គ្នា) */
-const fxOn=q=>(q._on!=null&&Math.abs(q._on-q.s)=.8)?q._on:q.s;
+const fxOn=q=>(q._on!=null&&q._on-q.s>=-.8&&q._on-q.s=2.2)?q._on:q.s;
 function fxPlan(items){let prevEnd=0,delayed=0;
  try{fxSpeechZones()}catch(e){}
  const __P=zsfPlaceItems(items);delayed=__P.delayed;const plan=items.map((it,__i)=>{const st=__P.st[__i],en=st+it.buf.duration;return{it,st,en}});
@@ -1545,6 +1545,8 @@ async function fxEnsureSpeech(){
  if(window.__spEn&&window.__spEn.file===file)return;
  try{if(file.size>4e8)return;AC=AC||new(window.AudioContext||window.webkitAudioContext)();
   const ab=await AC.decodeAudioData(await file.arrayBuffer());window.__spEn=fxAnalyze(ab)}catch(e){console.warn("speech analyze",e)}}
+
+function zsfPrevCue(q){var best=null;for(var i=0;icues.length;i++){var c=cues[i];if(c!==q&&c.sq.s&&(!best||c.s>best.s))best=c}return best}
 function fxSpeechZones(){
  const SP=window.__spEn;if(!SP||SP.file!==file||!SP.e.length)return null;
  const fs=SP.fs,e=SP.e,n=e.length,db=new Float32Array(n);
@@ -1553,13 +1555,13 @@ function fxSpeechZones(){
  for(const q of cues){
   q._on=null;q._off=null;
   if(!String(q.t||"").replace(/\[[1-4]\]/g,"").trim())continue;
-  const i0=Math.max(0,Math.floor((q.s-.7)/fs)),i1=Math.min(n,Math.ceil((q.e+1)/fs));
+  const __pv=zsfPrevCue(q),i0=Math.max(0,Math.floor((Math.max(q.s-.7,(__pv&&__pv.e>q.s-.7&&__pv.eq.e-.3)?__pv.e+.05:0))/fs)),i1=Math.min(n,Math.ceil((q.e+1)/fs));
   if(i1-i03){out.push([q.s,q.e]);continue}
   const w=Array.from(db.subarray(i0,i1)).sort((a,b)=>a-b),p90=w[Math.floor(w.length*.9)],thr=Math.max(floor+8,p90-18);
   let st=-1,found=false;
   for(let i=i0;i=i1;i++){const on=ii1&&db[i]>thr;
    if(on&&st0)st=i;
-   if(!on&&st>=0){out.push([st*fs,i*fs]);if(q._on===null)q._on=st*fs;q._off=i*fs;st=-1;found=true}}
+   if(!on&&st>=0){out.push([st*fs,i*fs]);if((i-st)*fs>=.2){if(q._on===null)q._on=st*fs;q._off=i*fs}st=-1;found=true}}
   if(!found)out.push([q.s,q.e])}
  return out.map(z=>[Math.max(0,z[0]-.12),z[1]+.25])}
 function fxZones(items){
@@ -2579,13 +2581,14 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
   async function classifyChunk(lines,ctx,wavB64,frames){
     var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
     var model=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
-    var ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx,!!(frames&&frames.length)),last=null,best={map:{},voices:[]};
+    var __t0=Date.now(),ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx,!!(frames&&frames.length)),last=null,best={map:{},voices:[]};
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0);
     var TMODELS=[model,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
     for(var round=0;round2;round++){
       for(var tm2=0;tm2TMODELS.length;tm2++){
         var wall=0;
         for(var n=0;nks.length;n++){
+          if(Date.now()-__t0>240000||window.__zsfTagAbort){round=9;tm2=99;break}
           try{
             var pr=parseTags(await callGemini(prompt,wavB64,ks[(start+n)%ks.length],TMODELS[tm2],frames),ids),c=Object.keys(pr.map).length;
             if(c>=Object.keys(best.map).length)best=pr;
@@ -2624,7 +2627,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     "   Whisper, shout, off-screen voice, narrator and phone calls are SPOKEN ([1] or [2]). Inner thoughts are common in this genre: if the voice sounds echoed, reverberant, filtered or detached from the room, tag it as a thought ([3]/[4]); choose spoken only when the voice sounds natural and present in the room. If voices overlap, use the main voice only.",
     "   VOICE RULES: gender is judged ONLY from the physical voice (pitch and timbre), never from names, pronouns, titles or the idea that speakers alternate. Build a small voice table in your head (A, B, C ...): one voice = one person = one gender. One speaker often says several lines in a row; lines with a tiny gap (under about 0.3 s) are usually the same speaker continuing. When two neighbouring lines switch between male and female, re-listen to confirm the voice really changed. If still unsure, keep the voice of the neighbouring line in the same scene.",
     "3) Translate the line into natural, spoken Khmer. The STORY CARD / genre block given below (if present) is MANDATORY: it decides vocabulary, register, rhythm and emotion of EVERY line (e.g. revenge or face-slap = cold, sharp, proud; sweet romance = soft and warm; ancient or palace = old-style and royal words by rank; comedy = light and playful; horror or suspense = tense and short). If the genre says AUTO, work out the genre from the story and sound, then follow it. Keep character names and forms of address consistent.",
-    "NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. ",
+    "COMPLETE MEANING: translate every sentence fully and faithfully. Never shorten, summarize, merge or drop any word, name, number, emotion or piece of information just to make the line shorter; the line may be as long as the meaning needs. Only choose the most natural, compact Khmer wording when it loses nothing. NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. ",
     "NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). ",
     "4) The tag decides the Khmer wording: a male speaker ([1]/[3]) uses ខ្ញុំ / ខ្ញុំបាទ and the reply «បាទ»; a female speaker ([2]/[4]) uses ខ្ញុំ / នាងខ្ញុំ and the reply «ចាស». Never mix them. An inner thought ([3]/[4]) is a private first-person monologue: address nobody and add no polite reply particles.",
     "",
@@ -3052,7 +3055,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
       var d=c.toDataURL("image/jpeg",0.6),i=d.indexOf(",");return i>0?d.slice(i+1):null;}catch(e){return null}
   }
   async function grabFramesFor(v,idxs,clipMs){
-    var per=Math.max(1,Math.min(2,Math.floor(90/Math.max(1,idxs.length)))),out=[],bad=0;
+    var per=Math.max(1,Math.min(3,Math.floor(90/Math.max(1,idxs.length)))),out=[],bad=0;
     for(var q=0;qidxs.length;q++){
       var b=srtBlocks[idxs[q]],t=times(b),d=Math.max(0,t.e-t.s),n=d500?1:per,jp=[],lb=[];
       for(var k=0;kn;k++){
@@ -3150,13 +3153,14 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
   async function classifyChunk(lines,ctx,wavB64,frames,fast){
     var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
     var model=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
-    var ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx,!!(frames&&frames.length)),last=null,best={map:{},voices:[]};
+    var __t0=Date.now(),ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx,!!(frames&&frames.length)),last=null,best={map:{},voices:[]};
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0);
     var TMODELS=[model,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
     for(var round=0;round2;round++){
       for(var tm2=0;tm2TMODELS.length;tm2++){
         var wall=0;
         for(var n=0;nks.length;n++){
+          if(Date.now()-__t0>240000||window.__zsfTagAbort){round=9;tm2=99;break}
           try{
             var pr=parseTags(await callGemini(prompt,wavB64,ks[(start+n)%ks.length],TMODELS[tm2],frames,fast),ids),c=Object.keys(pr.map).length;
             if(c>=Object.keys(best.map).length)best=pr;
@@ -3195,7 +3199,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     "   Whisper, shout, off-screen voice, narrator and phone calls are SPOKEN ([1] or [2]). Inner thoughts are common in this genre: if the voice sounds echoed, reverberant, filtered or detached from the room, tag it as a thought ([3]/[4]); choose spoken only when the voice sounds natural and present in the room. If voices overlap, use the main voice only.",
     "   VOICE RULES: gender is judged ONLY from the physical voice (pitch and timbre), never from names, pronouns, titles or the idea that speakers alternate. Build a small voice table in your head (A, B, C ...): one voice = one person = one gender. One speaker often says several lines in a row; lines with a tiny gap (under about 0.3 s) are usually the same speaker continuing. When two neighbouring lines switch between male and female, re-listen to confirm the voice really changed. If still unsure, keep the voice of the neighbouring line in the same scene.",
     "3) Translate the line into natural, spoken Khmer. The STORY CARD / genre block given below (if present) is MANDATORY: it decides vocabulary, register, rhythm and emotion of EVERY line (e.g. revenge or face-slap = cold, sharp, proud; sweet romance = soft and warm; ancient or palace = old-style and royal words by rank; comedy = light and playful; horror or suspense = tense and short). If the genre says AUTO, work out the genre from the story and sound, then follow it. Keep character names and forms of address consistent.",
-    "NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. ",
+    "COMPLETE MEANING: translate every sentence fully and faithfully. Never shorten, summarize, merge or drop any word, name, number, emotion or piece of information just to make the line shorter; the line may be as long as the meaning needs. Only choose the most natural, compact Khmer wording when it loses nothing. NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. ",
     "NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). ",
     "4) The tag decides the Khmer wording: a male speaker ([1]/[3]) uses ខ្ញុំ / ខ្ញុំបាទ and the reply «បាទ»; a female speaker ([2]/[4]) uses ខ្ញុំ / នាងខ្ញុំ and the reply «ចាស». Never mix them. An inner thought ([3]/[4]) is a private first-person monologue: address nobody and add no polite reply particles.",
     "",
@@ -3328,19 +3332,20 @@ var prep=function(g){return (async function(){try{
         return {idxs:idxs,wav:wav,lines:lines,fr:fr};
       }catch(e){console.warn("prep failed",e);return null;}})();};
     var prepP=groups.length?prep(0):null;
-    var tagConc=5;try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=6)tagConc=tcv}catch(_){}
+    var tagConc=Math.max(5,Math.min(10,keys().length*3));try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=6)tagConc=tcv}catch(_){}
     var inflight=[];
     var runGroup=async function(g,P0,ctx0){
       var idxs=groups[g];
       prog("🎭 AI កំពុងស្តាប់សំឡេង ប្រុស/ស្រី • ក្រុម "+(g+1)+"/"+groups.length,2+8*g/groups.length);
       try{
         if(!P0)throw new Error("prep");
-        var rs=await classifyChunk(P0.lines,ctx0,P0.wav,P0.fr,true),map=rs.map;profile=mergeProf(profile,rs.voices);Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});
+        var rs=await classifyChunk(P0.lines,ctx0,P0.wav,P0.fr),map=rs.map;profile=mergeProf(profile,rs.voices);Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});
         idxs.forEach(function(i){var b=srtBlocks[i],tg=map[String(b.id)];if(tg){b.text=applyTag(b.text,tg);done++;}else failed++;});
       }catch(e){console.warn("tag chunk failed",e);failed+=idxs.length;}
       var tail=idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");ctx=profText(profile)+(tail?((profile.length?". ":"")+"Tags of the last lines before this clip (id=tag): "+tail):"");
     };
     for(var g=0;ggroups.length;g++){
+      if(window.__zsfTagAbort)break;
       var P0=await prepP;
       prepP=(g+1groups.length)?prep(g+1):null;
       var rec={done:false,p:null};
@@ -3373,7 +3378,7 @@ var prep=function(g){return (async function(){try{
       for(var w=0;wwins.length;w++){
         var W=wins[w],widx=[];for(var z=W.a;z=W.b;z++)widx.push(z);
         if(widx.length>40)continue;
-        prog("🎭 ពិនិត្យឡើងវិញបន្ទាត់មិនច្បាស់ "+(w+1)+"/"+wins.length,10);
+        if(window.__zsfTagAbort||Date.now()-__tTag0>420000){prog("🎭 រំលងការពិនិត្យឡើងវិញ (យូរពេក)",9);break}prog("🎭 ពិនិត្យឡើងវិញបន្ទាត់មិនច្បាស់ "+(w+1)+"/"+wins.length,10);
         var c0=Math.max(0,times(srtBlocks[widx[0]]).s-PAD*1000),c1=times(srtBlocks[widx[widx.length-1]]).e;
         var wv=b64(sliceWav(A.ab,A.info,Math.max(0,c0/1000-A.offset),(c1/1000+PAD)-A.offset));
         var wl=widx.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-c0)+" --> "+fmtT(t.e-c0),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,"")};});
@@ -3467,7 +3472,7 @@ $("#gemBtn").onclick=async function(){
     for(var i=0;icues.length;i+=40){
       setProgress(Math.round(i/cues.length*100),"🧠 កំពុងបកប្រែ "+Math.min(i+40,cues.length)+"/"+cues.length);
       var part=cues.slice(i,i+40);
-      var pr="You are a professional Khmer subtitle translator. Translate each numbered line to "+tl+". Story context: "+$("#ctx").value+". Keep numbering, one line per item. If a line starts with a tag like [1], [2], [3] or [4], keep that tag unchanged at the start of the translated line. NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. Output only numbered lines.\n"+part.map(function(c,j){return (j+1)+". "+c.t.replace(/\n/g," ")}).join("\n");
+      var pr="You are a professional Khmer subtitle translator. Translate each numbered line to "+tl+". Story context: "+$("#ctx").value+". Keep numbering, one line per item. If a line starts with a tag like [1], [2], [3] or [4], keep that tag unchanged at the start of the translated line. NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). COMPLETE MEANING: translate every sentence fully and faithfully. Never shorten, summarize, merge or drop any word, name, number, emotion or piece of information just to make the line shorter; the line may be as long as the meaning needs. Only choose the most natural, compact Khmer wording when it loses nothing. NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. Output only numbered lines.\n"+part.map(function(c,j){return (j+1)+". "+c.t.replace(/\n/g," ")}).join("\n");
       var txt=null,lastE=null;
       for(var n=0;nkeys.length&&txt===null;n++){
         try{txt=await requestGemini(pr,keys[(ki+n)%keys.length],selections.geminiModel,false)}catch(e){lastE=e}
@@ -3604,14 +3609,14 @@ function planCuts(pcm){
 
 /* ===== v4.6 : cue ពេលវេលា = ពាក្យដំបូង → ពាក្យចុងក្រោយ (word timestamps) ដើម្បីត្រូវពេលវីដេអូដើម ===== */
 function zsfGroqCues(j,o){
- var segs=(j.segments||[]).filter(function(s){return !(s.no_speech_prob>0.85&&!(s.avg_logprob>-0.8))&&!(s.no_speech_prob>0.97)}),W=(j.words||[]).filter(function(w){return isFinite(w.start)&&isFinite(w.end)&&w.end>=w.start}),out=[],g=segs.map(function(){return []});
+ var segs=(j.segments||[]).filter(function(s){var n=s.no_speech_prob||0,l=(s.avg_logprob==null)?-0.3:s.avg_logprob;return !(n>0.85&&!(l>-0.5))&&!(n>0.6&&l-1)&&!(l-1.5)&&!(s.compression_ratio>2.4)}),W=(j.words||[]).filter(function(w){return isFinite(w.start)&&isFinite(w.end)&&w.end>=w.start}),out=[],g=segs.map(function(){return []});
  W.forEach(function(w){var m=(w.start+w.end)/2,bi=-1,bd=1e9;
   segs.forEach(function(s,i){var d=(m>=s.start&&m=s.end)?0:Math.min(Math.abs(m-s.start),Math.abs(m-s.end));if(dbd){bd=d;bi=i}});
   if(bi>=0&&bd=1.0)g[bi].push(w)});
  segs.forEach(function(s,i){var t=String(s.text||"").trim();if(!t)return;
   var a=s.start,b=s.end,ws=g[i];
   if(ws.length){var wa=ws[0].start,wb=ws[ws.length-1].end;if(wb>wa&&wa>=s.start-1&&wb=s.end+1){a=wa;b=wb}}
-  out.push({s:a+o,e:b+o,t:t})});
+  out.push({s:a+o,e:b+o,t:t,nsp:s.no_speech_prob||0,lp:(s.avg_logprob==null)?-0.3:s.avg_logprob})});
  return out}
 
 /* ===== V6.1 : ស្តារពាក្យដែលបាត់ — រកកន្លែងមានសំឡេងនិយាយតែគ្មានអក្សរ ហើយស្តាប់ម្តងទៀត ===== */
@@ -3622,7 +3627,7 @@ function zsfSpeechRegions(pcm){
  var floor=srt[Math.floor(nf*0.2)]||0,th=Math.max(0.012,floor*3),reg=[],st=-1,last=-1;
  for(f=0;fnf;f++){if(e[f]>th){if(st0)st=f;last=f}else if(st>=0&&f-last>8){reg.push([st*0.05,(last+1)*0.05]);st=-1}}
  if(st>=0)reg.push([st*0.05,(last+1)*0.05]);
- return reg.filter(function(r){return r[1]-r[0]>=0.5})}
+ return reg.filter(function(r){return r[1]-r[0]>=0.8})}
 async function zsfGapFill(pcm,out,keys,prog){
  var reg=zsfSpeechRegions(pcm),gaps=[],dur=pcm.length/32000;
  reg.forEach(function(r){var cov=0;out.forEach(function(c){var a=Math.max(r[0],c.s-0.1),b=Math.min(r[1],c.e+0.1);if(b>a)cov+=b-a});
@@ -3633,7 +3638,7 @@ async function zsfGapFill(pcm,out,keys,prog){
   if(b-a0.6)continue;
   try{
    var part=pcm.subarray(Math.floor(a*16000)*2,Math.floor(b*16000)*2),j=await groqCall(wavChunk(part),keys,st),cs=zsfGroqCues(j,a);
-   cs.forEach(function(c){if(!c.t||(H&&H.test(c.t)))return;
+   cs.forEach(function(c){if(!c.t||(H&&H.test(c.t)))return;if(c.nsp>0.5||c.lp-0.8||c.t.length2)return;
     var ov=0;out.forEach(function(x){var o2=Math.min(c.e,x.e)-Math.max(c.s,x.s);if(o2>0)ov+=o2});
     if(ov/Math.max(0.1,c.e-c.s)>0.5)return;
     out.push({s:c.s,e:Math.max(c.s+.25,c.e),t:c.t});added++})
@@ -3652,11 +3657,72 @@ function zsfCleanPcm(pcm){
  for(i=0;in;i++)x[i]=dv.getInt16(i*2,true)/32768;
  x=zsfBiquad(zsfBiquad(x,"hp",110,16000),"hp",110,16000);x=zsfBiquad(zsfBiquad(x,"lp",3800,16000),"lp",3800,16000);
  var W=8000,nw=Math.ceil(n/W),g=new Float32Array(nw),TG=0.12;
- for(var k=0;knw;k++){var a=k*W,b=Math.min(n,a+W),s=0;for(i=a;ib;i++)s+=x[i]*x[i];var r=Math.sqrt(s/Math.max(1,b-a));g[k]=r0.003?1:Math.max(0.8,Math.min(5,TG/r))}
+ for(var k=0;knw;k++){var a=k*W,b=Math.min(n,a+W),s=0;for(i=a;ib;i++)s+=x[i]*x[i];var r=Math.sqrt(s/Math.max(1,b-a));g[k]=r0.012?1:Math.max(0.8,Math.min(2.5,TG/r))}
  var out=new Uint8Array(n*2),ov=new DataView(out.buffer);
  for(i=0;in;i++){var p=i/W-0.5,k0=Math.max(0,Math.min(nw-1,Math.floor(p))),k1=Math.min(nw-1,k0+1),t=Math.max(0,Math.min(1,p-k0)),gg=g[k0]*(1-t)+g[k1]*t,v=x[i]*gg;
   v=Math.tanh(v*1.1)/1.1*0.95;ov.setInt16(i*2,Math.max(-32768,Math.min(32767,Math.round(v*32767))),true)}
  return out}
+
+/* ===== V6.3 : តម្រឹមពេលវេលាតាមមាត់តួពិត + លុបឃ្លាក្លែងក្លាយនៅកន្លែងគ្មានសំឡេងនិយាយ ===== */
+function zsfSpeechMask(pcm){
+ var n=pcm.length>>1,dv=new DataView(pcm.buffer,pcm.byteOffset,n*2),FR=800,nf=Math.floor(n/FR),e=new Float32Array(nf),f,k;
+ for(f=0;fnf;f++){var sum=0,o=f*FR;for(k=0;kFR;k++){var v=dv.getInt16((o+k)*2,true)/32768;sum+=v*v}e[f]=Math.sqrt(sum/FR)}
+ var sm=new Float32Array(nf);for(f=0;fnf;f++){var a=0,c=0;for(k=-1;k=1;k++){if(e[f+k]!==undefined){a+=e[f+k];c++}}sm[f]=a/c}
+ var srt=Array.prototype.slice.call(sm).sort(function(a,b){return a-b}),fl=srt[Math.floor(nf*0.15)]||0,hi=srt[Math.floor(nf*0.9)]||0.05;
+ var th=Math.max(0.008,fl*2.5,hi*0.06),m=new Uint8Array(nf),sp=0;
+ for(f=0;fnf;f++){if(sm[f]>th){m[f]=1;sp++}}
+ return {m:m,nf:nf,ratio:sp/Math.max(1,nf)}}
+function zsfSnapCues(pcm,cues0){
+ var M=zsfSpeechMask(pcm),m=M.m,nf=M.nf,FT=0.05,useful=M.ratio0.9&&M.ratio>0.02,out=[];
+ cues0.sort(function(a,b){return a.s-b.s});
+ cues0.forEach(function(c,ix){
+  var s=c.s,e=c.e,t=c.t;
+  if(useful){
+   var fa=Math.max(0,Math.floor(s/FT)),fb=Math.min(nf-1,Math.ceil(e/FT)),sp=0,i;
+   for(i=fa;i=fb;i++)sp+=m[i];
+   if((fb-fa+1)>=4&&sp/(fb-fa+1)0.12)return;
+   var sa=Math.max(0,Math.floor((s-0.5)/FT)),sb=Math.min(nf-2,Math.floor((e-0.1)/FT)),ns=-1;
+   for(i=sa;i=sb;i++){if(m[i]&&m[i+1]){ns=i;break}}
+   if(ns>=0){var s2=ns*FT;if(s2>s-0.5&&s2e-0.15)s=s2}
+   var ea=Math.min(nf-1,Math.floor((e+0.5)/FT)),eb=Math.max(0,Math.floor((s+0.1)/FT)),ne=-1;
+   for(i=ea;i>=eb;i--){if(m[i]&&m[i-1>=0?i-1:0]){ne=i;break}}
+   if(ne>=0){var e2=(ne+1)*FT+0.08;if(e2>s+0.2)e=Math.max(e2,e-0.25)}
+  }
+  var p=out[out.length-1],p2=out[out.length-2];
+  if(p&&p2&&p.t===t&&p2.t===t)return;
+  out.push({s:s,e:Math.max(s+0.25,e),t:t})});
+ return out}
+
+/* ===== V7.0 : Gemini ស្តាប់សំឡេង + ចែកតួ + បកប្រែ ដំណាលគ្នាពេលទាញអក្សរ (ដោយស្ងាត់ៗ ក្នុង 1-Click) ===== */
+function zsfStreamNorm(t){return String(t||"").replace(/\s+/g,"").replace(/[，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g,"")}
+function zsfStreamStart(total){
+ var H=(typeof ZSF_HALLUC!=="undefined")?ZSF_HALLUC:null,S={res:[],next:0,buf:[],q:[],run:0,rr:0,off:false,waiters:[]};
+ var store={};window.__zsfPre={store:store};
+ function fix(t){t=String(t||"").trim();try{if(typeof RP!=="undefined"&&RP.length)RP.forEach(function(a){t=t.split(a[0]).join(a[1])})}catch(e){}return t.replace(/\n+/g," ").trim()}
+ function fin(){S.run--;pump();if(!S.run&&!S.q.length)S.waiters.splice(0).forEach(function(f){f()})}
+ function pump(){while(!S.off&&S.run2&&S.q.length){var b=S.q.shift();S.run++;task(b).then(fin,fin)}}
+ async function task(sub){
+  for(var at=0;at2;at++){
+   try{
+    var r=await window.__zsfDirectAnalyze(sub,"",(S.rr=S.rr+1)),got=gParseSrtOut(r&&r.srt,sub),cnt=got.filter(Boolean).length;
+    if(cnt*2>sub.length){got.forEach(function(t,k){if(!t)return;var key=zsfStreamNorm(sub[k].text);(store[key]=store[key]||[]).push({s:sub[k].s,t:t})});return}
+   }catch(e){if(e&&(e.zsfQuota||/quota|resource.?exhausted/i.test(String(e.message||"")))){S.off=true;return}}
+   await new Promise(function(z){setTimeout(z,2500)})}}
+ function flush(final){
+  S.buf.sort(function(a,b){return a.s-b.s});
+  while(S.buf.length){
+   var take=[],t0=S.buf[0].s;
+   for(var i=0;iS.buf.length;i++){var c=S.buf[i];if(take.length&&(c.s-t0>120||take.length>=40))break;take.push(c)}
+   if(take.lengthS.buf.length||final){S.buf.splice(0,take.length);if(!S.off)S.q.push(take)}else break}
+  pump()}
+ S.note=function(i,arr){
+  S.res[i]=arr||[];
+  while(S.nexttotal&&S.res[S.next]!==undefined){
+   S.res[S.next].forEach(function(x){var t=fix(x.t);if(!t||(H&&H.test(t)))return;var e=Math.max(x.s+.25,x.e);S.buf.push({s:x.s,e:e,time:s2t(x.s)+" --> "+s2t(e),text:t})});
+   S.next++}
+  flush(S.next>=total)};
+ S.finish=function(maxMs){flush(true);return new Promise(function(r){if(S.off||(!S.run&&!S.q.length))return r();var t=setTimeout(r,maxMs);S.waiters.push(function(){clearTimeout(t);r()})})};
+ return S}
 async function groqTranscribe(prog){
  var keys=G.filter(Boolean);
  if(!keys.length){$("#gqbox").classList.remove("hide");throw new Error("សូមបញ្ចូល Groq Key ជាមុន")}
@@ -3664,10 +3730,11 @@ async function groqTranscribe(prog){
  prog(3,"🎧 កំពុងទាញសំឡេងពីវីដេអូ...");
  var wav=await extractVideoAudioV32Prototype(file);
  var u8=new Uint8Array(await wav.arrayBuffer()),off=wavDataOffset(u8),pcm=u8.subarray(off,off+((u8.length-off)&~1));
- var __cl=document.getElementById("zsfClean");if(__cl&&__cl.checked){try{prog(7,"🎚 កំពុងសម្អាតសំឡេង...");await sleep(20);pcm=zsfCleanPcm(pcm)}catch(e){console.warn("clean",e)}}
+ var pcm0=pcm,__cl=document.getElementById("zsfClean");if(__cl&&__cl.checked){try{prog(7,"🎚 កំពុងសម្អាតសំឡេង...");await sleep(20);pcm=zsfCleanPcm(pcm)}catch(e){console.warn("clean",e)}}
  prog(8,"🎵 វិភាគរកចន្លោះស្ងាត់ដកដង្ហើម (Silence Points 15s - 30s)...");
  await sleep(30);
  var plan=planCuts(pcm),total=plan.length;
+ if(window.__zsfStreamWant){try{window.__zsfStream=zsfStreamStart(total)}catch(e){window.__zsfStream=null}}
  prog(10,"🎵 បានបំបែកជា "+total+" កង់ (ចន្លោះ: 15s-30s ចំកន្លែងស្ងាត់)...");
  await sleep(400);
  var C=Math.max(1,Math.min(keys.length,4,total)),idx=0,done=0,err=null,res=new Array(total),lastP=12,GC=(window.__zsfGqCache=window.__zsfGqCache||new Map()),CB=[file&&file.name,file&&file.size,file&&file.lastModified,window.__zsfGqModel,lang].join("|");
@@ -3677,13 +3744,13 @@ async function groqTranscribe(prog){
   while(!err){
    var i=idx++;if(i>=total)return;
    var part=plan[i][1]-plan[i][0]1600?null:pcm.subarray(plan[i][0]*2,plan[i][1]*2);
-   if(!part){res[i]=[];done++;continue}
+   if(!part){res[i]=[];try{window.__zsfStream&&window.__zsfStream.note(i,res[i])}catch(e){}done++;continue}
     var ck=CB+"|"+i+"|"+plan[i][0]+"-"+plan[i][1];
-    if(GC.has(ck)){res[i]=GC.get(ck);done++;lastP=12+Math.round(done/total*86);prog(lastP,"✅ ប្រើលទ្ធផលដែលមានរួច ("+done+"/"+total+")");continue}
+    if(GC.has(ck)){res[i]=GC.get(ck);try{window.__zsfStream&&window.__zsfStream.note(i,res[i])}catch(e){}done++;lastP=12+Math.round(done/total*86);prog(lastP,"✅ ប្រើលទ្ធផលដែលមានរួច ("+done+"/"+total+")");continue}
    try{
     var j=await groqCall(wavChunk(part),keys,st),o=plan[i][0]/16000,arr=[];
     arr=zsfGroqCues(j,o);
-    res[i]=arr;if(GC.size>4000)GC.clear();GC.set(ck,arr);
+    res[i]=arr;if(GC.size>4000)GC.clear();GC.set(ck,arr);try{window.__zsfStream&&window.__zsfStream.note(i,res[i])}catch(e){}
    }catch(e){err=e;return}
    done++;lastP=12+Math.round(done/total*86);prog(lastP,"⚡ ទាញយកអក្សរ ("+done+"/"+total+")");
   }
@@ -3695,6 +3762,7 @@ async function groqTranscribe(prog){
  var gap=+$("#gap").value,H=(typeof ZSF_HALLUC!=="undefined")?ZSF_HALLUC:null;
  var out=segs.filter(function(x){return x.t&&!(H&&H.test(x.t))}).map(function(x){return {s:x.s,e:Math.max(x.s+.25,x.e),t:x.t}});
  try{var _ad=await zsfGapFill(pcm,out,keys,prog);if(_ad)prog(99,"✅ ស្តារបានបន្ថែម "+_ad+" ឃ្លា")}catch(e){console.warn(e)}
+ try{out=zsfSnapCues(pcm0,out)}catch(e){console.warn("snap",e)}
  out.sort(function(a,b){return a.s-b.s});
  for(var q=0;qout.length-1;q++){if(out[q+1].sout[q].e)out[q].e=Math.max(out[q].s+.2,out[q+1].s-.02)}
  if(!out.length)throw new Error("Groq មិនឮការនិយាយក្នុងវីដេអូនេះទេ");
@@ -3777,7 +3845,7 @@ async function translateAll(){var Z0=zsfSnap();
   var part=src.slice(i0,i0+B),res=new Array(part.length).fill(null);
   if(useGem){
     var prev=src.slice(Math.max(0,i0-2),i0).map(strip).join(" / ");
-    var HEAD="You are a professional Khmer subtitle translator. Translate each numbered line to "+tl+". Story context: "+ctxT+". Keep numbering, one line per item. If a line starts with a tag like [1], [2], [3] or [4], keep that tag unchanged at the start of the translated line. NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. Output only numbered lines.";
+    var HEAD="You are a professional Khmer subtitle translator. Translate each numbered line to "+tl+". Story context: "+ctxT+". Keep numbering, one line per item. If a line starts with a tag like [1], [2], [3] or [4], keep that tag unchanged at the start of the translated line. NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). COMPLETE MEANING: translate every sentence fully and faithfully. Never shorten, summarize, merge or drop any word, name, number, emotion or piece of information just to make the line shorter; the line may be as long as the meaning needs. Only choose the most natural, compact Khmer wording when it loses nothing. NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. Output only numbered lines.";
     var mk=function(idx){return HEAD+(prev?"\nPrevious lines for context only, do NOT translate them: "+prev:"")+"\n"+idx.map(function(j,x){return (x+1)+". "+part[j].t.replace(/\n/g," ")}).join("\n")};
     var fresh=new Array(part.length).fill(false),zk=function(c){return zsfTrKey(tv,ctxT,strip(c))};
     var hits=await zsfTrGetMany(part.map(zk));
@@ -3811,7 +3879,8 @@ async function translateAll(){var Z0=zsfSnap();
 }
 async function tagSpeakers(){
  if(!K.filter(Boolean).length||typeof window.zsfAutoClassifyTags!=="function")return;
- try{cuesToBlocks();window.__zsfForceTag=true;await window.zsfAutoClassifyTags();renderEditor()}catch(e){}
+ window.__zsfTagAbort=false;
+ try{cuesToBlocks();window.__zsfForceTag=true;var __tp=window.zsfAutoClassifyTags(),__tid;await Promise.race([__tp,new Promise(function(r){__tid=setTimeout(function(){window.__zsfTagAbort=true;try{showToast("⏱ ចែកតូយូរពេក — បន្តជំហានបន្ទាប់",false)}catch(e){}r()},900000)})]);clearTimeout(__tid);renderEditor()}catch(e){try{renderEditor()}catch(_){}}
 }
 
 /* ---------- ផ្ទាំងរើស Gemini / Groq ---------- */
@@ -3863,7 +3932,10 @@ $("#exp").onclick=async function(){
   if(c==="gem"||c==="groq"){
    phase(1);setProgress(1,"📦 កំពុងរៀបចំ...");
    setC([]);
-   if(c==="gem")await zsfTranscribeGeminiMain();else await zsfTranscribeGroqMain();
+   window.__zsfPre=null;window.__zsfStream=null;
+   window.__zsfStreamWant=(c==="groq"&&on(1)&&$("#target").value==="km"&&K.filter(Boolean).length>0&&typeof window.__zsfDirectAnalyze==="function");
+   try{if(c==="gem")await zsfTranscribeGeminiMain();else await zsfTranscribeGroqMain()}finally{window.__zsfStreamWant=false}
+   if(window.__zsfStream){try{setProgress(99,"🤖 កំពុងបញ្ចប់ផ្នែកចុងក្រោយ...");await window.__zsfStream.finish(150000)}catch(e){}window.__zsfStream=null}
    if(!cues.length)throw new Error("[1-Click Export គាំង!] មិនអាចទាញយក Subtitle ពីសំឡេងបានទេ។ ដំណើរការត្រូវបញ្ឈប់!");
   }else{phase(1);setProgress(100,"✅ ប្រើ SRT ដែលមានស្រាប់ "+cues.length+" ឃ្លា")}
   /* Step 2 */
@@ -3873,9 +3945,15 @@ $("#exp").onclick=async function(){
   else{
    /* FIX: Step 2 បកប្រែ SRT ដោយផ្ទាល់។ កុំរត់ gemWorkerRun នៅទីនេះ ព្រោះវាអាចវិភាគ/ផ្ទុកវីដេអូ និងសាក Model ជាច្រើនមុនពេលបកប្រែ។ ការចែកតួត្រូវធ្វើនៅ Step 3 ដូចដើម។ */
    window.__workerTagged=false;
-   try{await translateAll()}catch(e){throw new Error("[1-Click Export គាំង!] បរាជ័យក្នុងការបកប្រែ Subtitle! "+e.message)}
+   var __direct=false;
+   if(K.filter(Boolean).length){
+    try{await gemDirectRun(function(p,m){setProgress(p,m)});__direct=true}
+    catch(e){console.warn("1-click direct",e);try{showToast("⚠ Gemini ស្តាប់សំឡេង: "+String((e&&e.message)||e).slice(0,80)+" — ប្រើវិធីបម្រុង",false)}catch(_){}}
+   }
+   if(!__direct){try{await translateAll()}catch(e){throw new Error("[1-Click Export គាំង!] បរាជ័យក្នុងការបកប្រែ Subtitle! "+e.message)}}
    setProgress(100,"✅ បកប្រែរួចរាល់ "+cues.length+" ឃ្លា");
   }
+  window.__zsfPre=null;
   /* Step 3 : ចែកតួ ប្រុស/ស្រី */
   phase(3);
   if(on(2)&&window.__workerTagged&&cues.some(function(c){return /^\s*\[[1-4]\]/.test(c.t)})){setProgress(100,"✅ ចែកតួរួចរាល់ (Gemini Worker)")}
@@ -4114,7 +4192,12 @@ async function gemDirectRun(prog){
  var bible=await gPrepareBible(keys,prog);
  if(bible)showToast("✓ ការបកប្រែចាប់តាមបរិបទសាច់រឿងរបស់ SRT ដោយផ្ទាល់",true);
  /* ២) បកប្រែជាផ្នែកៗ (ស្តាប់សំឡេង + អាន SRT) ដូចកូដចាស់ */
- var groups=gGroups(lines,120,40),out=new Array(N).fill(null),doneLines=0,rr=0,stop=false;
+ var out=new Array(N).fill(null),doneLines=0,rr=0,stop=false,hit=0;
+ try{var pre=window.__zsfPre&&window.__zsfPre.store;
+  if(pre)lines.forEach(function(l,i){var a=pre[zsfStreamNorm(l.text)];if(!a)return;var bj=-1,bd=2.6;a.forEach(function(x,j){if(x.used)return;var d=Math.abs(x.s-l.s);if(dbd){bd=d;bj=j}});if(bj>=0){a[bj].used=1;out[i]=a[bj].t;hit++}})}catch(e){}
+ var groups=[];
+ (function(){var run=[];for(var i=0;i=N;i++){if(iN&&!out[i])run.push(i);else if(run.length){var rl=run;gGroups(rl.map(function(j){return lines[j]}),120,40).forEach(function(g){groups.push(g.map(function(k){return rl[k]}))});run=[]}}})();
+ doneLines=hit;if(hit)showToast("⚡ Gemini ស្តាប់+បកប្រែរួចជាមុន "+hit+"/"+N+" ឃ្លា (ពេលទាញអក្សរ)",true);
  prog(10,"🤖 Gemini កំពុងស្តាប់សំឡេង និងបកប្រែ...");
  async function part(idxs,depth){
   var sub=idxs.map(function(i){return lines[i]}),canSplit=idxs.length>=8&&depth3,err=null;
@@ -4170,7 +4253,7 @@ async function gemDirectRunV36(prog){
  var tagRules=wantTag?("\nVOICE TAGS: tag each entry with exactly one of: 1 = male voice spoken aloud, 2 = female voice spoken aloud, 3 = male inner thought, 4 = female inner thought. Judge gender ONLY from the physical voice you hear at that timestamp (pitch and timbre), never from names, pronouns or the idea that speakers alternate. Use inner thought (3/4) only with clear audio evidence (echo, filtered or detached voice); whispering, shouting, phone calls, off-screen voices and narrators are spoken (1/2). If one entry contains two different speakers, write the tag before each part inside \"t\" like \"[1] ... [2] ...\" and set \"tag\" to the first part's tag."):"";
  async function runBatch(a,b){
   var lines=[];for(var i=a;ib;i++)lines.push((i+1)+" | "+s2t(cues[i].s)+" --> "+s2t(cues[i].e)+" | "+String(cues[i].t).replace(/^\s*\[[1-4]\]\s*/,"").replace(/\n/g," "));
-  var prompt="ROLE: expert Chinese short-drama translator (Chinese to "+target+"), strict SRT editor and voice analyst.\nYou are given the full ATTACHED VIDEO (picture and sound) and part of its ORIGINAL SRT (speech-recognition output, may contain mistakes; times are positions in the video). Use the video to understand who speaks, to whom, and the story. For EVERY listed entry write the "+target+" translation.\nTRANSLATION RULES: natural spoken "+target+" suitable for dubbing, concise (similar length to the original speech), consistent names and terms, correct forms of address, no explanations. Keep every entry separate (never merge or split). Story context: "+(ctxT||"-")+"."+tagRules+"\nOUTPUT: ONE JSON array only, no markdown: "+(wantTag?'[{"n":entry number>,"tag":1-4>,"t":"translation>"}]':'[{"n":entry number>,"t":"translation>"}]')+". Include EVERY entry number listed, in order.\nENTRIES (number | time | original text):\n"+lines.join("\n");
+  var prompt="ROLE: expert Chinese short-drama translator (Chinese to "+target+"), strict SRT editor and voice analyst.\nYou are given the full ATTACHED VIDEO (picture and sound) and part of its ORIGINAL SRT (speech-recognition output, may contain mistakes; times are positions in the video). Use the video to understand who speaks, to whom, and the story. For EVERY listed entry write the "+target+" translation.\nTRANSLATION RULES: natural spoken "+target+" suitable for dubbing, complete and faithful (never shorten or drop meaning to match the length of the original speech), consistent names and terms, correct forms of address, no explanations. Keep every entry separate (never merge or split). Story context: "+(ctxT||"-")+"."+tagRules+"\nOUTPUT: ONE JSON array only, no markdown: "+(wantTag?'[{"n":entry number>,"tag":1-4>,"t":"translation>"}]':'[{"n":entry number>,"t":"translation>"}]')+". Include EVERY entry number listed, in order.\nENTRIES (number | time | original text):\n"+lines.join("\n");
   var last=null;
   for(var mi=0;mimodels.length;mi++){
    try{
@@ -4767,7 +4850,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="6.3";
+  var EMB="7.0";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
