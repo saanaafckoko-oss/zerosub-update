@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"8.8";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"9.0";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -788,7 +788,7 @@ $$("#sw button").forEach(b=>b.onclick=()=>applyTh(+b.dataset.i));
 $("#pal").onclick=()=>$("#sheet").classList.add("on");$("#cl").onclick=()=>$("#sheet").classList.remove("on");
 
 /* presets */
-const D={vol:[0,"%",5],pitch:[-2,"Hz",1],bass:[0,"",.5],speed:[15,"%",5],level:[20,"%",5],echo:[0,"",.1],auto:[35,"%",5]};
+const D={vol:[0,"%",1],pitch:[-2,"Hz",1],bass:[0,"",1],speed:[15,"%",1],level:[20,"%",1],echo:[0,"",.1],auto:[35,"%",1]};
 let slot=S.get("slot",0),P=S.get("pre",[{},{},{},{}]);if(!Array.isArray(P))P=[{},{},{},{}];while(P.length4)P.push({});if(!(slot>=0&&slot4))slot=0;
 const LIM={vol:[-100,200],pitch:[-50,50],bass:[-12,12],speed:[-50,100],level:[-100,100],echo:[0,1],auto:[0,100]};const cl=(k,x)=>Math.max(LIM[k][0],Math.min(LIM[k][1],+x.toFixed(2)));const v=k=>P[slot][k]??D[k][0];
 const IC=(d)=>`svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}/svg>`;
@@ -4992,7 +4992,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="8.8";
+  var EMB="9.0";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
