@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"6.0";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"7.2";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -63,7 +63,9 @@ input[type=range]{width:100%;accent-color:var(--teal);height:28px}
 .seg .b.on{background:linear-gradient(90deg,#f59e0b,#d97706);outline:none;color:#fff}
 .pane{display:none}.pane.on{display:block}
 .stage{position:relative;background:#050a18;border-radius:20px;overflow:hidden;text-align:center;box-shadow:inset 0 0 0 1px #1b2338}
-.stage video{max-width:100%;max-height:62vh;display:block;margin:auto}
+.stage video{max-width:100%;max-height:38vh;width:auto;height:auto;object-fit:contain;display:block;margin:auto}
+.stage{max-height:40vh;display:flex;align-items:center;justify-content:center}
+.stage .empty{width:100%}
 .empty{padding:26px 10px;color:var(--mut)}.empty b{display:block;color:var(--ink);font-size:18px;margin:12px 0 6px}
 .ico{width:64px;height:64px;border-radius:50%;background:#1b2b45;display:grid;place-items:center;margin:auto;font-size:30px}
 #sub{position:absolute;left:8px;right:8px;bottom:12%;font-weight:800;font-size:20px;text-shadow:0 0 5px #000,0 0 5px #000;pointer-events:none}
@@ -4850,7 +4852,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="7.0";
+  var EMB="7.2";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
