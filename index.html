@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"9.2";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"9.3";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -3749,7 +3749,7 @@ function zsfStreamStart(total){
   for(var at=0;at2;at++){
    try{
     var r=await window.__zsfDirectAnalyze(sub,"",(S.rr=S.rr+1)),got=gParseSrtOut(r&&r.srt,sub),cnt=got.filter(Boolean).length;
-    if(cnt*2>sub.length){got.forEach(function(t,k){if(!t)return;var key=zsfStreamNorm(sub[k].text);(store[key]=store[key]||[]).push({s:sub[k].s,t:t})});return}
+    if(cnt*2>sub.length){if(window.__zsfEarlyBible)got.forEach(function(t,k){if(!t)return;var key=zsfStreamNorm(sub[k].text);(store[key]=store[key]||[]).push({s:sub[k].s,t:t})});return}
    }catch(e){if(e&&(e.zsfQuota||/quota|resource.?exhausted/i.test(String(e.message||"")))){S.off=true;return}}
    await new Promise(function(z){setTimeout(z,2500)})}}
  function flush(final){
@@ -4259,7 +4259,7 @@ async function gemDirectRun(prog){
  var lines=cues.map(function(c){return {s:c.s,time:s2t(c.s)+" --> "+s2t(c.e),text:String(c.t||"").replace(TAGRE,"").replace(/\n+/g," ").trim()||"…"}});
  /* ១) សៀវភៅរឿង (លាក់) */
  prog(3,"📖 កំពុងអានរឿងទាំងមូល...");
- var bible=await gPrepareBible(keys,prog);
+ var bible=await gPrepareBible(keys,prog);if(!bible){try{bible=await gPrepareBible(keys,prog,lines.map(function(l){return l.text}).join("\n"))}catch(e){bible=null}}if(!bible){try{showToast("⚠ សៀវភៅរឿងបង្កើតមិនបាន (Gemini quota ឬបណ្តាញ) — បកប្រែតាមបរិបទធម្មតា",false)}catch(e){}}
  if(bible)showToast("✓ ការបកប្រែចាប់តាមបរិបទសាច់រឿងរបស់ SRT ដោយផ្ទាល់",true);
  /* ២) បកប្រែជាផ្នែកៗ (ស្តាប់សំឡេង + អាន SRT) ដូចកូដចាស់ */
  var out=new Array(N).fill(null),doneLines=0,rr=0,stop=false,hit=0;
@@ -4920,7 +4920,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="9.2";
+  var EMB="9.3";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
