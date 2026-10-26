@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"8.0";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"8.2";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -417,7 +417,8 @@ input.rg2.cy{--T:10px;--th:3px;--fc:#22d3ee;--tc:#44413d}
 
 /* V8.0: វីដេអូពេញទទឹងប្រអប់ (មិនតូចនៅកណ្តាល) */
 .stage{max-height:none!important}
-.stage video{width:100%!important;max-width:100%!important;max-height:80vh!important;height:auto!important;object-fit:contain!important}
+.stage video{width:100%!important;max-width:100%!important;max-height:49vh!important;max-height:125cqw!important;height:auto!important;object-fit:contain!important}
+.stage{container-type:inline-size}
 /style>style id="v160">
 /* ===== V1.6.0 AI Studio Suite = reference V1.4.1 (1 css px = 2.75 px, measured ref vs v16) ===== */
 header{padding-right:14px!important}
@@ -4902,7 +4903,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="8.0";
+  var EMB="8.2";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
