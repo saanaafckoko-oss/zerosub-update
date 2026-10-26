@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"10.5";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"10.0";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -683,7 +683,6 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
 
 section class="card">
  div class="row" style="align-items:center">div class="t" style="flex:1.5;margin:0;font-size:17px;white-space:nowrap">⭐ កំណត់ Preset សំឡេងតួ/div>button class="b gold" id="resetP" style="font-size:13px;padding:10px 6px">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>path d="M3 3v5h5M12 7.5V12l3 2"/>/svg> កំណត់លំនាំដើម/button>/div>
- button class="b gold" id="refBtn" style="display:none">🎯 ពិសិដ្ឋ ស្រីមុំ សំឡេងពិរោះ/button>
  div class="row" id="slots">/div>
 div class="grid2" id="grid2">
   div>div class="lbl">Volume High + Mid %/div>div class="step" data-k="vol">/div>/div>
@@ -693,7 +692,7 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
   div>div class="lbl">កម្រិតសំឡេង (Volume)/div>div class="step" data-k="level">/div>/div>
   div>div class="lbl">កម្រិតអេកូ (Echo)/div>div class="step" data-k="echo">/div>/div>
   div>div class="lbl">Auto Speed %/div>div class="step" data-k="auto">/div>/div>
-  div>div class="lbl">EQ Preset/div>select class="sel2" id="eq" style="padding:15px">option value="ref">🎯 ពិសិដ្ឋ ស្រីមុំ សំឡេងពិរោះ/option>option value="studio">✨ ស្ទូឌីយោ (ពិរោះ ស្រាល)/option>option value="phone">📱 ស្រួយភ្លឺ (ទូរសព្ទ)/option>option value="narr">🎙 និទានរឿង (ច្បាស់)/option>option value="warm">📻 បាសកក់ក្តៅ (សំឡេងទ្រូង)/option>option value="fairy">🧚 និទានរឿងព្រេង/option>option value="pod">📻 ផតខាស្ត/option>option value="flat">🎚 សំឡេងដើម (Flat)/option>/select>/div>
+  div>div class="lbl">EQ Preset/div>select class="sel2" id="eq" style="padding:15px">option value="studio">✨ ស្ទូឌីយោ (ពិរោះ ស្រាល)/option>option value="phone">📱 ស្រួយភ្លឺ (ទូរសព្ទ)/option>option value="narr">🎙 និទានរឿង (ច្បាស់)/option>option value="warm">📻 បាសកក់ក្តៅ (សំឡេងទ្រូង)/option>option value="fairy">🧚 និទានរឿងព្រេង/option>option value="pod">📻 ផតខាស្ត/option>option value="flat">🎚 សំឡេងដើម (Flat)/option>/select>/div>
  /div>
  div class="row">button class="b" id="tryV" style="flex:1.7;font-size:14px;padding:14px 4px">span class="ia">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/>path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/>/svg>/span> សាកល្បងសំឡេង/button>button class="b acc" id="saveP" style="font-size:14px;padding:14px 4px">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">path d="M7 19a5 5 0 0 1-.7-9.95A6.5 6.5 0 0 1 18.7 9.6 4.7 4.7 0 0 1 18 19H7z"/>path d="M12 16.5v-6M9.3 13l2.7-2.7 2.7 2.7" style="stroke:var(--dk,#10172b)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>/svg> រក្សាទុក/button>button class="b gold" id="gen" style="font-size:14px;padding:14px 4px">កំណត់ទូទៅ svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M6 15l6-6 6 6"/>/svg>/button>/div>
 
@@ -809,26 +808,10 @@ function steps(){$$(".step").forEach(el=>{const k=el.dataset.k,[,u,st]=D[k],x=v(
 function slots(){$("#slots").innerHTML=[[ICO.speaker,"ពិសិដ្ឋ"],[ICO.speaker,"ស្រីមុំ"],[ICO.speaker,"ពិសិដ្ឋ"],[ICO.speaker,"ស្រីមុំ"]].map((n,i)=>`button class="b slotb ${i===slot?"acc":""}" data-i="${i}" title="Slot ${i+1}: ${n[1]}${i>1?" (គិតក្នុងចិត្ត)":""}">span class="ic1">${n[0]}/span>span class="nm">${n[1]}/span>span class="cr">▾/span>/button>`).join("");$$("#slots .b").forEach(b=>b.onclick=()=>{slot=+b.dataset.i;S.set("slot",slot);slots();steps()})}
 const __msg=m=>typeof showToast==="function"?showToast(m,true):alert(m);$("#saveP").onclick=()=>{S.set("pre",P);__msg("✅ បានរក្សាទុក Preset "+["ពិសិដ្ឋ","ស្រីមុំ","ពិសិដ្ឋ","ស្រីមុំ"][slot])};function genView(){const open=S.get("genOpen",true);$("#grid2").classList.toggle("hide",!open);$("#gen").innerHTML="កំណត់ទូទៅ "+(open?ICO.up:ICO.down)}
 $("#gen").onclick=()=>{S.set("genOpen",!S.get("genOpen",true));genView()};
-$("#eq").onchange=()=>{P[slot].eq=$("#eq").value;if($("#eq").value==="ref"){const q=$("#eq");q.disabled=true;Promise.resolve($("#refBtn").onclick()).finally(()=>{q.disabled=false})}};
-const refOn=()=>[0,1,2,3].every(i=>(P[i]||{}).eq==="ref");
-const refPaint=()=>{const b=$("#refBtn");if(b)b.textContent=(refOn()?"✅ ":"🎯 ")+"ពិសិដ្ឋ ស្រីមុំ សំឡេងពិរោះ"};
-$("#refBtn").onclick=async()=>{const b=$("#refBtn");if(b.disabled)return;b.disabled=true;b.textContent="⏳ កំពុងវាស់សំឡេង...";
- for(let i=0;i4;i++){P[i]=Object.assign(P[i]||{},{eq:"ref",bass:0,vol:0,echo:0})}
- let note="";
- try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")await AC.resume();
-  const TXT="សួស្តី ថ្ងៃនេះអាកាសធាតុល្អណាស់ យើងទៅដើរលេងនៅសួនច្បារជាមួយគ្នា ខ្ញុំសង្ឃឹមថាអ្នកនឹងចូលចិត្តរឿងនេះ។",cl2=(x,a,c)=>Math.max(a,Math.min(c,x)),R={};
-  for(const sl of [0,1]){const T=sl===0?REF_RH.m:REF_RH.f,mm=bf=>[zsfF0(bf.getChannelData(0),bf.sampleRate),zsfRate(bf.getChannelData(0),bf.sampleRate)];
-   let [f0,rt]=mm(await ttsBuf(TXT,sl,0,0));if(!f0||!rt)throw new Error("វាស់មិនបាន");
-   let pitch=cl2(Math.round(T.f0-f0),-50,50);let [f1,r1]=mm(await ttsBuf(TXT,sl,pitch,0));if(f1)pitch=cl2(Math.round(pitch+(T.f0-f1)),-50,50);
-   const [,r2]=mm(await ttsBuf(TXT,sl,pitch,0));const speed=cl2(Math.round(((T.rate/(r2||rt))-1)*100),-50,100);R[sl]={pitch,speed}}
-  for(let i=0;i4;i++){const r=R[i%2];P[i].pitch=r.pitch;P[i].speed=r.speed}
-  note=" · ប្រុស Pitch "+R[0].pitch+" Speed "+R[0].speed+" · ស្រី Pitch "+R[1].pitch+" Speed "+R[1].speed}
- catch(e){note=" (EQ ប៉ុណ្ណោះ — វាស់ចង្វាក់មិនបាន៖ "+(e.message||e)+")"}
- b.disabled=false;S.set("pre",P);steps();refPaint();__msg("✅ បើកសំឡេងពិសិដ្ឋ/ស្រីមុំ ពិរោះ ទាំង ៤ Slot"+note)};
-refPaint();
-$("#resetP").onclick=()=>{P=[{},{},{},{}];S.set("pre",P);steps();refPaint();__msg("✅ បានកំណត់ Preset សំឡេងតួទាំង ៤ ទៅជាលំនាំដើម (Default)")};
+$("#eq").onchange=()=>{P[slot].eq=$("#eq").value};
+$("#resetP").onclick=()=>{P=[{},{},{},{}];S.set("pre",P);steps();__msg("✅ បានកំណត់ Preset សំឡេងតួទាំង ៤ ទៅជាលំនាំដើម (Default)")};
 /* preset -> sound (WebAudio). presetOf(slot) + playFx(blob,preset) សម្រាប់ភ្ជាប់ TTS ក្រោយ */
-const presetOf=i=>{const o=P[i]||{},r={};Object.keys(D).forEach(k=>r[k]=o[k]??D[k][0]);let q=EQ_ALIAS[o.eq]||o.eq;r.eq=EQ_PRESETS[q]?q:"studio";r.slot=i;return r};
+const presetOf=i=>{const o=P[i]||{},r={};Object.keys(D).forEach(k=>r[k]=o[k]??D[k][0]);let q=EQ_ALIAS[o.eq]||o.eq;r.eq=EQ_PRESETS[q]?q:"studio";return r};
 let FXC=null,FXS=null;
 function stopFx(){try{FXS&&FXS.stop()}catch(e){}FXS=null}
 /* បណ្តាញ Effect តាម Preset: src → Bass → Volume → EQ → Level → Compressor → out (+ Echo) */
@@ -841,64 +824,18 @@ const EQ_PRESETS={
  warm:{b:[[330,1.2,-3.5],[150,1.2,1.2],[1400,1,1.5],[2800,1,2.2],[8500,1.2,2.2]],c:[-19,2.6,20,150,1.8]},
  fairy:{b:[[320,1.2,-3.2],[160,1.2,1],[2700,1,2.8]].concat([[4500,1.2,1.8]]),t:[10000,2.5],c:[-18,2.8,14,120,2]},
  pod:{hp:85,b:[[320,1.2,-3.5],[160,1.2,.8],[1200,1,1],[2700,1,2.8],[9000,1.2,2.2]],c:[-18,2.5,15,120,1.8]},
- ref:{b:[],c:[-20,2.2,15,150,0],ref:1},
  flat:{b:[]}
 };
-/* ===== 🎯 សំឡេងគំរូដើម ពិសិដ្ឋ/ស្រីមុំ ៖ វាស់សំឡេង TTS ពិតរបស់ app ហើយកែ EQ+កម្រិតសំឡេង ឲ្យជិតសំឡេងគំរូ (ទិន្នន័យវាស់ពីវីដេអូគំរូ EP គំរូ) ===== */
-const REF_T={edges:[140.0, 176.4, 222.2, 280.0, 352.8, 444.5, 560.0, 705.6, 888.9, 1120.0, 1411.1, 1777.9, 2240.0, 2822.2, 3555.8, 4480.0, 5644.4, 7111.6, 8960.0],cen:[157, 198, 249, 314, 396, 499, 629, 792, 998, 1257, 1584, 1996, 2514, 3168, 3991, 5029, 6336, 7982],m:[16.6, 10.5, 13.1, 13.5, 10.4, 12.3, 7.2, 3.8, 1.3, -2.0, -5.1, -9.4, -11.6, -15.9, -17.7, -22.3, -24.7, -22.9],f:[9.4, 16.4, 17.3, 11.6, 10.4, 14.2, 8.2, 3.8, 0.3, -4.8, -5.9, -8.5, -14.1, -14.7, -17.8, -22.6, -20.6, -22.8],rmsM:-16.4,rmsF:-15.1};
-const _refC=new WeakMap();
-function _fft(re,im){const n=re.length;for(let i=1,j=0;in;i++){let b=n>>1;for(;j&b;b>>=1)j^=b;j^=b;if(ij){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t}}
- for(let l=2;l=n;l=1){const a=-2*Math.PI/l,wr=Math.cos(a),wi=Math.sin(a);for(let i=0;in;i+=l){let cr=1,ci=0;for(let k=0;kl/2;k++){const u=i+k,v=i+k+l/2,xr=re[v]*cr-im[v]*ci,xi=re[v]*ci+im[v]*cr;re[v]=re[u]-xr;im[v]=im[u]-xi;re[u]+=xr;im[u]+=xi;const t=cr*wr-ci*wi;ci=cr*wi+ci*wr;cr=t}}}}
-function refMatch(buf,male){
- const key=male?1:0;let c=_refC.get(buf);if(c&&c[key])return c[key];c=c||{};
- const sr=buf.sampleRate,d=buf.getChannelData(0);let N=1024;while(N/sr0.04)N*=2;const hop=N>>1,win=new Float32Array(N);for(let i=0;iN;i++)win[i]=0.5-0.5*Math.cos(2*Math.PI*i/(N-1));
- const fr=[];for(let s=0;s+N=d.length;s+=hop){let e=0;for(let i=0;iN;i++)e+=d[s+i]*d[s+i];fr.push([s,e/N])}
- const res={b:[],mk:0};
- if(fr.length3){c[key]=res;_refC.set(buf,c);return res}
- const sorted=fr.map(a=>a[1]).sort((a,b)=>a-b),p90=sorted[Math.floor(sorted.length*.9)],thr=Math.max(1e-7,p90*0.0225);
- const nb=REF_T.cen.length,E=REF_T.edges,bs=new Float64Array(nb),bc=new Float64Array(nb),re=new Float64Array(N),im=new Float64Array(N);let na=0,tp=0;
- for(const [s,e] of fr){if(ethr)continue;na++;tp+=e;for(let i=0;iN;i++){re[i]=d[s+i]*win[i];im[i]=0}_fft(re,im);
-  for(let k=1;kN/2;k++){const f=k*sr/N;if(fE[0]||f>=E[nb])continue;let b=0;while(bnb-1&&f>=E[b+1])b++;bs[b]+=re[k]*re[k]+im[k]*im[k];bc[b]++}}
- if(na3){c[key]=res;_refC.set(buf,c);return res}
- const dens=[],ok=[];for(let b=0;bnb;b++){ok.push(bc[b]>0&&E[b+1]sr/2*0.95);dens.push(ok[b]?10*Math.log10(bs[b]/bc[b]/na+1e-14):0)}
- let sm=0,cn=0;for(let b=0;bnb;b++)if(ok[b]&&REF_T.cen[b]>=200&&REF_T.cen[b]=4000){sm+=dens[b];cn++}
- const mean=cn?sm/cn:0,T=male?REF_T.m:REF_T.f,g=[];
- for(let b=0;bnb;b++)g.push(ok[b]?Math.max(-9,Math.min(9,T[b]-(dens[b]-mean))):0);
- const gs=g.map((v,b)=>(((g[b-1]??v)+2*v+(g[b+1]??v))/4));
- let pw=0,pg=0;for(let b=0;bnb;b++){const p=bs[b]/na;pw+=p;pg+=p*Math.pow(10,gs[b]/10)}
- const pre=10*Math.log10(tp/na+1e-14),dl=pw>0?10*Math.log10(pg/pw):0,tgt=male?REF_T.rmsM:REF_T.rmsF;
- res.mk=Math.max(-12,Math.min(12,tgt-(pre+dl)));
- for(let b=0;bnb;b++)if(Math.abs(gs[b])>=0.4)res.b.push([REF_T.cen[b],3,+gs[b].toFixed(2)]);
- c[key]=res;_refC.set(buf,c);return res}
-/* ===== វាស់ចង្វាក់ (ព្យាង្គ/វិនាទី) និងកម្ពស់សំឡេង F0 ===== */
-function zsfRate(d,sr){const hop=Math.round(sr*.01),win=Math.round(sr*.02),nf=Math.floor((d.length-win)/hop);if(nf20)return 0;
- let env=new Float64Array(nf);for(let f=0;fnf;f++){let e=0;const s=f*hop;for(let i=0;iwin;i++)e+=d[s+i]*d[s+i];env[f]=10*Math.log10(e/win+1e-10)}
- const sm=new Float64Array(nf);for(let f=0;fnf;f++){sm[f]=((env[f-1]??env[f])+env[f]+(env[f+1]??env[f]))/3}
- const so=Array.from(sm).sort((a,b)=>a-b),p90=so[Math.floor(nf*.9)],thr=p90-25;let act=0;for(let f=0;fnf;f++)if(sm[f]>thr)act++;if(act20)return 0;
- let pk=[];for(let f=4;fnf-4;f++){if(sm[f]=thr)continue;let mx=true;for(let k=-4;k=4;k++)if(sm[f+k]>sm[f]||(k0&&sm[f+k]===sm[f])){mx=false;break}if(!mx)continue;
-  let mL=1e9,mR=1e9;for(let k=1;k=15;k++){if(f-k>=0)mL=Math.min(mL,sm[f-k]);if(f+knf)mR=Math.min(mR,sm[f+k])}
-  if(sm[f]-Math.max(mL,mR)>=3){if(pk.length&&f-pk[pk.length-1]7){if(sm[f]>sm[pk[pk.length-1]])pk[pk.length-1]=f}else pk.push(f)}}
- return pk.length/(act*.01)}
-function zsfF0(d,sr){const k=Math.max(1,Math.floor(sr/12000)),s2=sr/k,x=new Float32Array(Math.floor(d.length/k));for(let i=0;ix.length;i++){let a=0;for(let j=0;jk;j++)a+=d[i*k+j];x[i]=a/k}
- const N=Math.round(s2*.04),hop=Math.round(s2*.02),lo=Math.floor(s2/400),hi=Math.floor(s2/70),rm=[];const fr=[];
- for(let s=0;s+N+hi=x.length&&s+N=x.length;s+=hop){let e=0;for(let i=0;iN;i++)e+=x[s+i]*x[s+i];fr.push([s,Math.sqrt(e/N)]);rm.push(Math.sqrt(e/N))}
- if(fr.length5)return 0;rm.sort((a,b)=>a-b);const thr=Math.max(1e-4,rm[Math.floor(rm.length*.9)]*.2),F=[];
- for(const [s,r] of fr){if(rthr)continue;let m=0;for(let i=0;iN;i++)m+=x[s+i];m/=N;let e0=0;for(let i=0;iN;i++){const v=x[s+i]-m;e0+=v*v}
-  let best=0,bl=0;for(let l=lo;l=hi;l++){let a=0;for(let i=0;iN-l;i++)a+=(x[s+i]-m)*(x[s+i+l]-m);if(a>best){best=a;bl=l}}
-  if(bl&&best/(e0+1e-12)>0.5)F.push(s2/bl)}
- if(F.length5)return 0;F.sort((a,b)=>a-b);return F[F.length>>1]}
-const REF_RH={m:{f0:131.9,rate:7.47},f:{f0:235.3,rate:6.89}};
 const EQ_ALIAS={bass:"warm",clear:"narr"};
 /* បណ្តាញ Effect តាម Preset: src → Bass → Volume High+Mid → EQ Preset → Level → Compressor → Limiter → out (+ Echo) */
 function fxChain(ctx,src,p,out){
  const bq=(t,f,g,q)=>{const n=ctx.createBiquadFilter();n.type=t;n.frequency.value=f;n.gain.value=g||0;if(q!==undefined)n.Q.value=q;return n};
- let E=EQ_PRESETS[p.eq]||EQ_PRESETS.studio,refMk=0;
- if(E.ref&&src.buffer){try{const m=refMatch(src.buffer,((p.slot|0)%2)===0);E={b:m.b,c:E.c};refMk=m.mk}catch(e){E={b:[],c:E.c}}}
+ const E=EQ_PRESETS[p.eq]||EQ_PRESETS.studio;
  const nodes=[bq("lowshelf",100,p.bass),bq("peaking",1800,20*Math.log10(Math.max(.05,1+p.vol/100)),1)];
  if(E.hp)nodes.push(bq("highpass",E.hp,0,-3.01));
  E.b.forEach(a=>nodes.push(bq("peaking",a[0],a[2],a[1])));
  if(E.t)nodes.push(bq("highshelf",E.t[0],E.t[1]));
- const g=ctx.createGain();g.gain.value=E.c&&refMk!==0?Math.pow(10,refMk/20):Math.max(0,1+p.level/100);nodes.push(g);
+ const g=ctx.createGain();g.gain.value=Math.max(0,1+p.level/100);nodes.push(g);
  if(E.c){const c=ctx.createDynamicsCompressor();c.threshold.value=E.c[0];c.knee.value=3;c.ratio.value=E.c[1];c.attack.value=E.c[2]/1000;c.release.value=E.c[3]/1000;nodes.push(c);
   const mk=ctx.createGain();mk.gain.value=Math.pow(10,E.c[4]/20);nodes.push(mk)}
  const lim=ctx.createDynamicsCompressor();lim.threshold.value=-1;lim.knee.value=0;lim.ratio.value=20;lim.attack.value=.003;lim.release.value=.05;nodes.push(lim);
@@ -3018,10 +2955,10 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     if(onProg)onProg(0,1,"🎧 កំពុងទាញសំឡេងពីវីដេអូ…");
     var A=await audioOnce(f);window.__zsfGemBeat=Date.now();
     var sr=A.info.fmt.sr,ba=A.info.fmt.ba||2,totalSec=A.info.data.len/ba/sr;
-    var PART=(function(){try{var q=parseInt(localStorage.getItem("zsf_gem_part"),10);if(q>=15&&q=180)return q}catch(_){}return 60})(),parts=[];
+    var PART=(function(){try{var q=parseInt(localStorage.getItem("zsf_gem_part"),10);if(q>=15&&q=180)return q}catch(_){}return 30})(),parts=[];
     for(var cs=0;cstotalSec-0.5;cs+=PART)parts.push({cs:cs,ce:Math.min(totalSec,cs+PART),last:(cs+PART)>=totalSec-0.5});
     if(!parts.length)throw new Error("សំឡេងខ្លីពេក");
-    var T0=Date.now(),conc=Math.min(10,Math.max(8,ks.length*3)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
+    var T0=Date.now(),conc=Math.min(12,Math.max(6,ks.length*3)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
     async function worker(){
       while(true){
         var i=next++;if(i>=parts.length)return;
@@ -3070,29 +3007,6 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
           }
         };
         await Promise.all(Array.from({length:Math.min(6,gaps.length)},gWorker));
-      }
-    }catch(_){}
-
-    /* v10.5: កែពេល start/end របស់ SRT ឲ្យត្រូវនឹងសំឡេងពិត (ដើមការនិយាយ/ចុងការនិយាយ ក្នុង ±0.6s) — មិនប៉ះបើរកមិនឃើញចន្លោះស្ងាត់ */
-    try{
-      if(__prof0&&__prof0.rms&&__prof0.rms.length>50){
-        var snR=__prof0.rms,snF=__prof0.frameSec,snN=snR.length,snS=new Float32Array(snN);
-        for(var sni=0;snisnN;sni++){var sna=0,snc=0;for(var snk=-2;snk=2;snk++){var snj=sni+snk;if(snj>=0&&snjsnN){sna+=snR[snj];snc++}}snS[sni]=sna/snc}
-        var snSorted=Array.from(snS).sort(function(a,b){return a-b}),snThr=Math.max(snSorted[Math.floor(snN*0.25)]*2.2,220)*0.8;
-        var snSIL=Math.max(2,Math.round(0.1/snF)),snWIN=Math.round(0.6/snF);
-        var snOn=function(f){if(snS[f]snThr)return false;for(var q=1;q=snSIL;q++){if(f-q0||snS[f-q]>=snThr)return false}return true};
-        var snOff=function(f){if(snS[f]snThr)return false;for(var q=1;q=snSIL;q++){if(f+q>=snN||snS[f+q]>=snThr)return false}return true};
-        var snCnt=0;
-        segs.forEach(function(g){
-          var f0=Math.round(g.start/snF),f1=Math.round(g.end/snF),bs=-1,bd=1e9,be=-1,bd2=1e9;
-          for(var dd=-snWIN;dd=snWIN;dd++){
-            var x1=f0+dd;if(x1>0&&x1snN&&snOn(x1)&&Math.abs(dd)bd){bd=Math.abs(dd);bs=x1}
-            var x2=f1+dd;if(x2>0&&x2snN-1&&snOff(x2)&&Math.abs(dd)bd2){bd2=Math.abs(dd);be=x2}
-          }
-          var ns=bs>=0?Math.max(0,bs*snF-0.03):g.start,ne=be>=0?(be+1)*snF+0.05:g.end;
-          if(ne-ns>=0.2&&(ns!==g.start||ne!==g.end)){g.start=ns;g.end=ne;snCnt++}
-        });
-        window.__zsfSnapCount=snCnt;
       }
     }catch(_){}
     var PUN=/[\s，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g;
@@ -5127,7 +5041,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="10.5";
+  var EMB="10.0";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
