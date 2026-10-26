@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"7.2";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"7.5";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -716,7 +716,7 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
   div class="row hide" id="pbar">button class="b teal" id="play">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">path d="M7 4.5v15l13-7.5z"/>/svg> Play/button>button class="b" id="stop" style="color:#f87171;border-color:#7a2b3a">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">rect x="5" y="5" width="14" height="14" rx="2.5"/>/svg> Stop/button>/div>
   div class="card in">div class="t" style="font-size:17px">span class="ia2">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M3 6l2 2 3.5-3.5M3 13l2 2 3.5-3.5M12 7h9M12 14h9M12 20h9M3 20h2"/>/svg>/span> ⚙️ ជ្រើសរើសកំណត់ (1-Click Auto Export) ៖/div>div class="chk" id="opts">/div>/div>
   div id="pinl">div class="pih">span class="spin">/span>span>⚡/span>b id="piTx">Export 1-Click (Step 1/6)/b>span id="piPc">0%/span>/div>div class="pbar">i id="piFill">/i>/div>div class="pis" id="piSt">span id="ps1">Step 1: ទាញអក្សរ/span>span id="ps2">○ Step 2: បកប្រែ/span>span id="ps3">○ Step 3: ចែកតួ/span>span id="ps4">○ Step 4: អានសំឡេង/span>span id="ps5">○ Step 5: ភ្លេងអម/span>span id="ps6">○ Step 6: Export/span>/div>div id="piMsg">/div>/div>
- div class="card in" id="syncCard" style="margin-top:12px">div class="t" style="font-size:16px">⏱ ត្រូវមាត់ — ពន្យារសំឡេងខ្មែរ/div>div class="row" style="align-items:center">button class="b" id="dlyM" style="flex:1">−/button>div id="dlyV" style="flex:1.6;text-align:center;font-weight:800;font-size:18px">+150 ms/div>button class="b" id="dlyP" style="flex:1">+/button>/div>div style="font-size:12px;color:var(--mut)">សំឡេងនិយាយមុនមាត់ → ចុច + · សំឡេងក្រោយមាត់ → ចុច − (ម្តង 25 ms)/div>/div>
+ div class="card in" id="syncCard" style="margin-top:12px">div class="t" style="font-size:16px">⏱ ត្រូវមាត់ — ពន្យារសំឡេងខ្មែរ/div>div class="row" style="align-items:center">button class="b" id="dlyM" style="flex:1">−/button>div id="dlyV" style="flex:1.6;text-align:center;font-weight:800;font-size:18px">+150 ms/div>button class="b" id="dlyP" style="flex:1">+/button>/div>div style="font-size:12px;color:var(--mut)">សំឡេងនិយាយមុនមាត់ → ចុច + · សំឡេងក្រោយមាត់ → ចុច − (ម្តង 25 ms)/div>/div>div class="card in" style="margin-top:12px">div class="t" style="font-size:16px">🔉 សំឡេងឥទ្ធិពលក្នុងពេលតួនិយាយ (សើច/ដាវ)/div>div class="row" style="align-items:center">input type="range" id="duckR" min="0" max="100" step="5" value="25" style="flex:1" oninput="try{localStorage.setItem('zsf_duck',this.value/100)}catch(e){}document.getElementById('duckV').textContent=this.value+'%'">b id="duckV" style="width:60px;text-align:center;font-size:18px">25%/b>/div>div style="font-size:12px;color:var(--mut)">0% = បិទទាំងអស់ (គ្មានសំឡេងតួ តែក៏គ្មានសំឡេងសើច) · កើនឡើង = ឮសំឡេងសើច/ដាវច្រើន តែអាចលេចសំឡេងតួបន្តិច/div>/div>
  button class="b teal big" style="margin-top:14px" id="exp">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M9 18V5.5l11-2V16"/>circle cx="6" cy="18" r="3" fill="currentColor"/>circle cx="17" cy="16" r="3" fill="currentColor"/>/svg> 🎬 នាំចេញវីដេអូរហ័ស Export 1 Click/button>
  /div>
 
@@ -1330,7 +1330,7 @@ function scheduleDub(items,t0,bus,bgG,base){
   const en=st+it.buf.duration;prevEnd=en;
   prevEnd=en;
  });
- if(bgG){for(const z of fxZones(items)){bgG.gain.setTargetAtTime(0,Math.max(0,t0+z[0]-.1),.04);bgG.gain.setTargetAtTime(base,t0+z[1],.07)}}
+ if(bgG){for(const z of fxZones(items)){bgG.gain.setTargetAtTime(base*zsDk(),Math.max(0,t0+z[0]-.1),.04);bgG.gain.setTargetAtTime(base,t0+z[1],.07)}}
  return delayed;
 }
 /* ===== SPMP4 : MP4 demux (H.264) + MP4 mux (H.264 + AAC/Opus) — គ្មាន library ក្រៅ ===== */
@@ -1566,6 +1566,8 @@ function fxSpeechZones(){
    if(!on&&st>=0){out.push([st*fs,i*fs]);if((i-st)*fs>=.2){if(q._on===null)q._on=st*fs;q._off=i*fs}st=-1;found=true}}
   if(!found)out.push([q.s,q.e])}
  return out.map(z=>[Math.max(0,z[0]-.12),z[1]+.25])}
+function zsDk(){try{var x=parseFloat(localStorage.getItem("zsf_duck"));return isFinite(x)?Math.max(0,Math.min(1,x)):.25}catch(e){return .25}}
+setTimeout(function(){var e=document.getElementById("duckR"),v=document.getElementById("duckV");if(e){e.value=Math.round(zsDk()*100);if(v)v.textContent=e.value+"%"}},900);
 function fxZones(items){
  let raw=fxSpeechZones();
  if(!raw){raw=[];for(const q of cues){if(String(q.t||"").replace(/\[[1-4]\]/g,"").trim())raw.push([Math.max(0,q.s-.06),q.e+.06])}}
@@ -1578,7 +1580,7 @@ async function fxRenderWin(s0,s1,SR,bed,bedGain,plan,base,duck,zones){
  const ws=s0/SR,we=s1/SR,oc=new OfflineAudioContext(2,s1-s0,SR);
  const bg=oc.createGain(),bus=oc.createGain();bg.connect(oc.destination);bus.connect(oc.destination);
  const zs=duck?(zones||plan.map(x=>[x.st-.06,x.en+.06])):[];
- let init=bedGain;for(const z of zs)if(z[0]=ws&&wsz[1])init=0;
+ let init=bedGain;for(const z of zs)if(z[0]=ws&&wsz[1])init=bedGain*zsDk();
  bg.gain.setValueAtTime(init,0);
  if(bed){const bs=oc.createBufferSource();bs.buffer=bed;bs.connect(bg);bs.start(0,ws,we-ws)}
  for(const x of plan){
@@ -1589,8 +1591,8 @@ async function fxRenderWin(s0,s1,SR,bed,bedGain,plan,base,duck,zones){
  for(const z of zs){
   if(z[1]=ws||z[0]>=we)continue;
   const a=z[0]-ws,b=z[1]-ws;
-  if(a-.1>0){g.setValueAtTime(bedGain,a-.1);g.linearRampToValueAtTime(0,a)}
-  if(bdur){g.setValueAtTime(0,Math.max(0,b));g.linearRampToValueAtTime(bedGain,b+.15)}}
+  if(a-.1>0){g.setValueAtTime(bedGain,a-.1);g.linearRampToValueAtTime(bedGain*zsDk(),a)}
+  if(bdur){g.setValueAtTime(bedGain*zsDk(),Math.max(0,b));g.linearRampToValueAtTime(bedGain,b+.15)}}
  return oc.startRendering()}
 
 async function doExportFast(){
@@ -2053,10 +2055,10 @@ async function doExportCopy(){
   aenc.configure({codec:ae.codec,sampleRate:SR,numberOfChannels:2,bitrate:ae.bitrate});
   const B=fxBounds(total,SR,voiceOn?zonesP.concat(plan):plan,150);
   const rw=q=>fxRenderWin(B[q],B[q+1],SR,bed,voiceOn?base:1,plan,base,voiceOn,zonesA);
-  nextP=B.length>1?rw(0):null;
+  const QW=[];let nq=0;while(nqMath.min(3,B.length-1))QW.push(rw(nq++));nextP=QW[0]||null;
   for(let k=0;k+1B.length;k++){
    if(err)throw err;
-   const curP=nextP;nextP=(k+2B.length)?rw(k+1):null;
+   const curP=QW.shift();if(nqB.length-1)QW.push(rw(nq++));nextP=QW[0]||null;
    const buf=await curP;
    const n=buf.length,pl=new Float32Array(n*2);
    pl.set(buf.getChannelData(0),0);pl.set(buf.numberOfChannels>1?buf.getChannelData(1):buf.getChannelData(0),n);
@@ -2065,7 +2067,7 @@ async function doExportCopy(){
    btn.textContent="កំពុង Export "+Math.min(95,Math.round((k+1)/(B.length-1)*95))+"%...";
   }
   await aenc.flush();if(err)throw err;
- }finally{try{if(nextP)nextP.catch(()=>{})}catch(e){}try{aenc.close()}catch(e){}try{if(wl)wl.release()}catch(e){}}
+ }finally{try{if(typeof QW!=="undefined")QW.forEach(x=>x.catch(()=>{}))}catch(e){}try{aenc.close()}catch(e){}try{if(wl)wl.release()}catch(e){}}
  const T2=performance.now();
  if(!frames.length)throw new Error("Encode សំឡេងមិនបាន");
  if(!asc)asc=new Uint8Array([0x12,0x10]);
@@ -2080,18 +2082,19 @@ async function doExportCopy(){
 
 
 async function doExport(){
+ const T0x=performance.now(),tag=m=>{try{showToast("ℹ Export វិធី "+m,true)}catch(e){}},done=m=>{try{showToast("⏱ Export វិធី "+m+" ប្រើពេល "+Math.round((performance.now()-T0x)/1000)+" វិនាទី",true)}catch(e){}};
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
  const btn=$("#exp"),old=btn.innerHTML,on=i=>!$$("#opts .b")[i].classList.contains("off");
  const eff=on(4)&&!!(O.blur||O.logo||O.text);
  if(!eff&&typeof AudioEncoder==="function"){
-  try{if(await doExportCopy())return}
+  try{tag("A: ចម្លងវីដេអូ+សំឡេងថ្មី (លឿនបំផុត)");if(await doExportCopy()){return}}
   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("copy export:",e);showToast("⚠ Export លឿនបំផុតមិនបាន ("+String((e&&e.message)||e).slice(0,60)+") — ប្រើវិធីបន្ទាប់",false)}
  }else if(eff){showToast("ℹ បិទ Eff (Blur/Logo/Text) ដើម្បី Export លឿនបំផុត",true)}
  if(fxSupported()){
-  try{if(await doExportFast())return}
+  try{tag("B: Encode ដោយ GPU/WebCodecs");if(await doExportFast()){done("B");return}}
   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("fast export:",e);showToast("⚠ Export លឿនមិនបាន ("+String((e&&e.message)||e).slice(0,70)+") — ប្រើវិធីធម្មតា",false)}
  }
- return doExportRT();
+ tag("C: ថតពេលពិត (យឺតបំផុត = ប្រវែងវីដេអូ)");await doExportRT();done("C");
 }
 async function doExportRT(){
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
@@ -4852,7 +4855,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="7.2";
+  var EMB="7.5";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
