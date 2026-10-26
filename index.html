@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"9.3";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"9.6";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -667,6 +667,7 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
 p class="zf-help">សូមបញ្ចូលកូនសោ (Key) ដើម្បីដំណើរការកម្មវិធី/p>
 input class="sel2" id="zfKey" type="text" placeholder="ENTER KEY..." autocomplete="off" autocapitalize="characters" spellcheck="false">
 div id="zfErr" role="alert">/div>
+div style="margin:10px 0 0;font:600 12.5px/1.6 'Noto Sans Khmer',system-ui,sans-serif;opacity:.85;text-align:center">📱 ID ទូរសព្ទ៖ b id="zfDev">.../b> button type="button" id="zfDevCp" style="border:1px solid currentColor;background:none;color:inherit;border-radius:8px;padding:2px 9px;font:inherit;margin-left:6px">📋 ចម្លង/button>/div>
 div class="zf-act">
 button class="b acc" id="zfGo" type="button">🔑 ដំណើរការ (ACTIVATE)/button>
 a class="b blue" id="zfTg" href="https://t.me/SAD_BOY_168" target="_blank" rel="noopener">span>✈️ ទាក់ទងទិញកូនសោតាម Telegram/span>/a>
@@ -1004,45 +1005,57 @@ setInterval(()=>{if($("#srtText").value.trim())$("#srtArea").classList.remove("h
 /* ===== Real features ===== */
 /* V5.8: រក្សាទុកវីដេអូលឿន — អានជាដុំ 6MB ដោយ FileReader (base64 ក្នុងម៉ាស៊ីន មិនប្រើ loop JS) អានដុំបន្ទាប់ពេលកំពុងសរសេរដុំមុន ហើយបង្ហាញភាគរយ/ល្បឿនពិត */
 async function zsFastSave(name,b){
- var N=window.ZSNative;
- if(window.ZSFApp||!N||typeof N.putFile!=="function"||typeof N.saveToDownloads!=="function")return false;
- var CH=6*1024*1024,total=b.size,tmp="zsdl_"+Date.now()+".bin",t0=performance.now(),wrote=0;
- if(!total)return false;
+ var A=window.ZSFApp,N=window.ZSNative;
+ var apk=!!(A&&typeof A.begin==="function"&&typeof A.chunk==="function"&&typeof A.end==="function");
+ var old=!apk&&!!(N&&typeof N.putFile==="function"&&typeof N.saveToDownloads==="function");
+ if(!apk&&!old)return false;
+ var total=b.size;if(!total)return false;
+ var CH=6*1024*1024,tmp="zsdl_"+Date.now()+".bin",t0=performance.now(),wrote=0,started=false;
+ var mime=String(b.type||"").split(";")[0].trim()||"video/mp4";
  var rd=function(o){return new Promise(function(res,rej){var fr=new FileReader();fr.onload=function(){var s=String(fr.result);res(s.slice(s.indexOf(",")+1))};fr.onerror=function(){rej(fr.error||new Error("read"))};fr.readAsDataURL(b.slice(o,Math.min(total,o+CH)))})};
  var mb=function(x){return (x/1048576).toFixed(0)};
  var say=function(p,m){try{setProgress(p,m)}catch(e){}try{showToast(m,true)}catch(e){}};
  var next=null;
  try{
+  if(apk){
+   if(!A.begin(name,mime)){say(0,"❌ រក្សាទុកមិនបាន (បើកឯកសារក្នុង Download មិនបាន)");return true}
+   started=true;
+  }
   next=rd(0);
   for(var o=0;ototal;o+=CH){
    var s=await next;next=null;
    if(o+CHtotal){next=rd(o+CH);next.catch(function(){})}
-   if(N.putFile(tmp,s,o>0)!==true)throw new Error("putFile");
+   if(apk){A.chunk(s)}
+   else if(N.putFile(tmp,s,o>0)!==true)throw new Error("putFile");
    wrote=Math.min(total,o+CH);
    var sec=Math.max(.1,(performance.now()-t0)/1000);
    say(Math.min(98,Math.round(wrote/total*100)),"📥 កំពុងរក្សាទុកវីដេអូ "+mb(wrote)+"/"+mb(total)+" MB • "+(wrote/1048576/sec).toFixed(1)+" MB/s");
   }
-  say(99,"📥 កំពុងចម្លងចូល Download...");
-  var r=await new Promise(function(res){
-   var cb="zsFastCb"+Date.now(),tm=setTimeout(function(){delete window[cb];res({ok:false,error:"timeout"})},10*60*1000);
-   window[cb]=function(x){clearTimeout(tm);delete window[cb];res(x||{ok:false})};
-   try{N.saveToDownloads(name,b.type||"video/mp4",tmp,cb)}catch(e){clearTimeout(tm);delete window[cb];res({ok:false,error:String(e)})}
-  });
-  try{N.deleteFile(tmp)}catch(e){}
-  if(!r||!r.ok)throw new Error((r&&r.error)||"saveToDownloads");
+  say(99,"📥 កំពុងបញ្ចប់...");
+  if(apk){
+   A.end();started=false;
+  }else{
+   var r=await new Promise(function(res){
+    var cb="zsFastCb"+Date.now(),tm=setTimeout(function(){delete window[cb];res({ok:false,error:"timeout"})},10*60*1000);
+    window[cb]=function(x){clearTimeout(tm);delete window[cb];res(x||{ok:false})};
+    try{N.saveToDownloads(name,mime,tmp,cb)}catch(e){clearTimeout(tm);delete window[cb];res({ok:false,error:String(e)})}
+   });
+   try{N.deleteFile(tmp)}catch(e){}
+   if(!r||!r.ok)throw new Error((r&&r.error)||"saveToDownloads");
+  }
   try{setProgress(100,"✅ រក្សាទុករួច")}catch(e){}
   try{showToast("✅ រក្សាទុករួចក្នុង Downloads: "+name+" ("+mb(total)+" MB)",true)}catch(e){}
   return true;
  }catch(err){
-  try{N.deleteFile(tmp)}catch(e){}
+  if(apk){if(started){try{A.abort(String(err))}catch(e){}}}else{try{N.deleteFile(tmp)}catch(e){}}
   try{setProgress(0,"❌ រក្សាទុកមិនបាន: "+String(err&&err.message||err))}catch(e){}
   try{showToast("❌ រក្សាទុកមិនបាន: "+String(err&&err.message||err)+(wrote?" (ទំហំទូរសព្ទពេញ?)":""),false)}catch(e){}
-  return wrote>0;   /* បើបរាជ័យមុនសរសេរអ្វីទាំងអស់ → ត្រឡប់ទៅវិធីចាស់ */
+  return wrote>0;
  }
 }
 
 const zsDlLegacy=(n,b)=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=n;a.style.display="none";(document.body||document.documentElement).appendChild(a);try{if(typeof showToast==="function")showToast("📥 កំពុងរក្សាទុកវីដេអូចូល Download ("+(b.size/1048576).toFixed(0)+"MB)... សូមរង់ចាំ កុំបិទ App",true)}catch(e){}a.click();setTimeout(()=>{try{a.remove()}catch(e){}},3000);setTimeout(()=>URL.revokeObjectURL(a.href),900000)};
-const dlBlob=(n,b)=>{zsFastSave(n,b).then(ok=>{if(!ok)zsDlLegacy(n,b)}).catch(()=>zsDlLegacy(n,b))};
+const dlBlob=(n,b)=>{try{if(window.zsfReportUsage)window.zsfReportUsage(b,n)}catch(e){}zsFastSave(n,b).then(ok=>{if(!ok)zsDlLegacy(n,b)}).catch(()=>zsDlLegacy(n,b))};
 let FF=null,mode="split",mergeFiles=[],bgmBuf=null,AC=null,ELSRC=null;
 const O={text:"",logo:null,blur:false,fs:.05,sb:.1};
 const say=m=>$("#splitOut").innerHTML=m;
@@ -4481,13 +4494,14 @@ function wipeAdminKeys(){
   ldel("zsf_keys_owner");return true;
  }catch(e){return false}
 }
-var WORKER_KEY_URL="https://soft-glitter-2121.saanaafckoko.workers.dev/check";
+var WORKER_KEY_URL="https://soft-forest-28cd.saanaafckoko.workers.dev/check";
 async function workerCheck(k){
  var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){try{ctl&&ctl.abort()}catch(e){}},12000);
  try{
-  var r=await fetch(WORKER_KEY_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify({key:k}),cache:"no-store",signal:ctl?ctl.signal:undefined});
+  var r=await fetch(WORKER_KEY_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify({key:k,device:getDev()}),cache:"no-store",signal:ctl?ctl.signal:undefined});
   var j=await r.json();
   if(j&&j.ok&&Number(j.expires)>Date.now())return {ok:true,expires:Number(j.expires)};
+  if(j&&j.reason==="device")return {device:true};
   if(j&&j.reason==="blocked")return {blocked:true};
   if(j&&j.reason==="expired")return {expired:true};
   if(j&&(j.reason==="invalid"||j.reason==="missing"))return {invalid:true};
@@ -4507,6 +4521,98 @@ async function remoteDays(k0){
  var d=Number(j.k[await keyHash(k0)]);
  return d>0?{days:d}:{days:0};
 }
+
+/* ---------- V9.5: ID ទូរសព្ទ + ពិនិត្យម្តងម្កាល + រាយការណ៍ការប្រើប្រាស់ ---------- */
+var DEV_KEY="zsf_device_id",DEV_RE=/^ZD-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/,devCache=null,OFFLINE_GRACE=3*86400000;
+function getDev(){
+ if(devCache)return devCache;
+ var d=lget(DEV_KEY);
+ if(d&&DEV_RE.test(d)){devCache=d;return d}
+ var A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",b=new Uint8Array(12),s="ZD-";
+ try{crypto.getRandomValues(b)}catch(e){for(var j=0;j12;j++)b[j]=Math.floor(Math.random()*256)}
+ for(var i=0;i12;i++){if(i&&i%4===0)s+="-";s+=A[b[i]%A.length]}
+ lset(DEV_KEY,s);devCache=s;return s;
+}
+async function ensureDev(){
+ try{
+  var d=lget(DEV_KEY);
+  if(d&&DEV_RE.test(d)){readDBid("device").then(function(x){if(!x||x.v!==d)writeDB({id:"device",v:d})}).catch(function(){});return}
+  var x=await readDBid("device");
+  if(x&&DEV_RE.test(String(x.v))){lset(DEV_KEY,x.v);devCache=x.v;return}
+  await writeDB({id:"device",v:getDev()});
+ }catch(e){}
+}
+function copyText(t){
+ function fb(){try{var ta=document.createElement("textarea");ta.value=t;ta.style.cssText="position:fixed;opacity:0;top:0;left:0";document.body.appendChild(ta);ta.focus();ta.select();var ok=document.execCommand("copy");document.body.removeChild(ta);return ok}catch(e){return false}}
+ try{if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t).then(function(){return true},function(){return fb()})}catch(e){}
+ return Promise.resolve(fb());
+}
+window.zsfCopyDev=function(){copyText(getDev()).then(function(ok){toast(ok?"📋 បានចម្លង ID ទូរសព្ទ៖ "+getDev():"សូមចម្លង ID នេះដោយដៃ៖ "+getDev(),ok)})};
+function devMsg(){return '📱 កូនសោនេះកំពុងចងភ្ជាប់នឹងទូរសព្ទផ្សេងbr>span style="font-weight:500;font-size:12.5px;opacity:.9">ផ្ញើ ID ទូរសព្ទនេះទៅអ្នកលក់តាម Telegram ដើម្បីប្តូរ៖br>b>'+getDev()+'/b>/span>br>button type="button" class="b" onclick="zsfCopyDev()" style="margin-top:8px">📋 ចម្លង ID/button>'}
+
+async function recheck(){
+ try{
+  var r=await getLogin();
+  if(!r||r.admin||!/^ZS-/.test(String(r.key||"")))return;
+  var last=Number(lget("zsf_last_chk")||0);
+  if(!last){last=Date.now();lset("zsf_last_chk",String(last))}
+  var wr=await workerCheck(r.key);
+  if(wr.ok){
+   lset("zsf_last_chk",String(Date.now()));
+   if(Number(wr.expires)!==Number(r.expiresAt)){r.expiresAt=wr.expires;await persist(r);unlock(wr.expires)}
+   flushUsage();return;
+  }
+  if(wr.device||wr.invalid||wr.expired){
+   await clearLogin();lockUI();window.scrollTo(0,0);
+   err(wr.device?devMsg():wr.expired?"⌛ កូនសោនេះផុតកំណត់ហើយbr>span style=\"font-weight:500;font-size:12.5px;opacity:.9\">សូមទាក់ទងអ្នកលក់តាម Telegram ដើម្បីបន្ថែមថ្ងៃ/span>":"🔒 កូនសោនេះមិនមានទៀតទេbr>span style=\"font-weight:500;font-size:12.5px;opacity:.9\">សូមទាក់ទងអ្នកលក់តាម Telegram/span>");
+   return;
+  }
+  if(wr.net&&Date.now()-last>OFFLINE_GRACE){
+   await clearLogin();lockUI();window.scrollTo(0,0);
+   err("⚠️ ត្រូវភ្ជាប់អ៊ីនធឺណិតដើម្បីផ្ទៀងផ្ទាត់កូនសោbr>span style=\"font-weight:500;font-size:12.5px;opacity:.9\">បានដាច់អ៊ីនធឺណិតលើសពី ៣ ថ្ងៃ/span>");
+  }
+ }catch(e){}
+}
+var rcTimer=null;
+function startRecheck(){if(rcTimer)clearInterval(rcTimer);setTimeout(recheck,1500);rcTimer=setInterval(recheck,30*60000)}
+
+var UQ="zsf_usage_q";
+function usageUrl(){return WORKER_KEY_URL.replace(/\/check\/?$/,"/usage")}
+function getQ(){try{return JSON.parse(lget(UQ)||"[]")||[]}catch(e){return []}}
+function setQ(q){lset(UQ,JSON.stringify(q.slice(-60)))}
+async function sendUsage(ev){
+ var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){try{ctl&&ctl.abort()}catch(e){}},12000);
+ try{
+  var r=await fetch(usageUrl(),{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify(ev),cache:"no-store",signal:ctl?ctl.signal:undefined});
+  var j=await r.json().catch(function(){return null});
+  if(!j)return r.status===200;
+  return !!(j.ok||j.reason==="device"||j.reason==="expired");
+ }catch(e){return false}
+ finally{clearTimeout(tm)}
+}
+async function flushUsage(){
+ var q=getQ();if(!q.length)return;setQ([]);var keep=[];
+ for(var i=0;iq.length;i++){if(!(await sendUsage(q[i])))keep.push(q[i])}
+ if(keep.length)setQ(getQ().concat(keep));
+}
+function vidDur(b){return new Promise(function(res){
+ var u,v;try{u=URL.createObjectURL(b);v=document.createElement("video")}catch(e){return res(0)}
+ var done=false;
+ function fin(){if(done)return;done=true;var d=v.duration;try{v.removeAttribute("src");v.load()}catch(e){}try{URL.revokeObjectURL(u)}catch(e){}res(isFinite(d)&&d>0?d:0)}
+ v.preload="metadata";v.muted=true;v.onloadedmetadata=fin;v.onerror=fin;setTimeout(fin,5000);v.src=u;
+})}
+window.zsfReportUsage=async function(b,name){
+ try{
+  var r=await getLogin();
+  if(!r||r.admin||!/^ZS-/.test(String(r.key||"")))return;
+  var sec=await vidDur(b);
+  if(!sec){try{if(typeof V!=="undefined"&&V&&isFinite(V.duration))sec=V.duration}catch(e){}}
+  var nm=String(name||"").toLowerCase();
+  var kind=/_merged\./.test(nm)?"merge":/_\d{3}\./.test(nm)?"split":"export";
+  var ev={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),key:r.key,device:getDev(),sec:Math.round(sec||0),kind:kind};
+  if(!(await sendUsage(ev))){var q=getQ();q.push(ev);setQ(q)}
+ }catch(e){}
+};
 
 /* ---------- Login record (localStorage + IndexedDB) ---------- */
 var DB="ZERO_FLASH_LOGIN_DB",ST="auth",RID="current",cache=null;
@@ -4602,20 +4708,21 @@ async function verify(){
   for(var i=0;icands.length&&!isAdmin;i++){tok=await derive(cands[i],ADM_SALT,ADM_N);if(sha256Hex(tok)===ADM_V)isAdmin=true}
   var k=findKey(raw)||raw,days=Number(gen[k]),netErr=false,wExp=0,wState="";
   if(!isAdmin&&!(days>0)){
-   if(/^ZS-/.test(normalize(raw))){var wr=await workerCheck(normalize(raw));if(wr.ok){wExp=wr.expires;k=normalize(raw)}else if(wr.blocked)wState="blocked";else if(wr.expired)wState="expired";else if(wr.net)netErr=true}
+   if(/^ZS-/.test(normalize(raw))){var wr=await workerCheck(normalize(raw));if(wr.ok){wExp=wr.expires;k=normalize(raw)}else if(wr.blocked)wState="blocked";else if(wr.expired)wState="expired";else if(wr.device)wState="device";else if(wr.net)netErr=true}
    else{var rr=await remoteDays(raw);if(rr.err)netErr=true;else if(rr.days>0){days=rr.days;k=normalize(raw)}}
   }
   var wait=700-(Date.now()-t0);if(wait>0)await new Promise(function(r){setTimeout(r,wait)});
   if(isAdmin){setKA({});await persist({key:"ADMIN",activatedAt:Date.now(),expiresAt:0,admin:true,tok:tok});unlock("ADMIN");return}
   if(wState==="blocked"){err("🚫 IP របស់អ្នកត្រូវបានបិទ (ដាក់កូនសោខុសច្រើនដង)br>span style=\"font-weight:500;font-size:12.5px;opacity:.9\">សូមទាក់ទងអ្នកលក់តាម Telegram ដើម្បីដោះ/span>");return}
+  if(wState==="device"){err(devMsg());return}
   if(wState==="expired"){err("⌛ កូនសោនេះផុតកំណត់ហើយbr>span style=\"font-weight:500;font-size:12.5px;opacity:.9\">សូមទាក់ទងអ្នកលក់តាម Telegram ដើម្បីបន្ថែមថ្ងៃ/span>");return}
   if(days>0||wExp>0){
    var now=Date.now(),exp=wExp>0?wExp:now+days*86400000;
    var saved=await persist({key:k,activatedAt:now,expiresAt:exp,admin:false});
    if(!saved){err(FAIL);return}
-   setKA({});markUsed(k,now,exp);
+   setKA({});markUsed(k,now,exp);lset("zsf_last_chk",String(Date.now()));
    if(wipeAdminKeys()){toast("🔒 បានលុប API Key ចាស់ចេញពីឧបករណ៍នេះ — សូមដាក់ Key ផ្ទាល់ខ្លួនរបស់អ្នក",true);setTimeout(function(){location.reload()},900);return}
-   unlock(exp);return;
+   unlock(exp);if(/^ZS-/.test(String(k)))startRecheck();return;
   }
   if(netErr){err("⚠️ មិនអាចផ្ទៀងផ្ទាត់កូនសោបានទេ — សូមភ្ជាប់អ៊ីនធឺណិត ហើយសាកល្បងម្តងទៀត");return}
   var n=(Number(ka.n)||0)+1,o={n:n};if(n>=5)o.until=Date.now()+Math.min(3600,30*Math.pow(2,n-5))*1000;setKA(o);
@@ -4631,7 +4738,7 @@ async function restore(){
  }
  var exp=Number(r&&r.expiresAt||0);
  try{var d=Number(gen[r&&r.key]);if(r&&!r.admin&&d>0&&r.activatedAt){var ne=Number(r.activatedAt)+d*86400000;if(ne>exp){exp=ne;r.expiresAt=ne;await persist(r)}}}catch(e){}
- if(exp&&Date.now()exp){try{markUsed(r.key,r.activatedAt,exp)}catch(e){}unlock(exp);return}
+ if(exp&&Date.now()exp){try{markUsed(r.key,r.activatedAt,exp)}catch(e){}unlock(exp);startRecheck();return}
  if(r&&exp&&Date.now()>=exp)await clearLogin();
  lockUI();
 }
@@ -4667,8 +4774,9 @@ setMode(document.documentElement.getAttribute("data-mode")==="light"?"light":"da
 $("out").onclick=async function(){if(await ask("ចាកចេញពីកម្មវិធីមែនទេ?")){await clearLogin();lockUI();window.scrollTo(0,0)}};
 $("zfExp").onclick=null;
 try{var dr=lget("zero_last_key_draft");if(dr)$("zfKey").value=dr}catch(e){}
+var dvb=$("zfDevCp");if(dvb)dvb.onclick=window.zsfCopyDev;
 restoreKeys();
-restore();
+ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textContent=getDev();restore()});
 })();
 /script>
 script id="zsf-v725-updbtn">
@@ -4920,7 +5028,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="9.3";
+  var EMB="9.6";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
@@ -4940,6 +5048,7 @@ restore();
           e.preventDefault();e.stopPropagation();
           var name=a.getAttribute("download")||"file";
           fetch(h).then(function(r){return r.blob()}).then(async function(b){
+            if(typeof window.zsFastSave==="function"){try{if(await window.zsFastSave(name,b))return}catch(_){}}
             if(!ZSFApp.begin(name,b.type||"application/octet-stream"))return;
             var CH=3*1024*1024;
             for(var o=0;o<b.size;o+=CH){
