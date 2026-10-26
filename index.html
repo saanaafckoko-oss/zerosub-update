@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"9.1";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"9.2";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -3653,30 +3653,15 @@ function planCuts(pcm){
 
 /* ===== v4.6 : cue ពេលវេលា = ពាក្យដំបូង → ពាក្យចុងក្រោយ (word timestamps) ដើម្បីត្រូវពេលវីដេអូដើម ===== */
 function zsfGroqCues(j,o){
-  var segs=(j.segments||[]).filter(function(s){var n=s.no_speech_prob||0,l=(s.avg_logprob==null)?-0.3:s.avg_logprob;
-   if(n>0.7&&l-0.7)return false;if(n>0.9&&l-0.4)return false;if(l-1.3)return false;if(s.compression_ratio>2.4)return false;return true}),
-   W=(j.words||[]).filter(function(w){return isFinite(w.start)&&isFinite(w.end)&&w.end>=w.start}),out=[],g=segs.map(function(){return []});
-  W.forEach(function(w){var m=(w.start+w.end)/2,bi=-1,bd=1e9;
-   segs.forEach(function(s,i){var d=(m>=s.start&&m=s.end)?0:Math.min(Math.abs(m-s.start),Math.abs(m-s.end));if(dbd){bd=d;bi=i}});
-   if(bi>=0&&bd=1.0)g[bi].push(w)});
-  segs.forEach(function(s,i){var t=String(s.text||"").trim();if(!t)return;
-   var a=s.start,b=s.end,ws=g[i],nsp=s.no_speech_prob||0,lp=(s.avg_logprob==null)?-0.3:s.avg_logprob;
-   if(ws.length){var wa=ws[0].start,wb=ws[ws.length-1].end;if(wb>wa&&wa>=s.start-1&&wb=s.end+1){a=wa;b=wb}}
-   var cuts=[];
-   if(ws.length>1){for(var k=1;kws.length;k++){if(ws[k].start-ws[k-1].end>=0.6)cuts.push(k)}}
-   if(cuts.length&&cuts.length=6){
-    var pos=[],ptr=0,ok=true;
-    for(var k2=0;k2ws.length&&ok;k2++){var wt=String(ws[k2].word||"").trim();if(!wt){pos.push(ptr);continue}var ix=t.indexOf(wt,ptr);if(ix0){ok=false;break}pos.push(ix);ptr=ix+wt.length}
-    if(ok){
-     var bounds=[0].concat(cuts),pcs=[];
-     for(var q=0;qbounds.length;q++){
-      var w0=bounds[q],w1=(q+1bounds.length?bounds[q+1]:ws.length),c0=(q===0?0:pos[w0]),c1=(q+1bounds.length?pos[w1]:t.length),tx=t.slice(c0,c1).trim();
-      if(!tx)continue;pcs.push({s:ws[w0].start+o,e:ws[w1-1].end+o,t:tx,nsp:nsp,lp:lp})}
-     if(pcs.length){pcs.forEach(function(x){out.push(x)});return}
-    }
-   }
-   out.push({s:a+o,e:b+o,t:t,nsp:nsp,lp:lp})});
-  return out}
+ var segs=(j.segments||[]).filter(function(s){var n=s.no_speech_prob||0,l=(s.avg_logprob==null)?-0.3:s.avg_logprob;return !(n>0.85&&!(l>-0.5))&&!(n>0.6&&l-1)&&!(l-1.5)&&!(s.compression_ratio>2.4)}),W=(j.words||[]).filter(function(w){return isFinite(w.start)&&isFinite(w.end)&&w.end>=w.start}),out=[],g=segs.map(function(){return []});
+ W.forEach(function(w){var m=(w.start+w.end)/2,bi=-1,bd=1e9;
+  segs.forEach(function(s,i){var d=(m>=s.start&&m=s.end)?0:Math.min(Math.abs(m-s.start),Math.abs(m-s.end));if(dbd){bd=d;bi=i}});
+  if(bi>=0&&bd=1.0)g[bi].push(w)});
+ segs.forEach(function(s,i){var t=String(s.text||"").trim();if(!t)return;
+  var a=s.start,b=s.end,ws=g[i];
+  if(ws.length){var wa=ws[0].start,wb=ws[ws.length-1].end;if(wb>wa&&wa>=s.start-1&&wb=s.end+1){a=wa;b=wb}}
+  out.push({s:a+o,e:b+o,t:t,nsp:s.no_speech_prob||0,lp:(s.avg_logprob==null)?-0.3:s.avg_logprob})});
+ return out}
 
 /* ===== V6.1 : ស្តារពាក្យដែលបាត់ — រកកន្លែងមានសំឡេងនិយាយតែគ្មានអក្សរ ហើយស្តាប់ម្តងទៀត ===== */
 function zsfSpeechRegions(pcm){
@@ -3687,8 +3672,8 @@ function zsfSpeechRegions(pcm){
  for(f=0;fnf;f++){if(e[f]>th){if(st0)st=f;last=f}else if(st>=0&&f-last>8){reg.push([st*0.05,(last+1)*0.05]);st=-1}}
  if(st>=0)reg.push([st*0.05,(last+1)*0.05]);
  return reg.filter(function(r){return r[1]-r[0]>=0.8})}
-async function zsfGapFill(pcm,out,keys,prog,V){
- var reg=V?(function(){var r=[],st=-1,i,m=V.m;for(i=0;i=V.nf;i++){if(iV.nf&&m[i]){if(st0)st=i}else if(st>=0){r.push([st*V.FT,i*V.FT]);st=-1}}return r.filter(function(x){return x[1]-x[0]>=0.8})})():zsfSpeechRegions(pcm),gaps=[],dur=pcm.length/32000;
+async function zsfGapFill(pcm,out,keys,prog){
+ var reg=zsfSpeechRegions(pcm),gaps=[],dur=pcm.length/32000;
  reg.forEach(function(r){var cov=0;out.forEach(function(c){var a=Math.max(r[0],c.s-0.1),b=Math.min(r[1],c.e+0.1);if(b>a)cov+=b-a});
   if(cov/(r[1]-r[0])0.4)gaps.push(r)});
  gaps=gaps.slice(0,60);if(!gaps.length)return 0;
@@ -3697,7 +3682,7 @@ async function zsfGapFill(pcm,out,keys,prog,V){
   if(b-a0.6)continue;
   try{
    var part=pcm.subarray(Math.floor(a*16000)*2,Math.floor(b*16000)*2),j=await groqCall(wavChunk(part),keys,st),cs=zsfGroqCues(j,a);
-   cs.forEach(function(c){if(!c.t||(H&&H.test(c.t)))return;if(c.nsp>0.35||c.lp-0.6||c.t.replace(/[\s,.!?;:，。！？、；：…]/g,"").length2)return;
+   cs.forEach(function(c){if(!c.t||(H&&H.test(c.t)))return;if(c.nsp>0.5||c.lp-0.8||c.t.length2)return;
     var ov=0;out.forEach(function(x){var o2=Math.min(c.e,x.e)-Math.max(c.s,x.s);if(o2>0)ov+=o2});
     if(ov/Math.max(0.1,c.e-c.s)>0.5)return;
     out.push({s:c.s,e:Math.max(c.s+.25,c.e),t:c.t});added++})
@@ -3752,62 +3737,6 @@ function zsfSnapCues(pcm,cues0){
   out.push({s:s,e:Math.max(s+0.25,e),t:t})});
  return out}
 
-
-/* ===== V8.3 : VAD ថ្មី (ស្តាប់តែសំឡេងមនុស្ស band 250-3400Hz) + លុប cue គ្មានសំឡេង + កែពេលវេលាតាមសំឡេងពិត ===== */
-function zsfVoiceEnergy(pcm){
-  var n=pcm.length>>1,dv=new DataView(pcm.buffer,pcm.byteOffset,n*2),FR=320,nf=Math.floor(n/FR),e=new Float32Array(nf),f,k;
-  function co(t,fc){var w=2*Math.PI*fc/16000,c=Math.cos(w),a=Math.sin(w)/(2*0.7071),a0=1+a,b0,b1,b2;
-   if(t==="hp"){b0=(1+c)/2;b1=-(1+c);b2=b0}else{b0=(1-c)/2;b1=1-c;b2=b0}
-   return {b0:b0/a0,b1:b1/a0,b2:b2/a0,a1:-2*c/a0,a2:(1-a)/a0,x1:0,x2:0,y1:0,y2:0}}
-  function st(q,x){var y=q.b0*x+q.b1*q.x1+q.b2*q.x2-q.a1*q.y1-q.a2*q.y2;q.x2=q.x1;q.x1=x;q.y2=q.y1;q.y1=y;return y}
-  var h1=co("hp",250),h2=co("hp",250),l1=co("lp",3400),l2=co("lp",3400);
-  for(f=0;fnf;f++){var sum=0,o=f*FR;for(k=0;kFR;k++){var v=dv.getInt16((o+k)*2,true)/32768;v=st(l2,st(l1,st(h2,st(h1,v))));sum+=v*v}e[f]=Math.sqrt(sum/FR)}
-  return e}
-function zsfVad(e){
-  var nf=e.length,FT=0.02,sm=new Float32Array(nf),i,j;
-  for(i=0;inf;i++){var a=0,c=0;for(j=-1;j=1;j++){if(e[i+j]!==undefined){a+=e[i+j];c++}}sm[i]=a/c}
-  var all=Array.prototype.slice.call(sm).sort(function(a,b){return a-b}),gHi=all[Math.floor(nf*0.9)]||0.05;
-  var BL=50,nb=Math.ceil(nf/BL),fl=new Float32Array(nb),b;
-  for(b=0;bnb;b++){var a0=Math.max(0,(b-3)*BL),a1=Math.min(nf,(b+4)*BL),w=Array.prototype.slice.call(sm,a0,a1).sort(function(x,y){return x-y});fl[b]=w[Math.floor(w.length*0.2)]||0}
-  var m=new Uint8Array(nf),sp=0;
-  for(i=0;inf;i++){var th=Math.max(0.004,fl[Math.floor(i/BL)]*1.6,gHi*0.04);if(sm[i]>th){m[i]=1}}
-  var run=0,g;
-  for(i=0;i=nf;i++){if(inf&&!m[i])run++;else{if(run>0&&run=12&&i-run>0&&inf&&m[i-run-1]){for(g=i-run;gi;g++)m[g]=1}run=0}}
-  run=0;
-  for(i=0;i=nf;i++){if(inf&&m[i])run++;else{if(run>0&&run4){for(g=i-run;gi;g++)m[g]=0}run=0}}
-  for(i=0;inf;i++)sp+=m[i];
-  return {m:m,nf:nf,FT:FT,ratio:sp/Math.max(1,nf),e:sm}}
-function zsfPlanCutsV(V,n){
-  var nf=V.nf,FT=V.FT,MIN=Math.round(15/FT),MAX=Math.round(30/FT),cuts=[0],st=0,f,i;
-  while(nf-st>MAX){
-   var best=-1,bl=0,i0=st+MIN,i1=Math.min(nf-1,st+MAX);
-   i=i0;while(i=i1){if(!V.m[i]){var j=i;while(j=i1&&!V.m[j])j++;if(j-i>bl){bl=j-i;best=Math.floor((i+j)/2)}i=j}else i++}
-   if(best0||bl3){var bv=Infinity;for(f=i0;f=i1;f++){if(V.e[f]bv){bv=V.e[f];best=f}}}
-   cuts.push(best);st=best}
-  if(cuts.length>1&&nf-st3*50)cuts.pop();
-  var res=[];for(f=0;fcuts.length;f++){var s0=cuts[f]*320,s1=(f+1cuts.length?cuts[f+1]*320:n);res.push([s0,s1])}
-  return res}
-function zsfRefineCues(V,cues0){
-  var m=V.m,nf=V.nf,FT=V.FT,out=[],i,drop=0;
-  cues0.sort(function(a,b){return a.s-b.s});
-  cues0.forEach(function(c){
-   var s=c.s,e=c.e,t=c.t,fa=Math.max(0,Math.floor(s/FT)),fb=Math.min(nf-1,Math.ceil(e/FT)),n=fb-fa+1,sp=0;
-   for(i=fa;i=fb;i++)sp+=m[i];
-   if(n>=8&&sp/n0.10){drop++;return}
-   if(n>=3&&sp2){drop++;return}
-   var dur=e-s,sa=Math.max(0,Math.floor((s-0.3)/FT)),sb=Math.min(nf-3,Math.floor((s+Math.min(3,dur*0.8))/FT)),ns=-1;
-   for(i=sa;i=sb;i++){if(m[i]&&m[i+1]&&m[i+2]){ns=i;break}}
-   if(ns>=0){var s2=ns*FT-0.03;if(s2>s)s=Math.min(s2,e-0.2);else s=Math.max(s2,s-0.3)}
-   var ea=Math.min(nf-1,Math.floor((e+0.3)/FT)),eb=Math.max(2,Math.floor((e-Math.min(3,(e-s)*0.8))/FT)),ne=-1;
-   for(i=ea;i>=eb;i--){if(m[i]&&m[i-1]&&m[i-2]){ne=i;break}}
-   if(ne>=0){var e2=(ne+1)*FT+0.06;if(e2>s+0.2)e=e2}
-   var p=out[out.length-1];if(p&&p.e>s&&sp.e-0.02){s=Math.max(s,Math.min(p.e,p.s+Math.max(0.2,(p.e-p.s)*0.5)))}
-   var q1=out[out.length-1],q2=out[out.length-2];
-   if(q1&&q2&&q1.t===t&&q2.t===t)return;
-   out.push({s:s,e:Math.max(s+0.25,e),t:t})});
-  try{console.log("refine: dropped "+drop+" cues without speech")}catch(x){}
-  return out}
-
 /* ===== V7.0 : Gemini ស្តាប់សំឡេង + ចែកតួ + បកប្រែ ដំណាលគ្នាពេលទាញអក្សរ (ដោយស្ងាត់ៗ ក្នុង 1-Click) ===== */
 function zsfStreamNorm(t){return String(t||"").replace(/\s+/g,"").replace(/[，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g,"")}
 function zsfStreamStart(total){
@@ -3855,8 +3784,7 @@ async function groqTranscribe(prog){
  var pcm0=pcm,__cl=document.getElementById("zsfClean");if(__cl&&__cl.checked){try{prog(7,"🎚 កំពុងសម្អាតសំឡេង...");await sleep(20);pcm=zsfCleanPcm(pcm)}catch(e){console.warn("clean",e)}}
  prog(8,"🎵 វិភាគរកចន្លោះស្ងាត់ដកដង្ហើម (Silence Points 15s - 30s)...");
  await sleep(30);
- var V=null;try{prog(8,"🎙 កំពុងវិភាគសំឡេងមនុស្ស (VAD)...");await sleep(20);V=zsfVad(zsfVoiceEnergy(pcm0))}catch(e){console.warn("vad",e);V=null}
- var plan=(V&&V.nf>100)?zsfPlanCutsV(V,pcm.length>>1):planCuts(pcm),total=plan.length;
+ var plan=planCuts(pcm),total=plan.length;
  if(window.__zsfStreamWant){try{window.__zsfStream=zsfStreamStart(total)}catch(e){window.__zsfStream=null}}
  prog(10,"🎵 បានបំបែកជា "+total+" កង់ (ចន្លោះ: 15s-30s ចំកន្លែងស្ងាត់)...");
  await sleep(400);
@@ -3884,8 +3812,8 @@ async function groqTranscribe(prog){
  var segs=[].concat.apply([],res.map(function(x){return x||[]}));
  var gap=+$("#gap").value,H=(typeof ZSF_HALLUC!=="undefined")?ZSF_HALLUC:null;
  var out=segs.filter(function(x){return x.t&&!(H&&H.test(x.t))}).map(function(x){return {s:x.s,e:Math.max(x.s+.25,x.e),t:x.t}});
- try{var _ad=await zsfGapFill(pcm,out,keys,prog,V);if(_ad)prog(99,"✅ ស្តារបានបន្ថែម "+_ad+" ឃ្លា")}catch(e){console.warn(e)}
- try{if(V&&V.ratio>0.02&&V.ratio0.97)out=zsfRefineCues(V,out);else out=zsfSnapCues(pcm0,out)}catch(e){console.warn("snap",e);try{out=zsfSnapCues(pcm0,out)}catch(e2){}}
+ try{var _ad=await zsfGapFill(pcm,out,keys,prog);if(_ad)prog(99,"✅ ស្តារបានបន្ថែម "+_ad+" ឃ្លា")}catch(e){console.warn(e)}
+ try{out=zsfSnapCues(pcm0,out)}catch(e){console.warn("snap",e)}
  out.sort(function(a,b){return a.s-b.s});
  for(var q=0;qout.length-1;q++){if(out[q+1].sout[q].e)out[q].e=Math.max(out[q].s+.2,out[q+1].s-.02)}
  if(!out.length)throw new Error("Groq មិនឮការនិយាយក្នុងវីដេអូនេះទេ");
@@ -4992,7 +4920,7 @@ restore();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="9.1";
+  var EMB="9.2";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
