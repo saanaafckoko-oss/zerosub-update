@@ -921,8 +921,23 @@ $("#gemBtn").onclick=async()=>{
   const pr=`Translate each numbered line to ${$("#target").selectedOptions[0].text}. Story context: ${$("#ctx").value}. Keep numbering, one line per item. NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). COMPLETE MEANING: translate every sentence fully and faithfully. Never shorten, summarize, merge or drop any word, name, number, emotion or piece of information just to make the line shorter; the line may be as long as the meaning needs. Only choose the most natural, compact Khmer wording when it loses nothing. NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. Output only numbered lines.\n`+part.map((c,j)=>`${j+1}. ${c.t.replace(/\n/g," ")}`).join("\n");
   const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GM[gmodel][1]}:generateContent?key=${keys[ki++%keys.length]}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:pr}]}]})});
   const j=await r.json();if(!r.ok)throw new Error(j.error?.message||r.status);
-  const ls=(j.candidates[0].content.parts[0].text||"").split("\n").map(l=>l.replace(/^\s*\d+[.)]\s*/,"").trim()).filter(Boolean);
-  part.forEach((c,k)=>out.push({...c,t:ls[k]||c.t}))}setC(out)}catch(e){alert("Gemini: "+e.message)}
+  const raw=(j.candidates?.[0]?.content?.parts||[]).map(x=>x.text||"").join("\n").trim();
+  if(!raw)throw new Error("Gemini មិនបានផ្ញើអត្ថបទត្រឡប់មក");
+  // ផ្គូផ្គងតាមលេខដើម មិនយកចម្លើយបន្ទាត់បន្ទាប់ទៅបំពេញបន្ទាត់ដែលបាត់ទេ
+  const mapped=new Map();
+  raw.split(/\r?\n/).forEach(line=>{
+   const m=line.match(/^\s*(\d{1,3})\s*[.)、:-]\s*(.*?)\s*$/);
+   if(m){const n=Number(m[1]);if(n>=1&&n<=part.length&&m[2]&&!mapped.has(n))mapped.set(n,m[2]);}
+  });
+  // បើម៉ូដែលមិនដាក់លេខសោះ អនុញ្ញាតតែពេលចំនួនបន្ទាត់ត្រូវគ្នាពេញលេញប៉ុណ្ណោះ
+  if(mapped.size===0){
+   const plain=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+   if(plain.length===part.length)plain.forEach((line,k)=>mapped.set(k+1,line.replace(/^\s*\d+\s*[.)、:-]\s*/,"")));
+  }
+  let missing=0;
+  part.forEach((c,k)=>{const translated=mapped.get(k+1);if(translated)out.push({...c,t:translated});else{out.push(c);missing++;}});
+  if(missing)throw new Error("Gemini បកប្រែបានមិនគ្រប់ "+missing+" បន្ទាត់ក្នុងក្រុមនេះ។ ខ្ញុំបានបញ្ឈប់ ដើម្បីកុំឱ្យប្រយោគខុសជួរ។ សូមសាកម្តងទៀត។");
+ }setC(out)}catch(e){alert("Gemini: "+e.message)}
  btn.innerHTML=ICO.brain+" Gemini"};
 $("#gooBtn").onclick=async()=>{if(!cues.length)return alert("សូមនាំចូល SRT ជាមុន");const b=$("#gooBtn");b.textContent="កំពុងបកប្រែ...";
  try{const o=[];for(const c of cues){const r=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${$("#target").value}&dt=t&q=${encodeURIComponent(c.t)}`);const j=await r.json();o.push({...c,t:j[0].map(x=>x[0]).join("")})}setC(o)}catch(e){alert("Google: "+e.message)}b.innerHTML=ICO.translate+" Google"};
@@ -4795,7 +4810,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"6.0",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"6.1",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
