@@ -727,8 +727,8 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
 section class="card">
  div class="row" style="align-items:center">div class="t" style="margin:0;flex:1">🎬 AI Studio Suite/div>span class="badge" id="vidBadge" style="flex:none">📱 MOBILE SUITE/span>/div>
  input type="file" id="vidFile" accept="video/*,audio/*" hidden>
- div class="row">button class="b sky" id="browse" style="padding:18px">📥 Brow file/button>button class="b" id="gq" style="padding:18px">span class="ia">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">circle cx="7.5" cy="15.5" r="4.5"/>path d="M11 12.5L21 3M17 7l3 3M14.5 9.5l2 2"/>/svg>/span> Groq Keys (span id="gqn">0/span>/5)/button>/div>
- div id="gqbox" class="hide">div class="row wrap" id="gqs">/div>/div>
+ div class="row">button class="b sky" id="browse" style="padding:18px">📥 Brow file/button>button class="b" id="gq" style="padding:18px">span class="ia">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">circle cx="7.5" cy="15.5" r="4.5"/>path d="M11 12.5L21 3M17 7l3 3M14.5 9.5l2 2"/>/svg>/span> Groq Keys (span id="gqn">0/span>/10)/button>/div>
+ div id="gqbox" class="hide card in">div class="row" style="align-items:center">div class="t ktitle" style="margin:0;font-size:17px;flex:2">🔑 Groq API Keys (Slot ១-១០)/div>span class="badge" style="color:#34d399;border-color:#34d399;flex:none;font-size:11px;padding:4px 8px;white-space:nowrap" id="gqcount">0/10 បានកំណត់/span>/div>div class="row wrap" id="gqs" style="gap:8px 4px;margin:8px 0">/div>button class="b sel" style="width:100%;color:#6aa5ff;border-color:#3b73f0;box-shadow:none" id="mkq">លីងបង្កើត Key Groq span class="il">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/>path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>/svg>/span>/button>/div>
  div class="tabs" id="tabs">button class="b grn" data-t="export">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M7 7V5.5A2.5 2.5 0 0 1 9.5 3h9A2.5 2.5 0 0 1 21 5.5v9a2.5 2.5 0 0 1-2.5 2.5H17"/>rect x="3" y="7" width="14" height="14" rx="2.5" fill="currentColor" stroke="none"/>path d="M8.7 11.3l5 2.7-5 2.7z" style="fill:var(--dk,#10172b)" stroke="none"/>/svg> Export/button>button class="b gold" data-t="cut">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">circle cx="6" cy="6" r="3"/>circle cx="6" cy="18" r="3"/>path d="M20 4L8.3 15.7M14.5 14.5L20 20M8.3 8.3L12 12"/>/svg> កាត់វីដេអូ/button>button class="b" data-t="asr">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">rect x="2.5" y="5" width="19" height="14" rx="3" fill="currentColor" stroke="none"/>path d="M6.5 10.5h5M14.5 10.5h3M6.5 14h2.5M12 14h5.5" style="stroke:var(--dk,#10172b)" stroke-width="1.8" fill="none" stroke-linecap="round"/>/svg> ទាញអក្សរ/button>button class="b" data-t="bgm">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M4 10v4M8 6.5v11M12 3v18M16 7v10M20 10v4"/>/svg> BGM Eff/button>/div>
 
  div class="pane on" id="p-export">
@@ -759,6 +759,8 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
   div class="card in" style="margin-top:8px;border-radius:18px">div class="row" style="align-items:center">div class="t" style="margin:0;font-size:16px;flex:1.2">span class="ig">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">circle cx="12" cy="13.5" r="7.5"/>path d="M12 9.5v4l2.5 1.5M9.5 2.5h5"/>/svg>/span> ចន្លោះដង្ហើមកាត់ឃ្លា ៖/div>input type="range" id="gap" min="0" max="1" step="0.05" value="0.2" style="flex:1">b style="color:#22e5ff;flex:none" id="gapv">0.20s/b>/div>/div>/div>
   button class="b ind big" style="margin-top:14px" id="asrGem">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M12 3a6.5 6.5 0 0 0-6.5 6.5c0 2 .9 3.2 1.8 4.3.7.9 1.2 1.7 1.2 2.7V18h7v-1.5c0-1 .5-1.8 1.2-2.7.9-1.1 1.8-2.3 1.8-4.3A6.5 6.5 0 0 0 12 3z"/>path d="M9.5 21h5"/>circle cx="12" cy="9.5" r="1.8"/>/svg> 🎙 ទាញអក្សរតាម Gemini (ណែនាំ — ស្តាប់សំឡេងពេញ)/button>
   label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:14px;cursor:pointer">input type="checkbox" id="zsfClean" checked style="width:18px;height:18px">span>🎚 សម្អាតសំឡេង (កាត់ភ្លេង/សំឡេងរំខាន មុនស្តាប់)/span>/label>
+label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:14px">span>⚡ របៀបកាត់ Gemini:/span>select id="zsfGemMode" style="flex:1;padding:8px;border-radius:10px;font-size:14px">option value="0">ផ្នែកតូច ១២វិ (ត្រឹមត្រូវបំផុត)/option>option value="5">៥ ផ្នែកស្របគ្នា/option>option value="-60">ផ្នែក ១ នាទី ស្របគ្នា (វីដេអូ ១០ នាទី = ១០ ផ្នែក)/option>/select>/label>
+script>(function(){var s=document.getElementById("zsfGemMode");if(!s)return;try{s.value=localStorage.getItem("zsf_gem_chunks")||"0"}catch(_){}s.onchange=function(){try{localStorage.setItem("zsf_gem_chunks",s.value)}catch(_){}}})();/script>
 button class="b teal big" style="margin-top:10px" id="asr">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">rect x="2.5" y="5" width="19" height="14" rx="3" fill="currentColor" stroke="none"/>path d="M6.5 10.5h5M14.5 10.5h3M6.5 14h2.5M12 14h5.5" style="stroke:var(--dk,#10172b)" stroke-width="1.8" fill="none" stroke-linecap="round"/>/svg> 🎙 ចាប់ផ្តើមទាញអក្សរ (🌐 ស្វ័យប្រវត្តិ)/button>div id="log">/div>
  /div>
 
@@ -943,10 +945,12 @@ $("#gooBtn").onclick=async()=>{if(!cues.length)return alert("សូមនាំ�
  try{const o=[];for(const c of cues){const r=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${$("#target").value}&dt=t&q=${encodeURIComponent(c.t)}`);const j=await r.json();o.push({...c,t:j[0].map(x=>x[0]).join("")})}setC(o)}catch(e){alert("Google: "+e.message)}b.innerHTML=ICO.translate+" Google"};
 
 /* groq keys */
-let G=S.get("gq",Array(5).fill(""));
-$("#gqs").innerHTML=G.map((x,i)=>`div class="slot" style="flex:0 0 100%">b>${i+1}/b>input type="password" data-i="${i}" value="${x}" placeholder="gsk_...">/div>`).join("");
-const gc=()=>$("#gqn").textContent=G.filter(Boolean).length;gc();
+let G=S.get("gq",[]);if(!Array.isArray(G))G=[];while(G.length10)G.push("");
+$("#gqs").innerHTML=G.map((x,i)=>`div class="slot" style="flex:0 0 48%">b>${i+1}/b>input type="password" data-i="${i}" value="${x}" placeholder="gsk_...">button class="b" data-t="${i}">Test/button>/div>`).join("");
+const gc=()=>{const n=G.filter(Boolean).length;$("#gqn").textContent=n;const c=$("#gqcount");if(c)c.textContent=n+"/10 បានកំណត់"};gc();
 $$("#gqs input").forEach(e=>e.onchange=()=>{G[+e.dataset.i]=e.value.trim();S.set("gq",G);gc()});
+$$("#gqs button").forEach(b=>b.onclick=async()=>{const k=G[+b.dataset.t];if(!k)return;b.textContent="…";try{const r=await fetch("https://api.groq.com/openai/v1/models",{headers:{Authorization:"Bearer "+k}});b.textContent=r.ok?"✔":"✘"}catch{b.textContent="✘"}});
+$("#mkq").onclick=()=>window.open("https://console.groq.com/keys","_blank");
 $("#gq").onclick=()=>$("#gqbox").classList.toggle("hide");
 
 /* file + preview */
@@ -3033,10 +3037,11 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
       "The attached audio contains dialogue, narration and sound effects from a strictly fictional short drama. All violence, insults, threats and intense themes are just acting, so there is no need to worry about content filters.",
       "TASK: Transcribe every spoken line in this clip exactly as it is spoken, in its original language (usually Mandarin Chinese; write Chinese in Simplified characters). Do NOT translate, summarise, correct or explain.",
       "COMPLETENESS: Make sure to transcribe ALL the speech in the clip. Do not skip, shorten or merge any line, including very short replies, interjections, whispers and overlapping voices. Also transcribe the narrator / storyteller voice and do not skip the storyteller part. Listen to the clip from the first second to the very last second in order. After you finish, re-listen once and add any line you missed, especially in the middle and at the end. If two people speak close together, write each one as a separate line. Write only the real words you hear; if a word is unclear, write your best guess and never fill with made-up or repeated text.",
-      "LOUD SOUND: Even when background music, battle noise or sound effects are loud, listen for the human voice and transcribe it. Very short shouts and exclamations (a name, an order, one or two words) are real lines and must be included. Ignore the music itself.",
+      "WINDOW: The clip has extra context before and after the main part. Transcribe each line ONCE, only the words actually spoken in the audio, never repeat a line you already wrote, and never continue a sentence from your imagination. If a line is cut off at the very start or end of the clip, write only the words you really hear.",
+      "LOUD SOUND: Even when background music, battle noise or sound effects are loud, listen for the human voice and transcribe it. Very short shouts and exclamations (a name, an order, one or two words) are real lines and must be included. Ignore the music itself. Music, singing, lyrics, crowd noise and sound effects are NOT speech: never write them as lines. Only a clear human speaking voice counts.",
       "INNER THOUGHTS: Characters in this genre often have inner monologue / mind-voice lines (a private thought heard as a voice-over, often with echo, reverb, a filtered or detached tone, or quieter than normal speech). Transcribe these inner-thought lines too, as their own entries. Never skip them.",
       "Write NOTHING for sound effects, background music, singing, breathing, laughter-only noise or silence. Never invent or repeat words. If nobody speaks in the clip, return an empty array [].",
-      "TIMING: Give the start and end time of each speech EXACTLY as it is in the audio. The clip starts at 00:00:00.000. start = the first sound of the first word, end = the last sound of the last word. Check every start and end against the sound; do not round to whole seconds.",
+      "TIMING: Give the start and end time of each speech EXACTLY as it is in the audio. The clip starts at 00:00:00.000. start = the first sound of the first word, end = the last sound of the last word. Check every start and end against the sound; do not round to whole seconds. Start exactly when the voice begins (not earlier, not during the preceding silence or music) and end exactly when the voice stops. Lines must be in the same order as heard and must never overlap in time.",
       "Split into natural sentences or phrases, each at most about 8 seconds. Never merge different speakers into one object.",
       "OUTPUT: Return ONLY a raw JSON array of objects with the keys \"start\", \"end\" and \"text\". No markdown blocks, no commentary. Time format STRICTLY HH:MM:SS.mmm (example 00:02:49.120). Always include the hours part 00 even for a short clip. NEVER put a colon before the milliseconds (wrong 02:49:120, right 00:02:49.120)."
     ].filter(Boolean).join("\n");
@@ -3163,16 +3168,32 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     for(var i=0;inF;i++){var sum=0,c=0,p0=base+i*fb;for(var p=p0;p+ba=p0+fb;p+=ba){var v=dv.getInt16(p,true);sum+=v*v;c++;}out[i]=c?Math.sqrt(sum/c):0;}
     return {rms:out,frameSec:fb/(f.sr*ba)};
   }
+  /* V12.1: ថាមពលក្នុងប្រេកង់សំឡេងមនុស្ស (~300–3400Hz) — កាត់បាស/តន្ត្រីខ្លាំងចេញ */
+  function gemTBand(A){
+    var f=A.info.fmt;if(f.bits!==16)return null;
+    var ba=f.ba||2,ch=f.ch||1,fb=Math.max(ba,Math.floor(0.02*f.sr)*ba),nF=Math.floor(A.info.data.len/fb),out=new Float32Array(nF),dv=new DataView(A.ab),base=A.info.data.off;
+    var aL=1-Math.exp(-2*Math.PI*300/f.sr),aH=1-Math.exp(-2*Math.PI*3400/f.sr),l1=0,l2=0;
+    for(var i=0;inF;i++){var sum=0,c=0,p0=base+i*fb;for(var p=p0;p+ba=p0+fb;p+=ba){var x=dv.getInt16(p,true);l1+=aL*(x-l1);var hp=x-l1;l2+=aH*(hp-l2);sum+=l2*l2;c++;}out[i]=c?Math.sqrt(sum/c):0;}
+    return {rms:out,frameSec:fb/(f.sr*ba)};
+  }
   function gemTSpeechInfo(A){
     if(A.__sp!==undefined)return A.__sp;
     var sp=null;
     try{
-      var P=gemTProfile(A);
+      var P=gemTBand(A)||gemTProfile(A);
       if(P&&P.rms&&P.rms.length>50){
-        var R=P.rms,N=R.length,S=new Float32Array(N);
+        var R=P.rms,N=R.length,S=new Float32Array(N),T=new Float32Array(N);
         for(var i=0;iN;i++){var s0=0,c0=0;for(var k=-2;k=2;k++){var j=i+k;if(j>=0&&jN){s0+=R[j];c0++}}S[i]=s0/c0}
-        var so=Array.from(S).sort(function(a,b){return a-b});
-        sp={S:S,F:P.frameSec,thr:Math.max(so[Math.floor(N*0.25)]*2.2,220)*0.8};
+        var F=P.frameSec,blk=Math.max(10,Math.round(8/F)),so=Array.from(S).sort(function(a,b){return a-b});
+        var gThr=Math.max(so[Math.floor(N*0.25)]*2.2,120)*0.8,nb=Math.ceil(N/blk),bt=[];
+        for(var b=0;bnb;b++){
+          var a0=Math.max(0,(b-1)*blk),a1=Math.min(N,(b+2)*blk),w=Array.prototype.slice.call(S,a0,a1).sort(function(x,y){return x-y});
+          var fl=w[Math.floor(w.length*0.2)]||0;
+          /* កម្រិតតាមតំបន់: ជាន់សំឡេងក្នុងតំបន់ ×2.4 (តន្ត្រីខ្លាំង → threshold ឡើង) ប៉ុន្តែមិនឱ្យលើស/ក្រោម global ខ្លាំង */
+          bt.push(Math.min(Math.max(fl*2.4*0.8,gThr*0.5),gThr*3));
+        }
+        for(var q=0;qN;q++)T[q]=bt[Math.min(nb-1,Math.floor(q/blk))];
+        sp={S:S,F:F,T:T,thr:gThr};
       }
     }catch(_){sp=null}
     A.__sp=sp;return sp;
@@ -3180,7 +3201,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
   function gemTVoiced(A,t0,t1){
     var sp=gemTSpeechInfo(A);if(!sp)return 0;
     var a=Math.max(0,Math.floor(t0/sp.F)),b=Math.min(sp.S.length-1,Math.floor(t1/sp.F)),n=0;
-    for(var i=a;i=b;i++)if(sp.S[i]>=sp.thr)n++;
+    for(var i=a;i=b;i++)if(sp.S[i]>=sp.T[i])n++;
     return n*sp.F;
   }
   function gemTSim(a,b){
@@ -3217,7 +3238,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     var lastErr=null;
     for(var at=0;at2;at++){
       try{
-        var txt=await gemTRotate(gparts,idx+at*7);
+        var txt=await gemTRotate(gparts,(p.kw!=null?(p.kw-(typeof currentApiIndex==="number"?currentApiIndex:0)+keys().length*1000):idx)+at*7);
         var arr=gemTParseJson(txt);
         if(arr===null)throw new Error("Gemini ឆ្លើយមិនមែន JSON");
         var items=[];
@@ -3249,7 +3270,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
           if(e-s>30)e=s+30;
           out.push({start:s,end:e,text:it.t});
         });
-        out=out.filter(function(g){var md=(g.start+g.end)/2;return md>=p.cs-0.8&&(p.last||mdp.ce+0.8);});
+        out=out.filter(function(g){var md=(g.start+g.end)/2;return md>=p.cs-0.05&&(p.last||mdp.ce);});
         /* Gemini ឆ្លើយ [] ទាំងដែលមានសំឡេងនិយាយ → សាកម្តងទៀត (Key/Model ផ្សេង) */
         if(!out.length&&at1&&gemTVoiced(A,p.cs,p.ce)>=3)continue;
         return out;
@@ -3265,7 +3286,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
       if(p.ce-p.cs>8&&v>=3&&chv*2&&((window.__zsfGemRecTry=(window.__zsfGemRecTry||0)+1)=16)){
         var r2=[];
         for(var c=p.cs,q=0;cp.ce-0.5;c+=6,q++){
-          try{r2=r2.concat(await gemTRaw(A,{cs:c,ce:Math.min(p.ce,c+6),last:!!p.last&&c+6>=p.ce-0.5,pad:3},idx+50+q,totalSec));}catch(_){}
+          try{r2=r2.concat(await gemTRaw(A,{cs:c,ce:Math.min(p.ce,c+6),last:!!p.last&&c+6>=p.ce-0.5,pad:3,kw:p.kw},idx+50+q,totalSec));}catch(_){}
         }
         if(gemTChars(r2)>ch){res=r2;window.__zsfGemRecov=(window.__zsfGemRecov||0)+1;}
       }
@@ -3279,13 +3300,18 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     if(onProg)onProg(0,1,"🎧 កំពុងទាញសំឡេងពីវីដេអូ…");
     var A=await audioOnce(f);window.__zsfGemBeat=Date.now();
     var sr=A.info.fmt.sr,ba=A.info.fmt.ba||2,totalSec=A.info.data.len/ba/sr;
-    var PART=(function(){try{var q=parseInt(localStorage.getItem("zsf_gem_part"),10);if(q>=15&&q=180)return q}catch(_){}return 12})(),parts=[];
-    for(var cs=0;cstotalSec-0.5;cs+=PART)parts.push({cs:cs,ce:Math.min(totalSec,cs+PART),last:(cs+PART)>=totalSec-0.5});
+    var CH=0;try{CH=parseInt(localStorage.getItem("zsf_gem_chunks"),10)||0}catch(_){}
+    var PART=(function(){try{var q=parseInt(localStorage.getItem("zsf_gem_part"),10);if(q>=15&&q=180)return q}catch(_){}
+      if(CH>=2)return Math.min(180,Math.max(30,Math.ceil(totalSec/CH)));
+      if(CH0)return Math.min(180,-CH);
+      return 12})(),parts=[];
+    for(var cs=0;cstotalSec-0.5;cs+=PART)parts.push({cs:cs,ce:Math.min(totalSec,cs+PART),last:(cs+PART)>=totalSec-0.5,pad:PART>30?6:undefined});
     if(!parts.length)throw new Error("សំឡេងខ្លីពេក");
-    window.__zsfGemRecov=0;window.__zsfGemRecTry=0;var T0=Date.now(),conc=Math.min(12,Math.max(6,ks.length*3)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
-    async function worker(){
+    window.__zsfGemRecov=0;window.__zsfGemRecTry=0;var T0=Date.now(),conc=PART>30?Math.min(parts.length,Math.max(2,ks.length)):Math.min(12,Math.max(6,ks.length*3)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
+    async function worker(_x,w){
       while(true){
         var i=next++;if(i>=parts.length)return;
+        if(PART>30)parts[i].kw=(w||0)%ks.length;
         try{res[i]=await gemTPart(A,parts[i],i,totalSec);}
         catch(e){lastErr=e;res[i]=null;failed.push(i);}
         done++;if(onProg)onProg(done,parts.length);
@@ -3341,16 +3367,16 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     try{
       var SP=gemTSpeechInfo(A);
       if(SP){
-        var sF=SP.F,sS=SP.S,sT=SP.thr,sN=sS.length,sMax=Math.max(1,Math.round(0.8/sF)),stt=window.__zsfGemStat;
+        var sF=SP.F,sS=SP.S,sTT=SP.T,sN=sS.length,sMax=Math.max(1,Math.round(1.5/sF)),stt=window.__zsfGemStat;
         segs=segs.filter(function(g){
           var a=Math.max(0,Math.floor(g.start/sF)),b=Math.min(sN-1,Math.floor(g.end/sF));
           if(ba)return true;
-          var nv=0,i;for(i=a;i=b;i++)if(sS[i]>=sT)nv++;
+          var nv=0,i;for(i=a;i=b;i++)if(sS[i]>=sTT[i])nv++;
           if(nv/(b-a+1)0.12){stt.ghost++;return false}
-          var k=a;while(kb&&k-asMax&&sS[k]sT)k++;
-          if(k>a&&sS[k]>=sT&&k*sFg.end-0.3){g.start=k*sF;stt.snap++}
-          k=b;while(k>a&&b-ksMax&&sS[k]sT)k--;
-          if(kb&&sS[k]>=sT&&(k+1)*sF>g.start+0.3){g.end=(k+1)*sF;stt.snap++}
+          var k=a;while(kb&&k-asMax&&sS[k]sTT[k])k++;
+          if(k>a&&sS[k]>=sTT[k]&&k*sFg.end-0.3){g.start=Math.max(0,k*sF-0.04);stt.snap++}
+          k=b;while(k>a&&b-ksMax&&sS[k]sTT[k])k--;
+          if(kb&&sS[k]>=sTT[k]&&(k+1)*sF>g.start+0.3){g.end=(k+1)*sF+0.04;stt.snap++}
           return true;
         });
       }
@@ -3358,18 +3384,21 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     segs.sort(function(a,b){return a.start-b.start;});
     /* V11.6: លុបបន្ទាត់ស្ទួនដែលសរសេរខុសគ្នាបន្តិច (ផ្នែកជិតគ្នាស្តាប់ឃើញពាក្យដូចគ្នា) — ប្រៀបធៀប ៤ បន្ទាត់ចុងក្រោយ តាមភាពស្រដៀងអក្សរ */
     var merged=[],dupN=0;
+    function __vc(g){var sp=gemTSpeechInfo(A);if(!sp)return 0;var a=Math.max(0,Math.floor(g.start/sp.F)),b=Math.min(sp.S.length-1,Math.floor(g.end/sp.F)),n=0;for(var i=a;i=b;i++)if(sp.S[i]>=sp.T[i])n++;return n/Math.max(1,b-a+1)}
     segs.forEach(function(g){
-      var hit=null,j,q,ov,sm;
-      for(j=merged.length-1;j>=0&&j>=merged.length-4;j--){
+      var hit=null,j,q,ov,sm,len1,len2;
+      len2=String(g.text).replace(PUN,"").length;
+      for(j=merged.length-1;j>=0&&j>=merged.length-12;j--){
         q=merged[j];
+        if(q.endg.start-3)break;
         ov=Math.min(q.end,g.end)-Math.max(q.start,g.start);
-        sm=gemTSim(q.text,g.text);
-        if((ov>0.1&&sm>=0.55)||(Math.abs(q.start-g.start)1.2&&sm>=0.85)){hit=q;break;}
+        sm=gemTSim(q.text,g.text);len1=String(q.text).replace(PUN,"").length;
+        var gap=g.start-q.end;
+        if((ov>0.1&&sm>=0.5)||(Math.abs(q.start-g.start)2&&sm>=0.8)||(gap1.2&&sm>=0.9&&Math.min(len1,len2)>=3)||(ov>-0.3&&sm>=0.95)){hit=q;break;}
       }
       if(hit){
-        var l1=String(hit.text).replace(PUN,"").length,l2=String(g.text).replace(PUN,"").length;
-        if(l2>l1){hit.text=g.text;hit.start=g.start;hit.end=g.end;}
-        else if(l2===l1){hit.start=(hit.start+g.start)/2;hit.end=(hit.end+g.end)/2;}
+        var l1=String(hit.text).replace(PUN,"").length,l2=len2;
+        if(l2>l1||(l2===l1&&__vc(g)>__vc(hit))){hit.text=g.text;hit.start=g.start;hit.end=g.end;}
         dupN++;return;
       }
       var p=merged[merged.length-1];
@@ -3757,7 +3786,9 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     var A=await getAudio(f),bps=A.info.fmt.sr*(A.info.fmt.ba||2);
     var V=null;try{V=await openVideo(f);}catch(_){V=null;}
     var maxLines=V?30:40;
+    var __chm=0;try{__chm=parseInt(localStorage.getItem("zsf_gem_chunks"),10)||0}catch(_){}
     var maxSec=Math.max(20,Math.min(100,Math.floor(11*1024*1024/bps))),PAD=3,groups=[],cur=[];
+    if(__chm!==0)maxSec=Math.min(maxSec,__chm0?Math.min(180,-__chm)+2*PAD:66);
     srtBlocks.forEach(function(b,i){var t=times(b);
       if(cur.length){var span=(t.e-times(srtBlocks[cur[0]]).s)/1000;if(span>maxSec-2*PAD||cur.length>=maxLines){groups.push(cur);cur=[];}}
       cur.push(i);});
@@ -3773,7 +3804,7 @@ var prep=function(g){return (async function(){try{
         return {idxs:idxs,wav:wav,lines:lines,fr:fr};
       }catch(e){console.warn("prep failed",e);return null;}})();};
     var prepP=groups.length?prep(0):null;
-    var tagConc=Math.min(8,Math.max(4,K.filter(Boolean).length*2));try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=6)tagConc=tcv}catch(_){}
+    var tagConc=Math.min(8,Math.max(4,K.filter(Boolean).length*2));if(__chm!==0)tagConc=Math.min(12,Math.max(6,K.filter(Boolean).length*3));try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=6)tagConc=tcv}catch(_){}
     var inflight=[];
     var runGroup=async function(g,P0,ctx0){
       var idxs=groups[g];
@@ -4084,6 +4115,7 @@ function wavChunk(pcm){var n=pcm.length,h=new ArrayBuffer(44),dv=new DataView(h)
 /* ---------- Groq ---------- */
 /* ===== v4.9 : Groq Rate limit (RPM) — រង់ចាំតាមពេលដែល Groq ប្រាប់ មិនផ្ទុះ request ទាំងអស់ក្នុងពេលតែមួយ ===== */
 var zsfGq={org:{},asm:{},hist:{},block:{},lim:{},dead:{}};
+function zsfGqSwap(){var all=["whisper-large-v3-turbo","whisper-large-v3"],cur=zsfGq.cur||window.__zsfGqModel||model,nx=all.filter(function(m){return m!==cur})[0];zsfGq.cur=nx;zsfGq.block={};zsfGq.hist={};return nx}
 function zsfGqId(k){return zsfGq.org[k]||zsfGq.asm[k]||k}
 function zsfGqMerge(k,org){var h=zsfGq.hist[org]||[];h=h.concat(zsfGq.hist[k]||[]);zsfGq.hist[k]=[];zsfGq.hist[org]=h.sort(function(a,b){return a-b})}
 function zsfGqWait(msg){var s=String(msg||""),i=s.search(/try again in/i);if(i0)return 5;var t=s.slice(i+12),tot=0,m,re=/(\d+(?:\.\d+)?)\s*(ms|h|m|s)/g,any=false;
@@ -4097,10 +4129,11 @@ async function groqCall(blob,keys,st){
   var bk=null,bw=1e12;
   for(var n=0;nkeys.length;n++){var kk=keys[(st.ki+n)%keys.length];if(zsfGq.dead[kk])continue;var w=zsfGqReady(kk);if(wbw){bw=w;bk=kk}}
   if(bk===null)throw lastErr||new Error("Groq Key \u1782\u17d2\u1798\u17b6\u1793\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a \u2014 \u179f\u17bc\u1798\u1796\u17b7\u1793\u17b7\u178f\u17d2\u1799 Key");
+  if(bw>25000&&(zsfGq.sw=(zsfGq.sw||0))4&&(st.sw||0)2){st.sw=(st.sw||0)+1;zsfGq.sw++;var __nm=zsfGqSwap();if(st.note)st.note("\uD83D\uDD04 \u1794\u17d2\u178f\u17bc\u179a\u1798\u17c9\u17bc\u178a\u17c2\u179b Groq \u2192 "+__nm);continue}
   if(bw>1200&&st.note)st.note("\u23f3 \u179a\u1784\u17cb\u1785\u17b6\u17c6 Groq (Rate limit) "+Math.ceil(bw/1000)+"s...");
   if(bw>0)await sleep(Math.min(bw,65000));
   var id=zsfGqId(bk);(zsfGq.hist[id]=zsfGq.hist[id]||[]).push(Date.now());
-  var fd=new FormData();fd.append("file",blob,"audio.wav");fd.append("model",window.__zsfGqModel||model);fd.append("response_format","verbose_json");fd.append("temperature","0");if(!window.__zsfNoWords){fd.append("timestamp_granularities[]","word");fd.append("timestamp_granularities[]","segment")}if(lang!=="auto")fd.append("language",lang);
+  var fd=new FormData();fd.append("file",blob,"audio.wav");fd.append("model",zsfGq.cur||window.__zsfGqModel||model);fd.append("response_format","verbose_json");fd.append("temperature","0");if(!window.__zsfNoWords){fd.append("timestamp_granularities[]","word");fd.append("timestamp_granularities[]","segment")}if(lang!=="auto")fd.append("language",lang);
   var r,j;
   try{var __c=window.AbortController?new AbortController():null,__t=setTimeout(function(){try{__c&&__c.abort()}catch(e){}},120000);try{r=await fetch("https://api.groq.com/openai/v1/audio/transcriptions",{method:"POST",headers:{Authorization:"Bearer "+bk},body:fd,signal:__c?__c.signal:undefined});j=await r.json()}finally{clearTimeout(__t)}}
   catch(e){lastErr=new Error("\u1794\u178e\u17d2\u178f\u17b6\u1789 "+e.message);tries++;await sleep(Math.round(1500*Math.pow(2,Math.min(tries,4))*(0.75+Math.random()*0.5)));continue}
@@ -4114,6 +4147,7 @@ async function groqCall(blob,keys,st){
    if(ws>120){zsfGq.dead[bk]=true;if(zsfGq.org[bk])keys.forEach(function(x){if(zsfGq.org[x]===zsfGq.org[bk])zsfGq.dead[x]=true})}
    else zsfGq.block[zsfGqId(bk)]=Date.now()+Math.round((ws+1)*1000);
    waits++;continue}
+  if((r.status===404||(r.status===400&&/model/i.test(String(msg))&&!/timestamp|granular/i.test(String(msg))))&&(st.sw||0)2){st.sw=(st.sw||0)+1;zsfGqSwap();tries++;continue}
   if(r.status===401||r.status===403){zsfGq.dead[bk]=true;tries++;continue}
   if(r.status>=500){tries++;await sleep(Math.round(1500*Math.pow(2,Math.min(tries,4))*(0.75+Math.random()*0.5)));continue}
   throw lastErr}
@@ -4123,7 +4157,9 @@ function planCuts(pcm){
  var n=pcm.length>>1,dv=new DataView(pcm.buffer,pcm.byteOffset,n*2),FR=800,nf=Math.floor(n/FR),e=new Float32Array(nf),f,k;
  for(f=0;fnf;f++){var sum=0,o=f*FR;for(k=0;kFR;k++){var v=dv.getInt16((o+k)*2,true)/32768;sum+=v*v}e[f]=Math.sqrt(sum/FR)}
  var sm=new Float32Array(nf);for(f=0;fnf;f++){var a=0,c=0;for(k=-2;k=1;k++){if(e[f+k]!==undefined){a+=e[f+k];c++}}sm[f]=a/c}
- var MIN=15*20,MAX=30*20,cuts=[0],st=0;
+ var MIN=15*20,MAX=30*20,cuts=[0],st=0,CHm=0;
+ try{CHm=parseInt(localStorage.getItem("zsf_gem_chunks"),10)||0}catch(e){}
+ if(CHm!==0){var TG=CHm0?-CHm:Math.ceil(nf*0.05/CHm);TG=Math.max(30,Math.min(150,TG));MIN=Math.round(TG*0.8*20);MAX=Math.round(TG*1.2*20)}
  while(nf-st>MAX){var best=st+MAX,bv=Infinity;for(f=st+MIN;f=st+MAX&&fnf;f++){if(sm[f]bv){bv=sm[f];best=f}}cuts.push(best);st=best}
  if(cuts.length>1&&nf-st3*20)cuts.pop();
  var res=[];for(f=0;fcuts.length;f++){var s0=cuts[f]*FR,s1=(f+1cuts.length?cuts[f+1]*FR:n);res.push([s0,s1])}
@@ -4262,11 +4298,13 @@ async function groqTranscribe(prog){
  var pcm0=pcm,__cl=document.getElementById("zsfClean");if(__cl&&__cl.checked){try{prog(7,"🎚 កំពុងសម្អាតសំឡេង...");await sleep(20);pcm=zsfCleanPcm(pcm)}catch(e){console.warn("clean",e)}}
  prog(8,"🎵 វិភាគរកចន្លោះស្ងាត់ដកដង្ហើម (Silence Points 15s - 30s)...");
  await sleep(30);
+ zsfGq.cur=null;zsfGq.sw=0;
  var plan=planCuts(pcm),total=plan.length;
  if(window.__zsfStreamWant){try{window.__zsfStream=zsfStreamStart(total)}catch(e){window.__zsfStream=null}}
  prog(10,"🎵 បានបំបែកជា "+total+" កង់ (ចន្លោះ: 15s-30s ចំកន្លែងស្ងាត់)...");
  await sleep(400);
- var C=Math.max(1,Math.min(keys.length,4,total)),idx=0,done=0,err=null,res=new Array(total),lastP=12,GC=(window.__zsfGqCache=window.__zsfGqCache||new Map()),CB=[file&&file.name,file&&file.size,file&&file.lastModified,window.__zsfGqModel,lang].join("|");
+ var __cm=0;try{__cm=parseInt(localStorage.getItem("zsf_gem_chunks"),10)||0}catch(e){}
+ var C=Math.max(1,Math.min(keys.length,__cm!==0?12:4,total)),idx=0,done=0,err=null,res=new Array(total),lastP=12,GC=(window.__zsfGqCache=window.__zsfGqCache||new Map()),CB=[file&&file.name,file&&file.size,file&&file.lastModified,window.__zsfGqModel,lang].join("|");
  prog(12,"⚡ ទាញយកអក្សរ (ដំណើរការ "+C+" Keys ដំណាលគ្នា)...");
  async function worker(w){
   var st={ki:w,note:function(m){try{prog(lastP,m)}catch(e){}}};
@@ -5545,7 +5583,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="12.0";
+  var EMB="12.6";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
