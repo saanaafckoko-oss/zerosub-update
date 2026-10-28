@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"10.1";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"10.6";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -737,7 +737,7 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
   div class="time hide" id="tbar">span id="tc">00:00/span>input type="range" id="seek" min="0" max="100" value="0" step="0.1">i id="td">00:00/i>/div>
   div class="row hide" id="pbar">button class="b teal" id="play">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">path d="M7 4.5v15l13-7.5z"/>/svg> Play/button>button class="b" id="stop" style="color:#f87171;border-color:#7a2b3a">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">rect x="5" y="5" width="14" height="14" rx="2.5"/>/svg> Stop/button>/div>
   div class="card in">div class="t" style="font-size:17px">span class="ia2">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M3 6l2 2 3.5-3.5M3 13l2 2 3.5-3.5M12 7h9M12 14h9M12 20h9M3 20h2"/>/svg>/span> ⚙️ ជ្រើសរើសកំណត់ (1-Click Auto Export) ៖/div>div class="chk" id="opts">/div>/div>
-  div id="pinl">div class="pih">span class="spin">/span>span>⚡/span>b id="piTx">Export 1-Click (Step 1/6)/b>span id="piPc">0%/span>/div>div class="pbar">i id="piFill">/i>/div>div class="pis" id="piSt">span id="ps1">Step 1: ទាញអក្សរ/span>span id="ps2">○ Step 2: បកប្រែ/span>span id="ps3">○ Step 3: ចែកតួ/span>span id="ps4">○ Step 4: អានសំឡេង/span>span id="ps5">○ Step 5: ភ្លេងអម/span>span id="ps6">○ Step 6: Export/span>/div>div id="piMsg">/div>/div>
+  div id="pinl">div class="pih">span class="spin">/span>span>⚡/span>b id="piTx">Export 1-Click (Step 1/6)/b>span id="piPc">0%/span>/div>div class="pbar">i id="piFill">/i>/div>div class="pis" id="piSt">span id="ps1">Step 1: ទាញអក្សរ/span>span id="ps2">○ Step 2: ចែកតួ/span>span id="ps3">○ Step 3: បកប្រែ/span>span id="ps4">○ Step 4: អានសំឡេង/span>span id="ps5">○ Step 5: ភ្លេងអម/span>span id="ps6">○ Step 6: Export/span>/div>div id="piMsg">/div>/div>
  
  button class="b teal big" style="margin-top:14px" id="exp">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M9 18V5.5l11-2V16"/>circle cx="6" cy="18" r="3" fill="currentColor"/>circle cx="17" cy="16" r="3" fill="currentColor"/>/svg> 🎬 នាំចេញវីដេអូរហ័ស Export 1 Click/button>
  /div>
@@ -1694,11 +1694,11 @@ async function doExportFast(){
  const enc=new VideoEncoder({output:(ch,meta)=>{const d=new Uint8Array(ch.byteLength);ch.copyTo(d);vs.push({d,t:ch.timestamp,k:ch.type==="key"});
   if(!vdesc&&meta&&meta.decoderConfig&&meta.decoderConfig.description)vdesc=fxCopy(meta.decoderConfig.description)},error:e=>{err=err||e}});
  enc.configure(vcfg);
- const gop=Math.max(1,Math.round(dm.fps*2)),fdur=Math.round(1e6/dm.fps),o4=on(4)&&!!(O.blur||O.logo||O.text),o0=false; /* V3.2 : មិនដុត Subtitle ក្នុងវីដេអូទៀតទេ */
+ const gop=Math.max(1,Math.round(dm.fps*2)),fdur=Math.round(1e6/dm.fps),o4=on(4)&&!!(O.blur||O.logo||O.text),o0=on(0)&&cues.length>0; /* V10.3 : ដុត Subtitle ខ្មែរលើវីដេអូ (ប៊ូតុង Subtitle បើក/បិទ) */
  /* V3.1 : បន្ថយការងារក្នុងមួយ frame — ឃ្លា Subtitle/Logo/Text គូរទុកម្តងហើយប្រើឡើងវិញ, Blur ដោយ downscale (លឿនជាង filter), frame ដែលមិនមានអ្វីត្រូវគូរ → encode ត្រង់ៗ មិនឆ្លងកាត់ canvas */
  const cuesS=cues.slice().sort((a,b)=>a.s-b.s);let ci=0,capCv=null,capQ=null,ovCv=null,bcv=null;
  const mkCv=()=>{const z=document.createElement("canvas");z.width=w;z.height=h;return z};
- const capOv=q=>{if(capQ!==q){capQ=q;if(!capCv)capCv=mkCv();const cc=capCv.getContext("2d");cc.clearRect(0,0,w,h);caption(cc,q.t,w/2,h*(1-O.sb),w,O.fs*h)}return capCv};
+ const capOv=q=>{if(capQ!==q){capQ=q;if(!capCv)capCv=mkCv();const cc=capCv.getContext("2d");cc.clearRect(0,0,w,h);caption(cc,String(q.t).replace(/^\s*\[[1-4]\]\s*/,""),w/2,h*(1-O.sb),w,O.fs*h)}return capCv};
  if(o4&&(O.logo||O.text)){ovCv=mkCv();const oc=ovCv.getContext("2d");
   if(O.logo){const lw=w*.2;oc.drawImage(O.logo,w-lw-16,16,lw,lw*O.logo.height/O.logo.width)}
   if(O.text)caption(oc,O.text,w/2,h*.12,w,O.fs*h)}
@@ -1734,10 +1734,10 @@ async function doExportFast(){
  const rd=fxReader(file),S=dm.samples;
  for(let i=0;iS.length;i++){
   if(err)throw err;
-  while((dec.decodeQueueSize>10||enc.encodeQueueSize>12)&&!err)await fxWait(1);
+  {let __w=0;while((dec.decodeQueueSize>10||enc.encodeQueueSize>12)&&!err){await fxWait(1);if(++__w>40000){err=new Error("Export គាំង (encoder ឈប់ឆ្លើយ) — ប្តូរវិធីបម្រុង");break}}}
   const s=S[i];
   dec.decode(new EncodedVideoChunk({type:s.k?"key":"delta",timestamp:Math.round((s.cts-dm.start)*1e6/dm.ts),data:await rd(s.o,s.z)}));nIn++}
- await dec.flush();await enc.flush();
+ {const __to=ms=>new Promise((_,rj)=>setTimeout(()=>rj(new Error("Export គាំងពេលបញ្ចប់ — ប្តូរវិធីបម្រុង")),ms));await Promise.race([dec.flush(),__to(120000)]);await Promise.race([enc.flush(),__to(120000)])}
  if(err)throw err;
  try{dec.close()}catch(e){}try{enc.close()}catch(e){}
  if(!vs.length||!vdesc)throw new Error("Encode វីដេអូមិនបាន");vp=1;upd()};
@@ -2152,11 +2152,11 @@ async function doExport(){
  const T0x=performance.now(),tag=m=>{try{showToast("ℹ Export វិធី "+m,true)}catch(e){}},done=m=>{try{showToast("⏱ Export វិធី "+m+" ប្រើពេល "+Math.round((performance.now()-T0x)/1000)+" វិនាទី",true)}catch(e){}};
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
  const btn=$("#exp"),old=btn.innerHTML,on=i=>!$$("#opts .b")[i].classList.contains("off");
- const eff=on(4)&&!!(O.blur||O.logo||O.text);
+ const burn=on(0)&&cues.length>0,eff=burn||(on(4)&&!!(O.blur||O.logo||O.text));
  if(!eff&&typeof AudioEncoder==="function"){
   try{tag("A: ចម្លងវីដេអូ+សំឡេងថ្មី (លឿនបំផុត)");if(await doExportCopy()){return}}
   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("copy export:",e);showToast("⚠ Export លឿនបំផុតមិនបាន ("+String((e&&e.message)||e).slice(0,60)+") — ប្រើវិធីបន្ទាប់",false)}
- }else if(eff){showToast("ℹ បិទ Eff (Blur/Logo/Text) ដើម្បី Export លឿនបំផុត",true)}
+ }else if(eff&&!burn){showToast("ℹ បិទ Eff (Blur/Logo/Text) ដើម្បី Export លឿនបំផុត",true)}else if(burn){showToast("ℹ កំពុងដុត Subtitle លើវីដេអូ",true)}
  if(fxSupported()){
   try{tag("B: Encode ដោយ GPU/WebCodecs");if(await doExportFast()){done("B");return}}
   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("fast export:",e);showToast("⚠ Export លឿនមិនបាន ("+String((e&&e.message)||e).slice(0,70)+") — ប្រើវិធីធម្មតា",false)}
@@ -2185,7 +2185,9 @@ async function doExportRT(){
  let stop=false;
  const fin=new Promise(r=>{rec.onstop=r});
  V.pause();V.currentTime=0;await new Promise(r=>{V.onseeked=()=>{V.onseeked=null;r()}});
+ const __cs=cues.slice().sort((a,b)=>a.s-b.s),__burn=on(0)&&__cs.length>0;
  const draw=()=>{c.drawImage(V,0,0,w,h);
+  if(__burn){const t=V.currentTime;let q=null;for(let i=0;i__cs.length;i++){if(__cs[i].s>t)break;if(t__cs[i].e){q=__cs[i];break}}if(q)caption(c,String(q.t).replace(/^\s*\[[1-4]\]\s*/,""),w/2,h*(1-O.sb),w,O.fs*h)}
   if(on(4)){if(O.blur){c.save();c.beginPath();c.rect(0,h*.78,w,h*.2);c.clip();c.filter="blur(16px)";c.drawImage(V,0,0,w,h);c.restore()}
    if(O.logo){const lw=w*.2;c.drawImage(O.logo,w-lw-16,16,lw,lw*O.logo.height/O.logo.width)}
    if(O.text)caption(c,O.text,w/2,h*.12,w,O.fs*h)}
@@ -3576,7 +3578,7 @@ caption=function(c,t,x,y,w,fs){return __capOrig(c,__stripTag(t),x,y,w,fs)};
 
 /script>
 script>(function(){var a=document.querySelector("#srtArea"),sec=a&&a.closest("section"),g=document.querySelector("#aiGen"),h=document.querySelector(".cuh0"),l=document.querySelector("#cueList");if(!sec)return;var c=document.createElement("section");c.className="card";c.id="cueCard";c.style.display="none";c.appendChild(h);c.appendChild(l);sec.insertAdjacentElement("afterend",c);sec.insertAdjacentElement("afterend",g)})()/script>
-div id="pbot">div class="pt">span class="spin">/span>span id="pbTx">/span>b id="pbPc">0%/b>/div>div class="pbar">i id="pbFill">/i>/div>div class="pst">span id="st1">Step 1: ទាញអក្សរ/span>span id="st2">○ Step 2: បកប្រែ/span>span id="st3">○ Step 3: ចែកតួ/span>span id="st4">○ Step 4: អានសំឡេង/span>span id="st5">○ Step 5: ភ្លេងអម/span>span id="st6">○ Step 6: Export/span>/div>/div>
+div id="pbot">div class="pt">span class="spin">/span>span id="pbTx">/span>b id="pbPc">0%/b>/div>div class="pbar">i id="pbFill">/i>/div>div class="pst">span id="st1">Step 1: ទាញអក្សរ/span>span id="st2">○ Step 2: ចែកតួ/span>span id="st3">○ Step 3: បកប្រែ/span>span id="st4">○ Step 4: អានសំឡេង/span>span id="st5">○ Step 5: ភ្លេងអម/span>span id="st6">○ Step 6: Export/span>/div>/div>
 script>
 (function(){
 const q=s=>document.querySelector(s),TAG=/^\s*\[[1-4]\]\s*/,NM=["ពិសិដ្ឋ","ស្រីមុំ","ពិសិដ្ឋ","ស្រីមុំ"];
@@ -3599,12 +3601,12 @@ q("#aiGen").onclick=()=>{if(!cues.length)return alert("សូមនាំចូ�
 setInterval(()=>{const a=document.activeElement;if(a&&a.dataset&&a.dataset.a=="txt")return;const k=cues.length+"|"+toSrt(cues);if(k!==last+"|"&&k!==cues.length+"|"+last){last=toSrt(cues);if(cues.length)q("#srtArea").classList.remove("hide");render()}},600);
 q("#vidFile").addEventListener("change",()=>{if(q("#vidFile").files[0])q("#browse").textContent="📂 ប្តូរឯកសារ Media"});
 let pc=0;
-const NMS=["ទាញអក្សរ","បកប្រែ","ចែកតួ","អានសំឡេង","ភ្លេងអម","Export"],LBL=["ទាញយក Subtitle","បកប្រែ Subtitle","ចែកតួ ប្រុស/ស្រី","អានសំឡេងខ្មែរ","បង្កើតភ្លេងអម","Export វីដេអូ"];
+const NMS=["ទាញអក្សរ","ចែកតួ","បកប្រែ","អានសំឡេង","ភ្លេងអម","Export"],LBL=["ទាញយក Subtitle","ចែកតួ ប្រុស/ស្រី","បកប្រែ Subtitle","អានសំឡេងខ្មែរ","បង្កើតភ្លេងអម","Export វីដេអូ"];
 const CS=function(r,e){try{r.scrollTo({left:Math.max(0,e.offsetLeft-r.clientWidth/2+e.offsetWidth/2),behavior:"smooth"})}catch(_){}};
 window.setProgress=function(p,msg,fs){msg=msg||"";const b=q("#pbot"),pi=q("#pinl"),bad=/^❌/.test(msg),raw=Math.max(0,Math.min(100,p||0));let n=bad?pc:raw;
 const pm=window.__pmap;if(pm&&!bad)n=pm[0]+n*(pm[1]-pm[0])/100;
 pc=n;b.style.display="block";document.body.classList.add("pb");
-const st=fs||window.__fstep||(/បកប្រែ|🧠/.test(msg)?2:/ចាប់ប្រុស|ចែកតួ|🎭/.test(msg)?3:/ភ្លេង|🎶/.test(msg)?5:/សំឡេង|Dub|TTS|🎙 កំពុងបង្កើត/.test(msg)&&!/ទាញ|ស្តាប់|Gemini ស្តាប់/.test(msg)?4:1),fin=n>=100&&!bad,okm=/^(✅|⏭|⚠)/.test(msg),
+const st=fs||window.__fstep||(/បកប្រែ|🧠/.test(msg)?3:/ចាប់ប្រុស|ចែកតួ|🎭/.test(msg)?2:/ភ្លេង|🎶/.test(msg)?5:/សំឡេង|Dub|TTS|🎙 កំពុងបង្កើត/.test(msg)&&!/ទាញ|ស្តាប់|Gemini ស្តាប់/.test(msg)?4:1),fin=n>=100&&!bad,okm=/^(✅|⏭|⚠)/.test(msg),
 txt=(bad||okm)?msg:"⚡ Step "+st+"/6: "+LBL[st-1]+" ("+Math.round(raw)+"%)...",pct=Math.round(n)+"%";
 q("#pbTx").textContent=txt;q("#pbPc").textContent=pct;q("#pbFill").style.width=n+"%";
 if(pi){pi.style.display=window.__pipe?"block":"none";q("#piTx").textContent="Export 1-Click (Step "+st+"/6)";q("#piPc").textContent=pct;q("#piFill").style.width=n+"%";q("#piMsg").textContent=txt}
@@ -3869,9 +3871,66 @@ $("#asr").onclick=zsfTranscribeGroqMain;
 /* ---------- ភ្លេងអម : លុបសំឡេងច្រៀង ដោយ FFmpeg (filter ដូច APK ទាំងស្រុង) ---------- */
 var BGM_MAIN="[0:a]aformat=sample_fmts=fltp:channel_layouts=stereo,asplit=2[a1][a2];[a1]lowpass=f=90[bass];[a2]highpass=f=90,pan=stereo|c0=c0-c1|c1=c1-c0,equalizer=f=1000:width_type=h:w=1800:g=-14,equalizer=f=2800:width_type=h:w=1600:g=-10,treble=g=-9:f=4500,lowpass=f=6000,volume=1.25[midhigh];[bass][midhigh]amix=inputs=2:weights=0.8|1.2[out]";
 var BGM_FALLBACK="aformat=sample_fmts=fltp:channel_layouts=stereo,pan=stereo|c0=c0-c1|c1=c1-c0,equalizer=f=1000:width_type=h:w=1800:g=-14,equalizer=f=2800:width_type=h:w=1600:g=-10,treble=g=-9:f=4500,lowpass=f=6000,volume=1.25";
+/* V10.4 : AI កាត់សំឡេងតួអង្គ (Spleeter ក្នុង APK) — បើគ្មាន APK ថ្មី ឬបរាជ័យ → ប្រើ Filter ចាស់ដដែល */
 async function makeBgm(prog){
- try{return await makeBgmJS(prog)}
- catch(e){console.warn("makeBgmJS",e);prog(3,"🎶 ប្តូរទៅ FFmpeg...");return await makeBgmFF(prog)}
+ window.__bgmNativeErr="";
+ try{var r1=await makeBgmNative(prog);window.__bgmMethod="AI";return r1}
+ catch(e){window.__bgmNativeErr=String(e&&e.message||e);console.warn("makeBgmNative",e);prog(3,"🎶 ប្តូរទៅ Filter ធម្មតា...")}
+ try{var r2=await makeBgmJS(prog);window.__bgmMethod="Filter";return r2}
+ catch(e){console.warn("makeBgmJS",e);prog(3,"🎶 ប្តូរទៅ FFmpeg...");var r3=await makeBgmFF(prog);window.__bgmMethod="FFmpeg";return r3}
+}
+/* V10.6 : ប៊ូតុងសាកល្បងកាត់ BGM (AI) ដាច់ដោយឡែក — ស្ដាប់លទ្ធផលភ្លាមៗ មិនបាច់រង់ចាំ Export ទាំងមូល */
+(function(){
+ function mk(){
+  var ex=document.getElementById("exp");
+  if(!ex||document.getElementById("zsBgmTest"))return;
+  var T0="🎶 សាកល្បងកាត់ BGM (AI) — ស្ដាប់ម្ដងមើល",st=0,src=null;
+  var b=document.createElement("button");b.id="zsBgmTest";b.className=ex.className;b.style.marginTop="10px";b.textContent=T0;
+  function stop(){try{if(src){src.onended=null;src.stop()}}catch(_){}src=null;b.textContent="▶ ស្ដាប់ភ្លេងអម ("+(window.__bgmMethod||"")+") — ចុចម្ដងទៀតដើម្បីស្ដាប់";st=1}
+  b.onclick=async function(){
+   if(st===2){stop();return}
+   if(st===1){
+    try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")await AC.resume();
+     src=AC.createBufferSource();src.buffer=bgmBuf;src.connect(AC.destination);src.onended=stop;src.start();st=2;b.textContent="⏹ បញ្ឈប់ការស្ដាប់ (ចុចដើម្បីបញ្ឈប់)"}
+    catch(e){showToast("ស្ដាប់មិនបាន: "+String(e.message).slice(0,60),false)}
+    return}
+   if(st===3)return;
+   if(typeof file==="undefined"||!file){showToast("សូមជ្រើសវីដេអូជាមុនសិន",false);return}
+   st=3;bgmBuf=null;var t0=Date.now();
+   try{
+    await makeBgm(function(p,m){b.textContent="🎶 "+Math.round(p)+"% "+String(m||"").replace(/^🎶\s*/,"").slice(0,38)});
+    var sec=Math.round((Date.now()-t0)/1000),how=window.__bgmMethod||"?";
+    showToast((how==="AI"?"✅ AI ជោគជ័យ":"⚠ ប្រើ "+how+" (AI មិនដំណើរការ: "+String(window.__bgmNativeErr||"").slice(0,70)+")")+" • ប្រើពេល "+sec+" វិនាទី",how==="AI");
+    st=1;b.textContent="▶ ស្ដាប់ភ្លេងអម ("+how+", "+sec+"s)";
+   }catch(e){st=0;b.textContent=T0;showToast("❌ បរាជ័យ: "+String(e&&e.message||e).slice(0,90),false)}
+  };
+  ex.parentNode.insertBefore(b,ex.nextSibling);
+ }
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mk);else mk();
+ setTimeout(mk,1500);
+})();
+async function makeBgmNative(prog){
+ var N=window.ZSNative;
+ if(!(N&&typeof N.separateBgm==="function"))throw new Error("no native AI");
+ var outName="bgm_ai.wav",MSG={copy:"កំពុងចម្លងវីដេអូ...",decode:"កំពុងអានសំឡេងវីដេអូ...",model:"កំពុងទាញយក AI (លើកដំបូងតែម្តង)...",load:"កំពុងបើក AI...",run:"AI កំពុងញែកសំឡេងតួអង្គចេញ"};
+ prog(1,"🎶 កំពុងរៀបចំ AI កាត់សំឡេងតួអង្គ...");
+ var r=await new Promise(function(res){
+  var cb="zsSepB"+Date.now();
+  window[cb]=function(x){try{delete window[cb];delete window[cb+"_p"]}catch(_){}res(x)};
+  window[cb+"_p"]=function(o){try{prog(Math.max(1,Math.min(94,o.p*0.94)),"🎶 "+(MSG[o.s]||"")+(o.s==="run"?" "+Math.round((o.p-35)*100/60)+"%":""))}catch(_){}};
+  try{N.separateBgm(outName,cb)}catch(e){res({ok:false,error:String(e)})}
+ });
+ if(!r||!r.ok)throw new Error("AI: "+(r&&r.error||"failed"));
+ if(Number(r.inSize)!==Number(file.size))throw new Error("picked file mismatch");
+ prog(95,"🎶 កំពុងផ្ទុកភ្លេងអម...");
+ var resp=await fetch("https://appassets.androidplatform.net/native/"+outName+"?t="+Date.now(),{cache:"no-store"});
+ if(!resp.ok)throw new Error("fetch bgm "+resp.status);
+ AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+ var og=await AC.decodeAudioData(await resp.arrayBuffer());
+ try{N.deleteFile(outName)}catch(_){}
+ bgmBuf=og;window.__bgmAutoBuf=og;window.__bgmFile=file;
+ prog(100,"✅ ភ្លេងអមរួចរាល់ (AI)");
+ return og;
 }
 async function makeBgmFF(prog){
  prog(2,"🎶 កំពុងរៀបចំបង្កើតសំឡេង Background ស្អាត (Smart Ducking 100% Offline)...");
@@ -3982,12 +4041,26 @@ function ask(){return new Promise(function(res){
 
 /* ---------- 1-Click Export : Step 1 ទាញអក្សរ → 2 បកប្រែ → 3 អានសំឡេង → 4 ភ្លេងអម → 5 Export ---------- */
 var PM={1:[0,20],2:[20,35],3:[35,50],4:[50,65],5:[65,72]};
-function phase(s,lo,hi){window.__fstep=s;window.__pmap=lo===undefined?(PM[s]||null):[lo,hi]}
+/* V10.5 : វាស់ពេលរៀងរាល់ Step ហើយបង្ហាញសរុបពេលចប់ (ដើម្បីដឹងថា Step ណាយឺត) */
+var __tmS={},__tmL=0;
+function phase(s,lo,hi){var t=Date.now();
+ if(s===1&&window.__fstep!==1){__tmS={};__tmL=t}
+ else if(window.__fstep&&window.__fstep!==s){__tmS[window.__fstep]=(__tmS[window.__fstep]||0)+(t-__tmL);__tmL=t}
+ window.__fstep=s;window.__pmap=lo===undefined?(PM[s]||null):[lo,hi]}
+function zsfTimes(msg){
+ var t=Date.now(),k;
+ if(window.__fstep&&__tmL){__tmS[window.__fstep]=(__tmS[window.__fstep]||0)+(t-__tmL);__tmL=t}
+ var N={1:"ទាញអក្សរ",2:"ចែកតួ",3:"បកប្រែ",4:"សំឡេង",5:"ភ្លេង",6:"Export"},o=[],tot=0;
+ for(k in __tmS){tot+=__tmS[k];o.push(k+":"+N[k]+" "+Math.round(__tmS[k]/1000)+"s")}
+ if(!o.length)return msg;
+ __tmS={};__tmL=0;
+ return msg+" ⏱ "+o.join(" · ")+" = "+Math.round(tot/1000)+"s"}
 function dubBtn(){return {set textContent(t){var m=/(\d+)\s*\/\s*(\d+)/.exec(t);setProgress(m?Math.round(m[1]/m[2]*100):0,"🎙 កំពុងបង្កើតសំឡេងខ្មែរ "+(m?m[1]+"/"+m[2]:"")+"...")}}}
 new MutationObserver(function(){if(!window.__expRunning)return;var eb=$("#exp"),t=eb.textContent.trim(),pc2=/កំពុង Export\s*(\d+)%/.exec(t);if(!pc2)return;
  setProgress(+pc2[1],"🎬 កំពុង Export "+pc2[1]+"%...",6)}).observe($("#exp"),{childList:true,characterData:true,subtree:true});
 
 function zsfDone(msg,big){
+ try{if(big)msg=zsfTimes(msg)}catch(_){}
  var d=document.getElementById("zsfDone");
  if(!d){d=document.createElement("div");d.id="zsfDone";
   d.style.cssText="position:fixed;left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:2147483000;max-width:540px;margin:auto;display:none;align-items:center;gap:12px;background:#0b2a1f;border:2px solid #10b981;color:#eafff6;border-radius:18px;padding:12px 14px;font-size:15px;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.65)";
@@ -4031,13 +4104,13 @@ $("#exp").onclick=async function(){
   /* Step 2a (v10): ស្តាប់សំឡេងចាប់ប្រុស/ស្រី/គិតក្នុងចិត្ត មុនបកប្រែ */
   window.__preTag=false;window.__preTried=false;
   if(on(2)&&c!=="keep"&&cues.length&&K.filter(Boolean).length){
-   window.__preTried=true;phase(3,20,35);setProgress(0,"🎭 កំពុងស្តាប់សំឡេង ចាប់ប្រុស/ស្រី/គិតក្នុងចិត្ត...");
+   window.__preTried=true;phase(2,20,35);setProgress(0,"🎭 កំពុងស្តាប់សំឡេង ចាប់ប្រុស/ស្រី/គិតក្នុងចិត្ត...");
    try{await tagSpeakers()}catch(e){console.warn("pretag",e)}
    window.__preTag=cues.some(function(q){return /^\s*\[[1-4]\]/.test(q.t)});
    setProgress(100,window.__preTag?"✅ ចែកតួរួចរាល់ (ស្តាប់សំឡេងពិត)":"⚠ ចែកតួមិនបាន — សាកវិធីបម្រុង");
   }
   /* Step 2 */
-  phase(2,35,50);
+  phase(3,35,50);
   if(!on(1))setProgress(100,"⏭ រំលងការបកប្រែ (បិទជម្រើស Gemini)");
   else if($("#target").value==="km"&&isKm())setProgress(100,"✅ SRT ជាភាសាខ្មែររួចហើយ — រំលងការបកប្រែ");
   else{
@@ -4045,19 +4118,17 @@ $("#exp").onclick=async function(){
    window.__workerTagged=false;
    var __direct=false;
    if(K.filter(Boolean).length){
-    try{await gemDirectRun(function(p,m){setProgress(p,m)});__direct=true}
+    try{await Promise.race([gemDirectRun(function(p,m){setProgress(p,m)}),new Promise(function(_,rj){setTimeout(function(){rj(new Error("Gemini យឺតពេក — ប្រើវិធីបម្រុង"))},600000)})]);__direct=true}
     catch(e){console.warn("1-click direct",e);try{showToast("⚠ Gemini ស្តាប់សំឡេង: "+String((e&&e.message)||e).slice(0,80)+" — ប្រើវិធីបម្រុង",false)}catch(_){}}
    }
-   if(!__direct){try{await translateAll()}catch(e){throw new Error("[1-Click Export គាំង!] បរាជ័យក្នុងការបកប្រែ Subtitle! "+e.message)}}
+   if(!__direct){setProgress(5,"🌐 កំពុងបកប្រែដោយវិធីបម្រុង (Google)...");try{await translateAll()}catch(e){throw new Error("[1-Click Export គាំង!] បរាជ័យក្នុងការបកប្រែ Subtitle! "+e.message)}}
    setProgress(100,"✅ បកប្រែរួចរាល់ "+cues.length+" ឃ្លា");
   }
   window.__zsfPre=null;
   /* Step 3 : ចែកតួ ប្រុស/ស្រី */
-  phase(3);
-  if(window.__preTag){setProgress(100,"✅ ចែកតួរួចរាល់")}
-  else if(on(2)&&window.__workerTagged&&cues.some(function(c){return /^\s*\[[1-4]\]/.test(c.t)})){setProgress(100,"✅ ចែកតួរួចរាល់ (Gemini Worker)")}
-  else if(on(2)&&c!=="keep"&&K.filter(Boolean).length&&!window.__preTried){setProgress(0,"🎭 កំពុងចាប់ប្រុស/ស្រី...");await tagSpeakers();setProgress(100,"✅ ចែកតួរួចរាល់")}
-  else setProgress(100,"⏭ រំលងការចែកតួ");
+  if(window.__preTag){}
+  else if(on(2)&&window.__workerTagged&&cues.some(function(c){return /^\s*\[[1-4]\]/.test(c.t)})){}
+  else if(on(2)&&c!=="keep"&&K.filter(Boolean).length&&!window.__preTried){phase(2,50,56);setProgress(0,"🎭 កំពុងចាប់ប្រុស/ស្រី...");await tagSpeakers();setProgress(100,"✅ ចែកតួរួចរាល់")}
   if(on(2)){var tc=[0,0,0,0,0];cues.forEach(function(q){var m=/^\s*\[([1-4])\]/.exec(q.t);if(m)tc[+m[1]]++});
    if(tc[1]+tc[2]+tc[3]+tc[4])zsfDone("✓ ចែកតួរួច: ប្រុស "+tc[1]+" • ស្រី "+tc[2]+" • គិតក្នុងចិត្តប្រុស "+tc[3]+" • គិតក្នុងចិត្តស្រី "+tc[4],false);
    else zsfDone("⚠ មិនឃើញ tag ប្រុស/ស្រី ក្នុង SRT ទេ",false)}
@@ -4299,7 +4370,7 @@ async function gemDirectRun(prog){
  var known=window.__preTag?cues.map(function(c){var m=/^\s*\[([1-4])\]/.exec(String(c.t||""));return m?+m[1]:0}):cues.map(function(){return 0});
  /* ១) សៀវភៅរឿង (លាក់) */
  prog(3,"📖 កំពុងអានរឿងទាំងមូល...");
- var bible=await gPrepareBible(keys,prog);if(!bible){try{bible=await gPrepareBible(keys,prog,lines.map(function(l){return l.text}).join("\n"))}catch(e){bible=null}}if(!bible){try{showToast("⚠ សៀវភៅរឿងបង្កើតមិនបាន (Gemini quota ឬបណ្តាញ) — បកប្រែតាមបរិបទធម្មតា",false)}catch(e){}}
+ var bible=null;try{bible=await Promise.race([gPrepareBible(keys,prog),new Promise(function(r){setTimeout(function(){r(null)},45000)})])}catch(e){bible=null}if(!bible){try{showToast("⚠ សៀវភៅរឿងបង្កើតមិនបាន (Gemini quota ឬបណ្តាញ) — បកប្រែតាមបរិបទធម្មតា",false)}catch(e){}}
  if(bible)showToast("✓ ការបកប្រែចាប់តាមបរិបទសាច់រឿងរបស់ SRT ដោយផ្ទាល់",true);
  /* ២) បកប្រែជាផ្នែកៗ (ស្តាប់សំឡេង + អាន SRT) ដូចកូដចាស់ */
  var out=new Array(N).fill(null),doneLines=0,rr=0,stop=false,hit=0;
@@ -4810,7 +4881,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"10.1",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"10.6",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -5056,7 +5127,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="10.1";
+  var EMB="10.6";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
