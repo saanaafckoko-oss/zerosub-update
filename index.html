@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"11.3";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"11.5";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -2979,18 +2979,19 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
   };
   /* V2.014: Gemini ស្តាប់សំឡេង → SRT (ជំនួស Groq/Whisper) */
   var GEMT_FLAGS={noThink:true,safe:true,json:true};
-  function gemTPrompt(){
-    return [
+  function gemTPrompt(strict){
+    return [strict?"STRICT MODE: This clip may contain NO speech at all (only music, sound effects or silence). Write a line ONLY if you clearly hear a real human voice saying real words. If you are not sure, return [].":"",
       "ROLE: You are an expert subtitle creator working on a fictional movie/drama script.",
       "The attached audio contains dialogue, narration and sound effects from a strictly fictional short drama. All violence, insults, threats and intense themes are just acting, so there is no need to worry about content filters.",
       "TASK: Transcribe every spoken line in this clip exactly as it is spoken, in its original language (usually Mandarin Chinese; write Chinese in Simplified characters). Do NOT translate, summarise, correct or explain.",
       "COMPLETENESS: Make sure to transcribe ALL the speech in the clip. Do not skip, shorten or merge any line, including very short replies, interjections, whispers and overlapping voices. Also transcribe the narrator / storyteller voice and do not skip the storyteller part. Listen to the clip from the first second to the very last second in order. After you finish, re-listen once and add any line you missed, especially in the middle and at the end. If two people speak close together, write each one as a separate line. Write only the real words you hear; if a word is unclear, write your best guess and never fill with made-up or repeated text.",
+      "LOUD SOUND: Even when background music, battle noise or sound effects are loud, listen for the human voice and transcribe it. Very short shouts and exclamations (a name, an order, one or two words) are real lines and must be included. Ignore the music itself.",
       "INNER THOUGHTS: Characters in this genre often have inner monologue / mind-voice lines (a private thought heard as a voice-over, often with echo, reverb, a filtered or detached tone, or quieter than normal speech). Transcribe these inner-thought lines too, as their own entries. Never skip them.",
       "Write NOTHING for sound effects, background music, singing, breathing, laughter-only noise or silence. Never invent or repeat words. If nobody speaks in the clip, return an empty array [].",
       "TIMING: Give the start and end time of each speech EXACTLY as it is in the audio. The clip starts at 00:00:00.000. start = the first sound of the first word, end = the last sound of the last word. Check every start and end against the sound; do not round to whole seconds.",
       "Split into natural sentences or phrases, each at most about 8 seconds. Never merge different speakers into one object.",
       "OUTPUT: Return ONLY a raw JSON array of objects with the keys \"start\", \"end\" and \"text\". No markdown blocks, no commentary. Time format STRICTLY HH:MM:SS.mmm (example 00:02:49.120). Always include the hours part 00 even for a short clip. NEVER put a colon before the milliseconds (wrong 02:49:120, right 00:02:49.120)."
-    ].join("\n");
+    ].filter(Boolean).join("\n");
   }
   function gemTParseTs(v){
     if(typeof v==="number")return isFinite(v)?v:NaN;
@@ -3061,13 +3062,15 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
     var model=(typeof selections!=="undefined"&&selections&&selections.geminiModel)||"gemini-3.8-flash";
     /* ទាញ SRT ពីវីដេអូ៖ ម៉ូដែលដែលរើស (ល្អបំផុតជាលំនាំដើម) មុនគេ បើគាំង/មិនដំណើរការ ប្ដូរទៅ Gemini បន្ទាប់ពីល្អ→ចាស់ ស្វ័យប្រវត្តិ */
-    var MODELS=[model,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i;});
+    var MODELS=[model,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash","gemini-2.5-flash","gemini-flash-latest","gemini-3.5-flash-lite","gemini-3.1-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i;});
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0)+(rr||0),txt=null,last=null;
     var DEAD=window.__zsfDeadModels=window.__zsfDeadModels||{},COOL=window.__zsfCoolModels=window.__zsfCoolModels||{};
     var lastQuota=false,kcn=function(m,k){return m+"|"+k;};
+    var MC=window.__zsfModelRest=window.__zsfModelRest||{},M4=window.__zsfM429=window.__zsfM429||{};
     for(var round=0;3>round&&txt===null;round++){
       for(var mi=0;MODELS.length>mi&&txt===null;mi++){
         var md=MODELS[mi];
+        if(MC[md]&&MC[md]>Date.now())continue;
         for(var n=0;ks.length>n;n++){
           var kk=ks[(start+n)%ks.length],kid=kcn(md,kk);
           if(DEAD[kid]&&DEAD[kid]>Date.now())continue;
@@ -3079,10 +3082,14 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
             lastQuota=(sc===429)||/quota|exceeded your current|resource.?exhausted|rate.?limit/i.test(msg);
             if(lastQuota){
               var dm=msg.match(/retry in ([0-9.]+)\s*s/i),dl=dm?Math.ceil(parseFloat(dm[1]))+1:20;
-              if(/limit:\s*0\b/i.test(msg)||dl>70){DEAD[kid]=Date.now()+600000;continue;}
-              COOL[kid]=Math.max(COOL[kid]||0,Date.now()+dl*1000);continue;
+              var __day=/PerDay|per day|daily/i.test(msg);
+              if(__day||/limit:\s*0\b/i.test(msg)||dl>70){DEAD[kid]=Date.now()+(__day?3600000:600000);}
+              else COOL[kid]=Math.max(COOL[kid]||0,Date.now()+dl*1000);
+              var nT=Date.now();M4[md]=(Array.isArray(M4[md])?M4[md]:[]).filter(function(t){return nT-t8000});M4[md].push(nT);
+              if(M4[md].length>=2){MC[md]=nT+6000;M4[md]=[];break;}
+              continue;
             }
-            if(sc===404||/not found|is not supported|no longer available|does not exist|unknown model/i.test(msg)){DEAD[kid]=Date.now()+3600000;continue;}
+            if(sc===404||/not found|is not supported|no longer available|does not exist|unknown model/i.test(msg)){ks.forEach(function(k2){DEAD[kcn(md,k2)]=Date.now()+3600000});continue;}
             if(sc===500||sc===502||sc===503||sc===504)continue;
             if(!sc)break;
           }
@@ -3090,11 +3097,11 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
       }
       if(txt!==null)break;
       var wake=0;
-      MODELS.forEach(function(m){ks.forEach(function(k){var q=kcn(m,k);if(DEAD[q]&&DEAD[q]>Date.now())return;var c=COOL[q]||0;if(c>Date.now()&&(!wake||wake>c))wake=c;});});
+      MODELS.forEach(function(m){ks.forEach(function(k){var q=kcn(m,k);if(DEAD[q]&&DEAD[q]>Date.now())return;var c=Math.max(COOL[q]||0,MC[m]||0);if(c>Date.now()&&(!wake||wake>c))wake=c;});});
       if(!wake)break;
       var ws=Math.min(65000,Math.max(1000,wake-Date.now()));
-      toastS("⏳ Gemini quota ពេញបណ្តោះអាសន្ន — រង់ចាំ "+Math.ceil(ws/1000)+" វិនាទី ហើយសាកម្តងទៀតស្វ័យប្រវត្តិ",true);
-      await new Promise(function(r){setTimeout(r,ws+500);});
+      if(ws>6000)toastS("⏳ Gemini quota ពេញបណ្តោះអាសន្ន — រង់ចាំ "+Math.ceil(ws/1000)+" វិនាទី ហើយសាកម្តងទៀតស្វ័យប្រវត្តិ",true);
+      await new Promise(function(r){setTimeout(r,ws+300);});
     }
     if(txt===null){
       if(lastQuota){var qe=new Error("Gemini អស់ quota (Key និង Model បម្រុងទាំងអស់) — សូមរង់ចាំ ១ នាទី ឬថែម API Key ថ្មី ហើយចុចម្តងទៀត");qe.zsfQuota=true;throw qe;}
@@ -3133,10 +3140,19 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     return n;
   }
   /* V11.2: ហៅ Gemini ម្តងសម្រាប់ window មួយ — មិនលុបបន្ទាត់ចោលស្ងាត់ៗទៀតទេ (timestamp ខុស/បន្ទាត់ខ្លី ត្រូវរក្សា) */
+  /* V11.5: ពង្រីកសំឡេងស្ងាត់ៗ (ដល់ ×6) មុនផ្ញើ — មិនប៉ះសំឡេងខ្លាំង ឬសំឡេងរំខានតិចតួច */
+  function gemTNorm(u8){
+    try{
+      var n=(u8.length-44)>>1,dv=new DataView(u8.buffer,u8.byteOffset),pk=0,i,v;
+      for(i=0;in;i++){v=Math.abs(dv.getInt16(44+i*2,true));if(v>pk)pk=v}
+      if(pk>2500&&pk20000){var g=Math.min(6,28000/pk);for(i=0;in;i++){v=Math.round(dv.getInt16(44+i*2,true)*g);dv.setInt16(44+i*2,Math.max(-32768,Math.min(32767,v)),true)}}
+    }catch(_){}
+    return u8;
+  }
   async function gemTRaw(A,p,idx,totalSec){
-    var PAD=3,a0=Math.max(0,p.cs-PAD),a1=Math.min(totalSec,p.ce+PAD),dur=a1-a0;
-    var wav=b64(sliceWav(A.ab,A.info,a0,a1));
-    var gparts=[{inline_data:{mime_type:"audio/wav",data:wav}},{text:gemTPrompt()}];
+    var PAD=(p.pad!=null?p.pad:4),a0=Math.max(0,p.cs-PAD),a1=Math.min(totalSec,p.ce+PAD),dur=a1-a0;
+    var wav=b64(gemTNorm(sliceWav(A.ab,A.info,a0,a1)));
+    var gparts=[{inline_data:{mime_type:"audio/wav",data:wav}},{text:gemTPrompt(!!p.strict)}];
     var lastErr=null;
     for(var at=0;at2;at++){
       try{
@@ -3172,7 +3188,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
           if(e-s>30)e=s+30;
           out.push({start:s,end:e,text:it.t});
         });
-        out=out.filter(function(g){return g.start>=p.cs-0.3&&(p.last||g.startp.ce+0.3);});
+        out=out.filter(function(g){var md=(g.start+g.end)/2;return md>=p.cs-0.8&&(p.last||mdp.ce+0.8);});
         /* Gemini ឆ្លើយ [] ទាំងដែលមានសំឡេងនិយាយ → សាកម្តងទៀត (Key/Model ផ្សេង) */
         if(!out.length&&at1&&gemTVoiced(A,p.cs,p.ce)>=3)continue;
         return out;
@@ -3185,10 +3201,10 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     /* V11.2: បើអក្សរតិចពេកធៀបនឹងសំឡេងនិយាយ → ស្តាប់ម្តងទៀតជាកំណាត់ ១០ វិនាទី ហើយយកលទ្ធផលដែលបានច្រើនជាង */
     try{
       var v=gemTVoiced(A,p.cs,p.ce),ch=gemTChars(res);
-      if(p.ce-p.cs>12&&v>=4&&chv*2.2){
+      if(p.ce-p.cs>8&&v>=3&&chv*2&&((window.__zsfGemRecTry=(window.__zsfGemRecTry||0)+1)=16)){
         var r2=[];
-        for(var c=p.cs,q=0;cp.ce-0.5;c+=10,q++){
-          try{r2=r2.concat(await gemTRaw(A,{cs:c,ce:Math.min(p.ce,c+10),last:!!p.last&&c+10>=p.ce-0.5},idx+50+q,totalSec));}catch(_){}
+        for(var c=p.cs,q=0;cp.ce-0.5;c+=6,q++){
+          try{r2=r2.concat(await gemTRaw(A,{cs:c,ce:Math.min(p.ce,c+6),last:!!p.last&&c+6>=p.ce-0.5,pad:3},idx+50+q,totalSec));}catch(_){}
         }
         if(gemTChars(r2)>ch){res=r2;window.__zsfGemRecov=(window.__zsfGemRecov||0)+1;}
       }
@@ -3202,10 +3218,10 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     if(onProg)onProg(0,1,"🎧 កំពុងទាញសំឡេងពីវីដេអូ…");
     var A=await audioOnce(f);window.__zsfGemBeat=Date.now();
     var sr=A.info.fmt.sr,ba=A.info.fmt.ba||2,totalSec=A.info.data.len/ba/sr;
-    var PART=(function(){try{var q=parseInt(localStorage.getItem("zsf_gem_part"),10);if(q>=15&&q=180)return q}catch(_){}return 20})(),parts=[];
+    var PART=(function(){try{var q=parseInt(localStorage.getItem("zsf_gem_part"),10);if(q>=15&&q=180)return q}catch(_){}return 12})(),parts=[];
     for(var cs=0;cstotalSec-0.5;cs+=PART)parts.push({cs:cs,ce:Math.min(totalSec,cs+PART),last:(cs+PART)>=totalSec-0.5});
     if(!parts.length)throw new Error("សំឡេងខ្លីពេក");
-    window.__zsfGemRecov=0;var T0=Date.now(),conc=Math.min(12,Math.max(6,ks.length*3)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
+    window.__zsfGemRecov=0;window.__zsfGemRecTry=0;var T0=Date.now(),conc=Math.min(12,Math.max(6,ks.length*3)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
     async function worker(){
       while(true){
         var i=next++;if(i>=parts.length)return;
@@ -3224,6 +3240,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     }
     if(failed.length===parts.length)throw lastErr||new Error("Gemini មិនបានឆ្លើយ");
     var segs=[];res.forEach(function(r){if(r)Array.prototype.push.apply(segs,r);});
+    window.__zsfGemStat={raw:segs.length,ghost:0,snap:0};
     var __gapAdded=0,__prof0=null;
     try{__prof0=gemTProfile(A);}catch(_){__prof0=null;}
     try{
@@ -3239,15 +3256,15 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
           else if(gCur){gHole++;if(gHole*gF>0.3){gRuns.push(gCur);gCur=null;gHole=0}}
         }
         if(gCur)gRuns.push(gCur);
-        var gaps=gRuns.map(function(r){return{s:r[0]*gF,e:(r[1]+1)*gF}}).filter(function(g){return g.e-g.s>=1.2});
+        var gaps=gRuns.map(function(r){return{s:r[0]*gF,e:(r[1]+1)*gF}}).filter(function(g){return g.e-g.s>=2.2});
         gaps.sort(function(a,b){return (b.e-b.s)-(a.e-a.s)});
-        var gw=[];gaps.forEach(function(g){for(var x=g.s;xg.e-0.3;x+=10){var ge=Math.min(g.e,x+10);if(ge-x>=1.2)gw.push({s:x,e:ge})}});gw.sort(function(a,b){return (b.e-b.s)-(a.e-a.s)});gaps=gw.slice(0,60);
+        var gw=[];gaps.forEach(function(g){for(var x=g.s;xg.e-0.3;x+=10){var ge=Math.min(g.e,x+10);if(ge-x>=2.2)gw.push({s:x,e:ge})}});gw.sort(function(a,b){return (b.e-b.s)-(a.e-a.s)});gaps=gw.slice(0,24);
         var gNext=0,gDone=0;
         var gWorker=async function(){
           while(true){
             var gz=gNext++;if(gz>=gaps.length||Date.now()-T0>420000)return;
             try{
-              var gg=gaps[gz],gr=await gemTPart(A,{cs:Math.max(0,gg.s-0.5),ce:Math.min(totalSec,gg.e+0.5),last:false},900+gz,totalSec);
+              var gg=gaps[gz],gr=await gemTPart(A,{cs:Math.max(0,gg.s-0.5),ce:Math.min(totalSec,gg.e+0.5),last:false,strict:true,pad:2},900+gz,totalSec);
               if(gr&&gr.length){Array.prototype.push.apply(segs,gr);__gapAdded+=gr.length}
             }catch(_){}
             gDone++;if(onProg)onProg(parts.length,parts.length,"🔎 ពិនិត្យឃ្លាដែលអាចបាត់ "+gDone+"/"+gaps.length+"…");
@@ -3259,6 +3276,24 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     var PUN=/[\s，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g;
     var HP=(typeof ZSF_HALLUC!=="undefined")?ZSF_HALLUC:null,HO=(typeof ZSF_HALLUC_ONLY!=="undefined")?ZSF_HALLUC_ONLY:null;
     segs=segs.filter(function(g){var t=String(g.text||"");if(HP&&HP.test(t))return false;if(HO&&HO.test(t.replace(PUN,"")))return false;return true;});
+    /* V11.5: លុបបន្ទាត់ដែលស្ថិតលើកន្លែងស្ងាត់ (សំឡេងខ្មោច) ហើយតម្រឹមពេលចាប់ផ្តើម/បញ្ចប់ទៅតាមសំឡេងពិត */
+    try{
+      var SP=gemTSpeechInfo(A);
+      if(SP){
+        var sF=SP.F,sS=SP.S,sT=SP.thr,sN=sS.length,sMax=Math.max(1,Math.round(0.8/sF)),stt=window.__zsfGemStat;
+        segs=segs.filter(function(g){
+          var a=Math.max(0,Math.floor(g.start/sF)),b=Math.min(sN-1,Math.floor(g.end/sF));
+          if(ba)return true;
+          var nv=0,i;for(i=a;i=b;i++)if(sS[i]>=sT)nv++;
+          if(nv/(b-a+1)0.12){stt.ghost++;return false}
+          var k=a;while(kb&&k-asMax&&sS[k]sT)k++;
+          if(k>a&&sS[k]>=sT&&k*sFg.end-0.3){g.start=k*sF;stt.snap++}
+          k=b;while(k>a&&b-ksMax&&sS[k]sT)k--;
+          if(kb&&sS[k]>=sT&&(k+1)*sF>g.start+0.3){g.end=(k+1)*sF;stt.snap++}
+          return true;
+        });
+      }
+    }catch(_){}
     segs.sort(function(a,b){return a.start-b.start;});
     var merged=[];
     segs.forEach(function(g){
@@ -3275,7 +3310,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     try{gh=zsfCleanGhost(m);merged=m.segments;}catch(_){}
     var off=A.offset||0;
     var outSegs=merged.map(function(g){return {start:g.start+off,end:g.end+off,text:g.text};});
-    return {segments:outSegs,profile:prof,offset:off,parts:parts.length,failed:failed.map(function(i){return parts[i].cs;}),ghost:gh,gapFilled:__gapAdded,recovered:window.__zsfGemRecov||0,sec:Math.round((Date.now()-T0)/1000),duration:totalSec};
+    return {segments:outSegs,profile:prof,offset:off,parts:parts.length,failed:failed.map(function(i){return parts[i].cs;}),ghost:gh,gapFilled:__gapAdded,stat:window.__zsfGemStat||null,recovered:window.__zsfGemRecov||0,sec:Math.round((Date.now()-T0)/1000),duration:totalSec};
   };
 })();
 
@@ -3743,6 +3778,7 @@ async function zsfTranscribeGeminiMain(){
     setC(subs.map(function(x){return {s:x.start/1000,e:x.end/1000,t:x.text}}));
     var notes=[],gh=r.ghost;
     if(gh&&gh.dup)notes.push("👻 លុបអក្សរស្ទួន "+gh.dup+" បន្ទាត់");
+    if(r.stat)notes.push("📊 Gemini ឆ្លើយ "+r.stat.raw+" បន្ទាត់ → សល់ "+subs.length+(r.stat.ghost?" • លុបសំឡេងខ្មោច "+r.stat.ghost:"")+(r.stat.snap?" • តម្រឹមពេល "+r.stat.snap:""));
     if(r.recovered)notes.push("🔁 ស្តាប់ឡើងវិញតាមកំណាត់ខ្លី "+r.recovered+" ផ្នែក");
     if(r.gapFilled)notes.push("🔎 បំពេញឃ្លាដែលបាត់ "+r.gapFilled+" បន្ទាត់");
     if(r.failed&&r.failed.length)notes.push("⚠ ផ្នែកបរាជ័យ (វិនាទីចាប់ផ្តើម): "+r.failed.join(", ")+" — សូមចុចម្តងទៀត");
@@ -5151,7 +5187,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"11.3",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"11.5",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -5397,7 +5433,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="11.3";
+  var EMB="11.5";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
