@@ -1005,8 +1005,17 @@ $("#tryV").onclick=async()=>{const b=$("#tryV"),old=b.innerHTML;
  try{b.textContent="⏳ ...";
  AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")await AC.resume();
   const p=presetOf(slot),res=await dubAudio("សួស្តី នេះជាការសាកល្បងសំឡេង",slot,p,null);
+  let pk=0;try{const d0=res.buf.getChannelData(0);for(let i=0;i!==d0.length;i+=8){const v=Math.abs(d0[i]);if(v>pk)pk=v}}catch(_){}
+  if(pk===0)throw new Error("សំឡេងដែលបានមកស្ងាត់ទាំងស្រុង (Server ឆ្លើយមកទទេ)");
   stopFx();const n=AC.createBufferSource();n.buffer=res.buf;fxChain(AC,n,p,AC.destination);FXS=n;n.start();
- }catch(e){alert("មានបញ្ហា: "+e.message)}finally{b.innerHTML=old}};
+ }catch(e){let dg="";try{const L=ttsList(),nm=u=>u.replace(/^https:\/\//,"").split(".")[0];
+  const R=await Promise.all(L.map(async u=>{const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),12000);
+   try{const r=await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:"សួស្តី",voice:voiceOfSlot(slot),rate:0,pitch:0}),signal:ac.signal});
+    if(!r.ok){let m="";try{m=(await r.json()).error}catch(_){}return nm(u)+" ៖ HTTP "+r.status+(m?" "+m:"")}
+    const ab=await r.arrayBuffer();return nm(u)+" ៖ "+(ab.byteLength>199?"OK ("+ab.byteLength+" bytes)":"ទទេ")}
+   catch(x){return nm(u)+" ៖ "+(x.name==="AbortError"?"ហួសម៉ោង (12 វិនាទី)":"មិនអាចភ្ជាប់បាន (ប្លុក/VPN/អ៊ីនធឺណិត)")}
+   finally{clearTimeout(tm)}}));dg="\n\n🔎 ពិនិត្យ TTS Server៖\n"+R.join("\n")}catch(_){}
+  alert("មានបញ្ហា: "+e.message+dg)}finally{b.innerHTML=old}};
 /* words replace + downloader UI + srt area */
 let RP=S.get("rp",[]);const rpc=()=>$("#rpn").textContent=RP.length;rpc();
 $("#rpIn").onclick=()=>{const i=document.createElement("input");i.type="file";i.accept=".txt,.csv";i.onchange=async()=>{const t=await i.files[0].text();RP=t.split(/\r?\n/).map(l=>l.split(/=>|=|,|\t/)).filter(a=>a.length>=2&&a[0].trim()).map(a=>[a[0].trim(),a.slice(1).join("=").trim()]);S.set("rp",RP);rpc()};i.click()};
@@ -1194,9 +1203,10 @@ function probe(fl){return new Promise(res=>{const v=document.createElement("vide
  v.preload="metadata";v.muted=true;v.onloadedmetadata=()=>done({w:v.videoWidth,h:v.videoHeight,d:v.duration});v.onerror=()=>done(null);setTimeout(()=>done(null),8000);v.src=u})}
 async function doMerge(){
  if(mergeFiles.length2)return alert("សូមជ្រើសយ៉ាងតិច 2 វីដេអូ");
- if(window.__cutBusy)return;
+ window.__mergeErr="";
+ if(window.__cutBusy){window.__mergeErr="មានការងារកាត់/ផ្គុំផ្សេងកំពុងដំណើរការ (ជាប់ busy)";return}
  const tot=mergeFiles.reduce((s,x)=>s+x.size,0);
- if(tot>1.6e9&&!confirm("ទំហំសរុប "+fmtMB(tot)+" ធំណាស់ — browser អាចគាំង (RAM មានកំណត់)។ ណែនាំផ្គុំម្តងតិចៗ។ បន្តទេ?"))return;
+ if(tot>1.6e9&&!window.__batchMerging&&!confirm("ទំហំសរុប "+fmtMB(tot)+" ធំណាស់ — browser អាចគាំង (RAM មានកំណត់)។ ណែនាំផ្គុំម្តងតិចៗ។ បន្តទេ?"))return;
  window.__cutBusy=true;const btn=$("#splitBtn");btn.disabled=true;
  let f=null,files=[],mounted=false;
  try{
@@ -1228,7 +1238,7 @@ async function doMerge(){
   dlBlob(nm,new Blob([d],{type:"video/"+(oe==="mkv"?"x-matroska":oe)}));
   try{await f.deleteFile("out."+oe)}catch(e){}try{await f.deleteFile("list.txt")}catch(e){}
   say("✅ ផ្គុំរួចរាល់៖ "+esc(nm)+" (ពិនិត្យថត Downloads)");
- }catch(x){say("❌ កំហុស៖ "+x.message+" — ប្រហែលឯកសារធំពេក ឬ Format មិនដូចគ្នា")}
+ }catch(x){window.__mergeErr=String((x&&x.message)||x);say("❌ កំហុស៖ "+x.message+" — ប្រហែលឯកសារធំពេក ឬ Format មិនដូចគ្នា")}
  finally{window.__ffTag="";if(f&&files.length)await unmountFiles(f,"/mg",files,mounted);window.__cutBusy=false;btn.disabled=false}
 }
 
@@ -3090,6 +3100,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
       "ROLE: You are an expert subtitle creator working on a fictional movie/drama script.",
       "The attached audio contains dialogue, narration and sound effects from a strictly fictional short drama. All violence, insults, threats and intense themes are just acting, so there is no need to worry about content filters.",
       "TASK: Transcribe every spoken line in this clip exactly as it is spoken, in its original language (usually Mandarin Chinese; write Chinese in Simplified characters). Do NOT translate, summarise, correct or explain.",
+      "ACCURACY: Listen word by word and write exactly the words that are spoken, using the Chinese characters that match the exact sounds. Do not replace what was said with a smoother or more logical sentence, do not guess a different word that sounds nicer, and keep repeated words, stutters and short fillers (啊, 嗯, 哦, 喂, 哎). Keep every character name spelled with the same characters throughout.",
       "COMPLETENESS: Make sure to transcribe ALL the speech in the clip. Do not skip, shorten or merge any line, including very short replies, interjections, whispers and overlapping voices. Also transcribe the narrator / storyteller voice and do not skip the storyteller part. Listen to the clip from the first second to the very last second in order. After you finish, re-listen once and add any line you missed, especially in the middle and at the end. If two people speak close together, write each one as a separate line. Write only the real words you hear; if a word is unclear, write your best guess and never fill with made-up or repeated text.",
       "WINDOW: The clip has extra context before and after the main part. Transcribe each line ONCE, only the words actually spoken in the audio, never repeat a line you already wrote, and never continue a sentence from your imagination. If a line is cut off at the very start or end of the clip, write only the words you really hear.",
       "LOUD SOUND: Even when background music, battle noise or sound effects are loud, listen for the human voice and transcribe it. Very short shouts and exclamations (a name, an order, one or two words) are real lines and must be included. Ignore the music itself. Music, singing, lyrics, crowd noise and sound effects are NOT speech: never write them as lines. Only a clear human speaking voice counts.",
@@ -3348,7 +3359,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     /* V11.2: បើអក្សរតិចពេកធៀបនឹងសំឡេងនិយាយ → ស្តាប់ម្តងទៀតជាកំណាត់ ១០ វិនាទី ហើយយកលទ្ធផលដែលបានច្រើនជាង */
     try{
       var v=gemTVoiced(A,p.cs,p.ce),ch=gemTChars(res);
-      if(p.ce-p.cs>8&&v>=3&&chv*2&&((window.__zsfGemRecTry=(window.__zsfGemRecTry||0)+1)=16)){
+      if(p.ce-p.cs>8&&v>=3&&chv*3&&((window.__zsfGemRecTry=(window.__zsfGemRecTry||0)+1)=80)){
         var r2=[];
         for(var c=p.cs,q=0;cp.ce-0.5;c+=6,q++){
           if(gemTLate())break;
@@ -3415,9 +3426,9 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
           else if(gCur){gHole++;if(gHole*gF>0.3){gRuns.push(gCur);gCur=null;gHole=0}}
         }
         if(gCur)gRuns.push(gCur);
-        var gaps=gRuns.map(function(r){return{s:r[0]*gF,e:(r[1]+1)*gF}}).filter(function(g){return g.e-g.s>=2.2});
+        var gaps=gRuns.map(function(r){return{s:r[0]*gF,e:(r[1]+1)*gF}}).filter(function(g){return g.e-g.s>=1.5});
         gaps.sort(function(a,b){return (b.e-b.s)-(a.e-a.s)});
-        var gw=[];gaps.forEach(function(g){for(var x=g.s;xg.e-0.3;x+=10){var ge=Math.min(g.e,x+10);if(ge-x>=2.2)gw.push({s:x,e:ge})}});gw.sort(function(a,b){return (b.e-b.s)-(a.e-a.s)});gaps=gw.slice(0,24);
+        var gw=[];gaps.forEach(function(g){for(var x=g.s;xg.e-0.3;x+=10){var ge=Math.min(g.e,x+10);if(ge-x>=1.5)gw.push({s:x,e:ge})}});gw.sort(function(a,b){return (b.e-b.s)-(a.e-a.s)});gaps=gw.slice(0,48);
         var gNext=0,gDone=0;
         var gWorker=async function(){
           while(true){
@@ -3429,7 +3440,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
             gDone++;if(onProg)onProg(parts.length,parts.length,"🔎 ពិនិត្យឃ្លាដែលអាចបាត់ "+gDone+"/"+gaps.length+"…");
           }
         };
-        await Promise.all(Array.from({length:Math.min(6,gaps.length)},gWorker));
+        await Promise.all(Array.from({length:Math.min(8,gaps.length)},gWorker));
       }
     }catch(_){}
     var PUN=/[\s，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g;
@@ -3451,6 +3462,23 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
           if(kb&&sS[k]>=sTT[k]&&(k+1)*sF>g.start+0.3){g.end=(k+1)*sF+0.04;stt.snap++}
           return true;
         });
+      }
+    }catch(_){}
+    /* V13.8: តម្រឹមម៉ោងតាមសំឡេងពិតឱ្យច្បាស់ — បើសំឡេងចាប់ផ្តើមមុន/បញ្ចប់ក្រោយម៉ោងដែល Gemini ឱ្យ ពង្រីកតាមសំឡេង (ក្នុង ០.៩ វិនាទី) */
+    try{
+      var SP2=gemTSpeechInfo(A);
+      if(SP2&&segs.length){
+        segs.sort(function(a,b){return a.start-b.start;});
+        var F2=SP2.F,S2=SP2.S,T2=SP2.T,N2=S2.length,ex2=Math.max(1,Math.round(0.9/F2));
+        for(var si=0;segs.length>si;si++){
+          var g2=segs[si],pv=si>0?segs[si-1].end:0,nx=segs.length>si+1?segs[si+1].start:1e9;
+          var a2=Math.max(0,Math.floor(g2.start/F2)),st2=0;
+          while(a2>0&&ex2>st2&&S2[a2-1]>=T2[a2-1]&&(a2-1)*F2>pv+0.02){a2--;st2++}
+          if(st2>0)g2.start=Math.max(0,a2*F2-0.04);
+          var b2=Math.min(N2-1,Math.floor(g2.end/F2)),en2=0;
+          while(N2-1>b2&&ex2>en2&&S2[b2+1]>=T2[b2+1]&&nx>(b2+2)*F2+0.02){b2++;en2++}
+          if(en2>0)g2.end=(b2+1)*F2+0.04;
+        }
       }
     }catch(_){}
     segs.sort(function(a,b){return a.start-b.start;});
@@ -4840,11 +4868,11 @@ $("#exp").onclick=async function(){
     window.__batchCap=[];var saved=false;
     try{
      if(files.length===1){await zsKeepOrDl(files[0])}
-     else{var old=mergeFiles;mergeFiles=files;try{await doMerge()}finally{mergeFiles=old}}
+     else{var old=mergeFiles;mergeFiles=files;window.__cutBusy=false;window.__mergeErr="";window.__batchMerging=true;try{await doMerge()}finally{mergeFiles=old;window.__batchMerging=false}}
     }catch(e){console.warn("batch merge",e)}
     saved=!!(window.__batchCap&&window.__batchCap.length)||files.length===1;
     window.__batchCap=null;
-    if(!saved){toast("ផ្គុំមិនបាន — កំពុងទាញយកដាច់ពីគ្នា",false);for(var z=0;zfiles.length;z++){await zsKeepOrDl(files[z]);await wait(600)}}
+    if(!saved){var why=window.__mergeErr||"មិនស្គាល់មូលហេតុ";try{alert("❌ ផ្គុំមិនបាន៖ "+why+"\n\nនឹងទាញយកដាច់ពីគ្នាជំនួស។")}catch(_){}toast("ផ្គុំមិនបាន — កំពុងទាញយកដាច់ពីគ្នា",false);for(var z=0;zfiles.length;z++){await zsKeepOrDl(files[z]);await wait(600)}}
    }
    var okN=caps.length;
    try{zsfDone((okN?("✅ ធ្វើរួច "+okN+" ភាគ"):"❌ មិនមានភាគណាបានទេ")+(fails.length?(" · ❌ បរាជ័យភាគ "+fails.join(", ")):""),true)}catch(e){}
@@ -4945,7 +4973,8 @@ function gCleanBible(j){
   if(!zh||!ZH.test(zh)||seen[zh]||!gKmOnly(km))return;seen[zh]=1;
   var g=/^f/i.test(c.gender||"")?"ស្រី":/^m/i.test(c.gender||"")?"ប្រុស":"?";
   var e=/anc/i.test(c.era||"")?"បុរាណ":/mod/i.test(c.era||"")?"ទំនើប":"?";
-  chars.push({zh:zh,km:km,gender:g,era:e,role:gKmOnly(c.role_km)?gTxt(c.role_km,80):""})});
+  var ag=/chi/i.test(c.age||"")?"កុមារ":/tee/i.test(c.age||"")?"វ័យជំទង់":/eld/i.test(c.age||"")?"មនុស្សចាស់":/adu/i.test(c.age||"")?"មនុស្សធំ":"?";
+  chars.push({zh:zh,km:km,gender:g,age:ag,relation:gKmOnly(c.relation_km)?gTxt(c.relation_km,40):"",era:e,role:gKmOnly(c.role_km)?gTxt(c.role_km,80):""})});
  var genres=arr(j.genre_codes).map(function(x){return String(x||"").trim()}).filter(function(c){return gGenreByCode(c)}).filter(function(c,i,a){return a.indexOf(c)===i}).slice(0,1);
  return {genres:genres,
   synopsis:gKmOnly(j.synopsis_km)?gTxt(j.synopsis_km,600):"",
@@ -4969,7 +4998,7 @@ window.zsfStoryBlock=function(){
   if(g)o+="\nការណែនាំតាមប្រភេទ:\n- "+g[3];
   o+="\n"+ZSF_ERA_RULE;
   if(b){
-   if(b.characters.length)o+="\nតួអង្គ (ឈ្មោះ = ខ្មែរ | ភេទ | សម័យ | តួនាទី): "+b.characters.map(function(c){return c.zh+"="+c.km+" | "+(c.gender||"?")+" | "+(c.era||"?")+" | "+(c.role||"")}).join(" ; ");
+   if(b.characters.length)o+="\nតួអង្គ (ឈ្មោះ = ខ្មែរ | ភេទ | វ័យ | ញាតិ/ទំនាក់ទំនង | សម័យ | តួនាទី): "+b.characters.map(function(c){return c.zh+"="+c.km+" | "+(c.gender||"?")+" | "+(c.age||"?")+" | "+(c.relation||"?")+" | "+(c.era||"?")+" | "+(c.role||"")}).join(" ; ");
    if(b.address.length)o+="\nពាក្យហៅគ្នា/ពាក្យខ្លួនឯង/ឋានៈ (ប្រើដូចគ្នាគ្រប់បន្ទាត់): "+b.address.map(function(a){return a.zh+"="+a.km}).join(" ; ");
    if(b.places.length)o+="\nទីកន្លែង (ប្រើដូចគ្នា): "+b.places.map(function(a){return a.zh+"="+a.km}).join(" ; ");
    if(b.terms.length)o+="\nពាក្យពិសេសរបស់រឿង (ប្រើដូចគ្នា): "+b.terms.map(function(a){return a.zh+"="+a.km}).join(" ; ");
@@ -4978,7 +5007,7 @@ window.zsfStoryBlock=function(){
  }catch(e){console.warn("story block",e)}
  return o};
 /* V12.9: សៀវភៅរឿងស្វ័យប្រវត្តិ (បង្កប់ក្នុងកូដ — គ្មានប្រអប់បរិបទ/ប៊ូតុងប្រភេទទៀត) */
-window.zsfBibleWaitMs=function(){var mb=0;try{mb=file?file.size/1048576:0}catch(_){}return Math.round(Math.min(240000,60000+mb*1200))};
+window.zsfBibleWaitMs=function(){var mb=0;try{mb=file?file.size/1048576:0}catch(_){}return 30000};
 window.zsfAutoStory=function(){try{if($("#target").value!=="km")return "";return String(window.zsfStoryBlock()||"").replace(/\s+/g," ").trim().slice(0,3500)}catch(_){return ""}};
 window.zsfEnsureStory=async function(){try{var ks=K.filter(Boolean);if(!ks.length||!cues.length||$("#target").value!=="km")return;await Promise.race([Promise.resolve(window.__bibleP||null).then(function(){return gPrepareBible(ks,function(){})}),new Promise(function(r){setTimeout(function(){r(null)},window.zsfBibleWaitMs())})])}catch(_){}};
 function gWithTimeout(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error("timeout"))},ms)})])}
@@ -4998,7 +5027,7 @@ async function gPrepareBible(keys,prog,ovr){
 "- genre_codes: an array with EXACTLY ONE code: the single dominant genre/setting of the whole story (the premise that drives the plot). NEVER combine several genres; if the story seems to mix genres, pick only the one that matters most. Choose ONLY from this list:\n"+list+"\n"+
 "- synopsis_km: 3-5 sentences in Khmer summarising the whole story, its setting and the main conflict.\n"+
 "- tone_km: a short Khmer phrase describing the emotional tone/atmosphere (e.g. serious and tense, funny, tender).\n"+
-"- characters: up to 14 characters: {zh, km, gender (M/F/?), era (ancient/modern/other), role_km}. km = natural Khmer transliteration of the Chinese pronunciation (e.g. 陈凡 = ឆិនហ្វាន). role_km = short Khmer role AND relationship to the others (e.g. ម្ចាស់ហាងសៀវភៅ ប្តីរបស់លីណា). Decide gender from what you see/hear and keep names identical for the whole story. Use the correct Chinese characters even if the subtitle has small speech-recognition typos. If a name is never spoken, use a role name.\n"+
+"- characters: up to 14 characters: {zh, km, gender (M/F/?), age (child/teen/adult/elder), era (ancient/modern/other), relation_km, role_km}. km = natural Khmer transliteration of the Chinese pronunciation (e.g. 陈凡 = ឆិនហ្វាន). relation_km = the exact Khmer family/social relation word of this character to the main character or others (បងប្រុស=older brother, បងស្រី=older sister, ប្អូនប្រុស, ប្អូនស្រី, ឪពុក=father, ម្តាយ=mother, ជីតា, ជីដូន, កូនប្រុស, កូនស្រី, ប្តី, ប្រពន្ធ, មិត្ត, ចៅហ្វាយ...). age = child, teen, adult or elder. Read every line carefully to detect who is older brother/sister, father, mother, child or adult. role_km = short Khmer role AND relationship to the others (e.g. ម្ចាស់ហាងសៀវភៅ ប្តីរបស់លីណា). Decide gender from what you see/hear and keep names identical for the whole story. Use the correct Chinese characters even if the subtitle has small speech-recognition typos. If a name is never spoken, use a role name.\n"+
 "- places: up to 10 place names {zh, km} (Khmer transliteration or the usual Khmer name).\n"+
 "- terms: up to 12 recurring story-specific terms, titles, items or concepts {zh, km} with ONE fixed Khmer rendering that fits the genre.\n"+
 "- address: up to 14 forms of address / self-reference / titles used between characters (e.g. 陛下, 店家, 咱, 朕, 大哥, 少爷, 老板) {zh, km} with ONE fixed Khmer rendering suited to who speaks to whom and the era.\n"+
@@ -5008,7 +5037,7 @@ async function gPrepareBible(keys,prog,ovr){
  var models=[m0,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
  /* វីដេអូតូច (≤ 60MB) → ឱ្យ AI មើលផ្ទាល់ ; ធំជាងនេះ ឬយឺតជាង ៦០ វិនាទី → អាន SRT តែម្យ៉ាង (លឿន) */
  var vpart=null;
- if(typeof ovr!=="string"&&file&&file.size=400*1048576&&/^video\//.test(String(file.type||"video/mp4"))){
+ if(false&&typeof ovr!=="string"&&file&&file.size=400*1048576&&/^video\//.test(String(file.type||"video/mp4"))){
   try{vpart=await gWithTimeout(gdVideoPart(keys[0],file,function(){}),Math.min(240000,60000+Math.round(file.size/1048576)*1200))}catch(e){console.warn("story video → text only",e);vpart=null}}
  for(var n=0;n2;n++){
   var key=keys[n%keys.length];
@@ -5016,7 +5045,7 @@ async function gPrepareBible(keys,prog,ovr){
    try{
     var raw=null;
     if(vpart){try{raw=await gdGenerate([vpart,{text:mk(true)}],key,models[mi])}catch(ve){console.warn("story video analysis → text only",ve);vpart=null;raw=null}}
-    if(raw===null)raw=await gdGenerate([{text:mk(false)}],key,models[mi]);
+    if(raw===null)raw=await gWithTimeout(gdGenerate([{text:mk(false)}],key,models[mi]),45000);
     var b=gCleanBible(gParseJson(raw));
     if(b.genres.length||b.characters.length||b.terms.length||b.address.length){
      var EB=window.__zsfEarlyBible;
@@ -5828,7 +5857,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="13.5";
+  var EMB="13.9";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
