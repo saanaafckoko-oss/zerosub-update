@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"10.9";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"11.0";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -1033,7 +1033,7 @@ async function zsFastSave(name,b){
  var next=null;
  try{
   if(apk){
-   if(!A.begin(name,mime)){say(0,"❌ រក្សាទុកមិនបាន (បើកឯកសារក្នុង Download មិនបាន)");return true}
+   if(!A.begin(name,mime)){say(0,"❌ រក្សាទុកមិនបាន (បើកឯកសារក្នុង Download មិនបាន)");window.__zsSaveErr="បើកឯកសារក្នុង Download មិនបាន";return true}
    started=true;
   }
   next=rd(0);
@@ -1062,6 +1062,7 @@ async function zsFastSave(name,b){
   try{showToast("✅ រក្សាទុករួចក្នុង Downloads: "+name+" ("+mb(total)+" MB)",true)}catch(e){}
   return true;
  }catch(err){
+  window.__zsSaveErr=String(err&&err.message||err);
   if(apk){if(started){try{A.abort(String(err))}catch(e){}}}else{try{N.deleteFile(tmp)}catch(e){}}
   try{setProgress(0,"❌ រក្សាទុកមិនបាន: "+String(err&&err.message||err))}catch(e){}
   try{showToast("❌ រក្សាទុកមិនបាន: "+String(err&&err.message||err)+(wrote?" (ទំហំទូរសព្ទពេញ?)":""),false)}catch(e){}
@@ -1520,7 +1521,7 @@ const SPMP4=(function(){
  function dl(n){return n128?[n]:[0x80|(n>>7),n&127]}
  function esdsBox(asc){
   const dsi=[5,...dl(asc.length),...asc];
-  const dcd=[4,...dl(13+dsi.length),0x40,0x15,0,0,0,0,0,0,0,0,0,0,0,0,...dsi];
+  const dcd=[4,...dl(13+dsi.length),0x40,0x15,0,0,0,0,0,0,0,0,0,0,0,...dsi];
   const es=[3,...dl(3+dcd.length+3),0,0,0,...dcd,6,1,2];
   return box("esds",U(full(0,0),es))}
  function audioEntry(kind,sr,ch,desc){
@@ -1675,6 +1676,7 @@ async function doExportFast(){
  const dcfg={codec:dm.codec,description:dm.desc,codedWidth:dm.w,codedHeight:dm.h};
  const ds=await VideoDecoder.isConfigSupported(dcfg);if(!ds||!ds.supported)throw new Error("Decoder វីដេអូមិនគាំទ្រ");
  const ae=await fxPickAudio();if(!ae)throw new Error("Audio encoder មិនមាន");
+ if(window.__zsNoBurn&&ae.kind!=="aac")throw new Error("Browser មិនអាច encode សំឡេង AAC — វីដេអូនឹងចាក់មិនបាននៅ Android");
  if(ae.kind==="opus"&&window.MediaRecorder&&MediaRecorder.isTypeSupported("video/mp4;codecs=avc1.42E01E,mp4a.40.2"))throw new Error("AAC មិនមាន — ប្រើវិធីធម្មតា");
  AC=AC||new(window.AudioContext||window.webkitAudioContext)();
  const voiceOn=on(3)&&cues.length>0,base=$("#bgm").value/100;
@@ -1694,7 +1696,7 @@ async function doExportFast(){
  const enc=new VideoEncoder({output:(ch,meta)=>{const d=new Uint8Array(ch.byteLength);ch.copyTo(d);vs.push({d,t:ch.timestamp,k:ch.type==="key"});
   if(!vdesc&&meta&&meta.decoderConfig&&meta.decoderConfig.description)vdesc=fxCopy(meta.decoderConfig.description)},error:e=>{err=err||e}});
  enc.configure(vcfg);
- const gop=Math.max(1,Math.round(dm.fps*2)),fdur=Math.round(1e6/dm.fps),o4=on(4)&&!!(O.blur||O.logo||O.text),o0=on(0)&&cues.length>0; /* V10.3 : ដុត Subtitle ខ្មែរលើវីដេអូ (ប៊ូតុង Subtitle បើក/បិទ) */
+ const gop=Math.max(1,Math.round(dm.fps*2)),fdur=Math.round(1e6/dm.fps),o4=!window.__zsNoBurn&&on(4)&&!!(O.blur||O.logo||O.text),o0=!window.__zsNoBurn&&on(0)&&cues.length>0; /* V10.3 : ដុត Subtitle ខ្មែរលើវីដេអូ (ប៊ូតុង Subtitle បើក/បិទ) */
  /* V3.1 : បន្ថយការងារក្នុងមួយ frame — ឃ្លា Subtitle/Logo/Text គូរទុកម្តងហើយប្រើឡើងវិញ, Blur ដោយ downscale (លឿនជាង filter), frame ដែលមិនមានអ្វីត្រូវគូរ → encode ត្រង់ៗ មិនឆ្លងកាត់ canvas */
  const cuesS=cues.slice().sort((a,b)=>a.s-b.s);let ci=0,capCv=null,capQ=null,ovCv=null,bcv=null;
  const mkCv=()=>{const z=document.createElement("canvas");z.width=w;z.height=h;return z};
@@ -1760,7 +1762,7 @@ async function doExportFast(){
  if(err)throw err;
  /* ---- Mux ---- */
  const blob=SPMP4.mux({w,h,vdesc,v:vs,fpsHint:dm.fps,a:{kind:ae.kind,sr:SR,ch:2,desc:adesc,fs:ae.fs,s:as},durUs:Math.round(durS*1e6)});
- dlBlob(fxOutName("mp4"),blob);window.__preDub=null;btn.innerHTML=old;
+ if(window.__zsNoBurn){await zsMp4Check(blob,{aN:as.length,sec:durS});await zsKeepSave(fxOutName("mp4"),blob)}else dlBlob(fxOutName("mp4"),blob);window.__preDub=null;btn.innerHTML=old;
  const sec=(performance.now()-T0)/1000;
  showToast(`⚡ Export លឿនរួច ${sec.toFixed(0)}s (${(durS/sec).toFixed(1)}× លឿនជាងពេលវីដេអូ)`+(dub?` • សំឡេងខ្មែរ ${dub.out.length}/${dub.total} ឃ្លា`+(dub.sped?` • បង្កើនល្បឿន ${dub.sped}`:"")+(delayed?` • ពន្យារ ${delayed} ឃ្លា`:"")+(dub.fail?` • បរាជ័យ ${dub.fail}`:""):""),!(dub&&dub.fail));
  return true}
@@ -2148,10 +2150,178 @@ async function doExportCopy(){
  return true}
 
 
+/* ===== V11.0 : Export "រក្សាវីដេអូដើម" — មុខងារថ្មី ដាច់ដោយឡែក (doExportKeep) =====
+   • មិនបម្លែង/មិន encode រូបភាពវីដេអូឡើងវិញ (ទុក video stream ដើមទាំងស្រុង) — ដូច្នេះលឿន ហើយគុណភាពដដែល
+   • មិនដុត Subtitle / Effect លើរូបភាពទេ (ទុកតែរូបភាពដើម + សំឡេងលាយរួច)
+   • Encode តែសំឡេង (AAC) រួចដាក់ជា audio track ថ្មីក្នុង MP4 ដើម
+   • ពិនិត្យរចនាសម្ព័ន្ធ MP4 (zsMp4Check) មុនរក្សាទុក — បើមិនត្រឹមត្រូវ មិនរាយការណ៍ថាជោគជ័យ
+   • រង់ចាំរក្សាទុកក្នុង Downloads ចប់ពិតប្រាកដ (zsKeepSave) រួចទើបប្រាប់ថារួច */
+function zsEsdsCheck(u8,s,e){
+ let i=-1;for(let p=s;p+4=e;p++)if(u8[p]===0x65&&u8[p+1]===0x73&&u8[p+2]===0x64&&u8[p+3]===0x73){i=p;break}
+ if(i0)return"គ្មាន esds";
+ let p=i+8;
+ const rl=()=>{let n=0,c,k=0;do{if(p>=e)throw 0;c=u8[p++];n=n*128+(c&127);k++}while((c&128)&&k4);return n};
+ try{
+  if(u8[p++]!==3)return"ES descriptor";
+  let L=rl();const esEnd=p+L;if(esEnd>e)return"ES length";
+  p+=2;const fl=u8[p++];if(fl&0x80)p+=2;if(fl&0x40)p+=1+u8[p];if(fl&0x20)p+=2;
+  if(u8[p++]!==4)return"DecoderConfig descriptor";
+  L=rl();const dEnd=p+L;if(dEnd>esEnd)return"DecoderConfig length";
+  if(u8[p]!==0x40)return"objectType";
+  p+=13;
+  if(u8[p++]!==5)return"AAC config (DecoderSpecificInfo) មិននៅត្រឹមកន្លែង";
+  L=rl();if(L2||p+L!==dEnd)return"AAC config length";
+  const aot=u8[p]>>3;if(aot!==2&&aot!==5&&aot!==29)return"AAC type "+aot;
+  return"";
+ }catch(x){return"esds អានមិនចេញ"}
+}
+async function zsMp4Check(blob,o){
+ o=o||{};
+ const bad=m=>{throw new Error("ឯកសារ MP4 មិនត្រឹមត្រូវ៖ "+m)};
+ const N=blob.size;if(!N)bad("ឯកសារទទេ");
+ const top=await zfTopBoxes(blob);
+ if(!top.length||top[top.length-1].end!==N)bad("ប្រអប់ខាងលើមិនគ្របដណ្តប់ឯកសារទាំងមូល");
+ const moovs=top.filter(t=>t.type==="moov");if(moovs.length!==1)bad("ចំនួន moov = "+moovs.length);
+ if(!top.some(t=>t.type==="mdat"))bad("គ្មាន mdat");
+ const mo=moovs[0];
+ const mv=new Uint8Array(await blob.slice(mo.start,mo.end).arrayBuffer()),dv=new DataView(mv.buffer);
+ const kids=zfBoxes(mv,mo.hdr,mv.length);
+ let nA=0,nV=0,aSamples=0,aSec=0;
+ for(const k of kids){
+  if(k.type!=="trak")continue;
+  const ti=zfTrakInfo(mv,k);if(!ti)continue;
+  const mdia=zfKid(mv,k,"mdia"),minf=mdia&&zfKid(mv,mdia,"minf"),stbl=minf&&zfKid(mv,minf,"stbl");
+  if(!stbl)bad("គ្មាន stbl");
+  const stsz=zfKid(mv,stbl,"stsz"),co=zfKid(mv,stbl,"stco")||zfKid(mv,stbl,"co64"),stsd=zfKid(mv,stbl,"stsd"),stsc=zfKid(mv,stbl,"stsc"),stts=zfKid(mv,stbl,"stts"),mdhd=zfKid(mv,mdia,"mdhd");
+  if(!stsz||!co||!stsd||!stsc||!stts||!mdhd)bad("តារាង sample មិនគ្រប់ ("+ti.handler+")");
+  const fixed=dv.getUint32(stsz.start+stsz.hdr+4),ns=dv.getUint32(stsz.start+stsz.hdr+8);
+  const is64=co.type==="co64",nc=dv.getUint32(co.start+co.hdr+4);
+  if(!ns||!nc)bad("track ទទេ ("+ti.handler+")");
+  const nsc=dv.getUint32(stsc.start+stsc.hdr+4),sc=[];
+  for(let i=0;insc;i++){const q=stsc.start+stsc.hdr+8+i*12;sc.push([dv.getUint32(q),dv.getUint32(q+4)])}
+  let si=0,sci=0;
+  for(let ci=0;cinc&&sins;ci++){
+   while(sci+1sc.length&&sc[sci+1][0]=ci+1)sci++;
+   const q=co.start+co.hdr+8+ci*(is64?8:4);
+   let off=is64?dv.getUint32(q)*4294967296+dv.getUint32(q+4):dv.getUint32(q);
+   for(let j=0;jsc[sci][1]&&sins;j++){
+    const z=fixed||dv.getUint32(stsz.start+stsz.hdr+12+si*4);
+    if(off0||off+z>N)bad("sample ("+ti.handler+" #"+si+") ហួសទំហំឯកសារ");
+    if(offmo.end&&off+z>mo.start)bad("sample ("+ti.handler+" #"+si+") ជាន់ moov");
+    off+=z;si++}
+  }
+  if(sins)bad("ចំនួន chunk មិនគ្រប់ ("+ti.handler+")");
+  if(ti.handler==="vide")nV++;
+  if(ti.handler==="soun"){
+   nA++;aSamples=ns;
+   const v1=mv[mdhd.start+mdhd.hdr]===1,ts=dv.getUint32(mdhd.start+mdhd.hdr+(v1?20:12));
+   const nt=dv.getUint32(stts.start+stts.hdr+4);let tot=0;
+   for(let i=0;int;i++){const q=stts.start+stts.hdr+8+i*8;tot+=dv.getUint32(q)*dv.getUint32(q+4)}
+   aSec=ts?tot/ts:0;
+   if(/mp4a/.test(String.fromCharCode.apply(null,mv.subarray(stsd.start,Math.min(stsd.end,stsd.start+40))))){
+    const r=zsEsdsCheck(mv,stsd.start,stsd.end);if(r)bad("សំឡេង AAC៖ "+r)}
+   else bad("សំឡេងមិនមែន AAC (Android ខ្លះចាក់មិនបាន)");
+  }
+ }
+ if(!nV)bad("គ្មាន video track");
+ if(nA!==1)bad("ចំនួន audio track = "+nA);
+ if(o.aN&&aSamples!==o.aN)bad("ចំនួន audio frame មិនត្រូវ ("+aSamples+" ≠ "+o.aN+")");
+ if(o.sec&&Math.abs(aSec-o.sec)>2)bad("រយៈពេលសំឡេង "+aSec.toFixed(1)+"s ≠ វីដេអូ "+o.sec.toFixed(1)+"s");
+ return{nV,nA,aSamples,aSec};
+}
+/* រក្សាទុកក្នុង Downloads ហើយរង់ចាំចប់ពិតប្រាកដ — បើ App រាយការណ៍កំហុស → throw (មិនបន្លំថាជោគជ័យ) */
+async function zsKeepSave(name,blob){
+ window.__zsSaveErr=null;
+ let ok=false;
+ try{ok=await zsFastSave(name,blob)}catch(e){window.__zsSaveErr=String((e&&e.message)||e)}
+ if(window.__zsSaveErr){const e=new Error("រក្សាទុកមិនបាន៖ "+window.__zsSaveErr+" (ប្រហែលទំហំទូរសព្ទពេញ)");e.fatal=true;throw e}
+ if(ok)return"app";
+ zsDlLegacy(name,blob);return"browser";
+}
+async function doExportKeep(){
+ const on=i=>!$$("#opts .b")[i].classList.contains("off"),btn=$("#exp"),old=btn.innerHTML,T0=performance.now();
+ const prog=(p,m)=>{btn.textContent="កំពុង Export "+Math.max(0,Math.min(99,Math.round(p)))+"%..."+(m?" • "+m:"")};
+ const fatal=m=>{const e=new Error(m);e.fatal=true;return e};
+ if(!file||!V.videoWidth)throw fatal("សូមជ្រើសវីដេអូជាមុន");
+ if(!(on(3)&&cues.length>0))throw fatal("Voice ត្រូវបានបិទ ឬគ្មាន SRT — គ្មានសំឡេងខ្មែរត្រូវដាក់ចូលវីដេអូទេ");
+ if(!/\.(mp4|m4v)$/i.test(file.name||"")&&!/mp4/i.test(file.type||""))throw new Error("វីដេអូមិនមែន MP4 — មិនអាចរក្សាវីដេអូដើមបាន");
+ if(typeof AudioEncoder!=="function"||typeof AudioData!=="function"||typeof OfflineAudioContext!=="function")throw new Error("Browser មិនមាន AudioEncoder");
+ prog(0,"កំពុងរៀបចំ");
+ const ae=await fxPickAudio();
+ if(!ae||ae.kind!=="aac")throw new Error("Browser មិនអាច encode សំឡេង AAC — ឯកសារ MP4 នឹងចាក់មិនបាន");
+ const P=await zfProbe(file);
+ if(!(P.sec>0.5))throw new Error("អានរយៈពេលវីដេអូមិនបាន");
+ AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+ const base=$("#bgm").value/100;
+ /* សំឡេងខ្មែរ */
+ let dub=window.__preDub||null;
+ if(!dub){btn.textContent="🎙 កំពុងបង្កើតសំឡេងខ្មែរ...";dub=await buildDub(btn);window.__preDub=dub}
+ if(!dub.out.length)throw fatal("បង្កើតសំឡេង TTS មិនបាន — ពិនិត្យអ៊ីនធឺណិត ឬ TTS Worker");
+ /* ភ្លេងអម (Background) */
+ await fxEnsureBgm(btn);
+ let bed=bgmBuf||null,noBed=false;
+ if(!bed){
+  if(file.size=4e8){try{bed=await AC.decodeAudioData(await file.arrayBuffer())}catch(e){bed=null}}
+  if(!bed){noBed=true}
+ }
+ const SR=ae.sr,total=Math.max(1,Math.round(P.sec*SR));
+ const {plan,delayed}=fxPlan(dub.out);
+ await fxEnsureSpeech();
+ const zonesA=fxZones(dub.out),zonesP=zonesA.map(z=>({st:z[0],en:z[1]}));
+ let wl=null;try{if(navigator.wakeLock)wl=await navigator.wakeLock.request("screen")}catch(e){}
+ const T1=performance.now(),frames=[];let asc=null,err=null;const QW=[];
+ const aenc=new AudioEncoder({output:(ch,meta)=>{const d=new Uint8Array(ch.byteLength);ch.copyTo(d);frames.push(d);
+  if(!asc&&meta&&meta.decoderConfig&&meta.decoderConfig.description)asc=fxCopy(meta.decoderConfig.description)},error:e=>{err=err||e}});
+ try{
+  aenc.configure({codec:ae.codec,sampleRate:SR,numberOfChannels:2,bitrate:ae.bitrate});
+  const B=fxBounds(total,SR,zonesP.concat(plan),150),NW=B.length-1;
+  const rw=q=>fxRenderWin(B[q],B[q+1],SR,bed,base,plan,base,true,zonesA);
+  let nq=0;while(nqMath.min(3,NW))QW.push(rw(nq++));
+  for(let k=0;kNW;k++){
+   if(err)throw err;
+   const cur=QW.shift();if(nqNW)QW.push(rw(nq++));
+   const buf=await cur,n=buf.length,pl=new Float32Array(n*2);
+   pl.set(buf.getChannelData(0),0);pl.set(buf.numberOfChannels>1?buf.getChannelData(1):buf.getChannelData(0),n);
+   aenc.encode(new AudioData({format:"f32-planar",sampleRate:SR,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(B[k]*1e6/SR),data:pl}));
+   while(aenc.encodeQueueSize>8&&!err)await fxWait(1);
+   prog((k+1)/NW*92);
+  }
+  await aenc.flush();if(err)throw err;
+ }finally{QW.forEach(x=>x.catch(()=>{}));try{aenc.close()}catch(e){}try{if(wl)wl.release()}catch(e){}}
+ const T2=performance.now();
+ if(!frames.length)throw new Error("Encode សំឡេងមិនបាន");
+ if(!asc)asc=new Uint8Array([0x12,0x10]);
+ /* ផ្គុំ MP4 (video ដើមមិនប៉ះពាល់) + ពិនិត្យ */
+ prog(93,"ផ្គុំវីដេអូ");
+ const blob=zfAssemble(P,frames,asc,SR,2);
+ prog(95,"ពិនិត្យឯកសារ");
+ const chk=await zsMp4Check(blob,{aN:frames.length,sec:P.sec});
+ /* រក្សាទុក */
+ prog(97,"កំពុងរក្សាទុក");
+ const via=await zsKeepSave(fxOutName("mp4"),blob);
+ window.__preDub=null;btn.innerHTML=old;
+ const sec=(performance.now()-T0)/1000;
+ showToast("⚡ Export រក្សាវីដេអូដើមរួច "+sec.toFixed(0)+"s [សំឡេង "+((T2-T1)/1000).toFixed(0)+"s] • "+(blob.size/1048576).toFixed(0)+" MB • សំឡេងខ្មែរ "+dub.out.length+"/"+dub.total+" ឃ្លា"+(delayed?" • ពន្យារ "+delayed:"")+(noBed?" • គ្មានភ្លេងអម":"")+(dub.fail?" • បរាជ័យ "+dub.fail:"")+(via==="browser"?" • (ទាញយកតាម Browser — សូមពិនិត្យ)":""),!(dub&&dub.fail));
+ return true;
+}
+
 async function doExport(){
  const T0x=performance.now(),tag=m=>{try{showToast("ℹ Export វិធី "+m,true)}catch(e){}},done=m=>{try{showToast("⏱ Export វិធី "+m+" ប្រើពេល "+Math.round((performance.now()-T0x)/1000)+" វិនាទី",true)}catch(e){}};
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
  const btn=$("#exp"),old=btn.innerHTML,on=i=>!$$("#opts .b")[i].classList.contains("off");
+ /* V11.0 : Export ថ្មី (រក្សាវីដេអូដើម, គ្មាន Subtitle). វិធីចាស់ខាងក្រោមនៅដដែល — អាចបើកវិញដោយ window.__zsOldExport=true */
+ if(window.__zsOldExport!==true){
+  const why=[];
+  try{tag("KEEP: រក្សាវីដេអូដើម + សំឡេងថ្មី (គ្មាន Subtitle)");if(await doExportKeep()){done("KEEP");return}}
+  catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("keep export:",e);why.push(String((e&&e.message)||e));
+   showToast("⚠ Export រក្សាវីដេអូដើមមិនបាន ("+why[0].slice(0,90)+") — ប្រើវិធី encode វីដេអូឡើងវិញ (គ្មាន Subtitle)",false)}
+  if(fxSupported()){
+   try{window.__zsNoBurn=true;tag("B: Encode វីដេអូឡើងវិញ (គ្មាន Subtitle)");if(await doExportFast()){done("B");return}}
+   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("fast export:",e);why.push(String((e&&e.message)||e))}
+   finally{window.__zsNoBurn=false}
+  }else why.push("Browser មិនគាំទ្រ WebCodecs");
+  throw new Error("Export មិនបាន៖ "+why.join(" | ").slice(0,200));
+ }
  const burn=on(0)&&cues.length>0,eff=burn||(on(4)&&!!(O.blur||O.logo||O.text));
  if(!eff&&typeof AudioEncoder==="function"){
   try{tag("A: ចម្លងវីដេអូ+សំឡេងថ្មី (លឿនបំផុត)");if(await doExportCopy()){return}}
@@ -4852,7 +5022,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"10.9",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"11.0",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -5098,7 +5268,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="10.9";
+  var EMB="11.0";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
