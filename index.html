@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"11.5";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"11.6";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -3135,6 +3135,19 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     for(var i=a;i=b;i++)if(sp.S[i]>=sp.thr)n++;
     return n*sp.F;
   }
+  function gemTSim(a,b){
+    var PU=/[\s，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g;
+    a=String(a).replace(PU,"");b=String(b).replace(PU,"");
+    if(!a||!b)return 0;
+    if(a===b)return 1;
+    if(a.indexOf(b)>=0||b.indexOf(a)>=0)return Math.min(a.length,b.length)>=2?0.95:0.6;
+    if(a.length2||b.length2)return 0;
+    var A2={},B2={},n1=0,n2=0,i,k,inter=0;
+    for(i=0;ia.length-1;i++){k=a.substr(i,2);A2[k]=(A2[k]||0)+1;n1++}
+    for(i=0;ib.length-1;i++){k=b.substr(i,2);B2[k]=(B2[k]||0)+1;n2++}
+    for(k in A2)if(B2[k])inter+=Math.min(A2[k],B2[k]);
+    return 2*inter/(n1+n2);
+  }
   function gemTChars(arr){
     var n=0;(arr||[]).forEach(function(g){n+=String(g.text||"").replace(/[\s，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g,"").length});
     return n;
@@ -3295,16 +3308,27 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
       }
     }catch(_){}
     segs.sort(function(a,b){return a.start-b.start;});
-    var merged=[];
+    /* V11.6: លុបបន្ទាត់ស្ទួនដែលសរសេរខុសគ្នាបន្តិច (ផ្នែកជិតគ្នាស្តាប់ឃើញពាក្យដូចគ្នា) — ប្រៀបធៀប ៤ បន្ទាត់ចុងក្រោយ តាមភាពស្រដៀងអក្សរ */
+    var merged=[],dupN=0;
     segs.forEach(function(g){
-      var p=merged[merged.length-1];
-      if(p&&g.startp.end-0.1){
-        var n1=p.text.replace(PUN,""),n2=g.text.replace(PUN,"");
-        if(n1===n2||n1.indexOf(n2)>=0||n2.indexOf(n1)>=0){if(g.text.length>p.text.length)p.text=g.text;p.end=Math.max(p.end,g.end);return;}
+      var hit=null,j,q,ov,sm;
+      for(j=merged.length-1;j>=0&&j>=merged.length-4;j--){
+        q=merged[j];
+        ov=Math.min(q.end,g.end)-Math.max(q.start,g.start);
+        sm=gemTSim(q.text,g.text);
+        if((ov>0.1&&sm>=0.55)||(Math.abs(q.start-g.start)1.2&&sm>=0.85)){hit=q;break;}
       }
+      if(hit){
+        var l1=String(hit.text).replace(PUN,"").length,l2=String(g.text).replace(PUN,"").length;
+        if(l2>l1){hit.text=g.text;hit.start=g.start;hit.end=g.end;}
+        else if(l2===l1){hit.start=(hit.start+g.start)/2;hit.end=(hit.end+g.end)/2;}
+        dupN++;return;
+      }
+      var p=merged[merged.length-1];
       if(p&&g.startp.end)p.end=Math.max(p.start+0.2,g.start-0.02);
       merged.push({start:g.start,end:g.end,text:g.text});
     });
+    try{window.__zsfGemStat.dup=dupN;}catch(_){}
     var prof=__prof0;
     var m={segments:merged,words:[],__profile:prof},gh=null;
     try{gh=zsfCleanGhost(m);merged=m.segments;}catch(_){}
@@ -3778,7 +3802,7 @@ async function zsfTranscribeGeminiMain(){
     setC(subs.map(function(x){return {s:x.start/1000,e:x.end/1000,t:x.text}}));
     var notes=[],gh=r.ghost;
     if(gh&&gh.dup)notes.push("👻 លុបអក្សរស្ទួន "+gh.dup+" បន្ទាត់");
-    if(r.stat)notes.push("📊 Gemini ឆ្លើយ "+r.stat.raw+" បន្ទាត់ → សល់ "+subs.length+(r.stat.ghost?" • លុបសំឡេងខ្មោច "+r.stat.ghost:"")+(r.stat.snap?" • តម្រឹមពេល "+r.stat.snap:""));
+    if(r.stat)notes.push("📊 Gemini ឆ្លើយ "+r.stat.raw+" បន្ទាត់ → សល់ "+subs.length+(r.stat.dup?" • លុបស្ទួន "+r.stat.dup:"")+(r.stat.ghost?" • លុបសំឡេងខ្មោច "+r.stat.ghost:"")+(r.stat.snap?" • តម្រឹមពេល "+r.stat.snap:""));
     if(r.recovered)notes.push("🔁 ស្តាប់ឡើងវិញតាមកំណាត់ខ្លី "+r.recovered+" ផ្នែក");
     if(r.gapFilled)notes.push("🔎 បំពេញឃ្លាដែលបាត់ "+r.gapFilled+" បន្ទាត់");
     if(r.failed&&r.failed.length)notes.push("⚠ ផ្នែកបរាជ័យ (វិនាទីចាប់ផ្តើម): "+r.failed.join(", ")+" — សូមចុចម្តងទៀត");
@@ -5187,7 +5211,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"11.5",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"11.6",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -5433,7 +5457,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="11.5";
+  var EMB="11.6";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
