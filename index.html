@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"10.6";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"10.8";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -765,7 +765,7 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
  div class="pane" id="p-bgm">
   button class="b vio big" id="voc">span class="vl">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M4 10v4M8 6.5v11M12 3v18M16 7v10M20 10v4"/>/svg>/span>🚀 បង្កើត / លុបសំឡេងច្រៀង (Generate Remove Vocal)/button>
   div class="card in" style="border-color:#5b2a6e;background:rgba(70,20,80,.25)">div class="row" style="align-items:center">b style="flex:none;color:#e879f9">span class="ip2">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M9 18V5.5l11-2V16"/>circle cx="6" cy="18" r="3" fill="currentColor"/>circle cx="17" cy="16" r="3" fill="currentColor"/>/svg>/span> BGM:/b>input type="range" id="bgm" min="0" max="100" value="30" style="accent-color:#d946ef">span class="badge" style="flex:none;color:#e879f9;border-color:#7a2b8e" id="bgmv">30%/span>/div>/div>
-  div class="card in" id="syncCard" style="margin-top:12px">div class="t" style="font-size:16px">⏱ ត្រូវមាត់ — ពន្យារសំឡេងខ្មែរ/div>div class="row" style="align-items:center">button class="b" id="dlyM" style="flex:1">−/button>div id="dlyV" style="flex:1.6;text-align:center;font-weight:800;font-size:18px">+150 ms/div>button class="b" id="dlyP" style="flex:1">+/button>/div>div style="font-size:12px;color:var(--mut)">សំឡេងនិយាយមុនមាត់ → ចុច + · សំឡេងក្រោយមាត់ → ចុច − (ម្តង 25 ms)/div>/div>div class="card in" id="duckCard" style="margin-top:12px">div class="t" style="font-size:16px">🔉 សំឡេងឥទ្ធិពលក្នុងពេលតួនិយាយ (សើច/ដាវ)/div>div class="row" style="align-items:center">input type="range" id="duckR" min="0" max="100" step="5" value="25" style="flex:1" oninput="try{localStorage.setItem('zsf_duck',this.value/100)}catch(e){}document.getElementById('duckV').textContent=this.value+'%'">b id="duckV" style="width:60px;text-align:center;font-size:18px">25%/b>/div>div style="font-size:12px;color:var(--mut)">0% = បិទទាំងអស់ (គ្មានសំឡេងតួ តែក៏គ្មានសំឡេងសើច) · កើនឡើង = ឮសំឡេងសើច/ដាវច្រើន តែអាចលេចសំឡេងតួបន្តិច/div>/div>
+  
  /div>
 /section>
 
@@ -984,7 +984,7 @@ jp:f('rect width="30" height="20" fill="#fff"/>circle cx="15" cy="10" r="6
 const L=[["auto",ICO.globe+" ស្វ័យប្រវត្តិ"],["zh",FL.cn+"ចិន"],["en",FL.us+"អង់គ្លេស"],["ko",FL.kr+"កូរ៉េ"],["ja",FL.jp+"ជប៉ុន"]],M=[["whisper-large-v3-turbo","⚡ Turbo"],["whisper-large-v3","🎯 V3 (ណែនាំ)"],["sens","📴 SenseVoice"]];
 function chips(id,l,g,s,cls){$(id).innerHTML=l.map(([x,n])=>`button class="b ${g()===x?cls:""}" data-v="${x}" style="${id=="#langs"?"flex:none;padding:10px 14px":""}">${n}/button>`).join("");$$(id+" .b").forEach(b=>b.onclick=()=>{s(b.dataset.v);chips(id,l,g,s,cls)})}
 chips("#langs",L,()=>lang,x=>lang=x,"sel");chips("#models",M,()=>model,x=>model=x,"pur");
-$("#gap").oninput=e=>$("#gapv").textContent=(+e.target.value).toFixed(2)+"s";$("#bgm").oninput=e=>$("#bgmv").textContent=e.target.value+"%";
+$("#gap").oninput=e=>$("#gapv").textContent=(+e.target.value).toFixed(2)+"s";$("#bgm").oninput=e=>{$("#bgmv").textContent=e.target.value+"%";try{localStorage.setItem("zsf_bgm",e.target.value)}catch(_){}};
 const lg=m=>$("#log").textContent+=m+"\n";
 /* Groq ASR: see zsfTranscribeGroqMain (end of file) */
 
@@ -3624,6 +3624,7 @@ var g=document.getElementById("gap"),b=document.getElementById("bgm");
 if(g){g.min=.05;g.max=.5;g.step=.05;if(+g.value>.5)g.value=.5}
 if(b){b.min=5;b.max=60;b.step=5}
 mk("gap",9,"cy");mk("bgm",11,"mg");
+try{var sv=parseInt(localStorage.getItem("zsf_bgm"));if(b&&isFinite(sv)){sv=Math.max(5,Math.min(60,Math.round(sv/5)*5));b.value=sv;var bv=document.getElementById("bgmv");if(bv)bv.textContent=sv+"%";b.dispatchEvent(new Event("input"))}}catch(_){}
 var ip=document.querySelector("#p-bgm .ip2");if(ip)ip.innerHTML='svg viewBox="0 0 24 24" fill="currentColor">circle cx="8" cy="18" r="3.6"/>rect x="11" y="3" width="2.6" height="15"/>path d="M13.6 3c2 3.5 5 3.5 5 8-1.5-2.5-3-3-5-3z"/>/svg>';
 })()/script>script>
 /* ===== V16: Groq (4 Keys ដំណាលគ្នា) + បកប្រែ + អានសំឡេង + ភ្លេងអម (FFmpeg ដូច APK) + 1-Click ៥ Step ===== */
@@ -3879,36 +3880,6 @@ async function makeBgm(prog){
  try{var r2=await makeBgmJS(prog);window.__bgmMethod="Filter";return r2}
  catch(e){console.warn("makeBgmJS",e);prog(3,"🎶 ប្តូរទៅ FFmpeg...");var r3=await makeBgmFF(prog);window.__bgmMethod="FFmpeg";return r3}
 }
-/* V10.6 : ប៊ូតុងសាកល្បងកាត់ BGM (AI) ដាច់ដោយឡែក — ស្ដាប់លទ្ធផលភ្លាមៗ មិនបាច់រង់ចាំ Export ទាំងមូល */
-(function(){
- function mk(){
-  var ex=document.getElementById("exp");
-  if(!ex||document.getElementById("zsBgmTest"))return;
-  var T0="🎶 សាកល្បងកាត់ BGM (AI) — ស្ដាប់ម្ដងមើល",st=0,src=null;
-  var b=document.createElement("button");b.id="zsBgmTest";b.className=ex.className;b.style.marginTop="10px";b.textContent=T0;
-  function stop(){try{if(src){src.onended=null;src.stop()}}catch(_){}src=null;b.textContent="▶ ស្ដាប់ភ្លេងអម ("+(window.__bgmMethod||"")+") — ចុចម្ដងទៀតដើម្បីស្ដាប់";st=1}
-  b.onclick=async function(){
-   if(st===2){stop();return}
-   if(st===1){
-    try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")await AC.resume();
-     src=AC.createBufferSource();src.buffer=bgmBuf;src.connect(AC.destination);src.onended=stop;src.start();st=2;b.textContent="⏹ បញ្ឈប់ការស្ដាប់ (ចុចដើម្បីបញ្ឈប់)"}
-    catch(e){showToast("ស្ដាប់មិនបាន: "+String(e.message).slice(0,60),false)}
-    return}
-   if(st===3)return;
-   if(typeof file==="undefined"||!file){showToast("សូមជ្រើសវីដេអូជាមុនសិន",false);return}
-   st=3;bgmBuf=null;var t0=Date.now();
-   try{
-    await makeBgm(function(p,m){b.textContent="🎶 "+Math.round(p)+"% "+String(m||"").replace(/^🎶\s*/,"").slice(0,38)});
-    var sec=Math.round((Date.now()-t0)/1000),how=window.__bgmMethod||"?";
-    showToast((how==="AI"?"✅ AI ជោគជ័យ":"⚠ ប្រើ "+how+" (AI មិនដំណើរការ: "+String(window.__bgmNativeErr||"").slice(0,70)+")")+" • ប្រើពេល "+sec+" វិនាទី",how==="AI");
-    st=1;b.textContent="▶ ស្ដាប់ភ្លេងអម ("+how+", "+sec+"s)";
-   }catch(e){st=0;b.textContent=T0;showToast("❌ បរាជ័យ: "+String(e&&e.message||e).slice(0,90),false)}
-  };
-  ex.parentNode.insertBefore(b,ex.nextSibling);
- }
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mk);else mk();
- setTimeout(mk,1500);
-})();
 async function makeBgmNative(prog){
  var N=window.ZSNative;
  if(!(N&&typeof N.separateBgm==="function"))throw new Error("no native AI");
@@ -4881,7 +4852,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"10.6",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"10.8",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -5127,7 +5098,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="10.6";
+  var EMB="10.8";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
