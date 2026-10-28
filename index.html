@@ -5671,7 +5671,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
     if(s00||s10)throw new Error("ឯកសារដែលទាញមកមិនត្រឹមត្រូវ");
     var html=w.slice(s0+12,s1).split("\uE000").join("");
     if(html.length100000||html.indexOf("ZERO SUB FLASH")0)throw new Error("ឯកសារដែលទាញមកមិនត្រឹមត្រូវ");
-    if(!nv||nv!==REMV)throw new Error("index.html លើ GitHub គឺ v"+(nv||"?")+" តែ version.txt គឺ v"+REMV+" — ផ្ទុកឡើងទាំងពីរឱ្យត្រូវគ្នា ឬសាកម្តងទៀតក្រោយ ៥ នាទី (cache)");
+    if(!nv)throw new Error("ឯកសារដែលទាញមកមិនត្រឹមត្រូវ");
     if(!newer(nv,ZSF_VER))throw new Error("GitHub មានតែ v"+nv+" — មិនថ្មីជាងកំណែបច្ចុប្បន្ន v"+ZSF_VER);
     await idbPut({ver:nv,html:html});
     try{localStorage.removeItem("zsf_upd_try")}catch(e){}
@@ -5828,7 +5828,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="13.4";
+  var EMB="13.5";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
