@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"10.8";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"10.9";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -3454,7 +3454,7 @@ var prep=function(g){return (async function(){try{
       for(var w=0;wwins.length;w++){
         var W=wins[w],widx=[];for(var z=W.a;z=W.b;z++)widx.push(z);
         if(widx.length>40)continue;
-        if(window.__zsfTagAbort||Date.now()-__tTag0>420000){prog("🎭 រំលងការពិនិត្យឡើងវិញ (យូរពេក)",9);break}prog("🎭 ពិនិត្យឡើងវិញបន្ទាត់មិនច្បាស់ "+(w+1)+"/"+wins.length,10);
+        if(window.__zsfTagAbort||Date.now()-__tTag0>150000){prog("🎭 រំលងការពិនិត្យឡើងវិញ (យូរពេក)",9);break}prog("🎭 ពិនិត្យឡើងវិញបន្ទាត់មិនច្បាស់ "+(w+1)+"/"+wins.length,10);
         var c0=Math.max(0,times(srtBlocks[widx[0]]).s-PAD*1000),c1=times(srtBlocks[widx[widx.length-1]]).e;
         var wv=b64(sliceWav(A.ab,A.info,Math.max(0,c0/1000-A.offset),(c1/1000+PAD)-A.offset));
         var wl=widx.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-c0)+" --> "+fmtT(t.e-c0),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,"")};});
@@ -3844,7 +3844,7 @@ async function groqTranscribe(prog){
  if(err)throw err;
  var segs=[].concat.apply([],res.map(function(x){return x||[]}));
  var gap=+$("#gap").value,H=(typeof ZSF_HALLUC!=="undefined")?ZSF_HALLUC:null;
- var out=segs.filter(function(x){return x.t&&!(H&&H.test(x.t))}).map(function(x){return {s:x.s,e:Math.max(x.s+.25,x.e),t:x.t}});
+ var __rawN=segs.length;var out=segs.filter(function(x){return x.t&&!(H&&H.test(x.t))});window.__zsfGqStat={raw:__rawN,kept:out.length,dropped:__rawN-out.length,chunks:total};out=out.map(function(x){return {s:x.s,e:Math.max(x.s+.25,x.e),t:x.t}});
  try{var _ad=await zsfGapFill(pcm,out,keys,prog);if(_ad)prog(99,"✅ ស្តារបានបន្ថែម "+_ad+" ឃ្លា")}catch(e){console.warn(e)}
  try{out=zsfSnapCues(pcm0,out)}catch(e){console.warn("snap",e)}
  out.sort(function(a,b){return a.s-b.s});
@@ -3858,7 +3858,7 @@ async function zsfTranscribeGroqMain(){
  try{
   $("#log").textContent="";
   var out=await groqTranscribe(function(p,m){setProgress(p,m)});
-  setC(out);setProgress(100,"✅ ទាញអក្សរ Groq រួចរាល់ • "+out.length+" ឃ្លា",window.__fstep||1);
+  setC(out);var __st=window.__zsfGqStat||{};setProgress(100,"✅ ទាញអក្សរ Groq រួចរាល់ • "+out.length+" ឃ្លា"+(__st.dropped?" (ត្រង "+__st.dropped+" ឃ្លាលំអៀង/ស្ទួនចោល)":""),window.__fstep||1);
   showV32Diag("Groq ស្តាប់សំឡេង • "+out.length+" ឃ្លា",true);
  }catch(e){
   var msg=String((e&&e.message)||e||"").slice(0,420);
@@ -3991,7 +3991,7 @@ async function translateAll(){var Z0=zsfSnap();
 async function tagSpeakers(){
  if(!K.filter(Boolean).length||typeof window.zsfAutoClassifyTags!=="function")return;
  window.__zsfTagAbort=false;
- try{cuesToBlocks();window.__zsfForceTag=true;var __tp=window.zsfAutoClassifyTags(),__tid;await Promise.race([__tp,new Promise(function(r){__tid=setTimeout(function(){window.__zsfTagAbort=true;try{showToast("⏱ ចែកតូយូរពេក — បន្តជំហានបន្ទាប់",false)}catch(e){}r()},900000)})]);clearTimeout(__tid);renderEditor()}catch(e){try{renderEditor()}catch(_){}}
+ try{cuesToBlocks();window.__zsfForceTag=true;var __tp=window.zsfAutoClassifyTags(),__tid;await Promise.race([__tp,new Promise(function(r){__tid=setTimeout(function(){window.__zsfTagAbort=true;try{showToast("⏱ ចែកតូយូរពេក — បន្តជំហានបន្ទាប់",false)}catch(e){}r()},360000)})]);clearTimeout(__tid);renderEditor()}catch(e){try{renderEditor()}catch(_){}}
 }
 
 /* ---------- ផ្ទាំងរើស Gemini / Groq ---------- */
@@ -4852,7 +4852,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"10.8",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"10.9",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -5098,7 +5098,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="10.8";
+  var EMB="10.9";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
