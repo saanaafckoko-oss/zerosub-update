@@ -689,7 +689,7 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
   div>div class="lbl">កម្រិតសំឡេង (Volume)/div>div class="step" data-k="level">/div>/div>
   div>div class="lbl">កម្រិតអេកូ (Echo)/div>div class="step" data-k="echo">/div>/div>
   div>div class="lbl">Auto Speed %/div>div class="step" data-k="auto">/div>/div>
-  div>div class="lbl">EQ Preset/div>select class="sel2" id="eq" style="padding:15px">option value="studio">✨ ស្ទូឌីយោ (ពិរោះ ស្រាល)/option>option value="phone">📱 ស្រួយភ្លឺ (ទូរសព្ទ)/option>option value="narr">🎙 និទានរឿង (ច្បាស់)/option>option value="warm">📻 បាសកក់ក្តៅ (សំឡេងទ្រូង)/option>option value="fairy">🧚 និទានរឿងព្រេង/option>option value="pod">📻 ផតខាស្ត/option>option value="flat">🎚 សំឡេងដើម (Flat)/option>/select>/div>
+  div>div class="lbl">EQ Preset/div>select class="sel2" id="eq" style="padding:15px">option value="ref">🎯 ពិសិដ្ឋ និងស្រីមុំគំរូ/option>option value="studio">✨ ស្ទូឌីយោ (ពិរោះ ស្រាល)/option>option value="phone">📱 ស្រួយភ្លឺ (ទូរសព្ទ)/option>option value="narr">🎙 និទានរឿង (ច្បាស់)/option>option value="warm">📻 បាសកក់ក្តៅ (សំឡេងទ្រូង)/option>option value="fairy">🧚 និទានរឿងព្រេង/option>option value="pod">📻 ផតខាស្ត/option>option value="flat">🎚 សំឡេងដើម (Flat)/option>/select>/div>
  /div>
  div class="row">button class="b" id="tryV" style="flex:1.7;font-size:14px;padding:14px 4px">span class="ia">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/>path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/>/svg>/span> សាកល្បងសំឡេង/button>button class="b acc" id="saveP" style="font-size:14px;padding:14px 4px">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">path d="M7 19a5 5 0 0 1-.7-9.95A6.5 6.5 0 0 1 18.7 9.6 4.7 4.7 0 0 1 18 19H7z"/>path d="M12 16.5v-6M9.3 13l2.7-2.7 2.7 2.7" style="stroke:var(--dk,#10172b)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>/svg> រក្សាទុក/button>button class="b gold" id="gen" style="font-size:14px;padding:14px 4px">កំណត់ទូទៅ svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M6 15l6-6 6 6"/>/svg>/button>/div>
 
@@ -807,7 +807,7 @@ $("#gen").onclick=()=>{S.set("genOpen",!S.get("genOpen",true));genView()};
 $("#eq").onchange=()=>{P[slot].eq=$("#eq").value};
 $("#resetP").onclick=()=>{P=[{},{},{},{}];S.set("pre",P);steps();__msg("✅ បានកំណត់ Preset សំឡេងតួទាំង ៤ ទៅជាលំនាំដើម (Default)")};
 /* preset -> sound (WebAudio). presetOf(slot) + playFx(blob,preset) សម្រាប់ភ្ជាប់ TTS ក្រោយ */
-const presetOf=i=>{const o=P[i]||{},r={};Object.keys(D).forEach(k=>r[k]=o[k]??D[k][0]);let q=EQ_ALIAS[o.eq]||o.eq;r.eq=EQ_PRESETS[q]?q:"studio";return r};
+const presetOf=i=>{const o=P[i]||{},r={};Object.keys(D).forEach(k=>r[k]=o[k]??D[k][0]);let q=EQ_ALIAS[o.eq]||o.eq;r.eq=EQ_PRESETS[q]?q:"studio";if(r.eq==="ref"&&i%2===1)r.eq="ref1";return r};
 let FXC=null,FXS=null;
 function stopFx(){try{FXS&&FXS.stop()}catch(e){}FXS=null}
 /* បណ្តាញ Effect តាម Preset: src → Bass → Volume → EQ → Level → Compressor → out (+ Echo) */
@@ -820,7 +820,9 @@ const EQ_PRESETS={
  warm:{b:[[330,1.2,-3.5],[150,1.2,1.2],[1400,1,1.5],[2800,1,2.2],[8500,1.2,2.2]],c:[-19,2.6,20,150,1.8]},
  fairy:{b:[[320,1.2,-3.2],[160,1.2,1],[2700,1,2.8]].concat([[4500,1.2,1.8]]),t:[10000,2.5],c:[-18,2.8,14,120,2]},
  pod:{hp:85,b:[[320,1.2,-3.5],[160,1.2,.8],[1200,1,1],[2700,1,2.8],[9000,1.2,2.2]],c:[-18,2.5,15,120,1.8]},
- flat:{b:[]}
+ flat:{b:[]},
+ ref:{hp:70,b:[[150,1.1,1.2],[320,1.2,-1.2],[1400,.9,-1.8],[3000,1,-.8]],t:[6000,-2.5],c:[-21,3,12,160,2.2]},
+ ref1:{hp:70,b:[[220,1.1,.8],[330,1.2,-1],[1500,.9,-1.5],[2600,1,-1.2]],t:[6000,-2.5],c:[-21,3,12,160,2.2]}
 };
 const EQ_ALIAS={bass:"warm",clear:"narr"};
 /* បណ្តាញ Effect តាម Preset: src → Bass → Volume High+Mid → EQ Preset → Level → Compressor → Limiter → out (+ Echo) */
@@ -1125,7 +1127,7 @@ async function doSplit(){
   }
   const dir=nat?String(prep.path).replace(/[^\/]+$/,""):"";
   const natCut=async i=>{
-   const out="sp"+Date.now()+"_"+i+"."+oe,fname=`${base}_${pad3(i+1)}.${oe}`,tag=`✂️ កំពុងកាត់ភាគ ${i+1}/${n} (Native`+(cutPrecise?" • ច្បាស់លាស់)":" • លឿន)");
+   const out="sp"+Date.now()+"_"+i+"."+oe,fname=`${base}_EP${String(i+1).padStart(2,"0")}.${oe}`,tag=`✂️ កំពុងកាត់ភាគ ${i+1}/${n} (Native`+(cutPrecise?" • ច្បាស់លាស់)":" • លឿន)");
    say(tag+" ...");
    const a=["-y","-ss",String(i*stp),"-i",prep.path,"-t",String(stp),"-map","0:v:0?","-map","0:a?"];
    if(cutPrecise)a.push("-c:v","libx264","-preset","ultrafast","-crf","23","-pix_fmt","yuv420p","-c:a","aac","-b:a","128k");
@@ -1162,7 +1164,7 @@ async function doSplit(){
      a.push("-avoid_negative_ts","make_zero","-y",out);
      st="កាត់ភាគ "+(i+1);await runFF(f,a);
      st="អានលទ្ធផលភាគ "+(i+1);const d=await f.readFile(out);
-     dlBlob(`${base}_${pad3(i+1)}.${oe}`,new Blob([d],{type:bt}));
+     dlBlob(`${base}_EP${String(i+1).padStart(2,"0")}.${oe}`,new Blob([d],{type:bt}));
      await f.deleteFile(out);await pause(1200);return;
     }catch(x){
      if(at===1)throw new Error(st+": "+errTxt(x));
@@ -3845,6 +3847,21 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     out.sort(function(a,b){return a.li-b.li});
     return {srt:out.map(function(o,i){return (i+1)+"\n"+lines[o.li].time+"\n"+o.text+"\n"}).join("\n")};
   };
+  function zsfPitchSplit(A){
+    var vals=[];
+    srtBlocks.forEach(function(b){var t=times(b),h=f0Of(A,t.s,t.e);if(h>=70&&h=450)vals.push(Math.log(h));});
+    if(vals.length8)return null;
+    var c1=Math.log(120),c2=Math.log(220),n1=0,n2=0;
+    for(var it=0;it30;it++){
+      var s1=0,s2=0;n1=0;n2=0;
+      vals.forEach(function(v){if(Math.abs(v-c1)=Math.abs(v-c2)){s1+=v;n1++}else{s2+=v;n2++}});
+      if(!n1||!n2)return null;
+      c1=s1/n1;c2=s2/n2;
+    }
+    if(n13||n23||(c2-c1)Math.log(1.3))return null;
+    var th=(c1+c2)/2;
+    return {lo:Math.exp(th-0.14),hi:Math.exp(th+0.14)};
+  }
   window.zsfAutoClassifyTags=async function(){
     if(!Array.isArray(srtBlocks)||!srtBlocks.length)return;
     var f=(window.__zsfMedia&&window.__zsfMedia.file)||null;
@@ -3856,9 +3873,9 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     prog("🎭 កំពុងរៀបចំសំឡេង សម្រាប់ចាប់ប្រុស/ស្រី...",1);
     var A=await getAudio(f),bps=A.info.fmt.sr*(A.info.fmt.ba||2);
     var V=null;try{V=await openVideo(f);}catch(_){V=null;}
-    var maxLines=V?30:40;
+    var maxLines=V?20:24;
     var __chm=0;try{__chm=parseInt(localStorage.getItem("zsf_gem_chunks"),10)||0}catch(_){}
-    var maxSec=Math.max(20,Math.min(100,Math.floor(11*1024*1024/bps))),PAD=3,groups=[],cur=[];
+    var maxSec=Math.max(20,Math.min(60,Math.floor(11*1024*1024/bps))),PAD=3,groups=[],cur=[];
     if(__chm!==0)maxSec=Math.min(maxSec,__chm0?Math.min(180,-__chm)+2*PAD:66);
     srtBlocks.forEach(function(b,i){var t=times(b);
       if(cur.length){var span=(t.e-times(srtBlocks[cur[0]]).s)/1000;if(span>maxSec-2*PAD||cur.length>=maxLines){groups.push(cur);cur=[];}}
@@ -3914,7 +3931,7 @@ var prep=function(g){return (async function(){try{
         }
       }
       srtBlocks.forEach(function(b,i){var m=TAG_RE.exec(b.text||"");if(m&&+m[1]>=3)mark(i,4,"T");});
-      try{srtBlocks.forEach(function(b,i){var m=TAG_RE.exec(b.text||"");if(!m)return;var tt=times(b),h=f0Of(A,tt.s,tt.e);if(!h)return;var male=(+m[1])%2===1;if((male&&h>195)||(!male&&h125))mark(i,5,"P");});}catch(_){}
+      var PS=null;try{PS=zsfPitchSplit(A)}catch(_){}try{srtBlocks.forEach(function(b,i){var m=TAG_RE.exec(b.text||"");if(!m)return;var tt=times(b),h=f0Of(A,tt.s,tt.e);if(!h)return;var male=(+m[1])%2===1;if(PS?((male&&h>=PS.hi)||(!male&&h=PS.lo)):((male&&h>195)||(!male&&h125)))mark(i,5,"P");});}catch(_){}
       var sl=Object.keys(sus).map(Number).sort(function(a,b){return (sus[b]-sus[a])||(a-b)}).slice(0,24).sort(function(a,b){return a-b}),wins=[];
       sl.forEach(function(i){var a0=Math.max(0,i-2),b0=Math.min(srtBlocks.length-1,i+2),L=wins[wins.length-1];
         if(L&&a0=L.b+1){L.b=Math.max(L.b,b0);L.t.push(i);}else wins.push({a:a0,b:b0,t:[i]});});
@@ -3943,7 +3960,14 @@ var prep=function(g){return (async function(){try{
       }
       await Promise.all(rcIn.map(function(r){return r.p}));
     }catch(e){console.warn("recheck pass",e);}
-    try{window.__zsfTagReport="ZSF "+(window.__ZSF_VER||"")+" tag report | line = id | tag | pitchHz | flags (P=pitch conflict T=thought L=low conf M=lip moves in thought S=still lips in speech F=isolated flip >x=changed by recheck to x)\n"+srtBlocks.map(function(b,i){var m=TAG_RE.exec(b.text||""),tt=times(b),h=0;try{h=f0Of(A,tt.s,tt.e)}catch(_){}return "#"+b.id+"|"+(m?m[1]:"-")+"|"+h+"|"+((typeof why!=="undefined"&&why[i])||"")}).join("\n")}catch(_){}
+    var flipped=0;
+    try{if(PS){srtBlocks.forEach(function(b,i){
+      var tx=String(b.text||""),ms=tx.match(/\[[1-4]\]/g);if(!ms||ms.length!==1)return;
+      var m=TAG_RE.exec(tx);if(!m)return;var tt=times(b),h=f0Of(A,tt.s,tt.e);if(!h)return;
+      var tg=+m[1],male=tg%2===1;
+      if((male&&h>=PS.hi)||(!male&&h=PS.lo)){b.text=applyTag(tx,male?tg+1:tg-1);flipped++;try{why[i]=(why[i]||"")+"A"}catch(_){}}
+    });}}catch(e){console.warn("pitch arbitration",e)}
+    try{window.__zsfTagReport="ZSF "+(window.__ZSF_VER||"")+" tag report | line = id | tag | pitchHz | flags (A=fixed by pitch P=pitch conflict T=thought L=low conf M=lip moves in thought S=still lips in speech F=isolated flip >x=changed by recheck to x)\n"+srtBlocks.map(function(b,i){var m=TAG_RE.exec(b.text||""),tt=times(b),h=0;try{h=f0Of(A,tt.s,tt.e)}catch(_){}return "#"+b.id+"|"+(m?m[1]:"-")+"|"+h+"|"+((typeof why!=="undefined"&&why[i])||"")}).join("\n")}catch(_){}
     closeVideo();
     try{renderEditor();saveData();}catch(_){}
     if(done>0&&failed===0)lastKey=key;
@@ -4552,7 +4576,7 @@ async function tagSpeakers(){
 
 /* ---------- ផ្ទាំងរើស Gemini / Groq ---------- */
 function closeAsk(){var e=document.getElementById("srcAsk");if(e)e.remove()}
-function ask(){return new Promise(function(res){
+function ask(){if(window.__batchChoice)return Promise.resolve(window.__batchChoice);return new Promise(function(res){
  closeAsk();
  var has=cues.length>0,w=document.createElement("div");w.id="srcAsk";
  w.style.cssText="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:18px";
@@ -4690,6 +4714,149 @@ $("#exp").onclick=async function(){
   window.__expRunning=false;window.__pipe=false;window.__fstep=0;window.__pmap=null;running=false;btn.disabled=false;btn.innerHTML=old;
  }
 };
+
+/* ===== V13.3 : ធ្វើច្រើនភាគ (Batch) — ដាក់ 2-10 ភាគ ធ្វើម្តងមួយភាគ (1-Click) រួចផ្គុំចូលគ្នាតែមួយ ===== */
+(function(){
+ var EP=[],cfg={src:"groq",mode:"merge",start:0},busy=false,stop=false,MAXEP=10,sh=null,bar=null;
+ function el(t,css,txt){var e=document.createElement(t);if(css)e.style.cssText=css;if(txt!=null)e.textContent=txt;return e}
+ function toast(m,ok){try{showToast(m,ok!==false)}catch(e){}}
+ function mb(n){return (n/1048576).toFixed(1)+" MB"}
+ var col=new Intl.Collator(undefined,{numeric:true,sensitivity:"base"});
+ var ex=$("#exp"),ob=document.createElement("button");
+ ob.className="b gold big";ob.id="bxOpen";ob.style.marginTop="10px";ob.textContent="\uD83D\uDCDA ធ្វើច្រើនភាគ (Batch)";
+ ex.parentNode.insertBefore(ob,ex.nextSibling);
+ ob.onclick=function(){if(busy)return toast("កំពុងធ្វើច្រើនភាគ… សូមរង់ចាំ",false);openSheet()};
+ /* ចាប់ឯកសារ Export ដើម្បីផ្គុំ */
+ var _fs=window.zsFastSave;
+ if(typeof _fs==="function")window.zsFastSave=async function(name,b){
+  var cap=window.__batchCap;
+  if(cap){cap.push({name:name,blob:b});if(window.__batchHold)return true}
+  return _fs.apply(this,arguments)};
+ var _sp=window.setProgress;
+ if(typeof _sp==="function")window.setProgress=function(p,m){try{if(busy)barDetail(p,m)}catch(e){}return _sp.apply(this,arguments)};
+ function closeSheet(){if(sh){sh.remove();sh=null}}
+ function openSheet(){
+  closeSheet();
+  sh=el("div","position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:14px");
+  var box=el("div","width:100%;max-width:460px;max-height:92vh;overflow:auto;background:#1b2338;border:2px solid var(--line);border-radius:24px;padding:16px;box-shadow:0 10px 40px rgba(0,0,0,.7)");
+  sh.appendChild(box);document.body.appendChild(sh);
+  sh.addEventListener("click",function(e){if(e.target===sh)closeSheet()});
+  render(box)}
+ function pick(box){
+  var i=document.createElement("input");i.type="file";i.accept="video/*";i.multiple=true;
+  i.onchange=function(){
+   var have={};EP.forEach(function(f){have[f.name+f.size]=1});
+   var add=[].slice.call(i.files).filter(function(f){return !have[f.name+f.size]}).sort(function(a,b){return col.compare(a.name,b.name)});
+   var over=false;add.forEach(function(f){if(EP.lengthMAXEP)EP.push(f);else over=true});
+   if(over)toast("ដាក់បានត្រឹម "+MAXEP+" ភាគ",false);
+   if(cfg.start>=EP.length)cfg.start=0;render(box)};
+  i.click()}
+ function render(box){
+  box.innerHTML="";
+  box.appendChild(el("div","font-weight:800;font-size:18px;margin-bottom:6px","\uD83D\uDCDA ធ្វើច្រើនភាគ (Batch)"));
+  box.appendChild(el("div","color:var(--mut);font-size:14px;margin-bottom:12px","ដាក់បានដល់ "+MAXEP+" ភាគ។ វាធ្វើម្តងមួយភាគ រួចផ្គុំចូលគ្នាតែមួយ។"));
+  var r=el("div","display:flex;gap:8px;margin-bottom:10px");
+  var a=el("button","flex:1;padding:14px","➕ បន្ថែមភាគ");a.className="b sky";a.onclick=function(){pick(box)};
+  var c=el("button","padding:14px","\uD83D\uDDD1");c.className="b";c.onclick=function(){EP=[];cfg.start=0;render(box)};
+  r.appendChild(a);r.appendChild(c);box.appendChild(r);
+  if(!EP.length)box.appendChild(el("div","color:var(--mut);text-align:center;padding:14px","មិនទាន់មានភាគទេ"));
+  EP.forEach(function(f,i){
+   var row=el("div","display:flex;align-items:center;gap:6px;padding:8px;margin:6px 0;border:1.5px solid var(--nb);border-radius:14px");
+   row.appendChild(el("b","flex:0 0 28px;text-align:center;color:var(--acc)",String(i+1)));
+   var nm=el("span","flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px",f.name);
+   row.appendChild(nm);row.appendChild(el("span","flex:0 0 auto;color:var(--mut);font-size:12px",mb(f.size)));
+   [["▲",-1],["▼",1],["✕",0]].forEach(function(k){
+    var b=el("button","flex:0 0 auto;padding:6px 9px;font-size:13px",k[0]);b.className="b";
+    b.onclick=function(){
+     if(k[1]===0){EP.splice(i,1);if(cfg.start>=EP.length)cfg.start=0}
+     else{var j=i+k[1];if(j>=0&&jEP.length){var t=EP[i];EP[i]=EP[j];EP[j]=t}}
+     render(box)};
+    row.appendChild(b)});
+   box.appendChild(row)});
+  if(!EP.length){var x0=el("button","width:100%;padding:12px;font-size:15px;margin-top:8px","បិទ");x0.className="b";x0.onclick=closeSheet;box.appendChild(x0);return}
+  box.appendChild(el("div","color:var(--mut);font-size:14px;margin:12px 0 4px","ចាប់ផ្ដើមពីភាគទី"));
+  var s1=el("select","width:100%;padding:13px");s1.className="sel2";
+  EP.forEach(function(f,i){var o=document.createElement("option");o.value=i;o.textContent=(i+1)+" — "+f.name;s1.appendChild(o)});
+  s1.value=cfg.start;s1.onchange=function(){cfg.start=+s1.value};box.appendChild(s1);
+  box.appendChild(el("div","color:var(--mut);font-size:14px;margin:12px 0 4px","របៀប"));
+  var s2=el("select","width:100%;padding:13px");s2.className="sel2";
+  [["merge","ធ្វើទាំងអស់ ហើយផ្គុំជាវីដេអូតែមួយ"],["sep","ធ្វើទាំងអស់ ហើយនាំចេញដាច់ពីគ្នា"],["one","ធ្វើតែភាគដែលបានជ្រើស"]].forEach(function(m){var o=document.createElement("option");o.value=m[0];o.textContent=m[1];s2.appendChild(o)});
+  s2.value=cfg.mode;s2.onchange=function(){cfg.mode=s2.value};box.appendChild(s2);
+  box.appendChild(el("div","color:var(--mut);font-size:14px;margin:12px 0 4px","ប្រភព Subtitle"));
+  var sr=el("div","display:flex;gap:8px");
+  [["gem","១. Gemini"],["groq","២. Groq"]].forEach(function(m){
+   var b=el("button","flex:1;padding:13px",m[1]);b.className="b"+(cfg.src===m[0]?" acc":"");
+   b.onclick=function(){cfg.src=m[0];render(box)};sr.appendChild(b)});
+  box.appendChild(sr);
+  var go=el("button","width:100%;margin-top:16px","▶ ចាប់ផ្ដើម");go.className="b teal big";go.onclick=run;box.appendChild(go);
+  var cl=el("button","width:100%;margin-top:8px;padding:12px;font-size:15px","បិទ");cl.className="b";cl.onclick=closeSheet;box.appendChild(cl)}
+ /* របារស្ថានភាព */
+ function showBar(){
+  if(bar)return;
+  bar=el("div","position:fixed;left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:2147483000;max-width:540px;margin:auto;display:flex;align-items:center;gap:10px;background:#1b2338;border:2px solid var(--line);color:#fff;border-radius:18px;padding:12px 14px;font-size:14px;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.65)");
+  var t=el("div","flex:1;min-width:0");t.id="bxTx";t.appendChild(el("div","font-weight:800","")).id="bxHead";t.appendChild(el("div","color:var(--mut);font-size:13px;word-break:break-word","")).id="bxDet";
+  var s=el("button","flex:0 0 auto;padding:9px 12px;font-size:14px","⏹ ឈប់");s.className="b";
+  s.onclick=function(){stop=true;s.disabled=true;toast("នឹងឈប់ក្រោយចប់ភាគនេះ",true)};
+  bar.appendChild(t);bar.appendChild(s);document.body.appendChild(bar)}
+ function hideBar(){if(bar){bar.remove();bar=null}}
+ function barHead(k,n,name){showBar();var h=document.getElementById("bxHead");if(h)h.textContent="\uD83D\uDCDA ភាគ "+(k+1)+"/"+n+" · "+name}
+ function barDetail(p,m){var d=document.getElementById("bxDet");if(d)d.textContent=(m||"")+(typeof p==="number"?" ("+Math.round(p)+"%)":"")}
+ function wait(ms){return new Promise(function(r){setTimeout(r,ms)})}
+ async function loadEp(f){
+  var inp=$("#vidFile");
+  try{var dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;inp.dispatchEvent(new Event("change",{bubbles:true}))}catch(e){}
+  await wait(400);
+  if(file!==f&&typeof load==="function")load(f);
+  for(var i=0;i200;i++){if(file===f&&V.videoWidth>0)return true;await wait(150)}
+  throw new Error("បើកវីដេអូមិនកើត")}
+ async function run(){
+  var list=EP.slice(),idx=[],merge=cfg.mode==="merge";
+  if(cfg.mode==="one")idx=[cfg.start];else for(var q=cfg.start;qlist.length;q++)idx.push(q);
+  if(!idx.length)return;
+  closeSheet();busy=true;stop=false;
+  var caps=[],fails=[],consec=0,wl=null;
+  window.__batchChoice=cfg.src;window.__batchHold=merge;
+  try{if(navigator.wakeLock)wl=await navigator.wakeLock.request("screen")}catch(e){}
+  try{
+   for(var k=0;kidx.length;k++){
+    if(stop)break;
+    var f=list[idx[k]],ok=false;
+    barHead(k,idx.length,f.name);
+    for(var tr=0;tr2&&!ok&&!stop;tr++){
+     window.__batchCap=[];
+     try{await loadEp(f);barDetail(0,"ចាប់ផ្ដើម…");await ex.onclick.call(ex)}catch(e){console.warn("batch ep",e)}
+     var cp=window.__batchCap;
+     if(cp&&cp.length){caps.push({i:idx[k],name:f.name,blob:cp[cp.length-1].blob});ok=true}
+     else if(tr===0&&!stop){barDetail(0,"ព្យាយាមម្តងទៀត…");await wait(1500)}
+    }
+    window.__batchCap=null;
+    if(ok){consec=0}else{fails.push(idx[k]+1);consec++;if(consec>=2){toast("ឈប់ ព្រោះបរាជ័យ ២ ភាគជាប់គ្នា (ពិនិត្យ Key ឬអ៊ីនធឺណិត)",false);break}}
+   }
+   window.__batchChoice=null;window.__batchHold=false;
+   if(merge&&caps.length){
+    showBar();var h=document.getElementById("bxHead");if(h)h.textContent="\uD83D\uDCDA កំពុងផ្គុំវីដេអូ…";barDetail(null,"សូមរង់ចាំ");
+    caps.sort(function(a,b){return a.i-b.i});
+    var files=caps.map(function(c){return new File([c.blob],c.name.replace(/\.[^.]+$/,"")+"_dub.mp4",{type:"video/mp4"})});
+    window.__batchCap=[];var saved=false;
+    try{
+     if(files.length===1){await zsKeepOrDl(files[0])}
+     else{var old=mergeFiles;mergeFiles=files;try{await doMerge()}finally{mergeFiles=old}}
+    }catch(e){console.warn("batch merge",e)}
+    saved=!!(window.__batchCap&&window.__batchCap.length)||files.length===1;
+    window.__batchCap=null;
+    if(!saved){toast("ផ្គុំមិនបាន — កំពុងទាញយកដាច់ពីគ្នា",false);for(var z=0;zfiles.length;z++){await zsKeepOrDl(files[z]);await wait(600)}}
+   }
+   var okN=caps.length;
+   try{zsfDone((okN?("✅ ធ្វើរួច "+okN+" ភាគ"):"❌ មិនមានភាគណាបានទេ")+(fails.length?(" · ❌ បរាជ័យភាគ "+fails.join(", ")):""),true)}catch(e){}
+  }finally{
+   window.__batchCap=null;window.__batchChoice=null;window.__batchHold=false;
+   try{if(wl)wl.release()}catch(e){}
+   busy=false;hideBar()}
+ }
+ async function zsKeepOrDl(f){
+  try{if(await zsFastSave(f.name,f))return}catch(e){}
+  dlBlob(f.name,f)}
+})();
 
 /* ===== V3.6 : Gemini ភ្ជាប់ត្រង់ (ដូចកូដចាស់) ៖ ផ្ទុកវីដេអូឡើង Gemini Files API ដោយ Key របស់អ្នក → ១ សំណើ វិភាគវីដេអូ + បកប្រែ + ដាក់ tag [1]-[4]។ គ្មាន Worker, គ្មានអ្វីបង្ហាញក្នុង UI ===== */
 var gdCache=null;
@@ -5661,7 +5828,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="13.0";
+  var EMB="13.4";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
