@@ -1101,28 +1101,89 @@ async function unmountFiles(f,dir,files,mounted){
 async function runFF(f,args){const c=await f.exec(args);if(c!==0)throw new Error("FFmpeg code "+c);}
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 
-/* Split */
+/* Split (v13.0) — ១) FFmpeg native ក្នុង APK (ZSNative.runFfmpeg — ឯកសារផ្ទាល់ គ្មានដែនកំណត់ RAM ដូចកម្មវិធី Tools ដែលប្រើ ffmpeg-kit) ២) បម្រុង: ffmpeg.wasm (ចាប់ផ្តើមឡើងវិញ + សាកម្តងទៀត) */
+const errTxt=x=>{try{if(x==null)return "មិនស្គាល់មូលហេតុ";if(typeof x==="string")return x;if(x.message)return String(x.message);if(x.type)return "event:"+x.type;return JSON.stringify(x).slice(0,200)}catch(_){return String(x)}};
+const nCall=(pre,go,ms,onP)=>new Promise(res=>{
+ const cb=pre+Date.now()+Math.floor(Math.random()*1e5);let tm=null;
+ const clean=()=>{clearTimeout(tm);try{delete window[cb]}catch(_){}try{delete window[cb+"_p"]}catch(_){}};
+ tm=setTimeout(()=>{clean();res(null)},ms);
+ window[cb]=x=>{clean();if(typeof x==="string"){try{x=JSON.parse(x)}catch(_){}}res(x)};
+ if(onP)window[cb+"_p"]=onP;
+ try{go(cb)}catch(er){clean();res(null)}
+});
 async function doSplit(){
  const n=plan();if(!file||!n)return alert("សូមជ្រើសវីដេអូ និងកំណត់រយៈពេលជាមុន");
  if(window.__cutBusy)return;window.__cutBusy=true;const btn=$("#splitBtn");btn.disabled=true;
- let f=null,src=null,mounted=false;const e=ext(file),oe=cutPrecise?"mp4":e,stp=step(),base=baseName(file);
+ const e=ext(file),oe=cutPrecise?"mp4":e,stp=step(),base=baseName(file),N=window.ZSNative;
+ const bt="video/"+(oe==="mkv"?"x-matroska":oe),outDur=i=>{const d=(V.duration||0)-i*stp;return Math.max(1,d>0?Math.min(stp,d):stp)};
+ let f=null,src=null,mounted=false,prep=null,nat=false,st="";
  try{
-  say("កំពុងផ្ទុក FFmpeg...");f=await ff();
-  src=new File([file],"src."+e,{type:file.type});
-  mounted=await mountFiles(f,"/sin",[src]);
-  const inp="/sin/"+src.name;
-  for(let i=0;in;i++){
-   window.__ffTag=`✂️ កំពុងកាត់ភាគ ${i+1}/${n}`+(cutPrecise?" (ច្បាស់លាស់)":" (លឿន)");say(window.__ffTag+" ...");
-   const out="p"+i+"."+oe,a=["-ss",String(i*stp),"-i",inp,"-t",String(stp)];
-   if(cutPrecise)a.push("-c:v","libx264","-preset","ultrafast","-crf","23","-pix_fmt","yuv420p","-c:a","aac","-b:a","128k","-movflags","+faststart");
+  if(N&&typeof N.runFfmpeg==="function"&&typeof N.prepareLastPicked==="function"&&typeof N.deleteFile==="function"){
+   st="រៀបចំឯកសារ native";say("📦 កំពុងរៀបចំឯកសារសម្រាប់ FFmpeg ក្នុង APK...");
+   prep=await nCall("zsPrep",cb=>N.prepareLastPicked(cb),15*60*1000);
+   nat=!!(prep&&prep.ok&&prep.path&&Number(prep.size)===Number(file.size));
+  }
+  const dir=nat?String(prep.path).replace(/[^\/]+$/,""):"";
+  const natCut=async i=>{
+   const out="sp"+Date.now()+"_"+i+"."+oe,fname=`${base}_${pad3(i+1)}.${oe}`,tag=`✂️ កំពុងកាត់ភាគ ${i+1}/${n} (Native`+(cutPrecise?" • ច្បាស់លាស់)":" • លឿន)");
+   say(tag+" ...");
+   const a=["-y","-ss",String(i*stp),"-i",prep.path,"-t",String(stp),"-map","0:v:0?","-map","0:a?"];
+   if(cutPrecise)a.push("-c:v","libx264","-preset","ultrafast","-crf","23","-pix_fmt","yuv420p","-c:a","aac","-b:a","128k");
    else a.push("-c","copy");
-   a.push("-avoid_negative_ts","make_zero","-y",out);
-   await runFF(f,a);
-   const d=await f.readFile(out);dlBlob(`${base}_${pad3(i+1)}.${oe}`,new Blob([d],{type:"video/"+(oe==="mkv"?"x-matroska":oe)}));
-   await f.deleteFile(out);await pause(1200)}
+   a.push("-avoid_negative_ts","make_zero");
+   if(/^(mp4|m4v|mov)$/.test(oe))a.push("-movflags","+faststart");
+   a.push(dir+out);
+   st="native កាត់ភាគ "+(i+1);
+   const r=await nCall("zsCut",cb=>N.runFfmpeg(JSON.stringify(a),cb),30*60*1000,ms=>say(tag+" "+Math.max(0,Math.min(99,Math.round(ms/10/stp)))+"%"));
+   if(!r||!r.ok){try{N.deleteFile(out)}catch(_){}throw new Error(errTxt(r&&r.error)||"native ffmpeg បរាជ័យ")}
+   st="native រក្សាទុកភាគ "+(i+1);say(`💾 កំពុងរក្សាទុកភាគ ${i+1}/${n} ...`);
+   let saved=false;
+   if(typeof N.saveToDownloads==="function"){const sr=await nCall("zsSv",cb=>N.saveToDownloads(fname,bt,out,cb),10*60*1000);saved=!!(sr&&sr.ok)}
+   if(!saved){
+    const resp=await fetch("https://appassets.androidplatform.net/native/"+out+"?t="+Date.now(),{cache:"no-store"});
+    if(!resp.ok)throw new Error("អានលទ្ធផល native មិនបាន (HTTP "+resp.status+")");
+    const bl=await resp.blob();if(!bl||bl.size1000)throw new Error("ឯកសារលទ្ធផលទទេ");
+    const b2=new Blob([bl],{type:bt});
+    if(!(await zsFastSave(fname,b2)))zsDlLegacy(fname,b2);
+   }
+   try{N.deleteFile(out)}catch(_){}
+   try{if(window.zsfReportUsage)window.zsfReportUsage({__zsSec:outDur(i)},fname)}catch(_){}
+  };
+  const wasmCut=async i=>{
+   for(let at=0;at2;at++){
+    try{
+     if(!f){st="ផ្ទុក FFmpeg";say("កំពុងផ្ទុក FFmpeg...");f=await ff()}
+     if(!src){st="mount ឯកសារ";src=new File([file],"src."+e,{type:file.type});mounted=await mountFiles(f,"/sin",[src])}
+     const inp="/sin/"+src.name;
+     window.__ffTag=`✂️ កំពុងកាត់ភាគ ${i+1}/${n}`+(cutPrecise?" (ច្បាស់លាស់)":" (លឿន)");say(window.__ffTag+" ...");
+     const out="p"+i+"."+oe,a=["-ss",String(i*stp),"-i",inp,"-t",String(stp)];
+     if(cutPrecise)a.push("-c:v","libx264","-preset","ultrafast","-crf","23","-pix_fmt","yuv420p","-c:a","aac","-b:a","128k","-movflags","+faststart");
+     else a.push("-c","copy");
+     a.push("-avoid_negative_ts","make_zero","-y",out);
+     st="កាត់ភាគ "+(i+1);await runFF(f,a);
+     st="អានលទ្ធផលភាគ "+(i+1);const d=await f.readFile(out);
+     dlBlob(`${base}_${pad3(i+1)}.${oe}`,new Blob([d],{type:bt}));
+     await f.deleteFile(out);await pause(1200);return;
+    }catch(x){
+     if(at===1)throw new Error(st+": "+errTxt(x));
+     console.warn("wasm split retry",x);
+     say("⚠ FFmpeg browser មានបញ្ហា ("+st+": "+errTxt(x)+") — ចាប់ផ្តើមឡើងវិញ...");
+     try{FF&&FF.terminate&&FF.terminate()}catch(_){}
+     FF=null;f=null;src=null;mounted=false;await pause(800);
+    }
+   }
+  };
+  for(let i=0;in;i++){
+   if(nat){try{await natCut(i);await pause(300);continue}catch(x){console.warn("native split",x);nat=false;say("⚠ Native មិនបាន ("+st+": "+errTxt(x)+") — ប្តូរទៅ FFmpeg browser...");await pause(1500)}}
+   await wasmCut(i);
+  }
   say(`✅ រួចរាល់ ${n} ភាគ (ពិនិត្យថត Downloads)`);
- }catch(x){say("❌ កំហុស៖ "+x.message)}
- finally{window.__ffTag="";if(f&&src)await unmountFiles(f,"/sin",[src],mounted);window.__cutBusy=false;btn.disabled=false}
+ }catch(x){say("❌ កំហុស៖ "+errTxt(x))}
+ finally{
+  window.__ffTag="";
+  try{if(prep&&prep.name&&N&&N.deleteFile)N.deleteFile(prep.name)}catch(_){}
+  if(f&&src){try{await unmountFiles(f,"/sin",[src],mounted)}catch(_){}}
+  window.__cutBusy=false;btn.disabled=false}
 }
 
 /* Merge */
@@ -5177,7 +5238,7 @@ window.zsfReportUsage=async function(b,name){
  try{
   var r=await getLogin();
   if(!r||r.admin||!/^ZS-/.test(String(r.key||"")))return;
-  var sec=await vidDur(b);
+  var sec=(b&&b.__zsSec>0)?b.__zsSec:await vidDur(b);
   if(!sec){try{if(typeof V!=="undefined"&&V&&isFinite(V.duration))sec=V.duration}catch(e){}}
   var nm=String(name||"").toLowerCase();
   var kind=/_merged\./.test(nm)?"merge":/_\d{3}\./.test(nm)?"split":"export";
@@ -5600,7 +5661,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="12.9";
+  var EMB="13.0";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
