@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"11.1";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"11.2";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -3108,8 +3108,33 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     for(var i=0;inF;i++){var sum=0,c=0,p0=base+i*fb;for(var p=p0;p+ba=p0+fb;p+=ba){var v=dv.getInt16(p,true);sum+=v*v;c++;}out[i]=c?Math.sqrt(sum/c):0;}
     return {rms:out,frameSec:fb/(f.sr*ba)};
   }
-  async function gemTPart(A,p,idx,totalSec){
-    var PAD=3,a0=Math.max(0,p.cs-PAD),a1=Math.min(totalSec,p.ce+PAD);
+  function gemTSpeechInfo(A){
+    if(A.__sp!==undefined)return A.__sp;
+    var sp=null;
+    try{
+      var P=gemTProfile(A);
+      if(P&&P.rms&&P.rms.length>50){
+        var R=P.rms,N=R.length,S=new Float32Array(N);
+        for(var i=0;iN;i++){var s0=0,c0=0;for(var k=-2;k=2;k++){var j=i+k;if(j>=0&&jN){s0+=R[j];c0++}}S[i]=s0/c0}
+        var so=Array.from(S).sort(function(a,b){return a-b});
+        sp={S:S,F:P.frameSec,thr:Math.max(so[Math.floor(N*0.25)]*2.2,220)*0.8};
+      }
+    }catch(_){sp=null}
+    A.__sp=sp;return sp;
+  }
+  function gemTVoiced(A,t0,t1){
+    var sp=gemTSpeechInfo(A);if(!sp)return 0;
+    var a=Math.max(0,Math.floor(t0/sp.F)),b=Math.min(sp.S.length-1,Math.floor(t1/sp.F)),n=0;
+    for(var i=a;i=b;i++)if(sp.S[i]>=sp.thr)n++;
+    return n*sp.F;
+  }
+  function gemTChars(arr){
+    var n=0;(arr||[]).forEach(function(g){n+=String(g.text||"").replace(/[\s，。！？、；：,.!?;:…“”"'‘’（）()\-—·]/g,"").length});
+    return n;
+  }
+  /* V11.2: ហៅ Gemini ម្តងសម្រាប់ window មួយ — មិនលុបបន្ទាត់ចោលស្ងាត់ៗទៀតទេ (timestamp ខុស/បន្ទាត់ខ្លី ត្រូវរក្សា) */
+  async function gemTRaw(A,p,idx,totalSec){
+    var PAD=3,a0=Math.max(0,p.cs-PAD),a1=Math.min(totalSec,p.ce+PAD),dur=a1-a0;
     var wav=b64(sliceWav(A.ab,A.info,a0,a1));
     var gparts=[{inline_data:{mime_type:"audio/wav",data:wav}},{text:gemTPrompt()}];
     var lastErr=null;
@@ -3118,22 +3143,57 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
         var txt=await gemTRotate(gparts,idx+at*7);
         var arr=gemTParseJson(txt);
         if(arr===null)throw new Error("Gemini ឆ្លើយមិនមែន JSON");
-        var out=[];
+        var items=[];
         arr.forEach(function(o){
           if(!o)return;
-          var s=gemTParseTs(o.start!=null?o.start:o.s),e=gemTParseTs(o.end!=null?o.end:o.e),t=String(o.text!=null?o.text:(o.t||"")).replace(/\s+/g," ").trim();
-          if(!t||!isFinite(s))return;
-          if(!isFinite(e)||e=s)e=s+Math.max(0.6,Math.min(6,t.length*0.25));
-          s+=a0;e+=a0;
-          if(s0)s=0;if(e>a1)e=a1;
-          if(e-s0.2)return;
-          if(e-s>30)e=s+30;
-          out.push({start:s,end:e,text:t});
+          var t=String(o.text!=null?o.text:(o.t||"")).replace(/\s+/g," ").trim();
+          if(!t)return;
+          var s=gemTParseTs(o.start!=null?o.start:o.s),e=gemTParseTs(o.end!=null?o.end:o.e);
+          var ok=isFinite(s)&&s>=0&&s=dur+1.5;
+          if(ok&&(!isFinite(e)||e=s))e=s+Math.max(0.6,Math.min(6,t.length*0.25));
+          items.push({s:ok?s:NaN,e:ok?e:NaN,t:t,ok:ok});
         });
-        return out.filter(function(g){return g.start>=p.cs-0.3&&(p.last||g.startp.ce+0.3);});
+        /* បន្ទាត់ដែល timestamp ខុស → ចែកតាមលំដាប់រវាងបន្ទាត់ល្អជិតខាង ជំនួសឱ្យការលុបចោល */
+        for(var i=0;iitems.length;i++){
+          if(items[i].ok)continue;
+          var j=i;while(jitems.length&&!items[j].ok)j++;
+          var lo=i>0?items[i-1].e:0,hi=jitems.length?items[j].s:dur;
+          if(!(hi>lo+0.3))hi=Math.min(dur,lo+Math.max(0.6,(j-i)*1.2));
+          var tot=0,k;for(k=i;kj;k++)tot+=Math.max(1,items[k].t.length);
+          var cur=lo;
+          for(k=i;kj;k++){var w=(hi-lo)*Math.max(1,items[k].t.length)/tot;items[k].s=cur;items[k].e=cur+w;cur+=w;}
+          i=j-1;
+        }
+        var out=[];
+        items.forEach(function(it){
+          var s=it.s+a0,e=it.e+a0;
+          if(s0)s=0;if(e>a1)e=a1;
+          if(e-s0.3)e=Math.min(totalSec,s+0.3);
+          if(e-s>30)e=s+30;
+          out.push({start:s,end:e,text:it.t});
+        });
+        out=out.filter(function(g){return g.start>=p.cs-0.3&&(p.last||g.startp.ce+0.3);});
+        /* Gemini ឆ្លើយ [] ទាំងដែលមានសំឡេងនិយាយ → សាកម្តងទៀត (Key/Model ផ្សេង) */
+        if(!out.length&&at1&&gemTVoiced(A,p.cs,p.ce)>=3)continue;
+        return out;
       }catch(e){lastErr=e;if(e&&(e.zsfQuota||e.blocked))break;await new Promise(function(r){setTimeout(r,500);});}
     }
     throw lastErr||new Error("Gemini មិនបានឆ្លើយ");
+  }
+  async function gemTPart(A,p,idx,totalSec){
+    var res=await gemTRaw(A,p,idx,totalSec);
+    /* V11.2: បើអក្សរតិចពេកធៀបនឹងសំឡេងនិយាយ → ស្តាប់ម្តងទៀតជាកំណាត់ ១០ វិនាទី ហើយយកលទ្ធផលដែលបានច្រើនជាង */
+    try{
+      var v=gemTVoiced(A,p.cs,p.ce),ch=gemTChars(res);
+      if(p.ce-p.cs>12&&v>=4&&chv*2.2){
+        var r2=[];
+        for(var c=p.cs,q=0;cp.ce-0.5;c+=10,q++){
+          try{r2=r2.concat(await gemTRaw(A,{cs:c,ce:Math.min(p.ce,c+10),last:!!p.last&&c+10>=p.ce-0.5},idx+50+q,totalSec));}catch(_){}
+        }
+        if(gemTChars(r2)>ch){res=r2;window.__zsfGemRecov=(window.__zsfGemRecov||0)+1;}
+      }
+    }catch(_){}
+    return res;
   }
   window.__zsfGemTranscribe=async function(onProg){
     var f=(window.__zsfMedia&&window.__zsfMedia.file)||null;
@@ -3142,10 +3202,10 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     if(onProg)onProg(0,1,"🎧 កំពុងទាញសំឡេងពីវីដេអូ…");
     var A=await audioOnce(f);window.__zsfGemBeat=Date.now();
     var sr=A.info.fmt.sr,ba=A.info.fmt.ba||2,totalSec=A.info.data.len/ba/sr;
-    var PART=(function(){try{var q=parseInt(localStorage.getItem("zsf_gem_part"),10);if(q>=15&&q=180)return q}catch(_){}return 30})(),parts=[];
+    var PART=(function(){try{var q=parseInt(localStorage.getItem("zsf_gem_part"),10);if(q>=15&&q=180)return q}catch(_){}return 20})(),parts=[];
     for(var cs=0;cstotalSec-0.5;cs+=PART)parts.push({cs:cs,ce:Math.min(totalSec,cs+PART),last:(cs+PART)>=totalSec-0.5});
     if(!parts.length)throw new Error("សំឡេងខ្លីពេក");
-    var T0=Date.now(),conc=Math.min(12,Math.max(6,ks.length*3)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
+    window.__zsfGemRecov=0;var T0=Date.now(),conc=Math.min(12,Math.max(6,ks.length*3)),next=0,done=0,res=new Array(parts.length),failed=[],lastErr=null;
     async function worker(){
       while(true){
         var i=next++;if(i>=parts.length)return;
@@ -3181,11 +3241,11 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
         if(gCur)gRuns.push(gCur);
         var gaps=gRuns.map(function(r){return{s:r[0]*gF,e:(r[1]+1)*gF}}).filter(function(g){return g.e-g.s>=1.2});
         gaps.sort(function(a,b){return (b.e-b.s)-(a.e-a.s)});
-        gaps=gaps.slice(0,14);
+        var gw=[];gaps.forEach(function(g){for(var x=g.s;xg.e-0.3;x+=10){var ge=Math.min(g.e,x+10);if(ge-x>=1.2)gw.push({s:x,e:ge})}});gw.sort(function(a,b){return (b.e-b.s)-(a.e-a.s)});gaps=gw.slice(0,60);
         var gNext=0,gDone=0;
         var gWorker=async function(){
           while(true){
-            var gz=gNext++;if(gz>=gaps.length||Date.now()-T0>150000)return;
+            var gz=gNext++;if(gz>=gaps.length||Date.now()-T0>420000)return;
             try{
               var gg=gaps[gz],gr=await gemTPart(A,{cs:Math.max(0,gg.s-0.5),ce:Math.min(totalSec,gg.e+0.5),last:false},900+gz,totalSec);
               if(gr&&gr.length){Array.prototype.push.apply(segs,gr);__gapAdded+=gr.length}
@@ -3215,7 +3275,7 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
     try{gh=zsfCleanGhost(m);merged=m.segments;}catch(_){}
     var off=A.offset||0;
     var outSegs=merged.map(function(g){return {start:g.start+off,end:g.end+off,text:g.text};});
-    return {segments:outSegs,profile:prof,offset:off,parts:parts.length,failed:failed.map(function(i){return parts[i].cs;}),ghost:gh,gapFilled:__gapAdded,sec:Math.round((Date.now()-T0)/1000),duration:totalSec};
+    return {segments:outSegs,profile:prof,offset:off,parts:parts.length,failed:failed.map(function(i){return parts[i].cs;}),ghost:gh,gapFilled:__gapAdded,recovered:window.__zsfGemRecov||0,sec:Math.round((Date.now()-T0)/1000),duration:totalSec};
   };
 })();
 
@@ -3683,6 +3743,7 @@ async function zsfTranscribeGeminiMain(){
     setC(subs.map(function(x){return {s:x.start/1000,e:x.end/1000,t:x.text}}));
     var notes=[],gh=r.ghost;
     if(gh&&gh.dup)notes.push("👻 លុបអក្សរស្ទួន "+gh.dup+" បន្ទាត់");
+    if(r.recovered)notes.push("🔁 ស្តាប់ឡើងវិញតាមកំណាត់ខ្លី "+r.recovered+" ផ្នែក");
     if(r.gapFilled)notes.push("🔎 បំពេញឃ្លាដែលបាត់ "+r.gapFilled+" បន្ទាត់");
     if(r.failed&&r.failed.length)notes.push("⚠ ផ្នែកបរាជ័យ (វិនាទីចាប់ផ្តើម): "+r.failed.join(", ")+" — សូមចុចម្តងទៀត");
     var wall=(performance.now()-wall0)/1000;
@@ -5022,7 +5083,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"11.1",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"11.2",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -5268,7 +5329,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="11.1";
+  var EMB="11.2";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
