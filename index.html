@@ -1460,8 +1460,8 @@ function tempoPlan(p,dur,slotD){
 function zsfFit(k,d){try{const v=parseFloat(localStorage.getItem("zsf_tts_"+k));if(isFinite(v))return v}catch(e){}return d}
 function zsfFitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch(e){return true}}
 function zsfAvail(q,dur,nx){
- const tail=zsfFit("tail",.45),mg=zsfFit("margin",.20),sp=nx?zsfFit("spill",.15):0,gap=nx?(nx.s-q.e):1.0,room=gap-.10;
- if(room>0){const tl=(room>=1.0)?Math.max(tail,.7):tail;return dur+Math.min(room,tl)+sp}
+ const tail=zsfFit("tail",.30),mg=zsfFit("margin",.20),sp=nx?zsfFit("spill",.15):0,gap=nx?(nx.s-q.e):1.0,room=gap-.10;
+ if(room>0){const tl=(room>=1.0)?Math.max(tail,.5):tail;return dur+Math.min(room,tl)+sp}
  return Math.max(dur*.6,.3,dur-mg)+sp}
 /* ពិនិត្យម្តងថា TTS Worker គាំទ្រ rate ពិតឬអត់ (បើមិនគាំទ្រ → ប្រើវិធី stretch ចាស់) */
 async function zsfProbeRate(slot){
@@ -1478,11 +1478,11 @@ async function dubAudioLocal(text,slot,p,slotD){
  return{buf,boost:pl.boost,tt:pl.tempo}}
 async function dubAudio(text,slot,p,slotD){
  if(window.__zsfRateOK===false)return dubAudioLocal(text,slot,p,slotD);
- const pitch=Math.round(p.pitch),auto=+p.auto||0,base=clampTempo(Math.max(1+p.speed/100,auto>0?zsfFit("mintempo",1.0):0));
+ const pitch=Math.round(p.pitch),auto=+p.auto||0,base=clampTempo(Math.max(1+p.speed/100,auto>0?zsfFit("mintempo",1.15):0));
  let cur=base,buf;
  try{buf=await ttsBuf(text,slot,pitch,Math.round((base-1)*100))}catch(e){return dubAudioLocal(text,slot,p,slotD)}
  if(!(slotD>0))return{buf,boost:false,tt:cur};
- if(auto>0){const cap=Math.min(base*(1+auto/100),1.4);
+ if(auto>0){const cap=Math.min(base*(1+auto/100),1.7);
   for(let it=0;it3;it++){
    const d=buf.duration;if(d=slotD*1.02)break;
    const tot=Math.min(cur*(d/slotD)*1.02,cap);if(tot=cur*1.015)break;
@@ -1490,7 +1490,7 @@ async function dubAudio(text,slot,p,slotD){
    buf=nb;cur=tot}}
  let forced=1;
  if(zsfFitOn()&&buf.duration>slotD){
-  const FM=zsfFit("fmax",1.3);let allow=Math.max(1,FM/Math.max(cur,1)),need=Math.min(buf.duration/(slotD*.97),allow);
+  const FM=zsfFit("fmax",1.7);let allow=Math.max(1,FM/Math.max(cur,1)),need=Math.min(buf.duration/(slotD*.97),allow);
   for(let f=0;f2&&need>1.01;f++){
    try{buf=wsolaStretch(buf,need)}catch(e){break}
    forced*=need;const nl=buf.duration;if(nl=slotD)break;
@@ -1528,7 +1528,7 @@ async function buildDub(btn){
 
 function zsfPlaceItems(items){
  /* V5.9: គ្មានជាន់ឃ្លា/ជាន់កន្ទុយទៀត — ឃ្លាបន្ទាប់ចាប់ផ្តើមបន្ទាប់ពីឃ្លាមុនចប់ជានិច្ច (+ចន្លោះ GAP) · ពន្យារសំឡេងទាំងមូលតាម DLY ឱ្យត្រូវមាត់ */
- const SPL=zsfFit("spill2",.2),FM=zsfFit("fmax",1.3),ON=zsfFitOn(),DLY=zsfFit("delay",0),GAP=zsfFit("gap2",.08);
+ const SPL=zsfFit("spill2",.2),FM=zsfFit("fmax",1.7),ON=zsfFitOn(),DLY=zsfFit("delay",0),GAP=zsfFit("gap2",.08);
  let cursor=0,delayed=0;const st=[];
  items.forEach((it,i)=>{
   const b0=it.buf0||(it.buf0=it.buf);let buf=b0,o0=Math.max(0,fxOn(it.q)+DLY);
@@ -2864,9 +2864,9 @@ function zsfFitDur(L,R,F,ks,ke,tk){
   var a0=Math.max(0,Math.floor(Math.max(s-0.3,pe)/F)),b0=Math.min(N-1,Math.floor((e+0.2)/F));
   var fa=Math.max(0,Math.floor((s-3)/F)),fbb=Math.min(N-1,Math.floor((e+3)/F)),W=[];
   for(i=fa;i=fbb;i++)W.push(D[i]);W.sort(function(x,y){return x-y});
-  var fl=W[Math.floor(W.length*0.1)];
+  var fl=Math.max(W[Math.floor(W.length*0.1)]+10,W[Math.floor(W.length*0.9)]-20);
   var on=[],cs=-1;
-  for(i=a0;i=b0+1;i++){var v=i=b0&&D[i]>=fl+10;if(v){if(cs0)cs=i}else if(cs>=0){on.push([cs*F,i*F]);cs=-1}}
+  for(i=a0;i=b0+1;i++){var v=i=b0&&D[i]>=fl;if(v){if(cs0)cs=i}else if(cs>=0){on.push([cs*F,i*F]);cs=-1}}
   var bu=[];on.forEach(function(r){var p=bu[bu.length-1];if(p&&r[0]-p[1]0.2)p[1]=r[1];else bu.push(r.slice())});
   bu=bu.filter(function(r){return r[1]-r[0]>=0.15});
   if(bu.length2)continue;
@@ -5964,7 +5964,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="15.0";
+  var EMB="15.2";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
