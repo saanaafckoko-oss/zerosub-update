@@ -1460,8 +1460,8 @@ function tempoPlan(p,dur,slotD){
 function zsfFit(k,d){try{const v=parseFloat(localStorage.getItem("zsf_tts_"+k));if(isFinite(v))return v}catch(e){}return d}
 function zsfFitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch(e){return true}}
 function zsfAvail(q,dur,nx){
- const tail=zsfFit("tail",.30),mg=zsfFit("margin",.20),sp=nx?zsfFit("spill",.15):0,gap=nx?(nx.s-q.e):1.0,room=gap-.10;
- if(room>0){const tl=(room>=1.0)?Math.max(tail,.5):tail;return dur+Math.min(room,tl)+sp}
+ const tail=zsfFit("tail",.45),mg=zsfFit("margin",.20),sp=nx?zsfFit("spill",.15):0,gap=nx?(nx.s-q.e):1.0,room=gap-.10;
+ if(room>0){const tl=(room>=1.0)?Math.max(tail,.7):tail;return dur+Math.min(room,tl)+sp}
  return Math.max(dur*.6,.3,dur-mg)+sp}
 /* ពិនិត្យម្តងថា TTS Worker គាំទ្រ rate ពិតឬអត់ (បើមិនគាំទ្រ → ប្រើវិធី stretch ចាស់) */
 async function zsfProbeRate(slot){
@@ -1478,11 +1478,11 @@ async function dubAudioLocal(text,slot,p,slotD){
  return{buf,boost:pl.boost,tt:pl.tempo}}
 async function dubAudio(text,slot,p,slotD){
  if(window.__zsfRateOK===false)return dubAudioLocal(text,slot,p,slotD);
- const pitch=Math.round(p.pitch),auto=+p.auto||0,base=clampTempo(Math.max(1+p.speed/100,auto>0?zsfFit("mintempo",1.15):0));
+ const pitch=Math.round(p.pitch),auto=+p.auto||0,base=clampTempo(Math.max(1+p.speed/100,auto>0?zsfFit("mintempo",1.0):0));
  let cur=base,buf;
  try{buf=await ttsBuf(text,slot,pitch,Math.round((base-1)*100))}catch(e){return dubAudioLocal(text,slot,p,slotD)}
  if(!(slotD>0))return{buf,boost:false,tt:cur};
- if(auto>0){const cap=Math.min(base*(1+auto/100),1.7);
+ if(auto>0){const cap=Math.min(base*(1+auto/100),1.4);
   for(let it=0;it3;it++){
    const d=buf.duration;if(d=slotD*1.02)break;
    const tot=Math.min(cur*(d/slotD)*1.02,cap);if(tot=cur*1.015)break;
@@ -1490,7 +1490,7 @@ async function dubAudio(text,slot,p,slotD){
    buf=nb;cur=tot}}
  let forced=1;
  if(zsfFitOn()&&buf.duration>slotD){
-  const FM=zsfFit("fmax",1.7);let allow=Math.max(1,FM/Math.max(cur,1)),need=Math.min(buf.duration/(slotD*.97),allow);
+  const FM=zsfFit("fmax",1.3);let allow=Math.max(1,FM/Math.max(cur,1)),need=Math.min(buf.duration/(slotD*.97),allow);
   for(let f=0;f2&&need>1.01;f++){
    try{buf=wsolaStretch(buf,need)}catch(e){break}
    forced*=need;const nl=buf.duration;if(nl=slotD)break;
@@ -1528,7 +1528,7 @@ async function buildDub(btn){
 
 function zsfPlaceItems(items){
  /* V5.9: គ្មានជាន់ឃ្លា/ជាន់កន្ទុយទៀត — ឃ្លាបន្ទាប់ចាប់ផ្តើមបន្ទាប់ពីឃ្លាមុនចប់ជានិច្ច (+ចន្លោះ GAP) · ពន្យារសំឡេងទាំងមូលតាម DLY ឱ្យត្រូវមាត់ */
- const SPL=zsfFit("spill2",.2),FM=zsfFit("fmax",1.7),ON=zsfFitOn(),DLY=zsfFit("delay",0),GAP=zsfFit("gap2",.08);
+ const SPL=zsfFit("spill2",.2),FM=zsfFit("fmax",1.3),ON=zsfFitOn(),DLY=zsfFit("delay",0),GAP=zsfFit("gap2",.08);
  let cursor=0,delayed=0;const st=[];
  items.forEach((it,i)=>{
   const b0=it.buf0||(it.buf0=it.buf);let buf=b0,o0=Math.max(0,fxOn(it.q)+DLY);
@@ -2810,6 +2810,73 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
 }
 
 
+/* V14.8: តម្រឹមម៉ោងចាប់ផ្តើមតាមចំណុចសំឡេងនិយាយឡើងខ្លាំងពិត (onset) */
+function zsfOnsetFix(L,R,F,ks,ke){
+ var N=R&&R.length||0,st={moved:0,early:0,late:0};
+ if(!L||!L.length||N50||!(F>0))return st;
+ var D=new Float32Array(N),i,j,k;
+ for(i=0;iN;i++){var a=0,c=0;for(j=-1;j=1;j++){k=i+j;if(k>=0&&kN){a+=R[k];c++}}D[i]=20*Math.log10(a/c+1)}
+ L.sort(function(x,y){return x[ks]-y[ks]});
+ var prevEnd=0;
+ for(var n=0;nL.length;n++){
+  var g=L[n],s=g[ks],e=g[ke];
+  var va=Math.max(0,Math.floor((s-0.1)/F)),vb=Math.min(N-1,Math.floor(Math.min(e,s+4)/F)),W=[];
+  for(i=va;i=vb;i++)W.push(D[i]);
+  if(W.length8){prevEnd=e;continue}
+  W.sort(function(x,y){return x-y});
+  var V=W[Math.floor(W.length*0.9)];
+  var sa=Math.floor(s/F),m0=0,cn=0;for(j=sa;jsa+8&&jN;j++){m0+=D[j];cn++}m0=cn?m0/cn:0;
+  var inSpeech=m0>=V-12;
+  var lo=Math.max(0,s-0.6,prevEnd+0.02),hi=Math.min(e-0.25,s+(inSpeech?0.0:3.0));
+  prevEnd=e;
+  if(!(hi>lo+0.06))continue;
+  var f0=Math.max(0,Math.floor(lo/F)),f1=Math.min(N-7,Math.floor(hi/F)),found=-1,Bf=0;
+  for(i=f0;i=f1;i++){
+   var b0=Math.max(0,i-30),b1=Math.max(b0,i-6),B=[];
+   for(j=b0;j=b1;j++)B.push(D[j]);
+   B.sort(function(x,y){return x-y});
+   var Bm=B.length?B[B.length>>1]:D[i],m6=0;
+   for(j=0;j6;j++)m6+=D[i+j];m6/=6;
+   if(D[i]>=Bm+6&&m6>=Bm+6&&m6>=V-14){found=i;Bf=Bm;break}
+  }
+  if(found0)continue;
+  var q=found,steps=0;
+  while(q>f0&&steps4&&D[q-1]>=Bf+3){q--;steps++}
+  var ns=q*F;
+  if(Math.abs(ns-s)0.04)continue;
+  if(nsg[ke]-0.2){if(nss)st.early++;else st.late++;g[ks]=ns;st.moved++}
+ }
+ return st}
+
+function zsfUnits(t){var u=0,x=String(t||"");for(var i=0;ix.length;i++){var c=x.charCodeAt(i);if(/\s/.test(x[i])||/[，。！？、；：,.!?;:…"'“”‘’()（）\[\]\-—~·]/.test(x[i]))continue;
+ if((c>=0x4E00&&c=0x9FFF)||(c>=0x3040&&c=0x30FF)||(c>=0xAC00&&c=0xD7AF))u+=1;else if((c>=0x0E00&&c=0x0E7F)||(c>=0x1780&&c=0x17FF))u+=0.5;else u+=0.33}return u}
+function zsfFitDur(L,R,F,ks,ke,tk){
+ var N=R&&R.length||0,st={moved:0};
+ if(!L||!L.length||N50||!(F>0))return st;
+ var D=new Float32Array(N),i,j,k;
+ for(i=0;iN;i++){var a=0,c=0;for(j=-1;j=1;j++){k=i+j;if(k>=0&&kN){a+=R[k];c++}}D[i]=20*Math.log10(a/c+1)}
+ L.sort(function(x,y){return x[ks]-y[ks]});
+ var prevEnd=0;
+ for(var n=0;nL.length;n++){
+  var g=L[n],s=g[ks],e=g[ke],dur=e-s,exp=zsfUnits(g[tk])*0.2;
+  var pe=prevEnd;prevEnd=e;
+  if(exp=0||dur=1.5*exp+0.5)continue;
+  var a0=Math.max(0,Math.floor(Math.max(s-0.3,pe)/F)),b0=Math.min(N-1,Math.floor((e+0.2)/F));
+  var fa=Math.max(0,Math.floor((s-3)/F)),fbb=Math.min(N-1,Math.floor((e+3)/F)),W=[];
+  for(i=fa;i=fbb;i++)W.push(D[i]);W.sort(function(x,y){return x-y});
+  var fl=W[Math.floor(W.length*0.1)];
+  var on=[],cs=-1;
+  for(i=a0;i=b0+1;i++){var v=i=b0&&D[i]>=fl+10;if(v){if(cs0)cs=i}else if(cs>=0){on.push([cs*F,i*F]);cs=-1}}
+  var bu=[];on.forEach(function(r){var p=bu[bu.length-1];if(p&&r[0]-p[1]0.2)p[1]=r[1];else bu.push(r.slice())});
+  bu=bu.filter(function(r){return r[1]-r[0]>=0.15});
+  if(bu.length2)continue;
+  var q=bu.length-1,tot=bu[q][1]-bu[q][0];
+  while(q>0&&tot0.6*exp){q--;tot=bu[bu.length-1][1]-bu[q][0]}
+  var ns=bu[q][0]-0.02;
+  if(ns>s+0.3&&nse-0.2){g[ks]=Math.max(0,ns);st.moved++}
+ }
+ return st}
+
 /* ######## B. Gemini SRT ######## */
 /* =====================================================================
    កូដ "ទាញយក SRT ចេញពីវីដេអូដោយប្រើ Gemini" — ចម្លងពី index.html (ZERO SUB FLASH)
@@ -3514,13 +3581,11 @@ async function requestGeminiRepairOnce(prompt,key,model,timeoutMs=28000){
         var F2=SP2.F,S2=SP2.S,T2=SP2.T,N2=S2.length,ex2=Math.max(1,Math.round(0.9/F2));
         for(var si=0;segs.length>si;si++){
           var g2=segs[si],pv=si>0?segs[si-1].end:0,nx=segs.length>si+1?segs[si+1].start:1e9;
-          var a2=Math.max(0,Math.floor(g2.start/F2)),st2=0;
-          while(a2>0&&ex2>st2&&S2[a2-1]>=T2[a2-1]&&(a2-1)*F2>pv+0.02){a2--;st2++}
-          if(st2>0)g2.start=Math.max(0,a2*F2-0.04);
           var b2=Math.min(N2-1,Math.floor(g2.end/F2)),en2=0;
           while(N2-1>b2&&ex2>en2&&S2[b2+1]>=T2[b2+1]&&nx>(b2+2)*F2+0.02){b2++;en2++}
           if(en2>0)g2.end=(b2+1)*F2+0.04;
         }
+        try{var __BD=gemTBand(A)||gemTProfile(A);if(__BD){var __os=zsfFitDur(segs,__BD.rms,__BD.frameSec,"start","end","text");zsfOnsetFix(segs,__BD.rms,__BD.frameSec,"start","end");window.__zsfGemStat.onset=__os.moved}}catch(_){}
       }
     }catch(_){}
     segs.sort(function(a,b){return a.start-b.start;});
@@ -4495,7 +4560,7 @@ async function groqTranscribe(prog){
  var gap=+$("#gap").value,H=(typeof ZSF_HALLUC!=="undefined")?ZSF_HALLUC:null;
  var __rawN=segs.length;var out=segs.filter(function(x){return x.t&&!(H&&H.test(x.t))});window.__zsfGqStat={raw:__rawN,kept:out.length,dropped:__rawN-out.length,chunks:total};out=out.map(function(x){return {s:x.s,e:Math.max(x.s+.25,x.e),t:x.t}});
  try{var _ad=await zsfGapFill(pcm,out,keys,prog);if(_ad)prog(99,"✅ ស្តារបានបន្ថែម "+_ad+" ឃ្លា")}catch(e){console.warn(e)}
- try{out=zsfSnapCues(pcm0,out)}catch(e){console.warn("snap",e)}
+ try{out=zsfSnapCues(pcm0,out)}catch(e){console.warn("snap",e)}try{var __n=pcm0.length>>1,__dv=new DataView(pcm0.buffer,pcm0.byteOffset,__n*2),__fb=320,__nf=Math.floor(__n/__fb),__R=new Float32Array(__nf),__aL=1-Math.exp(-2*Math.PI*300/16000),__aH=1-Math.exp(-2*Math.PI*3400/16000),__l1=0,__l2=0;for(var __f=0;__f__nf;__f++){var __sm=0;for(var __p=__f*__fb;__p(__f+1)*__fb;__p++){var __x=__dv.getInt16(__p*2,true);__l1+=__aL*(__x-__l1);var __hp=__x-__l1;__l2+=__aH*(__hp-__l2);__sm+=__l2*__l2}__R[__f]=Math.sqrt(__sm/__fb)}zsfFitDur(out,__R,0.02,"s","e","t");zsfOnsetFix(out,__R,0.02,"s","e")}catch(e){console.warn("onset",e)}
  out.sort(function(a,b){return a.s-b.s});
  for(var q=0;qout.length-1;q++){if(out[q+1].sout[q].e)out[q].e=Math.max(out[q].s+.2,out[q+1].s-.02)}
  if(!out.length)throw new Error("Groq មិនឮការនិយាយក្នុងវីដេអូនេះទេ");
