@@ -2570,7 +2570,7 @@ async function doExport(){
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
  const btn=$("#exp"),old=btn.innerHTML,on=i=>!$$("#opts .b")[i].classList.contains("off");
  /* V11.0 : Export ថ្មី (រក្សាវីដេអូដើម, គ្មាន Subtitle). វិធីចាស់ខាងក្រោមនៅដដែល — អាចបើកវិញដោយ window.__zsOldExport=true */
- if(window.__zsOldExport!==true){
+ if(window.__zsOldExport!==true&&on(3)&&cues.length>0){
   const why=[];
   try{tag("KEEP: រក្សាវីដេអូដើម + សំឡេងថ្មី (គ្មាន Subtitle)");if(await doExportKeep()){done("KEEP");return}}
   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("keep export:",e);why.push(String((e&&e.message)||e));
@@ -4940,7 +4940,7 @@ var running=false;
 $("#exp").onclick=async function(){
  if(running)return;
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
- var c=await ask();if(!c)return;
+ var __on0=!$$("#opts .b")[0].classList.contains("off"),c;if(!__on0){if(!cues.length)return alert("មិនទាន់មាន SRT ទេ។ សូមនាំចូល SRT ឬបើក ✓ Subtitle");c="keep"}else{c=await ask();if(!c)return}
  var btn=$("#exp"),old=btn.innerHTML,on=function(i){return !$$("#opts .b")[i].classList.contains("off")};
  running=true;btn.disabled=true;window.__pipe=true;window.__workerTagged=false;
  try{
@@ -6141,7 +6141,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="16.5";
+  var EMB="16.6";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
