@@ -980,7 +980,7 @@ kr:f('rect width="30" height="20" fill="#fff"/>circle cx="15" cy="10" r="5
 jp:f('rect width="30" height="20" fill="#fff"/>circle cx="15" cy="10" r="6" fill="#bc002d"/>')}})();
 const L=[["auto",ICO.globe+" ស្វ័យប្រវត្តិ"],["zh",FL.cn+"ចិន"],["en",FL.us+"អង់គ្លេស"],["ko",FL.kr+"កូរ៉េ"],["ja",FL.jp+"ជប៉ុន"]],M=[["whisper-large-v3-turbo","⚡ Turbo"],["whisper-large-v3","🎯 V3 (ណែនាំ)"],["sens","📴 SenseVoice"]];
 function chips(id,l,g,s,cls){$(id).innerHTML=l.map(([x,n])=>`button class="b ${g()===x?cls:""}" data-v="${x}" style="${id=="#langs"?"flex:none;padding:10px 14px":""}">${n}/button>`).join("");$$(id+" .b").forEach(b=>b.onclick=()=>{s(b.dataset.v);chips(id,l,g,s,cls)})}
-chips("#langs",L,()=>lang,x=>lang=x,"sel");chips("#models",M,()=>model,x=>model=x,"pur");
+chips("#langs",L,()=>lang,x=>lang=x,"sel");chips("#models",M,()=>model,x=>{model=x;try{zsfSvUi()}catch(e){}},"pur");try{zsfSvUi()}catch(e){}
 $("#gap").oninput=e=>$("#gapv").textContent=(+e.target.value).toFixed(2)+"s";$("#bgm").oninput=e=>{$("#bgmv").textContent=e.target.value+"%";try{localStorage.setItem("zsf_bgm",e.target.value)}catch(_){}};
 const lg=m=>$("#log").textContent+=m+"\n";
 /* Groq ASR: see zsfTranscribeGroqMain (end of file) */
@@ -4638,17 +4638,50 @@ async function groqTranscribe(prog){
  if(!out.length)throw new Error("Groq មិនឮការនិយាយក្នុងវីដេអូនេះទេ");
  return out;
 }
+/* ===== V15.6 : SenseVoice Offline ក្នុង APK (Silero VAD រកសំឡេងនិយាយពិត + SenseVoice Small ស្តាប់) ===== */
+function zsfSvNative(){var N=window.ZSNative;return !!(N&&typeof N.svTranscribe==="function")}
+function zsfSvUi(){
+ var host=document.getElementById("models");if(!host)return;
+ var n=document.getElementById("svNote");
+ if(!n){n=document.createElement("div");n.id="svNote";n.className="note";n.style.cssText="display:none;margin-top:8px";host.parentNode.insertBefore(n,host.nextSibling)}
+ if(model!=="sens"){n.style.display="none";return}
+ var t;
+ if(!zsfSvNative())t="⚠️ SenseVoice Offline ដំណើរការបានតែក្នុង APK ថ្មី (មិនមែន Browser) — ឥឡូវនេះនឹងប្រើ Whisper V3 ជំនួស";
+ else{var ok=false;try{ok=JSON.parse(window.ZSNative.svStatus()).ready}catch(e){}
+  t=ok?"✅ ម៉ូដែល SenseVoice បានទាញរួច — ដំណើរការ Offline បាន (កាត់ម៉ោងតាមសំឡេងនិយាយពិត)":"📴 SenseVoice Offline: លើកដំបូងត្រូវទាញម៉ូដែល ~230MB តែម្តង ក្រោយនេះប្រើ Offline (សូមបើក Wi-Fi/Data)"}
+ n.textContent=t;n.style.display="block"}
+async function zsfSenseVoice(prog){
+ var N=window.ZSNative;
+ if(!zsfSvNative())throw new Error("SenseVoice ដំណើរការបានតែក្នុង APK ថ្មី");
+ var MSG={copy:"កំពុងចម្លងវីដេអូ...",decode:"កំពុងអានសំឡេងវីដេអូ...",model:"កំពុងទាញយកម៉ូដែល SenseVoice (លើកដំបូងតែម្តង)",load:"កំពុងបើកម៉ូដែល...",vad:"កំពុងរកចំណុចដែលមានសំឡេងនិយាយ",asr:"SenseVoice កំពុងស្តាប់"};
+ var L=(typeof lang==="string")?lang:"auto",sil=Math.max(100,Math.round((+$("#gap").value||0.3)*1000));
+ prog(1,"📴 កំពុងរៀបចំ SenseVoice...");
+ var r=await new Promise(function(res){
+  var cb="zsSvB"+Date.now();
+  window[cb]=function(x){try{delete window[cb];delete window[cb+"_p"]}catch(_){}res(x)};
+  window[cb+"_p"]=function(o){try{var t=MSG[o.s]||"";if(o.s==="model"&&o.tot)t+=" "+o.mb+"/"+o.tot+"MB";prog(Math.max(1,Math.min(98,o.p)),"📴 "+t+(o.s==="asr"||o.s==="vad"?" "+Math.round(o.p)+"%":""))}catch(_){}};
+  try{N.svTranscribe(L,sil,16,cb)}catch(e){res({ok:false,error:String(e)})}
+ });
+ if(!r||!r.ok)throw new Error("SenseVoice: "+(r&&r.error||"failed"));
+ if(Number(r.inSize)!==Number(file.size))throw new Error("ឯកសារដែលជ្រើសមិនត្រូវគ្នា — សូមជ្រើសវីដេអូម្តងទៀត");
+ var out=(r.cues||[]).filter(function(x){return x&&x.t&&isFinite(x.s)&&isFinite(x.e)}).map(function(x){return {s:x.s,e:Math.max(x.s+.25,x.e),t:String(x.t)}});
+ out.sort(function(a,b){return a.s-b.s});
+ out.forEach(function(c,q){var nx=out[q+1];if(nx&&nx.s-c.e0)c.e=Math.max(c.s+.2,nx.s-.02)});
+ if(!out.length)throw new Error("SenseVoice មិនឮការនិយាយក្នុងវីដេអូនេះទេ");
+ window.__zsfGqStat={raw:out.length,kept:out.length,dropped:0,chunks:1};
+ try{prog(99,"✅ SenseVoice ស្តាប់រួច "+out.length+" ឃ្លា")}catch(_){}
+ return out}
 async function zsfTranscribeGroqMain(){
  if(!file)return alert("សូមជ្រើសវីដេអូជាមុន");
  var btn=$("#asr"),old=btn.innerHTML;btn.disabled=true;btn.textContent="⏳ កំពុងដំណើរការ...";
  try{
   $("#log").textContent="";
-  var out=await groqTranscribe(function(p,m){setProgress(p,m)});
-  setC(out);var __st=window.__zsfGqStat||{};setProgress(100,"✅ ទាញអក្សរ Groq រួចរាល់ • "+out.length+" ឃ្លា"+(__st.dropped?" (ត្រង "+__st.dropped+" ឃ្លាលំអៀង/ស្ទួនចោល)":""),window.__fstep||1);
+  var __sv=(model==="sens"&&zsfSvNative());var out=__sv?await zsfSenseVoice(function(p,m){setProgress(p,m)}):await groqTranscribe(function(p,m){setProgress(p,m)});
+  setC(out);var __st=window.__zsfGqStat||{};setProgress(100,"✅ ទាញអក្សរ "+(__sv?"SenseVoice":"Groq")+" រួចរាល់ • "+out.length+" ឃ្លា"+(__st.dropped?" (ត្រង "+__st.dropped+" ឃ្លាលំអៀង/ស្ទួនចោល)":""),window.__fstep||1);
   showV32Diag("Groq ស្តាប់សំឡេង • "+out.length+" ឃ្លា",true);
  }catch(e){
   var msg=String((e&&e.message)||e||"").slice(0,420);
-  setProgress(0,"❌ Groq បរាជ័យ • "+msg);showV32Diag("GROQ ERROR • "+msg,false);
+  setProgress(0,"❌ ទាញអក្សរបរាជ័យ • "+msg);showV32Diag("GROQ ERROR • "+msg,false);
  }
  btn.disabled=false;btn.innerHTML=old;
 }
