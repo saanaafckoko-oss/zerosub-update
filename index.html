@@ -709,7 +709,7 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
  /div>
  div id="srtArea" class="hide">
  div class="lbl">ភាសាគោលដៅ/div>
- select class="sel2" id="target">option value="km">ខ្មែរ/option>option value="en">អង់គ្លេស/option>option value="th">ថៃ/option>option value="vi">វៀតណាម/option>option value="zh-CN">ចិន/option>/select>
+ select class="sel2" id="target">option value="km">ខ្មែរ/option>option value="en">អង់គ្លេស/option>option value="th">ថៃ/option>option value="vi">វៀតណាម/option>option value="zh-CN">ចិន/option>/select>div class="lbl" style="margin-top:10px">ស្ទីលបកប្រែ/div>select class="sel2" id="trStyle">option value="normal">ធម្មតា (ត្រង់តាមសាច់រឿង)/option>option value="fun">😄 កំប្លែង ទាក់ទាញ (និយាយបែបសប្បាយ)/option>/select>
  div id="oldSrt">textarea id="srtText" rows="6" placeholder="SRT នឹងបង្ហាញនៅទីនេះ" style="margin-top:10px">/textarea>
  div class="row">button class="b" id="dlSrt">ទាញយក SRT/button>button class="b" id="clr">សម្អាត/button>/div>/div>
  button class="b big" id="aiGen">⚡ 🚀 ចាប់ផ្ដើម បង្កើតសំឡេង AI/button>
@@ -1117,10 +1117,11 @@ async function ff(){
      cu=cu||await ffGet("@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js","text/javascript",50000,false);
      wu=wu||await ffGet("@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm","application/wasm",5000000,true);
      wk=wk||await ffGet("@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js","text/javascript",1000,false);
-     await FF.load({coreURL:cu,wasmURL:wu,classWorkerURL:wk});
+     if(t===1)await FF.load({coreURL:"https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js",wasmURL:"https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm",classWorkerURL:wk});
+     else await FF.load({coreURL:cu,wasmURL:wu,classWorkerURL:wk});
      if(FF.loaded)return FF;
      throw new Error("FFmpeg ផ្ទុកមិនចប់");
-    }catch(e){lastErr=e;FF=null;await new Promise(r=>setTimeout(r,800*(t+1)))}
+    }catch(e){lastErr=e;FF=null;if(t===0){try{await caches.delete("zsf-ff1")}catch(_){}cu=wu=wk=null}await new Promise(r=>setTimeout(r,800*(t+1)))}
    }
    throw lastErr||new Error("FFmpeg ផ្ទុកមិនបាន");
   }finally{__ffP=null}
@@ -1237,6 +1238,75 @@ async function doSplit(){
 function probe(fl){return new Promise(res=>{const v=document.createElement("video"),u=URL.createObjectURL(fl);let dn=false;
  const done=r=>{if(dn)return;dn=true;URL.revokeObjectURL(u);res(r)};
  v.preload="metadata";v.muted=true;v.onloadedmetadata=()=>done({w:v.videoWidth,h:v.videoHeight,d:v.duration});v.onerror=()=>done(null);setTimeout(()=>done(null),8000);v.src=u})}
+/* V15.5 : ស្ទីលបកប្រែ — ធម្មតា / កំប្លែង ទាក់ទាញ (ជ្រើសក្នុងប្រអប់ "ស្ទីលបកប្រែ") · ប៉ះពាល់គ្រប់ការបកប្រែ Gemini (SRT + ទាញពីវីដេអូ) */
+var ZSF_FUN_PROMPT="STYLE (FUN & ENGAGING): make the Khmer lively and entertaining for viewers, like a witty Khmer social-media movie narrator, ONLY where the scene is light, comedic, teasing, awkward, or the characters are joking or showing off. Keep serious, sad, tense, dangerous, heartfelt-romantic and emotional-climax lines natural and sincere (no jokes there). Use natural spoken Khmer that young viewers really say (colloquial particles and everyday words, playful reactions, light exaggeration, witty comebacks, fitting Khmer sayings) instead of stiff formal written Khmer, and give each character a consistent personality in tone (cocky, shy, cunning, innocent, grumpy). Do NOT change the facts or meaning, do NOT add new information and do NOT drop anything; keep each line about the same length as a normal translation (at most about 15% longer) so the Khmer voice still fits the time slot. No vulgar, insulting or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply.";
+function zsfFunOn(){try{return localStorage.getItem("zsf_tr_style")==="fun"}catch(e){return false}}
+(function(){
+ var t=document.getElementById("trStyle");
+ if(t){try{t.value=zsfFunOn()?"fun":"normal"}catch(e){}t.onchange=function(){try{localStorage.setItem("zsf_tr_style",t.value)}catch(e){}try{showToast(t.value==="fun"?"😄 ស្ទីលកំប្លែង ទាក់ទាញ បើកហើយ":"ស្ទីលធម្មតា",true)}catch(e){}}}
+ if(window.__zsfStyleHook)return;window.__zsfStyleHook=true;
+ var F0=window.fetch;
+ window.fetch=function(u,o){
+  try{
+   if(zsfFunOn()&&typeof u==="string"&&u.indexOf("generativelanguage.googleapis.com")>=0&&u.indexOf(":generateContent")>=0&&o&&typeof o.body==="string"&&o.body.indexOf("NO LATIN LETTERS")>=0){
+    var j=JSON.parse(o.body),ps=j.contents&&j.contents[0]&&j.contents[0].parts,hit=false;
+    if(ps){for(var i=0;ips.length;i++){var x=ps[i];
+     if(x&&typeof x.text==="string"&&x.text.indexOf("NO LATIN LETTERS")>=0&&x.text.indexOf("STYLE (FUN")0){
+      x.text=x.text.indexOf("Output only numbered lines.")>=0?x.text.replace("Output only numbered lines.",ZSF_FUN_PROMPT+" Output only numbered lines."):(ZSF_FUN_PROMPT+"\n"+x.text);hit=true}}}
+    if(hit){j.generationConfig=j.generationConfig||{};j.generationConfig.temperature=Math.max(+j.generationConfig.temperature||0,.7);
+     o=Object.assign({},o,{body:JSON.stringify(j)})}
+   }
+  }catch(e){}
+  return F0.call(this,u,o)};
+})();
+/* V15.4: ផ្គុំវីដេអូដោយ FFmpeg native ក្នុង APK (ដូចការកាត់ភាគ) — មិនពឹង ffmpeg.wasm ទៀត */
+async function zsNativeMerge(fl,info){
+ const N=window.ZSNative;
+ if(!(N&&typeof N.runFfmpeg==="function"&&typeof N.putFile==="function"&&typeof N.deleteFile==="function"&&typeof N.saveToDownloads==="function"&&typeof N.prepareLastPicked==="function"))throw new Error("APK នេះគ្មាន native merge (putFile/runFfmpeg)");
+ const tg="mg"+Date.now(),names=[],list=tg+"_list.txt",out0=tg+"_out.mp4";let prep=null,dir="";
+ const readB64=(x,o,e)=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const s=String(fr.result);res(s.slice(s.indexOf(",")+1))};fr.onerror=()=>rej(fr.error||new Error("read"));fr.readAsDataURL(x.slice(o,e))});
+ try{
+  say("📦 កំពុងរៀបចំថត native...");
+  prep=await nCall("zsPrep",cb=>N.prepareLastPicked(cb),15*60*1000);
+  if(!(prep&&prep.ok&&prep.path))throw new Error("រកថត native មិនឃើញ");
+  dir=String(prep.path).replace(/[^\/]+$/,"");
+  const CH=6*1024*1024;
+  for(let i=0;ifl.length;i++){
+   const x=fl[i],nm=tg+"_"+i+"."+(ext(x)||"mp4");names.push(nm);
+   for(let o=0;ox.size;o+=CH){
+    say("📤 ផ្ទេរភាគ "+(i+1)+"/"+fl.length+" ទៅ native "+Math.round(Math.min(x.size,o+CH)/x.size*100)+"%");
+    const b64=await readB64(x,o,Math.min(x.size,o+CH));
+    if(N.putFile(nm,b64,o>0)!==true)throw new Error("putFile បរាជ័យ (ភាគ "+(i+1)+")");
+   }
+  }
+  const txt=names.map(n=>"file '"+dir+n+"'").join("\n")+"\n";
+  if(N.putFile(list,btoa(txt),false)!==true)throw new Error("សរសេរ list មិនបាន");
+  const exts=fl.map(ext),oe=exts.every(x=>x===exts[0])?exts[0]:"mp4",mp=/^(mp4|mov|m4v)$/.test(oe);
+  const run=async(a,lb)=>{say(lb+" ...");const r=await nCall("zsMg",cb=>N.runFfmpeg(JSON.stringify(a),cb),60*60*1000,ms=>say(lb+" "+Math.floor(ms/1000)+" វិនាទី"));return r};
+  let out=tg+"_out."+oe;
+  let r=await run(["-y","-f","concat","-safe","0","-i",dir+list,"-c","copy"].concat(mp?["-movflags","+faststart"]:[],[dir+out]),"🔗 កំពុងផ្គុំ (Native • លឿន)");
+  if(!(r&&r.ok)){
+   try{N.deleteFile(out)}catch(_){}
+   out=out0;
+   const v0=(info||[]).find(Boolean)||{w:1280,h:720},W=(v0.w||1280)&~1,H=(v0.h||720)&~1;
+   const inp=names.flatMap(n=>["-i",dir+n]);
+   const fc=names.map((_,i)=>`[${i}:v]scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,format=yuv420p[v${i}];[${i}:a]aresample=44100,aformat=channel_layouts=stereo[a${i}]`).join(";")+";"+names.map((_,i)=>`[v${i}][a${i}]`).join("")+`concat=n=${names.length}:v=1:a=1[v][a]`;
+   r=await run(["-y"].concat(inp,["-filter_complex",fc,"-map","[v]","-map","[a]","-c:v","libx264","-preset","ultrafast","-crf","23","-c:a","aac","-b:a","128k","-movflags","+faststart",dir+out]),"🔗 កំពុងផ្គុំ (Native • Re-encode)");
+  }
+  if(!(r&&r.ok))throw new Error("native ffmpeg ផ្គុំបរាជ័យ: "+errTxt(r&&r.error));
+  const fname=baseName(fl[0])+"_merged."+(out===out0?"mp4":oe);
+  say("💾 កំពុងរក្សាទុក "+esc(fname)+" ...");
+  const sr=await nCall("zsSv",cb=>N.saveToDownloads(fname,"video/mp4",out,cb),10*60*1000);
+  if(!(sr&&sr.ok))throw new Error("រក្សាទុកមិនបាន: "+errTxt(sr&&sr.error));
+  try{if(Array.isArray(window.__batchCap))window.__batchCap.push({name:fname,blob:null})}catch(_){}
+  try{const sec=(info||[]).reduce((a,x)=>a+((x&&x.d)||0),0);if(window.zsfReportUsage&&sec>0)window.zsfReportUsage({__zsSec:sec},fname)}catch(_){}
+  names.push(out);
+  return fname;
+ }finally{
+  for(const n of names.concat([list,out0])){try{N.deleteFile(n)}catch(_){}}
+  try{if(prep&&prep.name)N.deleteFile(prep.name)}catch(_){}
+ }
+}
 async function doMerge(){
  if(mergeFiles.length2)return alert("សូមជ្រើសយ៉ាងតិច 2 វីដេអូ");
  window.__mergeErr="";
@@ -1244,10 +1314,12 @@ async function doMerge(){
  const tot=mergeFiles.reduce((s,x)=>s+x.size,0);
  if(tot>1.6e9&&!window.__batchMerging&&!confirm("ទំហំសរុប "+fmtMB(tot)+" ធំណាស់ — browser អាចគាំង (RAM មានកំណត់)។ ណែនាំផ្គុំម្តងតិចៗ។ បន្តទេ?"))return;
  window.__cutBusy=true;const btn=$("#splitBtn");btn.disabled=true;
- let f=null,files=[],mounted=false;
+ let f=null,files=[],mounted=false,nerr="";
  try{
   say("កំពុងពិនិត្យវីដេអូ...");
   const info=await Promise.all(mergeFiles.map(probe));
+  try{const nr=await zsNativeMerge(mergeFiles,info);if(nr){say("✅ ផ្គុំរួចរាល់៖ "+esc(nr)+" (ពិនិត្យថត Downloads)");return}}
+  catch(x){nerr="native: "+errTxt(x);console.warn(nerr);say("⚠ "+esc(nerr)+" — សាក FFmpeg browser...")}
   say("កំពុងផ្ទុក FFmpeg...");f=await ff();
   const exts=mergeFiles.map(ext);
   files=mergeFiles.map((x,i)=>new File([x],"m"+i+"."+exts[i],{type:x.type}));
@@ -1274,7 +1346,7 @@ async function doMerge(){
   dlBlob(nm,new Blob([d],{type:"video/"+(oe==="mkv"?"x-matroska":oe)}));
   try{await f.deleteFile("out."+oe)}catch(e){}try{await f.deleteFile("list.txt")}catch(e){}
   say("✅ ផ្គុំរួចរាល់៖ "+esc(nm)+" (ពិនិត្យថត Downloads)");
- }catch(x){window.__mergeErr=String((x&&x.message)||x);say("❌ កំហុស៖ "+x.message+" — ប្រហែលឯកសារធំពេក ឬ Format មិនដូចគ្នា")}
+ }catch(x){window.__mergeErr=(nerr?nerr+" | ":"")+"browser: "+String((x&&x.message)||x);say("❌ កំហុស៖ "+esc(window.__mergeErr))}
  finally{window.__ffTag="";if(f&&files.length)await unmountFiles(f,"/mg",files,mounted);window.__cutBusy=false;btn.disabled=false}
 }
 
@@ -2683,7 +2755,7 @@ function zsfTrSummary(a){var b=zsfSnap(),d={req:b.req-a.req,ok:b.ok-a.ok,inTok:b
  try{if(typeof showToast==="function")showToast(msg,true)}catch(e){}return d}
 var ZSF_TR_PV="v1",zsfTrDB=null,zsfTrMem=new Map();
 function zsfHash(s){s=String(s||"");var h=5381;for(var i=0;is.length;i++)h=((h5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)+"."+s.length}
-function zsfTrKey(tl,ctx,text){return ZSF_TR_PV+"|"+selections.geminiModel+"|"+tl+"|"+zsfHash(ctx)+"|"+text}
+function zsfTrKey(tl,ctx,text){return ZSF_TR_PV+"|"+selections.geminiModel+"|"+tl+((typeof zsfFunOn==="function"&&zsfFunOn())?"|fun":"")+"|"+zsfHash(ctx)+"|"+text}
 function zsfTrOk(tl,srcText,v){if(!v)return false;var hasL=/[A-Za-z\u00C0-\uFFFF]/.test(srcText);
  if(/^km/i.test(tl))return /[\u1780-\u17FF]/.test(v)||!hasL;return v!==srcText||!hasL}
 function zsfTrOpen(){return new Promise(function(res){try{if(!window.indexedDB)return res(null);var q=indexedDB.open("zsf_trcache",1);q.onupgradeneeded=function(){try{q.result.createObjectStore("kv")}catch(e){}};q.onsuccess=function(){res(q.result)};q.onerror=function(){res(null)};q.onblocked=function(){res(null)}}catch(e){res(null)}})}
@@ -5964,7 +6036,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="15.3";
+  var EMB="15.5";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
