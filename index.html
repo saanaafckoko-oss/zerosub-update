@@ -4222,7 +4222,7 @@ async function zsfTranscribeGeminiMain(){
     showV32Diag("Gemini ស្តាប់សំឡេង • "+cues.length+" ឃ្លា • "+r.parts+" ផ្នែក • ⏱ "+wall.toFixed(1)+"s"+(notes.length?"\n"+notes.join(" • "):""),true);
   }catch(e){
     var msg=String((e&&e.message)||e||"").slice(0,420);
-    setProgress(0,"❌ Gemini Transcribe បរាជ័យ • "+msg);
+    window.__zsfAsrErr=msg;setProgress(0,"❌ Gemini Transcribe បរាជ័យ • "+msg);
     showV32Diag("GEMINI TRANSCRIBE ERROR • "+msg,false);
   }
   btn.disabled=false;btn.innerHTML=old;
@@ -4681,7 +4681,7 @@ async function zsfTranscribeGroqMain(){
   showV32Diag("Groq ស្តាប់សំឡេង • "+out.length+" ឃ្លា",true);
  }catch(e){
   var msg=String((e&&e.message)||e||"").slice(0,420);
-  setProgress(0,"❌ ទាញអក្សរបរាជ័យ • "+msg);showV32Diag("GROQ ERROR • "+msg,false);
+  window.__zsfAsrErr=msg;setProgress(0,"❌ ទាញអក្សរបរាជ័យ • "+msg);showV32Diag("GROQ ERROR • "+msg,false);
  }
  btn.disabled=false;btn.innerHTML=old;
 }
@@ -4878,10 +4878,10 @@ $("#exp").onclick=async function(){
    phase(1);setProgress(1,"📦 កំពុងរៀបចំ...");
    setC([]);
    window.__zsfPre=null;window.__zsfStream=null;try{window.zsfResetBible&&window.zsfResetBible()}catch(e){}
-   window.__zsfStreamWant=(false&&c==="groq"&&on(1)&&$("#target").value==="km"&&K.filter(Boolean).length>0&&typeof window.__zsfDirectAnalyze==="function");
+   window.__zsfAsrErr="";window.__zsfStreamWant=(false&&c==="groq"&&on(1)&&$("#target").value==="km"&&K.filter(Boolean).length>0&&typeof window.__zsfDirectAnalyze==="function");
    try{if(c==="gem")await zsfTranscribeGeminiMain();else await zsfTranscribeGroqMain()}finally{window.__zsfStreamWant=false}
    if(window.__zsfStream){try{setProgress(99,"🤖 កំពុងបញ្ចប់ផ្នែកចុងក្រោយ...");await window.__zsfStream.finish(150000)}catch(e){}window.__zsfStream=null}
-   if(!cues.length)throw new Error("[1-Click Export គាំង!] មិនអាចទាញយក Subtitle ពីសំឡេងបានទេ។ ដំណើរការត្រូវបញ្ឈប់!");
+   if(!cues.length)throw new Error("[1-Click Export គាំង!] មិនអាចទាញយក Subtitle ពីសំឡេងបានទេ។ ដំណើរការត្រូវបញ្ឈប់!"+(window.__zsfAsrErr?" — មូលហេតុ៖ "+window.__zsfAsrErr:""));
   }else{phase(1);setProgress(100,"✅ ប្រើ SRT ដែលមានស្រាប់ "+cues.length+" ឃ្លា")}
   /* V7.9: កាត់ភ្លេងអម (Step 5) ស្របពេលបកប្រែ/អានសំឡេង (ប្រើបណ្តាញ) ដើម្បីកុំរង់ចាំបន្តបន្ទាប់ — លទ្ធផលដដែល */
   window.__bgmBg=null;
@@ -6069,7 +6069,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="15.7";
+  var EMB="15.8";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
