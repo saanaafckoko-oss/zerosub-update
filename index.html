@@ -713,7 +713,7 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
  div id="oldSrt">textarea id="srtText" rows="6" placeholder="SRT នឹងបង្ហាញនៅទីនេះ" style="margin-top:10px">/textarea>
  div class="row">button class="b" id="dlSrt">ទាញយក SRT/button>button class="b" id="clr">សម្អាត/button>/div>/div>
  button class="b big" id="aiGen">⚡ 🚀 ចាប់ផ្ដើម បង្កើតសំឡេង AI/button>
- div class="cuh0">b id="cueN">⁝ 0 បន្ទាត់/b>button class="b" id="cuDiv">svg viewBox="0 0 24 24" fill="currentColor" stroke="none">circle cx="9" cy="8" r="3.6"/>path d="M2.5 20c0-3.6 2.8-6 6.5-6s6.5 2.4 6.5 6z"/>path d="M16.8 6.2a4.2 4.2 0 0 1 0 5.6M19.4 3.8a7.6 7.6 0 0 1 0 10.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>/svg> ចែកតួ/button>button class="b" id="cuExp">svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">path d="M12 4v11M7.500 10.500L12 15l4.500-4.500M5 19.500h14"/>/svg> នាំចេញ .srt/button>button class="b" id="cuClr">svg viewBox="0 0 24 24" fill="currentColor" stroke="none">rect x="2.5" y="6" width="12" height="2" rx=".7"/>rect x="6" y="3.6" width="5" height="2.6" rx=".9"/>path d="M3.8 9.2h9.4l-.8 10.2a1.6 1.6 0 0 1-1.6 1.4H6.2a1.6 1.6 0 0 1-1.6-1.4z"/>path d="M17 9h4.5M17 13h4.5M17 17h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>/svg> លុប SRT/button>button class="b" id="cuRep" title="ចម្លងរបាយការណ៍ចាប់ប្រុស/ស្រី">📋/button>/div>
+ div class="cuh0">b id="cueN">⁝ 0 បន្ទាត់/b>button class="b" id="cuDiv">svg viewBox="0 0 24 24" fill="currentColor" stroke="none">circle cx="9" cy="8" r="3.6"/>path d="M2.5 20c0-3.6 2.8-6 6.5-6s6.5 2.4 6.5 6z"/>path d="M16.8 6.2a4.2 4.2 0 0 1 0 5.6M19.4 3.8a7.6 7.6 0 0 1 0 10.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>/svg> ចែកតួ/button>button class="b" id="cuExp">svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">path d="M12 4v11M7.500 10.500L12 15l4.500-4.500M5 19.500h14"/>/svg> នាំចេញ .srt/button>button class="b" id="cuClr">svg viewBox="0 0 24 24" fill="currentColor" stroke="none">rect x="2.5" y="6" width="12" height="2" rx=".7"/>rect x="6" y="3.6" width="5" height="2.6" rx=".9"/>path d="M3.8 9.2h9.4l-.8 10.2a1.6 1.6 0 0 1-1.6 1.4H6.2a1.6 1.6 0 0 1-1.6-1.4z"/>path d="M17 9h4.5M17 13h4.5M17 17h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>/svg> លុប SRT/button>button class="b" id="cuRep" title="ចម្លងរបាយការណ៍ចាប់ប្រុស/ស្រី">📋/button>button class="b" id="cuAlign" title="តម្រឹមម៉ោង Subtitle ឱ្យចំសំឡេងពិត">🎯 តម្រឹមម៉ោង/button>/div>
  div id="cueList">/div>
  /div>
 /section>
@@ -4376,6 +4376,39 @@ else if(a=="sp"){c.t="["+(+b.dataset.k+1)+"] "+tx;sync();render()}});
 q("#cueList").addEventListener("change",e=>{if(e.target.dataset.a!="txt")return;const c=cues[+e.target.closest(".cu").dataset.i],m=TAG.exec(c.t);c.t=(m?m[0]:"")+e.target.value;sync()});
 q("#cuDiv").onclick=()=>q("#tagBtn").click();q("#cuExp").onclick=()=>q("#dlSrt").click();
 q("#cuClr").onclick=()=>{if(!cues.length)return;if(!confirm("លុប SRT ទាំងអស់ ("+cues.length+" បន្ទាត់)?"))return;try{cur&&cur.stop()}catch(e){}cues=[];try{srtBlocks=[]}catch(e){}q("#srtText").value="";last="";q("#sub").textContent="";q("#srtFile").value="";render()};
+/* V16.0 : 🎯 តម្រឹមម៉ោង Subtitle ឱ្យចំសំឡេងពិត (ដូចក្នុង APK Sp) — ប្រើ Mask សំឡេងនិយាយ កែម៉ោងចាប់ផ្តើម/បញ្ចប់ មិនលុបបន្ទាត់ណាមួយឡើយ */
+function zsfAlignCues(pcm,list){
+ var M=zsfSpeechMask(pcm),m=M.m,nf=M.nf,FT=0.05,st={s:0,e:0},out=[],prevE=0,i,k;
+ if(!(M.ratio>0.02&&0.9>M.ratio))return {skip:true,cues:list,st:st};
+ for(i=0;list.length>i;i++){
+  var c=list[i],s=c.s,e=c.e,nx=list[i+1]?list[i+1].s:1e9,s2=s,e2=e;
+  var a=Math.max(0,Math.floor((s-0.35)/FT)),b=Math.min(nf-2,Math.floor((e-0.1)/FT)),on=-1;
+  for(k=a;b>=k;k++){if(m[k]&&m[k+1]){on=k;break}}
+  if(on>=0){var t0=on*FT;if(t0>s-0.35&&e-0.15>t0)s2=t0}
+  if(prevE>s2)s2=prevE;
+  var ea=Math.min(nf-1,Math.floor((e+0.5)/FT)),eb=Math.max(1,Math.floor((s2+0.1)/FT)),ne=-1;
+  for(k=ea;k>=eb;k--){if(m[k]&&m[k-1]){ne=k;break}}
+  if(ne>=0){var t1=(ne+1)*FT+0.1;if(t1>s2+0.3)e2=t1}
+  if(e2>nx-0.02)e2=nx-0.02;
+  if(s2+0.25>e2)e2=s2+0.25;
+  if(Math.abs(s2-s)>0.04)st.s++;
+  if(Math.abs(e2-e)>0.04)st.e++;
+  out.push(Object.assign({},c,{s:s2,e:e2}));prevE=e2}
+ return {skip:false,cues:out,st:st}}
+q("#cuAlign").onclick=async function(){
+ if(!cues.length)return alert("❌ គ្មាន Subtitle សម្រាប់តម្រឹមម៉ោងទេ!");
+ if(!file)return alert("សូមជ្រើសវីដេអូជាមុន");
+ var b=q("#cuAlign"),old=b.innerHTML;b.disabled=true;b.textContent="⏳ កំពុងវិភាគសំឡេង...";
+ try{
+  var wav=await extractVideoAudioV32Prototype(file);
+  var u8=new Uint8Array(await wav.arrayBuffer()),off=wavDataOffset(u8),pcm=u8.subarray(off,off+((u8.length-off)&~1));
+  try{pcm=zsfCleanPcm(pcm)}catch(e){}
+  var list=cues.map(function(c){return Object.assign({},c)}).sort(function(x,y){return x.s-y.s});
+  var r=zsfAlignCues(pcm,list);
+  if(r.skip){showToast("⚠️ ញែកសំឡេងនិយាយមិនបាន — ម៉ោងមិនត្រូវបានប្តូរ",false)}
+  else{setC(r.cues);try{render()}catch(e){}showToast("✅ បានតម្រឹមម៉ោង Subtitle ទាំងអស់ ("+r.cues.length+" ឃ្លា • កែម៉ោងចាប់ផ្តើម "+r.st.s+" • កែម៉ោងបញ្ចប់ "+r.st.e+")",true)}
+ }catch(e){showToast("❌ តម្រឹមម៉ោងបរាជ័យ: "+String((e&&e.message)||e).slice(0,160),false)}
+ b.disabled=false;b.innerHTML=old};
 q("#aiGen").onclick=()=>{if(!cues.length)return alert("សូមនាំចូល SRT ជាមុន");if(!V.src)return alert("សូមរើសវីដេអូជាមុន");doExport().catch(function(x){alert("Export: "+x.message)})};
 setInterval(()=>{const a=document.activeElement;if(a&&a.dataset&&a.dataset.a=="txt")return;const k=cues.length+"|"+toSrt(cues);if(k!==last+"|"&&k!==cues.length+"|"+last){last=toSrt(cues);if(cues.length)q("#srtArea").classList.remove("hide");render()}},600);
 q("#vidFile").addEventListener("change",()=>{if(q("#vidFile").files[0])q("#browse").textContent="📂 ប្តូរឯកសារ Media"});
@@ -4676,7 +4709,7 @@ async function zsfTranscribeGroqMain(){
  var btn=$("#asr"),old=btn.innerHTML;btn.disabled=true;btn.textContent="⏳ កំពុងដំណើរការ...";
  try{
   $("#log").textContent="";
-  var __sv=(model==="sens"&&zsfSvNative());var out;if(__sv){out=await zsfSenseVoice(function(p,m){setProgress(p,m)});var __tt=0,__tc=0;out.forEach(function(c){__tt+=c.e-c.s;__tc+=String(c.t).replace(/\s/g,"").length});if(__tc>0&&__tt/__tc>0.8){setProgress(5,"⚠️ SenseVoice ចែកម៉ោងវែងពេក — ប្តូរទៅ Groq Whisper...");try{var __g=await groqTranscribe(function(p,m){setProgress(p,m)});if(__g&&__g.length>out.length){out=__g;__sv=false}}catch(_){}}}else out=await groqTranscribe(function(p,m){setProgress(p,m)});
+  var __sv=(model==="sens"&&zsfSvNative());var out;if(__sv){try{out=await zsfSenseVoice(function(p,m){setProgress(p,m)})}catch(__e){window.__zsfSvErr=String((__e&&__e.message)||__e);setProgress(5,"⚠️ SenseVoice បរាជ័យ — ប្តូរទៅ Groq Whisper...");__sv=false;out=await groqTranscribe(function(p,m){setProgress(p,m)})}var __tt=0,__tc=0;out.forEach(function(c){__tt+=c.e-c.s;__tc+=String(c.t).replace(/\s/g,"").length});if(__sv&&__tc>0&&__tt/__tc>0.8){setProgress(5,"⚠️ SenseVoice ចែកម៉ោងវែងពេក — ប្តូរទៅ Groq Whisper...");try{var __g=await groqTranscribe(function(p,m){setProgress(p,m)});if(__g&&__g.length>out.length){out=__g;__sv=false}}catch(_){}}}else out=await groqTranscribe(function(p,m){setProgress(p,m)});
   setC(out);var __st=window.__zsfGqStat||{};setProgress(100,"✅ ទាញអក្សរ "+(__sv?"SenseVoice":"Groq")+" រួចរាល់ • "+out.length+" ឃ្លា"+(__st.dropped?" (ត្រង "+__st.dropped+" ឃ្លាលំអៀង/ស្ទួនចោល)":""),window.__fstep||1);
   showV32Diag("Groq ស្តាប់សំឡេង • "+out.length+" ឃ្លា",true);
  }catch(e){
@@ -6069,7 +6102,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="15.9";
+  var EMB="16.0";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
