@@ -853,7 +853,7 @@ const voiceOfSlot=i=>(i%2===0)?"km-KH-PisethNeural":"km-KH-SreymomNeural";
 genView();slots();steps();
 
 /* gemini panel */
-const GM=[["3.1 Flash-Lite","gemini-3.1-flash-lite"],["3.1 Pro","gemini-3.1-pro"],["3.8 Flash","gemini-3.8-flash"],["3.5 Flash-Lite","gemini-3.5-flash-lite"],["3.6 Flash","gemini-3.6-flash"],["3.5 Flash","gemini-3.5-flash"]];{const _g=S.get("gmid",null),_i=GM.findIndex(m=>m[1]===_g);if(_i>=0)gmodel=_i}
+const GM=[["3.1 Flash-Lite","gemini-3.1-flash-lite"],["3.1 Pro","gemini-3.1-pro"],["3.8 Flash","gemini-3.8-flash"],["3.7 Flash","gemini-3.7-flash"],["3.5 Flash-Lite","gemini-3.5-flash-lite"],["3.6 Flash","gemini-3.6-flash"],["3.5 Flash","gemini-3.5-flash"]];{const _g=S.get("gmid",null),_i=GM.findIndex(m=>m[1]===_g);if(_i>=0)gmodel=_i}
 const gmHtml=()=>GM.map((m,i)=>`button class="b pill ${i===gmodel?"on":""}">${i===gmodel?ICO.checkc+" ⚡ ":""}${/Pro/.test(m[0])?"💎 ":""}${m[0]}/button>`).join("");function gms(){$("#gm").innerHTML=gmHtml();S.set("gmid",GM[gmodel][1]);$$("#gm .b").forEach((b,i)=>b.onclick=()=>{gmodel=i;gms()})}gms();
 let K=S.get("gk",Array(10).fill(""));
 $("#keys").innerHTML=K.map((x,i)=>`div class="slot" style="flex:0 0 46%">b>${i+1}/b>input type="password" data-i="${i}" value="${x}" placeholder="••••••••">button class="b" data-t="${i}">Test/button>/div>`).join("");
@@ -981,7 +981,7 @@ jp:f('rect width="30" height="20" fill="#fff"/>circle cx="15" cy="10" r="6
 const L=[["auto",ICO.globe+" ស្វ័យប្រវត្តិ"],["zh",FL.cn+"ចិន"],["en",FL.us+"អង់គ្លេស"],["ko",FL.kr+"កូរ៉េ"],["ja",FL.jp+"ជប៉ុន"]],M=[["whisper-large-v3-turbo","⚡ Turbo"],["whisper-large-v3","🎯 V3 (ណែនាំ)"],["sens","📴 SenseVoice"]];
 function chips(id,l,g,s,cls){$(id).innerHTML=l.map(([x,n])=>`button class="b ${g()===x?cls:""}" data-v="${x}" style="${id=="#langs"?"flex:none;padding:10px 14px":""}">${n}/button>`).join("");$$(id+" .b").forEach(b=>b.onclick=()=>{s(b.dataset.v);chips(id,l,g,s,cls)})}
 chips("#langs",L,()=>lang,x=>lang=x,"sel");chips("#models",M,()=>model,x=>{model=x;try{zsfSvUi()}catch(e){}},"pur");try{zsfSvUi()}catch(e){}
-$("#gap").oninput=e=>$("#gapv").textContent=(+e.target.value).toFixed(2)+"s";$("#bgm").oninput=e=>{$("#bgmv").textContent=e.target.value+"%";try{localStorage.setItem("zsf_bgm",e.target.value)}catch(_){}};
+$("#gap").oninput=e=>{$("#gapv").textContent=(+e.target.value).toFixed(2)+"s";try{localStorage.setItem("zsf_gap",e.target.value)}catch(_){}};$("#bgm").oninput=e=>{$("#bgmv").textContent=e.target.value+"%";try{localStorage.setItem("zsf_bgm",e.target.value)}catch(_){}};
 const lg=m=>$("#log").textContent+=m+"\n";
 /* Groq ASR: see zsfTranscribeGroqMain (end of file) */
 
@@ -4474,6 +4474,7 @@ var g=document.getElementById("gap"),b=document.getElementById("bgm");
 if(g){g.min=.05;g.max=.5;g.step=.05;if(+g.value>.5)g.value=.5}
 if(b){b.min=5;b.max=60;b.step=5}
 mk("gap",9,"cy");mk("bgm",11,"mg");
+try{var gv=parseFloat(localStorage.getItem("zsf_gap"));if(g&&isFinite(gv)){gv=Math.max(.05,Math.min(.5,Math.round(gv/.05)*.05));g.value=gv.toFixed(2);var gvv=document.getElementById("gapv");if(gvv)gvv.textContent=gv.toFixed(2)+"s";g.dispatchEvent(new Event("input"))}}catch(_){}
 try{var sv=parseInt(localStorage.getItem("zsf_bgm"));if(b&&isFinite(sv)){sv=Math.max(5,Math.min(60,Math.round(sv/5)*5));b.value=sv;var bv=document.getElementById("bgmv");if(bv)bv.textContent=sv+"%";b.dispatchEvent(new Event("input"))}}catch(_){}
 var ip=document.querySelector("#p-bgm .ip2");if(ip)ip.innerHTML='svg viewBox="0 0 24 24" fill="currentColor">circle cx="8" cy="18" r="3.6"/>rect x="11" y="3" width="2.6" height="15"/>path d="M13.6 3c2 3.5 5 3.5 5 8-1.5-2.5-3-3-5-3z"/>/svg>';
 })()/script>script>
@@ -6140,7 +6141,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="16.3";
+  var EMB="16.5";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
