@@ -709,7 +709,7 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
  /div>
  div id="srtArea" class="hide">
  div class="lbl">ភាសាគោលដៅ/div>
- select class="sel2" id="target">option value="km">ខ្មែរ/option>option value="en">អង់គ្លេស/option>option value="th">ថៃ/option>option value="vi">វៀតណាម/option>option value="zh-CN">ចិន/option>/select>div class="lbl" style="margin-top:10px">ស្ទីលបកប្រែ/div>select class="sel2" id="trStyle">option value="normal">ធម្មតា (ត្រង់តាមសាច់រឿង)/option>option value="fun">😄 កំប្លែង ទាក់ទាញ (និយាយបែបសប្បាយ)/option>/select>
+ select class="sel2" id="target">option value="km">ខ្មែរ/option>option value="en">អង់គ្លេស/option>option value="th">ថៃ/option>option value="vi">វៀតណាម/option>option value="zh-CN">ចិន/option>/select>div class="lbl" style="margin-top:10px">ស្ទីលបកប្រែ/div>select class="sel2" id="trStyle">option value="auto">🎭 ស្វ័យប្រវត្តិ (តាមសាច់រឿង៖ កំប្លែង/បូរាណ/ធម្មតា)/option>option value="normal">ធម្មតា (ត្រង់តាមសាច់រឿង)/option>option value="fun">😄 កំប្លែង ទាក់ទាញ (និយាយបែបសប្បាយ)/option>/select>
  div id="oldSrt">textarea id="srtText" rows="6" placeholder="SRT នឹងបង្ហាញនៅទីនេះ" style="margin-top:10px">/textarea>
  div class="row">button class="b" id="dlSrt">ទាញយក SRT/button>button class="b" id="clr">សម្អាត/button>/div>/div>
  button class="b big" id="aiGen">⚡ 🚀 ចាប់ផ្ដើម បង្កើតសំឡេង AI/button>
@@ -1239,25 +1239,63 @@ function probe(fl){return new Promise(res=>{const v=document.createElement("vide
  const done=r=>{if(dn)return;dn=true;URL.revokeObjectURL(u);res(r)};
  v.preload="metadata";v.muted=true;v.onloadedmetadata=()=>done({w:v.videoWidth,h:v.videoHeight,d:v.duration});v.onerror=()=>done(null);setTimeout(()=>done(null),8000);v.src=u})}
 /* V15.5 : ស្ទីលបកប្រែ — ធម្មតា / កំប្លែង ទាក់ទាញ (ជ្រើសក្នុងប្រអប់ "ស្ទីលបកប្រែ") · ប៉ះពាល់គ្រប់ការបកប្រែ Gemini (SRT + ទាញពីវីដេអូ) */
-var ZSF_FUN_PROMPT="STYLE (FUN & ENGAGING): make the Khmer lively and entertaining for viewers, like a witty Khmer social-media movie narrator, ONLY where the scene is light, comedic, teasing, awkward, or the characters are joking or showing off. Keep serious, sad, tense, dangerous, heartfelt-romantic and emotional-climax lines natural and sincere (no jokes there). Use natural spoken Khmer that young viewers really say (colloquial particles and everyday words, playful reactions, light exaggeration, witty comebacks, fitting Khmer sayings) instead of stiff formal written Khmer, and give each character a consistent personality in tone (cocky, shy, cunning, innocent, grumpy). Do NOT change the facts or meaning, do NOT add new information and do NOT drop anything; keep each line about the same length as a normal translation (at most about 15% longer) so the Khmer voice still fits the time slot. No vulgar, insulting or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply.";
-function zsfFunOn(){try{return localStorage.getItem("zsf_tr_style")==="fun"}catch(e){return false}}
+var ZSF_FUN_PROMPT="STYLE (FUN & ENGAGING): make the Khmer lively and entertaining for viewers, like a witty Khmer social-media movie narrator, ONLY where the scene is light, comedic, teasing, awkward, or the characters are joking or showing off. Keep serious, sad, tense, dangerous, heartfelt-romantic and emotional-climax lines natural and sincere (no jokes there). Use natural spoken Khmer that young viewers really say (colloquial particles and everyday words, playful reactions, light exaggeration, witty comebacks, fitting Khmer sayings) instead of stiff formal written Khmer, and give each character a consistent personality in tone (cocky, shy, cunning, innocent, grumpy). Do NOT change the facts or meaning, do NOT add new information and do NOT drop anything; keep each line about the same length as a normal translation (at most about 15% longer) so the Khmer voice still fits the time slot. No vulgar, insulting or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (genre, era, characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it.";
+var ZSF_AUTO_PROMPT="STYLE (AUTO BY STORY): first infer from the story card, the characters and the whole SRT what kind of story this is, then adapt the Khmer register scene by scene. COMEDIC / light / teasing / awkward / boasting scenes: lively, witty, natural spoken Khmer that young viewers really say, playful reactions, light exaggeration, fitting Khmer sayings. ANCIENT / palace / royal / wuxia / xianxia / historical scenes: archaic, dignified Khmer with proper rank-based address and royal or classical vocabulary (e.g. king, minister, master, disciple, sect), no modern slang. MODERN drama, serious, sad, tense, dangerous, romantic and emotional-climax lines: natural, sincere, no jokes. Keep each character's personality consistent. Do NOT change the facts or meaning, do NOT add information and do NOT drop anything; keep each line at most about 15% longer than a normal translation so it fits the time slot. No vulgar or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (genre, era, characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it.";
+function zsfStyleMode(){try{var v=localStorage.getItem("zsf_tr_style");return(v==="fun"||v==="normal")?v:"auto"}catch(e){return "auto"}}
+function zsfFunOn(){return zsfStyleMode()!=="normal"}
+async function zsfEnforce(F0,self,u,o,ENF){
+ var r=await F0.call(self,u,o);
+ if(!ENF)return r;
+ try{
+  var j=JSON.parse(o.body),ps=j.contents[0].parts,src="";
+  ps.forEach(function(x){if(x&&typeof x.text==="string")src+=x.text+"\n"});
+  var sb="";try{sb=String(window.zsfStoryBlock()||"")}catch(_){}
+  if(sb)src=src.split(sb).join("");
+  var chars=[],keep=[];try{if(gBible){chars=(gBible.characters||[]).filter(function(c){return c&&c.zh&&c.zh.length>=2&&c.km});keep=(gBible.keep_latin||[])}}catch(_){}
+  var need=chars.filter(function(c){return src.indexOf(c.zh)>=0});
+  var check=function(t){
+   if(!t||t.length<2)return "empty";
+   var tt=t;keep.forEach(function(k){if(k)tt=tt.split(k).join("")});
+   if(/[A-Za-z]{2,}/.test(tt.replace(/\[[^\]]*\]/g,"").replace(/https?:\S+/g,"")))return "latin";
+   var miss=[];for(var i=0;i<need.length;i++){var km=String(need[i].km).split(/[\/,|]/)[0].trim();if(km&&t.indexOf(km)<0)miss.push(km)}
+   if(need.length>=2&&miss.length*2>need.length)return "names missing: "+miss.slice(0,6).join(", ");
+   return "";
+  };
+  var getT=function(resp){return resp.clone().json().then(function(d){var c=d&&d.candidates&&d.candidates[0];return c&&c.content&&c.content.parts?c.content.parts.map(function(p){return p.text||""}).join(""):""}).catch(function(){return ""})};
+  var t=await getT(r),bad=check(t);
+  var tries=0;
+  while(bad&&r.ok&&tries<3){
+   tries++;
+   var j2=JSON.parse(o.body);
+   var last=j2.contents[0].parts.length-1;
+   j2.contents[0].parts[last].text+="\n\nCORRECTION (attempt "+tries+"): the previous answer BROKE the rules ("+bad+"). Translate again and OBEY the STORY CARD and the chosen STYLE on every line: use the exact Khmer names/terms/forms of address from the card, no Latin letters, keep numbering. Output only numbered lines.";
+   j2.generationConfig=j2.generationConfig||{};j2.generationConfig.temperature=Math.min(1,(+j2.generationConfig.temperature||0.7)+0.1*tries);
+   var r2=await F0.call(self,u,Object.assign({},o,{body:JSON.stringify(j2)}));
+   if(!r2.ok)break;
+   var t2=await getT(r2),b2=check(t2);
+   r=r2;t=t2;bad=b2;
+  }
+ }catch(e){}
+ return r}
+
 (function(){
  var t=document.getElementById("trStyle");
- if(t){try{t.value=zsfFunOn()?"fun":"normal"}catch(e){}t.onchange=function(){try{localStorage.setItem("zsf_tr_style",t.value)}catch(e){}try{showToast(t.value==="fun"?"😄 ស្ទីលកំប្លែង ទាក់ទាញ បើកហើយ":"ស្ទីលធម្មតា",true)}catch(e){}}}
+ if(t){try{t.value=zsfStyleMode()}catch(e){}t.onchange=function(){try{localStorage.setItem("zsf_tr_style",t.value)}catch(e){}try{showToast(t.value==="fun"?"😄 ស្ទីលកំប្លែង ទាក់ទាញ បើកហើយ":(t.value==="auto"?"🎭 ស្ទីលស្វ័យប្រវត្តិតាមសាច់រឿង បើកហើយ":"ស្ទីលធម្មតា"),true)}catch(e){}}}
  if(window.__zsfStyleHook)return;window.__zsfStyleHook=true;
  var F0=window.fetch;
  window.fetch=function(u,o){
+  var ENF=false;
   try{
    if(zsfFunOn()&&typeof u==="string"&&u.indexOf("generativelanguage.googleapis.com")>=0&&u.indexOf(":generateContent")>=0&&o&&typeof o.body==="string"&&o.body.indexOf("NO LATIN LETTERS")>=0){
-    var j=JSON.parse(o.body),ps=j.contents&&j.contents[0]&&j.contents[0].parts,hit=false;
+    var SP=(zsfStyleMode()==="fun"?ZSF_FUN_PROMPT:ZSF_AUTO_PROMPT),j=JSON.parse(o.body),ps=j.contents&&j.contents[0]&&j.contents[0].parts,hit=false;
     if(ps){for(var i=0;ips.length;i++){var x=ps[i];
-     if(x&&typeof x.text==="string"&&x.text.indexOf("NO LATIN LETTERS")>=0&&x.text.indexOf("STYLE (FUN")0){
-      x.text=x.text.indexOf("Output only numbered lines.")>=0?x.text.replace("Output only numbered lines.",ZSF_FUN_PROMPT+" Output only numbered lines."):(ZSF_FUN_PROMPT+"\n"+x.text);hit=true}}}
-    if(hit){j.generationConfig=j.generationConfig||{};j.generationConfig.temperature=Math.max(+j.generationConfig.temperature||0,.7);
+     if(x&&typeof x.text==="string"&&x.text.indexOf("NO LATIN LETTERS")>=0&&x.text.indexOf("STYLE (")0){
+      x.text=x.text.indexOf("Output only numbered lines.")>=0?x.text.replace("Output only numbered lines.",SP+" Output only numbered lines."):(SP+"\n"+x.text);hit=true}}}
+    if(hit){ENF=true;j.generationConfig=j.generationConfig||{};j.generationConfig.temperature=Math.max(+j.generationConfig.temperature||0,.7);
      o=Object.assign({},o,{body:JSON.stringify(j)})}
    }
   }catch(e){}
-  return F0.call(this,u,o)};
+  return zsfEnforce(F0,this,u,o,ENF)};
 })();
 /* V15.4: ផ្គុំវីដេអូដោយ FFmpeg native ក្នុង APK (ដូចការកាត់ភាគ) — មិនពឹង ffmpeg.wasm ទៀត */
 async function zsNativeMerge(fl,info){
@@ -2755,7 +2793,7 @@ function zsfTrSummary(a){var b=zsfSnap(),d={req:b.req-a.req,ok:b.ok-a.ok,inTok:b
  try{if(typeof showToast==="function")showToast(msg,true)}catch(e){}return d}
 var ZSF_TR_PV="v1",zsfTrDB=null,zsfTrMem=new Map();
 function zsfHash(s){s=String(s||"");var h=5381;for(var i=0;is.length;i++)h=((h5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)+"."+s.length}
-function zsfTrKey(tl,ctx,text){return ZSF_TR_PV+"|"+selections.geminiModel+"|"+tl+((typeof zsfFunOn==="function"&&zsfFunOn())?"|fun":"")+"|"+zsfHash(ctx)+"|"+text}
+function zsfTrKey(tl,ctx,text){return ZSF_TR_PV+"|"+selections.geminiModel+"|"+tl+((typeof zsfFunOn==="function"&&zsfFunOn())?"|"+zsfStyleMode():"")+"|"+zsfHash(ctx)+"|"+text}
 function zsfTrOk(tl,srcText,v){if(!v)return false;var hasL=/[A-Za-z\u00C0-\uFFFF]/.test(srcText);
  if(/^km/i.test(tl))return /[\u1780-\u17FF]/.test(v)||!hasL;return v!==srcText||!hasL}
 function zsfTrOpen(){return new Promise(function(res){try{if(!window.indexedDB)return res(null);var q=indexedDB.open("zsf_trcache",1);q.onupgradeneeded=function(){try{q.result.createObjectStore("kv")}catch(e){}};q.onsuccess=function(){res(q.result)};q.onerror=function(){res(null)};q.onblocked=function(){res(null)}}catch(e){res(null)}})}
@@ -3540,7 +3578,7 @@ function zsfFitDur(L,R,F,ks,ke,tk){
     /* V11.2: បើអក្សរតិចពេកធៀបនឹងសំឡេងនិយាយ → ស្តាប់ម្តងទៀតជាកំណាត់ ១០ វិនាទី ហើយយកលទ្ធផលដែលបានច្រើនជាង */
     try{
       var v=gemTVoiced(A,p.cs,p.ce),ch=gemTChars(res);
-      if(p.ce-p.cs>8&&v>=3&&chv*3&&((window.__zsfGemRecTry=(window.__zsfGemRecTry||0)+1)=80)){
+      if(p.ce-p.cs>8&&v>=3&&chv*4.5&&((window.__zsfGemRecTry=(window.__zsfGemRecTry||0)+1)=220)){
         var r2=[];
         for(var c=p.cs,q=0;cp.ce-0.5;c+=6,q++){
           if(gemTLate())break;
@@ -3607,9 +3645,9 @@ function zsfFitDur(L,R,F,ks,ke,tk){
           else if(gCur){gHole++;if(gHole*gF>0.3){gRuns.push(gCur);gCur=null;gHole=0}}
         }
         if(gCur)gRuns.push(gCur);
-        var gaps=gRuns.map(function(r){return{s:r[0]*gF,e:(r[1]+1)*gF}}).filter(function(g){return g.e-g.s>=1.5});
+        var gaps=gRuns.map(function(r){return{s:r[0]*gF,e:(r[1]+1)*gF}}).filter(function(g){return g.e-g.s>=0.8});
         gaps.sort(function(a,b){return (b.e-b.s)-(a.e-a.s)});
-        var gw=[];gaps.forEach(function(g){for(var x=g.s;xg.e-0.3;x+=10){var ge=Math.min(g.e,x+10);if(ge-x>=1.5)gw.push({s:x,e:ge})}});gw.sort(function(a,b){return (b.e-b.s)-(a.e-a.s)});gaps=gw.slice(0,48);
+        var gw=[];gaps.forEach(function(g){for(var x=g.s;xg.e-0.3;x+=10){var ge=Math.min(g.e,x+10);if(ge-x>=0.8)gw.push({s:x,e:ge})}});gw.sort(function(a,b){return (b.e-b.s)-(a.e-a.s)});gaps=gw.slice(0,120);
         var gNext=0,gDone=0;
         var gWorker=async function(){
           while(true){
@@ -3636,7 +3674,7 @@ function zsfFitDur(L,R,F,ks,ke,tk){
           var a=Math.max(0,Math.floor(g.start/sF)),b=Math.min(sN-1,Math.floor(g.end/sF));
           if(ba)return true;
           var nv=0,i;for(i=a;i=b;i++)if(sS[i]>=sTT[i])nv++;
-          if(nv/(b-a+1)0.12){stt.ghost++;return false}
+          if(nv/(b-a+1)0.06){stt.ghost++;return false}
           var k=a;while(kb&&k-asMax&&sS[k]sTT[k])k++;
           if(k>a&&sS[k]>=sTT[k]&&k*sFg.end-0.3){g.start=Math.max(0,k*sF-0.04);stt.snap++}
           k=b;while(k>a&&b-ksMax&&sS[k]sTT[k])k--;
@@ -6102,7 +6140,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="16.1";
+  var EMB="16.3";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
