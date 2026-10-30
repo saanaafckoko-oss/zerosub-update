@@ -1460,7 +1460,7 @@ function tempoPlan(p,dur,slotD){
 function zsfFit(k,d){try{const v=parseFloat(localStorage.getItem("zsf_tts_"+k));if(isFinite(v))return v}catch(e){}return d}
 function zsfFitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch(e){return true}}
 function zsfAvail(q,dur,nx){
- const tail=zsfFit("tail",.30),mg=zsfFit("margin",.20),sp=nx?zsfFit("spill",.15):0,gap=nx?(nx.s-q.e):1.0,room=gap-.10;
+ const tail=zsfFit("tail",.30),mg=zsfFit("margin",.20),sp=nx?zsfFit("spill",0):0,gap=nx?(nx.s-q.e):1.0,room=gap-.10;
  if(room>0){const tl=(room>=1.0)?Math.max(tail,.5):tail;return dur+Math.min(room,tl)+sp}
  return Math.max(dur*.6,.3,dur-mg)+sp}
 /* ពិនិត្យម្តងថា TTS Worker គាំទ្រ rate ពិតឬអត់ (បើមិនគាំទ្រ → ប្រើវិធី stretch ចាស់) */
@@ -1527,17 +1527,17 @@ async function buildDub(btn){
 /* កំណត់ពេលចាក់ ៖ ចាប់ផ្តើមត្រង់ពេល SRT; បើឃ្លាមុនមិនទាន់ចប់ រង់ចាំវាចប់សិន (មិនឱ្យជាន់គ្នា) ។ ពេលនិយាយ BGM/សំឡេងដើម = 0% ក្រៅពីនោះតាម slider */
 
 function zsfPlaceItems(items){
- /* V5.9: គ្មានជាន់ឃ្លា/ជាន់កន្ទុយទៀត — ឃ្លាបន្ទាប់ចាប់ផ្តើមបន្ទាប់ពីឃ្លាមុនចប់ជានិច្ច (+ចន្លោះ GAP) · ពន្យារសំឡេងទាំងមូលតាម DLY ឱ្យត្រូវមាត់ */
- const SPL=zsfFit("spill2",.2),FM=zsfFit("fmax",1.7),ON=zsfFitOn(),DLY=zsfFit("delay",0),GAP=zsfFit("gap2",.08);
+ /* V15.3: មិនជាន់ឃ្លា ១០០% — ពន្លឿនឃ្លាឱ្យចុះក្នុងចន្លោះមុន បើនៅតែវែង ឃ្លាបន្ទាប់ត្រូវរង់ចាំឃ្លាមុនចប់ជានិច្ច (មិនឱ្យកន្ទុយជាន់គ្នា) */
+ const FM=zsfFit("fmax",1.7),ON=zsfFitOn(),DLY=zsfFit("delay",0),GAP=zsfFit("gap2",.12),PUSH=zsfFit("push",2.5);
  let cursor=0,delayed=0;const st=[];
  items.forEach((it,i)=>{
   const b0=it.buf0||(it.buf0=it.buf);let buf=b0,o0=Math.max(0,fxOn(it.q)+DLY);
-  if(cursor>o0+.02){o0=Math.min(cursor,o0+.12);delayed++}
+  if(cursor>o0+.02){o0=Math.min(cursor,o0+PUSH);delayed++}
   const nx=items[i+1];
-  if(ON&&nx){const lim=Math.max(.3,fxOn(nx.q)+DLY+SPL-GAP-o0),dl=b0.duration;
+  if(ON&&nx){const lim=Math.max(.3,fxOn(nx.q)+DLY-GAP-o0),dl=b0.duration;
    if(dl>lim*1.02){const tt=it.tt||1,al=Math.max(1,FM/Math.max(tt,1)),nd=Math.min(dl/lim,al);
     if(nd>1.01){try{buf=wsolaStretch(b0,nd)}catch(e){buf=b0}}}}
-  it.buf=buf;st.push(o0);cursor=o0+buf.duration+GAP-Math.min(SPL,.25)});
+  it.buf=buf;st.push(o0);cursor=o0+buf.duration+GAP});
  return{st,delayed}}
 function scheduleDub(items,t0,bus,bgG,base){
  let prevEnd=0,delayed=0;try{fxSpeechZones()}catch(e){}
@@ -5964,7 +5964,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="15.2";
+  var EMB="15.3";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
