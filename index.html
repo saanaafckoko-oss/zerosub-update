@@ -4966,8 +4966,8 @@ $("#exp").onclick=async function(){
   }catch(e){window.__bgmBg=null}
   /* Step 2a (v10): ស្តាប់សំឡេងចាប់ប្រុស/ស្រី/គិតក្នុងចិត្ត មុនបកប្រែ */
   window.__preTag=false;window.__preTried=false;window.__bibleP=null;
-  try{if(on(1)&&c!=="keep"&&cues.length&&K.filter(Boolean).length&&$("#target").value==="km"){window.__bibleP=gPrepareBible(K.filter(Boolean),function(){}).catch(function(){return null})}}catch(e){window.__bibleP=null}
-  if(on(2)&&c!=="keep"&&cues.length&&K.filter(Boolean).length){
+  try{if(on(1)&&cues.length&&K.filter(Boolean).length&&$("#target").value==="km"){window.__bibleP=gPrepareBible(K.filter(Boolean),function(){}).catch(function(){return null})}}catch(e){window.__bibleP=null}
+  if(on(2)&&cues.length&&K.filter(Boolean).length){
    window.__preTried=true;phase(2,20,35);setProgress(0,"🎭 កំពុងស្តាប់សំឡេង ចាប់ប្រុស/ស្រី/គិតក្នុងចិត្ត...");
    try{await tagSpeakers()}catch(e){console.warn("pretag",e)}
    window.__preTag=cues.some(function(q){return /^\s*\[[1-4]\]/.test(q.t)});
@@ -4993,7 +4993,7 @@ $("#exp").onclick=async function(){
   /* Step 3 : ចែកតួ ប្រុស/ស្រី */
   if(window.__preTag){}
   else if(on(2)&&window.__workerTagged&&cues.some(function(c){return /^\s*\[[1-4]\]/.test(c.t)})){}
-  else if(on(2)&&c!=="keep"&&K.filter(Boolean).length&&!window.__preTried){phase(2,50,56);setProgress(0,"🎭 កំពុងចាប់ប្រុស/ស្រី...");await tagSpeakers();setProgress(100,"✅ ចែកតួរួចរាល់")}
+  else if(on(2)&&K.filter(Boolean).length&&!window.__preTried){phase(2,50,56);setProgress(0,"🎭 កំពុងចាប់ប្រុស/ស្រី...");await tagSpeakers();setProgress(100,"✅ ចែកតួរួចរាល់")}
   if(on(2)){var tc=[0,0,0,0,0];cues.forEach(function(q){var m=/^\s*\[([1-4])\]/.exec(q.t);if(m)tc[+m[1]]++});
    if(tc[1]+tc[2]+tc[3]+tc[4])zsfDone("✓ ចែកតួរួច: ប្រុស "+tc[1]+" • ស្រី "+tc[2]+" • គិតក្នុងចិត្តប្រុស "+tc[3]+" • គិតក្នុងចិត្តស្រី "+tc[4],false);
    else zsfDone("⚠ មិនឃើញ tag ប្រុស/ស្រី ក្នុង SRT ទេ",false)}
@@ -5318,7 +5318,7 @@ async function gPrepareBible(keys,prog,ovr){
 "- keep_latin: English/Latin words or brand/technical terms that really appear and should stay in Latin letters (empty array if none; ignore obvious recognition errors).\n"+
 "All km values must be written in Khmer script only (no Chinese, no Latin letters).\n\nSUBTITLE TEXT:\n"+sample};
  var m0=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
- var models=[m0,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
+ var models=[m0,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-2.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
  /* វីដេអូតូច (≤ 60MB) → ឱ្យ AI មើលផ្ទាល់ ; ធំជាងនេះ ឬយឺតជាង ៦០ វិនាទី → អាន SRT តែម្យ៉ាង (លឿន) */
  var vpart=null;
  if(false&&typeof ovr!=="string"&&file&&file.size=400*1048576&&/^video\//.test(String(file.type||"video/mp4"))){
@@ -5338,7 +5338,7 @@ async function gPrepareBible(keys,prog,ovr){
        ["characters","places","terms","address"].forEach(function(k){var ek=EB[k]||[],seen={};ek.forEach(function(x){seen[x.zh]=1});b[k]=ek.concat((b[k]||[]).filter(function(x){return !seen[x.zh]}));if(k==="characters")b[k]=b[k].slice(0,16)});
        if(!b.synopsis)b.synopsis=EB.synopsis;if(!b.tone)b.tone=EB.tone}catch(e){}}
      gBible=b;gBibleSig=sig;return b}
-   }catch(e){console.warn("story bible",models[mi],e);if(e&&(e.status===404||e.status===400))continue;if(e&&e.status===429)break}
+   }catch(e){console.warn("story bible",models[mi],e);continue}
   }
  }
  if(typeof ovr!=="string"&&window.__zsfEarlyBible){gBible=window.__zsfEarlyBible;gBibleSig=sig;return gBible}
