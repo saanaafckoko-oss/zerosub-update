@@ -3321,7 +3321,7 @@ function zsfFitDur(L,R,F,ks,ke,tk){
       "TASK: Transcribe every spoken line in this clip exactly as it is spoken, in its original language (usually Mandarin Chinese; write Chinese in Simplified characters). Do NOT translate, summarise, correct or explain.",
       "ACCURACY: Listen word by word and write exactly the words that are spoken, using the Chinese characters that match the exact sounds. Do not replace what was said with a smoother or more logical sentence, do not guess a different word that sounds nicer, and keep repeated words, stutters and short fillers (啊, 嗯, 哦, 喂, 哎). Keep every character name spelled with the same characters throughout.",
       "COMPLETENESS: Make sure to transcribe ALL the speech in the clip. Do not skip, shorten or merge any line, including very short replies, interjections, whispers and overlapping voices. Also transcribe the narrator / storyteller voice and do not skip the storyteller part. Listen to the clip from the first second to the very last second in order. After you finish, re-listen once and add any line you missed, especially in the middle and at the end. If two people speak close together, write each one as a separate line. Write only the real words you hear; if a word is unclear, write your best guess and never fill with made-up or repeated text.",
-      "WINDOW: The clip has extra context before and after the main part. Transcribe each line ONCE, only the words actually spoken in the audio, never repeat a line you already wrote, and never continue a sentence from your imagination. If a line is cut off at the very start or end of the clip, write only the words you really hear.",
+      "WINDOW: Transcribe EVERY spoken line in the WHOLE clip, from the very first second to the very last second, including lines that start right at the beginning or end right at the end of the clip. Do NOT skip lines near the start or end because they look like extra context. Write each line ONCE, only the words actually spoken in the audio, never repeat a line you already wrote, and never continue a sentence from your imagination. If a line is cut off at the very start or end of the clip, write only the words you really hear.",
       "LOUD SOUND: Even when background music, battle noise or sound effects are loud, listen for the human voice and transcribe it. Very short shouts and exclamations (a name, an order, one or two words) are real lines and must be included. Ignore the music itself. Music, singing, lyrics, crowd noise and sound effects are NOT speech: never write them as lines. Only a clear human speaking voice counts.",
       "INNER THOUGHTS: Characters in this genre often have inner monologue / mind-voice lines (a private thought heard as a voice-over, often with echo, reverb, a filtered or detached tone, or quieter than normal speech). Transcribe these inner-thought lines too, as their own entries. Never skip them.",
       "Write NOTHING for sound effects, background music, singing, breathing, laughter-only noise or silence. Never invent or repeat words. If nobody speaks in the clip, return an empty array [].",
@@ -3584,7 +3584,7 @@ function zsfFitDur(L,R,F,ks,ke,tk){
           if(gemTLate())break;
           try{r2=r2.concat(await gemTRaw(A,{cs:c,ce:Math.min(p.ce,c+6),last:!!p.last&&c+6>=p.ce-0.5,pad:3,kw:p.kw},idx+50+q,totalSec));}catch(_){}
         }
-        if(gemTChars(r2)>ch){res=r2;window.__zsfGemRecov=(window.__zsfGemRecov||0)+1;}
+        var __c2=gemTChars(r2);if(__c2>ch&&__c2<=Math.max(12,v*6.5)){res=r2;window.__zsfGemRecov=(window.__zsfGemRecov||0)+1;}
       }
     }catch(_){}
     return res;
@@ -3634,9 +3634,9 @@ function zsfFitDur(L,R,F,ks,ke,tk){
     try{__prof0=gemTProfile(A);}catch(_){__prof0=null;}
     try{
       if(__prof0&&__prof0.rms&&__prof0.rms.length>50){
-        var gR=__prof0.rms,gF=__prof0.frameSec,gN=gR.length,gS=new Float32Array(gN);
+        var __gB=null;try{__gB=gemTBand(A)}catch(_){__gB=null}var gR=(__gB&&__gB.rms?__gB:__prof0).rms,gF=(__gB&&__gB.rms?__gB:__prof0).frameSec,gN=gR.length,gS=new Float32Array(gN);
         for(var gi=0;gigN;gi++){var gs0=0,gc0=0;for(var gk=-2;gk=2;gk++){var gj=gi+gk;if(gj>=0&&gjgN){gs0+=gR[gj];gc0++}}gS[gi]=gs0/gc0}
-        var gSorted=Array.from(gS).sort(function(a,b){return a-b}),gThr=Math.max(gSorted[Math.floor(gN*0.25)]*2.2,220)*0.8;
+        var gSorted=Array.from(gS).sort(function(a,b){return a-b}),gThr=Math.max(gSorted[Math.floor(gN*0.25)]*2.2,(__gB&&__gB.rms?120:220))*0.8;
         var gCov=new Uint8Array(gN);
         segs.forEach(function(g){var a1=Math.max(0,Math.floor((g.start-0.3)/gF)),b1=Math.min(gN-1,Math.floor((g.end+0.3)/gF));for(var q1=a1;q1=b1;q1++)gCov[q1]=1});
         var gRuns=[],gCur=null,gHole=0;
@@ -6141,7 +6141,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="16.8";
+  var EMB="16.9";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
