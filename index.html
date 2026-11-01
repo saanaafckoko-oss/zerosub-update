@@ -5167,9 +5167,46 @@ async function googleTr(texts,tl){
  return out}
 /* v21 : បកប្រែ batch ស្របគ្នា (ម្នាក់ៗ Key ផ្សេងគ្នា) · ផ្គូផ្គងតាមលេខ (មិនរអិលជួរ) · ឃ្លាដែលខ្វះ → Google តែឃ្លានោះ · ផ្តល់បរិបទ ២ ឃ្លាមុន */
 async function translateAll(){var Z0=zsfSnap();
- var keys=K.filter(Boolean),tv=$("#target").value,tl=$("#target").selectedOptions[0].text,TAG=/^\s*\[[1-4]\]\s*/,src=cues.slice(),B=40,
+ var keys=K.filter(Boolean),tv=$("#target").value,tl=$("#target").selectedOptions[0].text,TAG=/^\s*\[[1-4]\]\s*/,src=cues.slice(),B=60,
   batches=[],out=new Array(src.length),useGem=keys.length>0,gemFail=0,done=0,next=0,ctxT="",
   strip=function(c){return c.t.replace(TAG,"").replace(/\n/g," ")};
+ if(!keys.length)throw new Error("គ្មាន Gemini API Key");
+ var sleep2=function(ms){return new Promise(function(z){setTimeout(z,ms)})},inUse={},kptr=0;
+ function keyCooled(k){var ms=zsfTrModels();return ms.every(function(m){return zsfTrCooled(k,m)})}
+ function pickKey(){var n=keys.length,t,k;
+  for(t=0;tn;t++){k=keys[(kptr+t)%n];if(!inUse[k]&&!keyCooled(k)){kptr=(kptr+t+1)%n;return k}}
+  for(t=0;tn;t++){k=keys[(kptr+t)%n];if(!inUse[k]){kptr=(kptr+t+1)%n;return k}}
+  k=keys[kptr%n];kptr=(kptr+1)%n;return k}
+ /* ១ ក្រុម (60 បន្ទាត់) = ១ Key · Key គាំង/អស់ Quota → Key បន្ទាប់ · Model មមាញឹក → Model បន្ទាប់ភ្លាមៗ · មិនប្រើ Google */
+ async function gemStrict(prompt,wi){
+  var t0=Date.now(),pass=0,key=pickKey();inUse[key]=1;
+  try{
+   while(Date.now()-t0900000){
+    var models=zsfTrModels();
+    for(var kk=0;kkkeys.length;kk++){
+     for(var mi=0;mimodels.length;mi++){
+      var m=models[mi];
+      if(zsfTrCooled(key,m))continue;
+      try{
+       var txt=await Promise.race([requestGeminiOnce(prompt,key,m,false),new Promise(function(_,rj){setTimeout(function(){rj(new Error("timeout"))},90000)})]);
+       if(txt)return txt;
+       zsfTrCool[key+"|"+m]=Date.now()+20000;
+      }catch(e){
+       var kd=zsfErrKind(e);
+       if(kd==="auth"){zsfTrCool[key+"|*"]=Date.now()+600000;break}
+       if(kd==="rate"){zsfTrCool[key+"|"+m]=Date.now()+90000;continue}
+       if(kd==="model"){zsfTrCool[key+"|"+m]=Date.now()+1800000;continue}
+       zsfTrCool[key+"|"+m]=Date.now()+(/timeout|abort/i.test(String((e&&e.message)||e))?60000:20000);
+       continue}
+     }
+     delete inUse[key];key=pickKey();inUse[key]=1;
+    }
+    pass++;
+    try{setProgress(Math.round(done/src.length*100),"⏳ Key/Gemini កំពុងមមាញឹក — រង់ចាំហើយសាកម្តងទៀត...")}catch(_){}
+    await sleep2(Math.min(15000,3000+pass*2000));
+   }
+   throw new Error("Gemini បកប្រែមិនបាន — ពិនិត្យ API Key / Quota")
+  }finally{delete inUse[key]}}
  if(window.zsfEnsureStory)await window.zsfEnsureStory();ctxT=window.zsfAutoStory?window.zsfAutoStory():"";
  for(var i=0;isrc.length;i+=B)batches.push(i);
  async function doBatch(i0,wi){
@@ -5182,21 +5219,19 @@ async function translateAll(){var Z0=zsfSnap();
     var hits=await zsfTrGetMany(part.map(zk));
     hits.forEach(function(h,j){if(h){res[j]=h;ZST.hit++}else ZST.miss++});
     var todo=[];res.forEach(function(r,j){if(r===null)todo.push(j)});
-    var parseInto=function(t,idx){t.split("\n").forEach(function(l){var m=/^\s*(\d+)[.)]\s*(.*)$/.exec(l);if(m){var x=+m[1]-1;if(x>=0&&xidx.length&&m[2].trim()&&res[idx[x]]===null){res[idx[x]]=m[2].trim();fresh[idx[x]]=true}}})};
+    var parseInto=function(t,idx){t.split("\n").forEach(function(l){var m=/^\s*(\d+)[.)]\s*(.*)$/.exec(l);if(m){var x=+m[1]-1;if(x>=0&&xidx.length&&m[2].trim()&&res[idx[x]]===null&&zsfTrOk(tv,strip(part[idx[x]]),m[2].replace(TAG,"").trim())){res[idx[x]]=m[2].trim();fresh[idx[x]]=true}}})};
     if(todo.length){
-     var txt=await zsfTrCall(mk(todo),keys,wi);
-     if(txt!==null){gemFail=0;parseInto(txt,todo);
-      var m2=todo.filter(function(j){return res[j]===null});
-      if(m2.length){ZST.retry++;var t2=await zsfTrCall(mk(m2),keys,wi);if(t2!==null)parseInto(t2,m2)}}
-     else if(++gemFail>=6){useGem=false;try{showToast("Gemini \u1794\u179a\u17b6\u1787\u17d0\u1799\u1785\u17d2\u179a\u17be\u1793\u178a\u1784 \u2014 \u1794\u17d2\u179a\u17be Google Translate \u1787\u17c6\u1793\u17bd\u179f",false)}catch(e){}}
-    }
+      var txt=await gemStrict(mk(todo),wi);
+      parseInto(txt,todo);
+      var m2=todo.filter(function(j){return res[j]===null}),rounds=0;
+      while(m2.length&&rounds6){rounds++;ZST.retry++;var t2=await gemStrict(mk(m2),wi);parseInto(t2,m2);m2=todo.filter(function(j){return res[j]===null})}
+     }
     var puts=[];fresh.forEach(function(f,j){if(f){var v=res[j].replace(TAG,"").trim();if(zsfTrOk(tv,strip(part[j]),v))puts.push([zk(part[j]),v])}});
     if(puts.length)zsfTrPutMany(puts);
   }
   var miss=[];res.forEach(function(r,j){if(r===null)miss.push(j)});
   if(miss.length){
-   var g=null;try{g=await googleTr(miss.map(function(j){return strip(part[j])}),tv)}catch(e){if(miss.length===part.length)throw e}
-   if(g)miss.forEach(function(j,x){res[j]=g[x]||null});
+   for(var mq=0;mqmiss.length;mq++){var jj=miss[mq];try{var t3=await gemStrict(HEAD+"\n1. "+part[jj].t.replace(/\n/g," "),wi);var mm=/^\s*1[.)]\s*(.*)$/m.exec(t3);if(mm&&mm[1].trim())res[jj]=mm[1].trim()}catch(e){}}
   }
   part.forEach(function(c,k){var t=res[k]||c.t.replace(TAG,""),m=c.t.match(TAG);if(m&&!TAG.test(t))t=m[0].trim()+" "+t;out[i0+k]={s:c.s,e:c.e,t:t}});
   done+=part.length;setProgress(Math.round(done/src.length*100),"🧠 កំពុងបកប្រែ "+done+"/"+src.length+(useGem?" (Gemini)":" (Google)")+"...");
@@ -5204,7 +5239,7 @@ async function translateAll(){var Z0=zsfSnap();
  async function worker(wi){if(wi>0)await new Promise(function(z){setTimeout(z,wi*250)});while(nextbatches.length){await doBatch(batches[next++],wi)}}
  setProgress(0,"🧠 កំពុងបកប្រែ 0/"+src.length+"...");
  /* កំណត់ concurrency មិនឱ្យលើសចំនួន Key ដែលមាន និងអតិបរមា 3 ដើម្បីកុំឱ្យ Key តែមួយទទួល Request ស្របគ្នាច្រើនពេក។ */
- var conc=Math.max(1,Math.min(batches.length,useGem?Math.min(16,keys.length):3));
+ var conc=Math.max(1,Math.min(batches.length,2));
  await Promise.all(Array.from({length:conc},function(_,wi){return worker(wi)}));
  setC(out);try{zsfTrSummary(Z0)}catch(e){}
 }
@@ -5309,12 +5344,12 @@ $("#exp").onclick=async function(){
    /* FIX: Step 2 បកប្រែ SRT ដោយផ្ទាល់។ កុំរត់ gemWorkerRun នៅទីនេះ ព្រោះវាអាចវិភាគ/ផ្ទុកវីដេអូ និងសាក Model ជាច្រើនមុនពេលបកប្រែ។ ការចែកតួត្រូវធ្វើនៅ Step 3 ដូចដើម។ */
    window.__workerTagged=false;
    var __direct=false;window.__zsfTextOnly=!!window.__preTag;
-   if(K.filter(Boolean).length){
+   if(false&&K.filter(Boolean).length){
     try{await Promise.race([gemDirectRun(function(p,m){setProgress(p,m)}),new Promise(function(_,rj){setTimeout(function(){rj(new Error("Gemini យឺតពេក — ប្រើវិធីបម្រុង"))},600000)})]);__direct=true}
     catch(e){console.warn("1-click direct",e);try{showToast("⚠ Gemini ស្តាប់សំឡេង: "+String((e&&e.message)||e).slice(0,80)+" — ប្រើវិធីបម្រុង",false)}catch(_){}}
    }
    window.__zsfTextOnly=false;
-   if(!__direct){setProgress(5,"🌐 កំពុងបកប្រែដោយវិធីបម្រុង (Google)...");try{await translateAll()}catch(e){throw new Error("[1-Click Export គាំង!] បរាជ័យក្នុងការបកប្រែ Subtitle! "+e.message)}}
+   if(!__direct){setProgress(5,"🧠 កំពុងបកប្រែដោយ Gemini...");try{await translateAll()}catch(e){throw new Error("[1-Click Export គាំង!] បរាជ័យក្នុងការបកប្រែ Subtitle! "+e.message)}}
    setProgress(100,"✅ បកប្រែរួចរាល់ "+cues.length+" ឃ្លា");
   }
   window.__zsfPre=null;
@@ -6531,7 +6566,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="17.4";
+  var EMB="17.5";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
