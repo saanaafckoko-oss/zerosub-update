@@ -2910,6 +2910,7 @@ async function doExportNative(){
  if(typeof OfflineAudioContext!=="function")throw new Error("Browser មិនមាន OfflineAudioContext");
  if(!file||!V.videoWidth)throw fatal("សូមជ្រើសវីដេអូជាមុន");
  const dur=V.duration||0;if(!(dur>0.5))throw new Error("អានរយៈពេលវីដេអូមិនបាន");
+ const lg=m=>{try{zsxLog(m)}catch(e){}};
  const note=(p,m)=>{try{if(typeof __zsWorkNote==="function")__zsWorkNote(p,"Export "+Math.round(p)+"% "+(m||""))}catch(e){}};
  const prog=(p,m)=>{p=Math.max(0,Math.min(99,p));btn.textContent="កំពុង Export "+Math.round(p)+"%..."+(m?" • "+m:"");note(p,m)};
  const b64of=bl=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const t=String(fr.result);res(t.slice(t.indexOf(",")+1))};fr.onerror=()=>rej(fr.error||new Error("read"));fr.readAsDataURL(bl)});
@@ -2918,9 +2919,11 @@ async function doExportNative(){
   /* ១. វីដេអូដើមនៅក្នុង native */
   prog(0,"រៀបចំវីដេអូដើម");
   prep=await nCall("zsPrep",cb=>N.prepareLastPicked(cb),15*60*1000);
+  lg("prepareLastPicked → ok="+(prep&&prep.ok)+" size="+(prep&&prep.size)+" file="+file.size+" path="+(prep&&prep.path));
   if(!(prep&&prep.ok&&prep.path))throw new Error("native រកថត/វីដេអូមិនឃើញ");
   const dir=String(prep.path).replace(/[^\/]+$/,"");
   let src=Number(prep.size)===Number(file.size)?prep.path:null;
+  lg(src?"ប្រើវីដេអូដើមក្នុង native (មិនចម្លង)":"ទំហំមិនត្រូវ → ផ្ទេរវីដេអូតាម putFile");
   if(!src){
    if(file.size>1.6e9)throw new Error("វីដេអូធំពេកសម្រាប់ផ្ទេរទៅ native");
    own=tg+"_src."+(ext(file)||"mp4");const C0=6*1024*1024;
@@ -2941,10 +2944,12 @@ async function doExportNative(){
    if(!bed)noBed=true}
   const SR=44100,total=Math.max(1,Math.round((dur+0.3)*SR));
   const {plan,delayed}=fxPlan(dub.out);
+  lg("សំឡេងខ្មែរ "+dub.out.length+" ឃ្លា • bed="+(bed?"yes":"no")+" • bgm="+(bgmBuf?"yes":"no"));
   prog(9,"វិភាគសំឡេង");try{await zsTO(fxEnsureSpeech(),30000,"វិភាគសំឡេងគាំង")}catch(e){console.warn("speech",e)}
   const zonesA=fxZones(dub.out),zonesP=zonesA.map(z=>({st:z[0],en:z[1]}));
   try{if(navigator.wakeLock)wl=await navigator.wakeLock.request("screen")}catch(e){}
   const B=fxBounds(total,SR,zonesP.concat(plan),150),NW=B.length-1;
+  lg("Render សំឡេង "+NW+" បំណែក • ប្រវែង "+Math.round(dur)+"s");
   const rw=q=>fxRenderWin(B[q],B[q+1],SR,bed,base,plan,base,true,zonesA);
   const QW=[];let nq=0,first=true;
   while(nqMath.min(2,NW))QW.push(rw(nq++));
@@ -2959,7 +2964,7 @@ async function doExportNative(){
     for(let o=0;oby.length;o+=CH){
      if(N.putFile(pcm,await b64of(new Blob([by.subarray(o,Math.min(by.length,o+CH))])),!first)!==true)throw new Error("putFile បរាជ័យ (ផ្ទេរសំឡេងទៅ native)");
      first=false}
-    prog(10+(k+1)/NW*50,"Render សំឡេង "+(k+1)+"/"+NW);
+    prog(10+(k+1)/NW*50,"Render សំឡេង "+(k+1)+"/"+NW);lg("បំណែក "+(k+1)+"/"+NW+" រួច");
    }
   }finally{QW.forEach(x=>x.catch(()=>{}));try{if(wl)wl.release()}catch(e){}}
   if(first)throw new Error("គ្មានសំឡេងសម្រាប់ផ្ញើទៅ native");
@@ -2971,9 +2976,10 @@ async function doExportNative(){
   let r=null,used="",lastErr="";
   for(const v of V2){
    const lb="ផ្គុំជាមួយវីដេអូដើម ("+(v.n==="Copy"?"Copy លឿន":"Encode")+")";prog(62,lb);
+   lg("runFfmpeg "+v.n+": "+JSON.stringify(v.a).slice(0,150));
    r=await nCall("zsExp",cb=>N.runFfmpeg(JSON.stringify(v.a),cb),60*60*1000,ms=>prog(62+Math.min(30,ms/1000/dur*30),lb));
    if(r&&r.ok){used=v.n;break}
-   lastErr=errTxt(r&&r.error);try{N.deleteFile(out)}catch(_){}
+   lastErr=errTxt(r&&r.error);lg("ffmpeg "+v.n+" បរាជ័យ: "+(r?JSON.stringify(r).slice(0,200):"គ្មានចម្លើយ (timeout/គាំង)"));try{N.deleteFile(out)}catch(_){}
    console.warn("native ffmpeg",v.n,lastErr)}
   if(!used)throw new Error("native ffmpeg បរាជ័យ: "+lastErr);
   /* ៤. រក្សាទុក */
@@ -2993,7 +2999,44 @@ async function doExportNative(){
  }
 }
 
+/* ===== V18.5 : ផ្ទាំង Log ពេល Export — បង្ហាញថាជាប់ត្រង់ដំណាក់កាលណា (ចុច 📋 Copy ហើយផ្ញើមកខ្ញុំ) ===== */
+(function(){
+ if(window.__zsxDiag)return;window.__zsxDiag=1;
+ var L=[],T=performance.now(),box=null,pre=null,lastKey="",lastT=0,hideT=null;
+ function copyTxt(t){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t);return true}}catch(e){}
+  try{var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;left:-999px";document.body.appendChild(a);a.select();var ok=document.execCommand("copy");a.remove();return ok}catch(e){return false}}
+ function ui(){
+  if(!document.body)return;
+  if(!box){
+   box=document.createElement("div");
+   box.style.cssText="position:fixed;left:6px;right:6px;bottom:96px;z-index:99999;background:rgba(0,0,0,.9);color:#9ef;font:11px/1.35 monospace;border:1px solid #0ff;border-radius:10px;padding:6px 8px;max-height:210px;overflow:auto;white-space:pre-wrap;word-break:break-all";
+   var bar=document.createElement("div");bar.style.cssText="display:flex;gap:8px;margin-bottom:4px;position:sticky;top:0";
+   var mk=function(t,f){var b=document.createElement("button");b.textContent=t;b.style.cssText="background:#134;color:#fff;border:1px solid #0ff;border-radius:8px;padding:3px 10px;font-size:12px";b.onclick=f;return b};
+   bar.appendChild(mk("📋 Copy log",function(){var ok=copyTxt(L.join("\n"));try{showToast(ok?"📋 ចម្លង log រួច — ដាក់ (Paste) ផ្ញើមកខ្ញុំ":"❌ ចម្លងមិនបាន — ថតអេក្រង់ជំនួស",ok)}catch(e){}}));
+   bar.appendChild(mk("✕",function(){box.style.display="none"}));
+   pre=document.createElement("div");box.appendChild(bar);box.appendChild(pre);document.body.appendChild(box)}
+  box.style.display="block";pre.textContent=L.slice(-16).join("\n");box.scrollTop=box.scrollHeight}
+ window.zsxLog=function(m){var t=((performance.now()-T)/1000).toFixed(0);L.push(t+"s "+String(m).slice(0,170));if(L.length>300)L.shift();if(window.__zsxOn)ui()};
+ window.zsxStart=function(){clearTimeout(hideT);T=performance.now();L.length=0;window.__zsxOn=1;lastKey="";zsxLog("▶ Export v18.5 • video="+((typeof file!=="undefined"&&file)?Math.round(file.size/1048576)+"MB":"?")+" • ZSNative="+(window.ZSNative?"yes":"no"))};
+ window.zsxEnd=function(ok){zsxLog(ok?"✅ ចប់":"⏹ ឈប់");if(ok){hideT=setTimeout(function(){window.__zsxOn=0;if(box)box.style.display="none"},8000)}};
+ function hook(){
+  try{var b=document.getElementById("exp");
+   if(b&&window.MutationObserver){new MutationObserver(function(){
+    if(!window.__zsxOn)return;var tx=(b.textContent||"").trim(),key=tx.replace(/[0-9]+/g,"#"),now=performance.now();
+    if(key!==lastKey||now-lastT>5000){lastKey=key;lastT=now;zsxLog("UI: "+tx)}
+   }).observe(b,{childList:true,characterData:true,subtree:true})}}catch(e){}
+  try{var st=window.showToast;if(typeof st==="function"&&!st.__zsx){var w=function(m,ok){try{if(window.__zsxOn)zsxLog("toast: "+m)}catch(e){}return st.apply(this,arguments)};w.__zsx=1;window.showToast=w}}catch(e){}
+  try{["warn","error"].forEach(function(k){var o=console[k];if(o&&!o.__zsx){var w=function(){try{if(window.__zsxOn)zsxLog(k+": "+Array.prototype.slice.call(arguments).map(function(x){return x&&x.message?x.message:String(x)}).join(" "))}catch(e){}return o.apply(console,arguments)};w.__zsx=1;console[k]=w}})}catch(e){}
+ }
+ setTimeout(hook,1500);setTimeout(hook,6000);
+})();
+
 async function doExport(){
+ try{zsxStart()}catch(e){}
+ try{const r=await doExport0();try{zsxEnd(true)}catch(e){}return r}
+ catch(e){try{zsxLog("❌ "+String((e&&e.message)||e));zsxEnd(false)}catch(_){}throw e}
+}
+async function doExport0(){
  const T0x=performance.now(),tag=m=>{try{showToast("ℹ Export វិធី "+m,true)}catch(e){}},done=m=>{try{showToast("⏱ Export វិធី "+m+" ប្រើពេល "+Math.round((performance.now()-T0x)/1000)+" វិនាទី",true)}catch(e){}};
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
  const btn=$("#exp"),old=btn.innerHTML,on=i=>!$$("#opts .b")[i].classList.contains("off");
@@ -6710,7 +6753,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="18.4";
+  var EMB="18.5";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
