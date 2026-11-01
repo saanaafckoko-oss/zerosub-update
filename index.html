@@ -3001,14 +3001,20 @@ async function doExport(){
  if(window.__zsOldExport!==true&&on(3)&&cues.length>0){
   const why=[];
   /* V18.2 : សាក Native FFmpeg មុនគេ (លឿនបំផុត ហើយមិនពឹង AAC របស់ WebView) */
-  let __noAac=false;
+  let __noAac=false;const __apk=!!(window.ZSNative&&typeof window.ZSNative.runFfmpeg==="function"&&typeof window.ZSNative.putFile==="function");
   if(window.__zsNoNativeExp!==true&&window.ZSNative&&typeof window.ZSNative.runFfmpeg==="function"){
-   try{tag("N: Native FFmpeg — រក្សាវីដេអូដើម + សំឡេងថ្មី (លឿនបំផុត)");if(await doExportNative()){done("N");return}}
+   try{tag("N v18.4: Native FFmpeg — រក្សាវីដេអូដើម + សំឡេងថ្មី (លឿនបំផុត)");if(await doExportNative()){done("N");return}}
    catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("native export:",e);why.push("native: "+String((e&&e.message)||e));showToast("⚠ Native Export មិនបាន ("+why[0].slice(0,90)+") — សាកវិធីបន្ទាប់",false)}
   }
   try{tag("KEEP: រក្សាវីដេអូដើម + សំឡេងថ្មី (គ្មាន Subtitle)");if(await doExportKeep()){done("KEEP");return}}
   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("keep export:",e);why.push(String((e&&e.message)||e));__noAac=/AAC/.test(why[why.length-1]);
    showToast("⚠ Export រក្សាវីដេអូដើមមិនបាន ("+why[0].slice(0,90)+") — ប្រើវិធី encode វីដេអូឡើងវិញ (គ្មាន Subtitle)",false)}
+  /* V18.4 : ក្នុង APK បើវិធីលឿន (N/KEEP) មិនបាន → ឈប់ប្រាប់មូលហេតុពិត មិនធ្លាក់ទៅ B/C ដោយស្ងាត់ៗ (B/C អាចអស់ពេលជាង ៣០ នាទី ឬគាំងត្រង់ 4%) */
+  if(__apk){
+   let __go=false;
+   try{__go=confirm("Export លឿន (v18.4) មិនបាន៖\n"+why.join("\n").slice(0,400)+"\n\nប្រើវិធីយឺត (ថតពេលពិត អាចអស់ពេលយូរ) ឬទេ?\n(ចុច Cancel ហើយផ្ញើសារខាងលើមកខ្ញុំ)")}catch(e){}
+   if(!__go)throw new Error("Export លឿនមិនបាន: "+why.join(" | ").slice(0,300));
+  }
   if(fxSupported()&&!__noAac){
    try{window.__zsNoBurn=true;tag("B: Encode វីដេអូឡើងវិញ (គ្មាន Subtitle)");if(await doExportFast()){done("B");return}}
    catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("fast export:",e);why.push(String((e&&e.message)||e));showToast("⚠ វិធី B មិនបាន ("+why[why.length-1].slice(0,80)+") — ប្រើវិធី C ថតពេលពិត",false)}
@@ -6704,7 +6710,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="18.3";
+  var EMB="18.4";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
