@@ -2337,9 +2337,9 @@ async function doExportFast(){
  const aenc=new AudioEncoder({output:(ch,meta)=>{const d=new Uint8Array(ch.byteLength);ch.copyTo(d);as.push({d,t:ch.timestamp});
   if(!adesc&&meta&&meta.decoderConfig&&meta.decoderConfig.description)adesc=fxCopy(meta.decoderConfig.description)},error:e=>{err=err||e}});
  aenc.configure({codec:ae.codec,sampleRate:SR,numberOfChannels:2,bitrate:ae.bitrate});
- const B=fxBounds(total,SR,voiceOn?zonesP.concat(plan):plan,150);
+ const B=fxBounds(total,SR,voiceOn?zonesP.concat(plan):plan,60);
  for(let k=0;k+1B.length;k++){
-  const buf=await zsTO(fxRenderWin(B[k],B[k+1],SR,bed,voiceOn?base:1,plan,base,voiceOn,zonesA),90000,"Render សំឡេងគាំង");
+  const buf=await zsTO(fxRenderWin(B[k],B[k+1],SR,bed,voiceOn?base:1,plan,base,voiceOn,zonesA),400000,"Render សំឡេងគាំង");
   const n=buf.length,pl=new Float32Array(n*2);pl.set(buf.getChannelData(0),0);pl.set(buf.numberOfChannels>1?buf.getChannelData(1):buf.getChannelData(0),n);
   aenc.encode(new AudioData({format:"f32-planar",sampleRate:SR,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(B[k]*1e6/SR),data:pl}));
   while(aenc.encodeQueueSize>8&&!err)await fxWait(1);
@@ -2347,7 +2347,7 @@ async function doExportFast(){
   ap=(k+1)/(B.length-1);window.__zsAct=performance.now();upd()}
  await zsTO(aenc.flush(),120000,"Encode AAC គាំង");if(err)throw err;try{aenc.close()}catch(e){}
  if(!as.length)throw new Error("Encode សំឡេងមិនបាន");ap=1;upd()};
- let wdT;const wd=new Promise((_,rj)=>{wdT=setInterval(()=>{if(performance.now()-window.__zsAct>90000){err=err||new Error("Export គាំង — គ្មានវឌ្ឍនភាព ៩០ វិនាទី");rj(err)}},3000)});
+ let wdT;const wd=new Promise((_,rj)=>{wdT=setInterval(()=>{if(performance.now()-window.__zsAct>400000){err=err||new Error("Export គាំង — គ្មានវឌ្ឍនភាព ៩០ វិនាទី");rj(err)}},3000)});
  const allP=Promise.all([vidTask().catch(e=>{err=err||e;throw e}),audTask().catch(e=>{err=err||e;throw e})]);allP.catch(()=>{});
  try{await Promise.race([allP,wd])}finally{clearInterval(wdT);if(err){try{dec.close()}catch(e){}try{enc.close()}catch(e){}}}
  if(err)throw err;
@@ -2713,7 +2713,7 @@ async function doExportCopy(){
   if(!asc&&meta&&meta.decoderConfig&&meta.decoderConfig.description)asc=fxCopy(meta.decoderConfig.description)},error:e=>{err=err||e}});
  try{
   aenc.configure({codec:ae.codec,sampleRate:SR,numberOfChannels:2,bitrate:ae.bitrate});
-  const B=fxBounds(total,SR,voiceOn?zonesP.concat(plan):plan,150);
+  const B=fxBounds(total,SR,voiceOn?zonesP.concat(plan):plan,60);
   const rw=q=>fxRenderWin(B[q],B[q+1],SR,bed,voiceOn?base:1,plan,base,voiceOn,zonesA);
   const QW=[];let nq=0;while(nqMath.min(3,B.length-1))QW.push(rw(nq++));nextP=QW[0]||null;
   for(let k=0;k+1B.length;k++){
@@ -2866,13 +2866,13 @@ async function doExportKeep(){
   if(!asc&&meta&&meta.decoderConfig&&meta.decoderConfig.description)asc=fxCopy(meta.decoderConfig.description)},error:e=>{err=err||e}});
  try{
   aenc.configure({codec:ae.codec,sampleRate:SR,numberOfChannels:2,bitrate:ae.bitrate});
-  const B=fxBounds(total,SR,zonesP.concat(plan),150),NW=B.length-1;
+  const B=fxBounds(total,SR,zonesP.concat(plan),60),NW=B.length-1;
   const rw=q=>fxRenderWin(B[q],B[q+1],SR,bed,base,plan,base,true,zonesA);
-  let nq=0;while(nqMath.min(2,NW))QW.push(rw(nq++));
+  let nq=0;while(nqMath.min(1,NW))QW.push(rw(nq++));
   for(let k=0;kNW;k++){
    if(err)throw err;
    const cur=QW.shift();if(nqNW)QW.push(rw(nq++));
-   const buf=await zsTO(cur,90000,"Render សំឡេងគាំង"),n=buf.length,pl=new Float32Array(n*2);
+   const buf=await zsTO(cur,400000,"Render សំឡេងគាំង"),n=buf.length,pl=new Float32Array(n*2);
    pl.set(buf.getChannelData(0),0);pl.set(buf.numberOfChannels>1?buf.getChannelData(1):buf.getChannelData(0),n);
    aenc.encode(new AudioData({format:"f32-planar",sampleRate:SR,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(B[k]*1e6/SR),data:pl}));
    while(aenc.encodeQueueSize>8&&!err)await fxWait(1);
@@ -2948,16 +2948,16 @@ async function doExportNative(){
   prog(9,"វិភាគសំឡេង");try{await zsTO(fxEnsureSpeech(),30000,"វិភាគសំឡេងគាំង")}catch(e){console.warn("speech",e)}
   const zonesA=fxZones(dub.out),zonesP=zonesA.map(z=>({st:z[0],en:z[1]}));
   try{if(navigator.wakeLock)wl=await navigator.wakeLock.request("screen")}catch(e){}
-  const B=fxBounds(total,SR,zonesP.concat(plan),150),NW=B.length-1;
+  const B=fxBounds(total,SR,zonesP.concat(plan),60),NW=B.length-1;
   lg("Render សំឡេង "+NW+" បំណែក • ប្រវែង "+Math.round(dur)+"s");
   const rw=q=>fxRenderWin(B[q],B[q+1],SR,bed,base,plan,base,true,zonesA);
   const QW=[];let nq=0,first=true;
-  while(nqMath.min(2,NW))QW.push(rw(nq++));
+  while(nqMath.min(1,NW))QW.push(rw(nq++));
   const CH=6*1024*1024;
   try{
    for(let k=0;kNW;k++){
     const cur=QW.shift();if(nqNW)QW.push(rw(nq++));
-    const buf=await zsTO(cur,90000,"Render សំឡេងគាំង"),n=buf.length;
+    const buf=await zsTO(cur,400000,"Render សំឡេងគាំង"),n=buf.length;
     const L=buf.getChannelData(0),R=buf.numberOfChannels>1?buf.getChannelData(1):L,pa=new Int16Array(n*2);
     for(let i=0;in;i++){let x=L[i],y=R[i];x=x-1?-1:x>1?1:x;y=y-1?-1:y>1?1:y;pa[2*i]=x0?x*32768:x*32767;pa[2*i+1]=y0?y*32768:y*32767}
     const by=new Uint8Array(pa.buffer);
@@ -3017,7 +3017,7 @@ async function doExportNative(){
    pre=document.createElement("div");box.appendChild(bar);box.appendChild(pre);document.body.appendChild(box)}
   box.style.display="block";pre.textContent=L.slice(-16).join("\n");box.scrollTop=box.scrollHeight}
  window.zsxLog=function(m){var t=((performance.now()-T)/1000).toFixed(0);L.push(t+"s "+String(m).slice(0,170));if(L.length>300)L.shift();if(window.__zsxOn)ui()};
- window.zsxStart=function(){clearTimeout(hideT);T=performance.now();L.length=0;window.__zsxOn=1;lastKey="";zsxLog("▶ Export v18.5 • video="+((typeof file!=="undefined"&&file)?Math.round(file.size/1048576)+"MB":"?")+" • ZSNative="+(window.ZSNative?"yes":"no"))};
+ window.zsxStart=function(){clearTimeout(hideT);T=performance.now();L.length=0;window.__zsxOn=1;lastKey="";zsxLog("▶ Export v18.6 • video="+((typeof file!=="undefined"&&file)?Math.round(file.size/1048576)+"MB":"?")+" • ZSNative="+(window.ZSNative?"yes":"no"))};
  window.zsxEnd=function(ok){zsxLog(ok?"✅ ចប់":"⏹ ឈប់");if(ok){hideT=setTimeout(function(){window.__zsxOn=0;if(box)box.style.display="none"},8000)}};
  function hook(){
   try{var b=document.getElementById("exp");
@@ -6753,7 +6753,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="18.5";
+  var EMB="18.6";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
