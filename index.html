@@ -2959,7 +2959,7 @@ async function doExportNative(){
   lg("Render សំឡេង "+NW+" បំណែក • ប្រវែង "+Math.round(dur)+"s");
   const rw=q=>fxRenderWin(B[q],B[q+1],SR,bed,base,plan,base,true,zonesA);
   const QW=[];let nq=0,first=true;
-  const RC=4;while(nqMath.min(RC,NW))QW.push(rw(nq++));
+  const RC=Math.max(4,Math.min(6,(navigator.hardwareConcurrency||4)-2));while(nqMath.min(RC,NW))QW.push(rw(nq++));
   const CH=6*1024*1024;
   try{
    for(let k=0;kNW;k++){
@@ -2976,7 +2976,7 @@ async function doExportNative(){
   }finally{QW.forEach(x=>x.catch(()=>{}));try{if(wl)wl.release()}catch(e){}}
   M.render=performance.now();if(first)throw new Error("គ្មានសំឡេងសម្រាប់ផ្ញើទៅ native");
   /* ៣. FFmpeg native (copy វីដេអូ → បើបរាជ័យ encode ដោយ libx264 ultrafast) */
-  const mix=["-f","s16le","-ar",String(SR),"-ac","2","-i",dir+pcm],map=["-map","0:v:0","-map","1:a:0"],aac=["-c:a","aac","-b:a","160k"],tail=["-shortest","-movflags","+faststart",dir+out];
+  const mix=["-f","s16le","-ar",String(SR),"-ac","2","-i",dir+pcm],map=["-map","0:v:0","-map","1:a:0"],aac=["-c:a","aac","-b:a","160k"],tail=["-shortest",dir+out];
   const V2=[
    {n:"Copy",a:["-y","-i",src].concat(mix,map,["-c:v","copy"],aac,tail)},
    {n:"Encode",a:["-y","-i",src].concat(mix,map,["-c:v","libx264","-preset","ultrafast","-crf","23","-pix_fmt","yuv420p"],aac,tail)}];
@@ -6769,7 +6769,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="19.8";
+  var EMB="19.9";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
