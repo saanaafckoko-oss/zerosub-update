@@ -656,6 +656,24 @@ html[data-mode=light] .zf-lgm button{color:#2a1b0a}
 html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,.25)}
 /style>script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js">/script>
 script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js">/script>
+style id="ly-css">
+#ovl{position:absolute;display:none;z-index:2;overflow:hidden;pointer-events:none}
+#ovc{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+#ovh{position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none}
+.lyb{position:absolute;pointer-events:auto;touch-action:none;box-sizing:border-box;border:2px dashed transparent}
+.lyb.sel{border-color:#22e5ff;box-shadow:0 0 0 1px rgba(0,0,0,.45)}
+.lyb .lyh{display:none;position:absolute;right:-2px;bottom:-2px;width:30px;height:30px;border-radius:9px 0 9px 0;background:#22e5ff;opacity:.95}
+.lyb.sel .lyh{display:block}
+.stage #sub{z-index:3}.stage .play{z-index:6}
+#lyPanel .lyr{margin:8px 0}#lyPanel .lyr>span{display:block;font-size:13px;color:var(--mut);margin-bottom:2px}#lyPanel .lyr b{color:var(--acc)}
+#lyPanel input[type=number],#lyPanel textarea{width:100%;box-sizing:border-box;background:rgba(0,0,0,.35);color:var(--ink);border:1.5px solid var(--nb);border-radius:12px;padding:8px 10px;font:700 15px inherit;font-family:inherit}
+#lyPanel .lysw{display:inline-block;width:30px;height:30px;border-radius:50%;border:2px solid #556;margin:3px 6px 3px 0;vertical-align:middle}
+#lyPanel .lysw.on{border-color:#fff;box-shadow:0 0 0 2px #22e5ff}
+#lyPanel .lyc{flex:none!important;padding:8px 14px!important;font-size:14px!important}
+#lyMod{position:fixed;left:0;top:0;right:0;bottom:0;z-index:99999;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:18px}
+#lyMod .lymc{width:100%;max-width:420px;border:1.5px solid var(--nb);border-radius:22px;padding:16px;background:#10172b;color:#f4ead8;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+#lyMod .lyr{margin:12px 0}#lyMod .lyr>span{display:block;font-size:13px;color:#cdbf9f;margin-bottom:2px}#lyMod .lyr b{color:#ffb300}
+/style>
 /head>body class="zf-locked">
 div id="zfAuth" role="dialog" aria-label="ZERO FLASH Login">
 div class="zf-top">button id="zfLg" type="button" aria-label="Language">svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">circle cx="12" cy="12" r="9"/>path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>/svg>/button>button id="zfDn" type="button" aria-label="ភ្លឺ / ងងឹត">/button>/div>
@@ -727,9 +745,10 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
 
  div class="pane on" id="p-export">
   div class="seg" style="margin-bottom:12px;padding:6px;gap:6px">button class="b" id="aT">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M4 3.5h16A1.5 1.5 0 0 1 21.5 5v11a1.5 1.5 0 0 1-1.5 1.5h-5.5L12 21l-2.5-3.5H4A1.5 1.5 0 0 1 2.5 16V5A1.5 1.5 0 0 1 4 3.5z" fill="currentColor" stroke="none"/>path d="M12 7v7M8.5 10.5h7" stroke="#5b2fd0" stroke-width="2" fill="none" stroke-linecap="round"/>/svg> + អក្សរ/button>button class="b" id="aL">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">rect x="3" y="3.6" width="18" height="17" rx="2.5" fill="currentColor" stroke="none"/>circle cx="12" cy="10" r="2.4" fill="#1d4ed8"/>path d="M7.5 17c.6-2.4 2.3-3.6 4.5-3.6s3.9 1.2 4.5 3.6z" fill="#1d4ed8"/>/svg> + Logo/button>button class="b" id="aB">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">circle cx="6" cy="6" r="1.2"/>circle cx="12" cy="6" r="1.2"/>circle cx="18" cy="6" r="1.2"/>circle cx="6" cy="12" r="1.2"/>circle cx="12" cy="12" r="1.2"/>circle cx="18" cy="12" r="1.2"/>circle cx="6" cy="18" r="1.2"/>circle cx="12" cy="18" r="1.2"/>circle cx="18" cy="18" r="1.2"/>/svg> + Blur/button>button class="b gold" id="aS">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">circle cx="12" cy="12" r="3"/>path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>/svg> Setting/button>/div>
-  div class="stage">div class="empty" id="noVid">div class="ico">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M7.5 7V5.5A2.5 2.5 0 0 1 10 3h9a2.5 2.5 0 0 1 2.5 2.5v9a2.5 2.5 0 0 1-2.5 2.5h-1.5"/>rect x="2.5" y="7.5" width="14" height="13.5" rx="2.5" fill="currentColor" stroke="none"/>path d="M7.8 11.2l5 2.9-5 2.9z" style="fill:var(--dk,#10172b)" stroke="none"/>/svg>/div>b>មិនទាន់មានវីដេអូសម្រាប់ Export នៅឡើយទេ/b>សូមចុច «📥 Brow file» ខាងលើដើម្បីជ្រើសរើសវីដេអូ ឬចុច «✂️ កាត់វីដេអូ» ខាងលើដើម្បីកាត់/ផ្តុំវីដេអូ/div>video id="vid" playsinline class="hide">/video>div id="sub">/div>button class="play hide" id="bigPlay">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">path d="M8 5v14l11-7z"/>/svg>/button>/div>
+  div class="stage">div class="empty" id="noVid">div class="ico">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M7.5 7V5.5A2.5 2.5 0 0 1 10 3h9a2.5 2.5 0 0 1 2.5 2.5v9a2.5 2.5 0 0 1-2.5 2.5h-1.5"/>rect x="2.5" y="7.5" width="14" height="13.5" rx="2.5" fill="currentColor" stroke="none"/>path d="M7.8 11.2l5 2.9-5 2.9z" style="fill:var(--dk,#10172b)" stroke="none"/>/svg>/div>b>មិនទាន់មានវីដេអូសម្រាប់ Export នៅឡើយទេ/b>សូមចុច «📥 Brow file» ខាងលើដើម្បីជ្រើសរើសវីដេអូ ឬចុច «✂️ កាត់វីដេអូ» ខាងលើដើម្បីកាត់/ផ្តុំវីដេអូ/div>video id="vid" playsinline class="hide">/video>div id="sub">/div>div id="ovl">canvas id="ovc">/canvas>div id="ovh">/div>/div>button class="play hide" id="bigPlay">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">path d="M8 5v14l11-7z"/>/svg>/button>/div>
   div class="time hide" id="tbar">span id="tc">00:00/span>input type="range" id="seek" min="0" max="100" value="0" step="0.1">i id="td">00:00/i>/div>
   div class="row hide" id="pbar">button class="b teal" id="play">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">path d="M7 4.5v15l13-7.5z"/>/svg> Play/button>button class="b" id="stop" style="color:#f87171;border-color:#7a2b3a">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">rect x="5" y="5" width="14" height="14" rx="2.5"/>/svg> Stop/button>/div>
+  div class="card in" id="lyPanel">div class="t" style="font-size:17px;justify-content:space-between">span>🎞 Layer Overlay span class="badge" id="lyCnt">0/span>/span>button class="b" id="lyClr" style="flex:none;padding:6px 10px;font-size:13px;display:none">🗑 លុបទាំងអស់/button>/div>div id="lyEmpty" style="color:var(--mut);font-size:13px;line-height:1.5">សូមចុចប៊ូតុង + អក្សរ ឬ + Logo ឬ + Blur នៅខាងលើ ដើម្បីបង្កើត Overlay ថ្មី/div>div id="lyWarn" style="display:none;color:#fbbf24;font-size:12px;line-height:1.5;margin:6px 0">⚠ ប៊ូតុង Effect ខាងក្រោមត្រូវបើក (✓) ទើប Layer ទាំងនេះត្រូវដុតលើវីដេអូពេល Export/div>div id="lyChips" class="row wrap" style="gap:6px;margin:6px 0">/div>div id="lyEdit">/div>/div>
   div class="card in">div class="t" style="font-size:17px">span class="ia2">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M3 6l2 2 3.5-3.5M3 13l2 2 3.5-3.5M12 7h9M12 14h9M12 20h9M3 20h2"/>/svg>/span> ⚙️ ជ្រើសរើសកំណត់ (1-Click Auto Export) ៖/div>div class="chk" id="opts">/div>/div>
   div id="pinl">div class="pih">span class="spin">/span>span>⚡/span>b id="piTx">Export 1-Click (Step 1/6)/b>span id="piPc">0%/span>/div>div class="pbar">i id="piFill">/i>/div>div class="pis" id="piSt">span id="ps1">Step 1: ទាញអក្សរ/span>span id="ps2">○ Step 2: ចែកតួ/span>span id="ps3">○ Step 3: បកប្រែ/span>span id="ps4">○ Step 4: អានសំឡេង/span>span id="ps5">○ Step 5: ភ្លេងអម/span>span id="ps6">○ Step 6: Export/span>/div>div id="piMsg">/div>/div>
  
@@ -1254,17 +1273,17 @@ async function zsfEnforce(F0,self,u,o,ENF){
   var chars=[],keep=[];try{if(gBible){chars=(gBible.characters||[]).filter(function(c){return c&&c.zh&&c.zh.length>=2&&c.km});keep=(gBible.keep_latin||[])}}catch(_){}
   var need=chars.filter(function(c){return src.indexOf(c.zh)>=0});
   var check=function(t){
-   if(!t||t.length<2)return "empty";
+   if(!t||t.length2)return "empty";
    var tt=t;keep.forEach(function(k){if(k)tt=tt.split(k).join("")});
    if(/[A-Za-z]{2,}/.test(tt.replace(/\[[^\]]*\]/g,"").replace(/https?:\S+/g,"")))return "latin";
-   var miss=[];for(var i=0;i<need.length;i++){var km=String(need[i].km).split(/[\/,|]/)[0].trim();if(km&&t.indexOf(km)<0)miss.push(km)}
+   var miss=[];for(var i=0;ineed.length;i++){var km=String(need[i].km).split(/[\/,|]/)[0].trim();if(km&&t.indexOf(km)0)miss.push(km)}
    if(need.length>=2&&miss.length*2>need.length)return "names missing: "+miss.slice(0,6).join(", ");
    return "";
   };
   var getT=function(resp){return resp.clone().json().then(function(d){var c=d&&d.candidates&&d.candidates[0];return c&&c.content&&c.content.parts?c.content.parts.map(function(p){return p.text||""}).join(""):""}).catch(function(){return ""})};
   var t=await getT(r),bad=check(t);
   var tries=0;
-  while(bad&&r.ok&&tries<3){
+  while(bad&&r.ok&&tries3){
    tries++;
    var j2=JSON.parse(o.body);
    var last=j2.contents[0].parts.length-1;
@@ -1421,11 +1440,324 @@ $("#b2").onclick=()=>mode==="merge"?pickMerge():$("#vidFile").click();
 $("#splitBtn").onclick=()=>mode==="split"?doSplit():doMerge();
 updPrec();
 
-/* Overlays */
-$("#aT").onclick=e=>{const t=prompt("អក្សរដែលចង់បន្ថែមលើវីដេអូ (ទទេ = លុប)",O.text);if(t===null)return;O.text=t;e.currentTarget.classList.toggle("vio",!!t)};
-$("#aL").onclick=e=>{const i=document.createElement("input");i.type="file";i.accept="image/*";i.onchange=()=>{const im=new Image();im.onload=()=>{O.logo=im;e.target.classList.add("vio")};im.src=URL.createObjectURL(i.files[0])};i.click()};
-$("#aB").onclick=e=>{O.blur=!O.blur;e.currentTarget.classList.toggle("vio",O.blur)};
-$("#aS").onclick=()=>{const a=prompt("ទំហំអក្សរ Subtitle (% នៃកម្ពស់វីដេអូ)",String(O.fs*100));if(a)O.fs=Math.max(2,Math.min(12,+a))/100;const b=prompt("ចម្ងាយ Subtitle ពីខាងក្រោម (%)",String(O.sb*100));if(b)O.sb=Math.max(1,Math.min(60,+b))/100};
+/* Overlays V17.0 : ប្រព័ន្ធ Layer (+អក្សរ / +Logo / +Blur) ធ្វើតាម APK Sp
+   - ចុចប៊ូតុងម្តង = បន្ថែម Layer ថ្មីម្តង (អាចមានច្រើន Layer)
+   - អូសលើវីដេអូដើម្បីផ្លាស់ទី • អូសជ្រុងស្តាំក្រោមដើម្បីប្តូរទំហំ
+   - Layer នីមួយៗកំណត់ពេលចាប់ផ្តើម/បញ្ចប់បាន • Logo អាចជារូប ឬ Video (មាន Chromakey លុបផ្ទៃបៃតង)
+   - ការគូរតែមួយ (lyDraw) ប្រើទាំងមើលជាមុន និង Export ដូច្នេះអ្វីដែលឃើញ = អ្វីដែល Export */
+const LY=[];let LYSEL=null,LYID=0,lyRaf=0,lyLast=0,lyDrag=null,lyClrT=0;
+const lyGet=id=>LY.find(L=>L.id===id);
+const lyClamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lyOn=(L,t)=>t>=L.s-1e-6&&(L.e=0||t=L.e+1e-6);
+const lySz=s=>(typeof HTMLVideoElement!=="undefined"&&s instanceof HTMLVideoElement)?[s.videoWidth,s.videoHeight]:[s.width,s.height];
+const lyCols=["#ffffff","#ffe600","#ff3b3b","#22e55a","#22e5ff","#ff4fd8","#000000"];
+const __lyM=document.createElement("canvas").getContext("2d");
+const __lyB=[document.createElement("canvas"),document.createElement("canvas")];
+
+/* ---------- អក្សរ ---------- */
+function lyLines(c,L,W,H){
+ const fs=L.fs*H;c.font=`800 ${fs}px "Noto Sans Khmer",sans-serif`;
+ const maxW=Math.max(fs,L.w*W),out=[];
+ String(L.txt||"").split("\n").forEach(par=>{
+  const parts=__capSeg?[...__capSeg.segment(par)].map(z=>z.segment):[...par];
+  let cur="";for(const p of parts){if(cur&&c.measureText(cur+p).width>maxW){out.push(cur);cur=p.trimStart()}else cur+=p}
+  out.push(cur)});
+ return {lines:out,fs,lh:fs*1.3};
+}
+function lyTextCv(L,W,H){
+ const key=[L.txt,L.fs,L.col,L.sc,L.w,W,H].join("|");
+ const cc=L._cc||(L._cc=new Map());let cv=cc.get(key);if(cv)return cv;
+ const m=lyLines(__lyM,L,W,H),pad=Math.ceil(m.fs*.35);
+ const cw=Math.max(4,Math.ceil(L.w*W)+pad*2),ch=Math.max(4,Math.ceil(m.lines.length*m.lh)+pad*2);
+ cv=document.createElement("canvas");cv.width=cw;cv.height=ch;const c=cv.getContext("2d");
+ c.font=`800 ${m.fs}px "Noto Sans Khmer",sans-serif`;c.textAlign="center";c.textBaseline="middle";c.lineJoin="round";c.lineWidth=m.fs/5;
+ m.lines.forEach((l,i)=>{const yy=pad+m.lh*(i+.5);c.strokeStyle=L.sc;c.strokeText(l,cw/2,yy);c.fillStyle=L.col;c.fillText(l,cw/2,yy)});
+ if(cc.size>5)cc.clear();cc.set(key,cv);return cv;
+}
+
+/* ---------- Blur (រក្សាទុកជា pyramid ៖ លឿន មិនពឹង ctx.filter) ---------- */
+function lyBlur(c,src,L,W,H){
+ const bw=Math.max(2,Math.round(L.w*W)),bh=Math.max(2,Math.round(L.h*H));
+ const bx=Math.round(L.x*W-bw/2),by=Math.round(L.y*H-bh/2);
+ const x0=Math.max(0,bx),y0=Math.max(0,by),x1=Math.min(W,bx+bw),y1=Math.min(H,by+bh),rw=x1-x0,rh=y1-y0;
+ if(rw2||rh2)return;
+ const sz=lySz(src);if(!sz[0]||!sz[1])return;const kx=sz[0]/W,ky=sz[1]/H;
+ const k=Math.max(1.5,L.lv*(H/720)/1.6);
+ const sw=Math.max(2,Math.round(rw/k)),sh=Math.max(2,Math.round(rh/k)),s2w=Math.max(2,sw>>1),s2h=Math.max(2,sh>>1);
+ const a=__lyB[0],b=__lyB[1];
+ if(a.width!==sw||a.height!==sh){a.width=sw;a.height=sh}
+ if(b.width!==s2w||b.height!==s2h){b.width=s2w;b.height=s2h}
+ const ac=a.getContext("2d"),bc=b.getContext("2d");
+ ac.clearRect(0,0,sw,sh);bc.clearRect(0,0,s2w,s2h);
+ ac.imageSmoothingEnabled=true;ac.imageSmoothingQuality="high";bc.imageSmoothingEnabled=true;bc.imageSmoothingQuality="high";
+ ac.drawImage(src,x0*kx,y0*ky,rw*kx,rh*ky,0,0,sw,sh);
+ bc.drawImage(a,0,0,sw,sh,0,0,s2w,s2h);
+ ac.clearRect(0,0,sw,sh);ac.drawImage(b,0,0,s2w,s2h,0,0,sw,sh);
+ c.imageSmoothingEnabled=true;c.imageSmoothingQuality="high";
+ c.drawImage(a,0,0,sw,sh,x0,y0,rw,rh);
+}
+
+/* ---------- Logo / Video Overlay + Chromakey ---------- */
+function lyKey(cv){
+ const x=cv.getContext("2d",{willReadFrequently:true}),im=x.getImageData(0,0,cv.width,cv.height),d=im.data;
+ for(let i=0;id.length;i+=4){
+  const r=d[i],g=d[i+1],b=d[i+2],m=r>b?r:b,df=g-m;
+  if(df>28){const a=df>=78?0:Math.round(255*(78-df)/50);if(ad[i+3])d[i+3]=a;d[i+1]=m}
+ }
+ x.putImageData(im,0,0);
+}
+function lyVid(L){
+ const v=L.vid;if(!v||!v.videoWidth)return null;
+ if(!L.pvc){const pw=Math.min(256,v.videoWidth);L.pvc=document.createElement("canvas");L.pvc.width=pw;L.pvc.height=Math.max(2,Math.round(pw*v.videoHeight/v.videoWidth))}
+ if(L._lt!==v.currentTime||L._lk!==L.ck){
+  L._lt=v.currentTime;L._lk=L.ck;
+  const x=L.pvc.getContext("2d",{willReadFrequently:true});x.clearRect(0,0,L.pvc.width,L.pvc.height);x.drawImage(v,0,0,L.pvc.width,L.pvc.height);
+  if(L.ck)lyKey(L.pvc);
+ }
+ return L.pvc;
+}
+function lyLogoSrc(L,t,pv){
+ if(!L.vk)return L.img||null;
+ if(pv)return lyVid(L);
+ const fr=L.fr;if(!fr||!fr.length)return null;
+ const d=L.dur||1,i=Math.floor((Math.max(0,t-L.s)%d)*(L.fps||10))%fr.length;
+ return fr[i];
+}
+
+/* ---------- ការគូរតែមួយ (មើលជាមុន + Export) ---------- */
+function lyDraw(c,W,H,t,src,pv){
+ const act=L=>lyOn(L,t)?1:((pv&&L.id===LYSEL)?0.3:0);
+ for(const L of LY){if(L.k!=="b")continue;const a=act(L);if(!a)continue;c.save();c.globalAlpha=a;lyBlur(c,src,L,W,H);c.restore()}
+ for(const L of LY){
+  if(L.k==="b")continue;const a=act(L);if(!a)continue;
+  c.save();
+  if(L.k==="t"){const cv=lyTextCv(L,W,H);c.globalAlpha=a;c.drawImage(cv,Math.round(L.x*W-cv.width/2),Math.round(L.y*H-cv.height/2))}
+  else{
+   const s=lyLogoSrc(L,t,pv);
+   if(s){const z=lySz(s);if(z[0]>0&&z[1]>0){const lw=L.w*W,lh=lw*z[1]/z[0];c.globalAlpha=a*L.op;c.drawImage(s,L.x*W-lw/2,L.y*H-lh/2,lw,lh)}}
+  }
+  c.restore();
+ }
+}
+/* រៀបចំ Frame នៃ Video Overlay មុន Export (ទាញ Frame ទុក + Chromakey) */
+async function lyPrep(W,H,btn){
+ for(const L of LY){L._cc=null;L.fr=null}
+ const vs=LY.filter(L=>L.k==="l"&&L.vk&&L.url);
+ for(let n=0;nvs.length;n++){
+  const L=vs[n];if(btn)btn.textContent=`កំពុងរៀបចំ Video Overlay ${n+1}/${vs.length}...`;
+  const v=document.createElement("video");v.muted=true;v.playsInline=true;v.preload="auto";v.src=L.url;
+  await new Promise((ok,no)=>{const to=setTimeout(()=>no(new Error("Video Overlay បើកយូរពេក")),15000);v.onloadeddata=()=>{clearTimeout(to);ok()};v.onerror=()=>{clearTimeout(to);no(new Error("Video Overlay បើកមិនបាន"))}});
+  const dur=v.duration>0&&isFinite(v.duration)?v.duration:1;L.dur=dur;
+  const pw=Math.max(8,Math.min(Math.round(L.w*W),640)),ph=Math.max(8,Math.round(pw*v.videoHeight/v.videoWidth));
+  let fps=Math.max(4,Math.min(15,Math.floor(1.2e7/(dur*pw*ph))));const nf=Math.max(1,Math.min(Math.ceil(dur*fps),400));fps=nf/dur;L.fps=fps;
+  const fr=[];
+  for(let i=0;inf;i++){
+   const tg=Math.min(Math.max(0,dur-.001),i/fps);
+   if(Math.abs(v.currentTime-tg)>.002)await new Promise(ok=>{const to=setTimeout(ok,4000);v.onseeked=()=>{clearTimeout(to);ok()};try{v.currentTime=tg}catch(_){clearTimeout(to);ok()}});
+   const cv=document.createElement("canvas");cv.width=pw;cv.height=ph;const x=cv.getContext("2d",{willReadFrequently:true});x.drawImage(v,0,0,pw,ph);if(L.ck)lyKey(cv);fr.push(cv);
+  }
+  v.onseeked=null;v.removeAttribute("src");try{v.load()}catch(_){}
+  L.fr=fr;
+ }
+}
+
+/* ---------- ទីតាំងមើលជាមុនលើវីដេអូ ---------- */
+function lyLay(){
+ const st=V.parentElement;if(!st||V.classList.contains("hide")||!V.videoWidth)return null;
+ const sr=st.getBoundingClientRect(),vr=V.getBoundingClientRect();if(!vr.width||!vr.height)return null;
+ const sc=Math.min(vr.width/V.videoWidth,vr.height/V.videoHeight),pw=V.videoWidth*sc,ph=V.videoHeight*sc;
+ return {left:vr.left-sr.left+(vr.width-pw)/2,top:vr.top-sr.top+(vr.height-ph)/2,pw,ph};
+}
+function lyBox(L,pw,ph){
+ if(L.k==="t"){const m=lyLines(__lyM,L,pw,ph);return {w:L.w*pw,h:m.lines.length*m.lh+m.fs*.3}}
+ if(L.k==="b")return {w:L.w*pw,h:L.h*ph};
+ return {w:L.w*pw,h:L.w*pw*(L.ar||1)};
+}
+function lyBoxes(lay){
+ const h=$("#ovh"),ids=LY.map(L=>L.id).join(",");
+ if(h._ids!==ids){h.innerHTML="";LY.forEach(L=>{const d=document.createElement("div");d.className="lyb";d.dataset.id=L.id;d.innerHTML='i class="lyh">/i>';h.appendChild(d)});h._ids=ids}
+ [...h.children].forEach(d=>{
+  const L=lyGet(+d.dataset.id);if(!L)return;const b=lyBox(L,lay.pw,lay.ph);
+  d.style.width=b.w+"px";d.style.height=b.h+"px";d.style.left=(L.x*lay.pw-b.w/2)+"px";d.style.top=(L.y*lay.ph-b.h/2)+"px";
+  d.classList.toggle("sel",L.id===LYSEL);
+ });
+}
+function lyPaint(){
+ const lay=lyLay();if(!lay||!LY.length)return;
+ const cv=$("#ovc"),dpr=Math.min(2,window.devicePixelRatio||1),W=Math.max(2,Math.round(lay.pw*dpr)),H=Math.max(2,Math.round(lay.ph*dpr));
+ if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}
+ const c=cv.getContext("2d");c.clearRect(0,0,W,H);
+ try{lyDraw(c,W,H,V.currentTime||0,V,true)}catch(e){}
+}
+function lyRender(){
+ const ov=$("#ovl"),lay=lyLay();
+ if(!lay||!LY.length){ov.style.display="none"}
+ else{ov.style.display="block";ov.style.left=lay.left+"px";ov.style.top=lay.top+"px";ov.style.width=lay.pw+"px";ov.style.height=lay.ph+"px";lyBoxes(lay);lyPaint()}
+ lyChips();
+}
+function lyTick(ts){
+ lyRaf=0;const b=$("#exp");if(b&&b.disabled)return;
+ if(!document.hidden&&(ts-lyLast>=33)){lyLast=ts;lyPaint()}
+ if(LY.length&&(!V.paused||LY.some(L=>L.vk)))lyRaf=requestAnimationFrame(lyTick);
+}
+function lyKick(){if(!lyRaf)lyRaf=requestAnimationFrame(lyTick)}
+
+/* ---------- បន្ទះ Layer (Chip + កែ) ---------- */
+function lyChips(){
+ const nm={t:"Aa",l:"🖼",b:"▦"},cnt={t:0,l:0,b:0};
+ $("#lyChips").innerHTML=LY.map(L=>{const n=++cnt[L.k];return `button class="b lyc${L.id===LYSEL?" vio":""}" data-sel="${L.id}">${nm[L.k]} ${n}/button>`}).join("");
+ $("#lyEmpty").style.display=LY.length?"none":"block";
+ $("#lyCnt").textContent=LY.length;$("#lyClr").style.display=LY.length?"":"none";
+ [["#aT","t"],["#aL","l"],["#aB","b"]].forEach(p=>$(p[0]).classList.toggle("vio",LY.some(L=>L.k===p[1])));
+ const eo=$$("#opts .b")[4]&&$$("#opts .b")[4].classList.contains("off");
+ $("#lyWarn").style.display=(LY.length&&eo)?"block":"none";
+}
+function lyEditor(){
+ const box=$("#lyEdit"),L=lyGet(LYSEL);if(!L){box.innerHTML="";return}
+ const names={t:"អក្សរ",l:"Logo",b:"Blur"},idx=LY.filter(x=>x.k===L.k).indexOf(L)+1;
+ const sl=(f,lab,min,max,step,m,unit)=>{const v=Math.round(L[f]/m*10)/10;return `div class="lyr">span>${lab}: b id="lyv_${f}">${v}${unit}/b>/span>input type="range" data-f="${f}" data-m="${m}" data-u="${unit}" min="${min}" max="${max}" step="${step}" value="${L[f]/m}">/div>`};
+ const sw=(f,lab)=>`div class="lyr">span>${lab}/span>${lyCols.map(c=>`i class="lysw${L[f]===c?" on":""}" data-sw="${f}" data-v="${c}" style="background:${c}">/i>`).join("")}/div>`;
+ let h=`div class="row" style="align-items:center;margin:8px 0">b style="color:var(--acc);flex:1">${names[L.k]} #${idx}/b>button class="b" data-a="del" style="flex:none;color:#f87171;border-color:#7a2b3a;padding:8px 12px;font-size:13px">🗑 លុប Layer នេះ/button>/div>`;
+ if(L.k==="t"){
+  h+=`div class="lyr">span>អក្សរ/span>textarea rows="2" data-f="txt">${esc(L.txt)}/textarea>/div>`
+   +sl("fs","ទំហំអក្សរ (% នៃកម្ពស់វីដេអូ)",2,15,.5,.01,"%")+sl("w","ទទឹងប្រអប់អក្សរ",10,100,1,.01,"%")+sw("col","ពណ៌អក្សរ")+sw("sc","ពណ៌ស៊ុមអក្សរ");
+ }else if(L.k==="l"){
+  h+=`div class="row" style="margin:6px 0">button class="b" data-a="swap" style="padding:10px">🖼 ប្តូររូប / វីដេអូ/button>/div>`;
+  if(L.vk)h+=`div class="lyr">span>ជ្រើសរើសប្រភេទ Video Overlay/span>/div>div class="row" style="margin:4px 0">button class="b${L.ck?"":" vio"}" data-a="ck0" style="padding:10px 6px;font-size:13px">▶ Video ធម្មតា/button>button class="b${L.ck?" vio":""}" data-a="ck1" style="padding:10px 6px;font-size:13px">🟩 Chromakey លុបផ្ទៃបៃតង/button>/div>`;
+  h+=sl("w","ទំហំ Logo",5,100,1,.01,"%")+sl("op","ភាពច្បាស់",10,100,1,.01,"%");
+ }else{
+  h+=sl("lv","កម្រិត Blur",1,40,1,1,"")+sl("w","ទទឹង",5,120,1,.01,"%")+sl("h","កម្ពស់",2,120,1,.01,"%");
+ }
+ h+=`div class="row" style="margin:8px 0 2px">div class="lyr" style="margin:0">span>ចាប់ផ្តើម (វិនាទី)/span>input type="number" inputmode="decimal" step="0.1" min="0" data-f="s" data-m="1" value="${L.s}">button class="b" data-a="now-s" style="width:100%;margin-top:6px;padding:8px 4px;font-size:12px">📍 ពេលបច្ចុប្បន្ន/button>/div>div class="lyr" style="margin:0">span>បញ្ចប់ (0 = ដល់ចប់)/span>input type="number" inputmode="decimal" step="0.1" min="0" data-f="e" data-m="1" value="${L.e}">button class="b" data-a="now-e" style="width:100%;margin-top:6px;padding:8px 4px;font-size:12px">📍 ពេលបច្ចុប្បន្ន/button>/div>/div>`;
+ h+=`div class="note" style="color:var(--mut);font-size:12px;margin-top:8px;line-height:1.5">អូសលើវីដេអូដើម្បីផ្លាស់ទី • អូសជ្រុងស្តាំក្រោមដើម្បីប្តូរទំហំ/div>`;
+ box.innerHTML=h;
+}
+function lySync(){
+ const L=lyGet(LYSEL);if(!L)return;
+ $$("#lyEdit [data-f]").forEach(el=>{
+  const f=el.dataset.f;if(!(f in L)||(el.type!=="range"&&el.type!=="number"))return;
+  const m=parseFloat(el.dataset.m||"1"),v=L[f]/m;if(document.activeElement!==el)el.value=v;
+  const lab=$("#lyv_"+f);if(lab)lab.textContent=(Math.round(v*10)/10)+(el.dataset.u||"");
+ });
+}
+function lySelect(id){LYSEL=id;lyEditor();lyRender();lyKick()}
+function lyAdd(o){
+ const L=Object.assign({id:++LYID,x:.5,y:.5,w:.3,s:0,e:0},o);LY.push(L);LYSEL=L.id;
+ lyEditor();lyRender();lyKick();return L;
+}
+function lyDel(L){
+ if(L.url){try{URL.revokeObjectURL(L.url)}catch(_){}}
+ if(L.vid){try{L.vid.pause()}catch(_){}}
+ const i=LY.indexOf(L);if(i>=0)LY.splice(i,1);
+ LYSEL=LY.length?LY[Math.min(i,LY.length-1)].id:null;
+ lyEditor();lyRender();
+}
+
+/* ---------- Logo : ជ្រើសរូប ឬ វីដេអូ ---------- */
+function lyLoadLogo(f,L0){
+ const url=URL.createObjectURL(f),isV=/^video\//.test(f.type)||/\.(mp4|webm|mov|mkv|3gp|m4v)$/i.test(f.name||"");
+ const fin=patch=>{
+  if(L0){
+   if(L0.url){try{URL.revokeObjectURL(L0.url)}catch(_){}}
+   if(L0.vid){try{L0.vid.pause()}catch(_){}}
+   ["img","vid","pvc","fr","url"].forEach(k=>{L0[k]=null});L0.vk=false;L0._lt=null;
+   Object.assign(L0,patch);lyEditor();lyRender();lyKick();
+  }else lyAdd(Object.assign({k:"l",x:.86,y:.1,w:.2,op:1,ck:false},patch));
+ };
+ if(isV){
+  const v=document.createElement("video");v.muted=true;v.loop=true;v.playsInline=true;v.preload="auto";v.src=url;
+  v.onloadedmetadata=()=>{v.play().catch(()=>{});fin({vk:true,vid:v,url,ar:v.videoHeight/v.videoWidth,dur:v.duration>0&&isFinite(v.duration)?v.duration:1})};
+  v.onerror=()=>{try{URL.revokeObjectURL(url)}catch(_){}alert("មិនអាចបើកវីដេអូ Logo នេះបានទេ")};
+ }else{
+  const im=new Image();
+  im.onload=()=>fin({vk:false,img:im,url,ar:im.naturalHeight/im.naturalWidth});
+  im.onerror=()=>{try{URL.revokeObjectURL(url)}catch(_){}alert("មិនអាចបើករូបនេះបានទេ")};
+  im.src=url;
+ }
+}
+function lyPickLogo(L0){
+ const i=document.createElement("input");i.type="file";i.accept="image/*,video/*";
+ i.onchange=()=>{const f=i.files&&i.files[0];if(f)lyLoadLogo(f,L0)};i.click();
+}
+
+/* ---------- ប៊ូតុងទាំង ៣ ---------- */
+$("#aT").onclick=()=>{
+ lyAdd({k:"t",txt:"សរសេរអក្សរនៅទីនេះ",x:.5,y:.12,w:.8,fs:.05,col:"#ffffff",sc:"#000000"});
+ setTimeout(()=>{const ta=$("#lyEdit textarea");if(ta){ta.focus();ta.select()}},60);
+};
+$("#aL").onclick=()=>lyPickLogo(null);
+$("#aB").onclick=()=>lyAdd({k:"b",x:.5,y:.88,w:.9,h:.16,lv:12});
+$("#lyClr").onclick=e=>{
+ const b=e.currentTarget;
+ if(!lyClrT){b.textContent="ចុចម្តងទៀត = លុបទាំងអស់";lyClrT=setTimeout(()=>{lyClrT=0;b.textContent="🗑 លុបទាំងអស់"},3000);return}
+ clearTimeout(lyClrT);lyClrT=0;b.textContent="🗑 លុបទាំងអស់";
+ LY.slice().forEach(L=>{if(L.url){try{URL.revokeObjectURL(L.url)}catch(_){}}if(L.vid){try{L.vid.pause()}catch(_){}}});
+ LY.length=0;LYSEL=null;lyEditor();lyRender();
+};
+$("#lyChips").onclick=e=>{const b=e.target.closest("[data-sel]");if(b)lySelect(+b.dataset.sel)};
+$("#lyEdit").addEventListener("input",e=>{
+ const el=e.target,f=el.dataset.f;if(!f)return;const L=lyGet(LYSEL);if(!L)return;
+ if(el.type==="range"||el.type==="number"){
+  let v=parseFloat(el.value);if(!isFinite(v))v=0;if(el.type==="number"&&v0)v=0;
+  L[f]=v*parseFloat(el.dataset.m||"1");
+  const lab=$("#lyv_"+f);if(lab)lab.textContent=(Math.round(v*10)/10)+(el.dataset.u||"");
+ }else L[f]=el.value;
+ lyRender();lyKick();
+});
+$("#lyEdit").addEventListener("click",e=>{
+ const L=lyGet(LYSEL);if(!L)return;
+ const sw=e.target.closest("[data-sw]");
+ if(sw){L[sw.dataset.sw]=sw.dataset.v;$$("#lyEdit [data-sw='"+sw.dataset.sw+"']").forEach(x=>x.classList.toggle("on",x===sw));lyRender();return}
+ const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a;
+ if(a==="del")lyDel(L);
+ else if(a==="swap")lyPickLogo(L);
+ else if(a==="ck0"||a==="ck1"){L.ck=a==="ck1";L._lt=null;lyEditor();lyRender();lyKick()}
+ else if(a==="now-s"){L.s=Math.round((V.currentTime||0)*10)/10;if(L.e>0&&L.e=L.s)L.e=0;lyEditor();lyRender()}
+ else if(a==="now-e"){const t=Math.round((V.currentTime||0)*10)/10;L.e=t>L.s?t:0;lyEditor();lyRender()}
+});
+
+/* ---------- អូស / ប្តូរទំហំលើវីដេអូ ---------- */
+const __ovh=$("#ovh");
+__ovh.addEventListener("pointerdown",e=>{
+ const d=e.target.closest(".lyb");if(!d)return;const L=lyGet(+d.dataset.id);if(!L)return;
+ e.preventDefault();const lay=lyLay();if(!lay)return;const chg=LYSEL!==L.id;LYSEL=L.id;
+ lyDrag={L,h:e.target.classList.contains("lyh"),sx:e.clientX,sy:e.clientY,x:L.x,y:L.y,w:L.w,hh:L.h,pw:lay.pw,ph:lay.ph};
+ try{d.setPointerCapture(e.pointerId)}catch(_){}
+ if(chg)lyEditor();lyRender();
+});
+__ovh.addEventListener("pointermove",e=>{
+ const D=lyDrag;if(!D)return;e.preventDefault();const L=D.L,dx=(e.clientX-D.sx)/D.pw,dy=(e.clientY-D.sy)/D.ph;
+ if(!D.h){L.x=lyClamp(D.x+dx,0,1);L.y=lyClamp(D.y+dy,0,1)}
+ else{
+  const nw=lyClamp(D.w+dx,.04,1.2),dd=nw-D.w;L.w=nw;L.x=D.x+dd/2;
+  if(L.k==="b"){const nh=lyClamp(D.hh+dy,.02,1.2);L.h=nh;L.y=D.y+(nh-D.hh)/2}
+  else if(L.k==="l"){L.y=D.y+(dd*D.pw*(L.ar||1)/D.ph)/2}
+ }
+ lySync();lyRender();
+});
+["pointerup","pointercancel"].forEach(ev=>__ovh.addEventListener(ev,()=>{lyDrag=null}));
+try{const ro=new ResizeObserver(()=>lyRender());ro.observe(V.parentElement);ro.observe(V)}catch(_){}
+window.addEventListener("resize",lyRender);
+["loadedmetadata","loadeddata","resize","emptied"].forEach(ev=>V.addEventListener(ev,lyRender));
+["play","pause","seeked","seeking","ended","timeupdate"].forEach(ev=>V.addEventListener(ev,()=>{if(LY.length)lyKick()}));
+$$("#opts .b").forEach(b=>b.addEventListener("click",lyChips));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{LY.forEach(L=>{L._cc=null});lyRender()});
+lyChips();
+
+/* ---------- Setting (ជំនួស prompt ចាស់ ដែលចេញផ្ទាំង "appassets.androidplatform.net និយាយថា") ---------- */
+$("#aS").onclick=()=>{
+ if($("#lyMod"))return;
+ const m=document.createElement("div");m.id="lyMod";
+ m.innerHTML=`div class="lymc">div class="t" style="font-size:18px">⚙️ Setting/div>
+ div class="lyr">span>ទំហំអក្សរ Subtitle (% នៃកម្ពស់វីដេអូ): b id="lyms1">${Math.round(O.fs*1000)/10}%/b>/span>input type="range" id="lym1" min="2" max="12" step="0.5" value="${O.fs*100}">/div>
+ div class="lyr">span>ចម្ងាយ Subtitle ពីខាងក្រោម (%): b id="lyms2">${Math.round(O.sb*1000)/10}%/b>/span>input type="range" id="lym2" min="1" max="60" step="1" value="${O.sb*100}">/div>
+ button class="b teal big" id="lymOk" style="width:100%;margin-top:14px">យល់ព្រម/button>/div>`;
+ document.body.appendChild(m);
+ $("#lym1").oninput=e=>{O.fs=parseFloat(e.target.value)/100;$("#lyms1").textContent=e.target.value+"%"};
+ $("#lym2").oninput=e=>{O.sb=parseFloat(e.target.value)/100;$("#lyms2").textContent=e.target.value+"%"};
+ const close=()=>m.remove();
+ $("#lymOk").onclick=close;m.addEventListener("click",e=>{if(e.target===m)close()});
+};
 
 /* Remove vocal (centre-channel cancel) */
 $("#voc").onclick=async()=>{
@@ -1956,28 +2288,23 @@ async function doExportFast(){
  const enc=new VideoEncoder({output:(ch,meta)=>{const d=new Uint8Array(ch.byteLength);ch.copyTo(d);vs.push({d,t:ch.timestamp,k:ch.type==="key"});
   if(!vdesc&&meta&&meta.decoderConfig&&meta.decoderConfig.description)vdesc=fxCopy(meta.decoderConfig.description)},error:e=>{err=err||e}});
  enc.configure(vcfg);
- const gop=Math.max(1,Math.round(dm.fps*2)),fdur=Math.round(1e6/dm.fps),o4=!window.__zsNoBurn&&on(4)&&!!(O.blur||O.logo||O.text),o0=!window.__zsNoBurn&&on(0)&&cues.length>0; /* V10.3 : ដុត Subtitle ខ្មែរលើវីដេអូ (ប៊ូតុង Subtitle បើក/បិទ) */
+ const gop=Math.max(1,Math.round(dm.fps*2)),fdur=Math.round(1e6/dm.fps),o4=!window.__zsNoBurn&&on(4)&&LY.length>0,o0=!window.__zsNoBurn&&on(0)&&cues.length>0; /* V10.3 : ដុត Subtitle ខ្មែរលើវីដេអូ (ប៊ូតុង Subtitle បើក/បិទ) */
  /* V3.1 : បន្ថយការងារក្នុងមួយ frame — ឃ្លា Subtitle/Logo/Text គូរទុកម្តងហើយប្រើឡើងវិញ, Blur ដោយ downscale (លឿនជាង filter), frame ដែលមិនមានអ្វីត្រូវគូរ → encode ត្រង់ៗ មិនឆ្លងកាត់ canvas */
  const cuesS=cues.slice().sort((a,b)=>a.s-b.s);let ci=0,capCv=null,capQ=null,ovCv=null,bcv=null;
  const mkCv=()=>{const z=document.createElement("canvas");z.width=w;z.height=h;return z};
  const capOv=q=>{if(capQ!==q){capQ=q;if(!capCv)capCv=mkCv();const cc=capCv.getContext("2d");cc.clearRect(0,0,w,h);caption(cc,String(q.t).replace(/^\s*\[[1-4]\]\s*/,""),w/2,h*(1-O.sb),w,O.fs*h)}return capCv};
- if(o4&&(O.logo||O.text)){ovCv=mkCv();const oc=ovCv.getContext("2d");
-  if(O.logo){const lw=w*.2;oc.drawImage(O.logo,w-lw-16,16,lw,lw*O.logo.height/O.logo.width)}
-  if(O.text)caption(oc,O.text,w/2,h*.12,w,O.fs*h)}
- const direct0=rot===0&&!o4;
+ if(o4)await lyPrep(w,h,btn);
+ const direct0=rot===0,lyAct=t=>o4&&LY.some(L=>lyOn(L,t));
  const dec=new VideoDecoder({output:fr=>{
   try{
    const t=fr.timestamp/1e6;if(fr.timestamp0)return;
    let q=null;
    if(o0){while(cicuesS.length&&cuesS[ci].et)ci++;const cq=cuesS[ci];if(cq&&t>=cq.s&&t=cq.e)q=cq}
-   if(direct0&&!q&&fr.displayWidth===w&&fr.displayHeight===h){
+   if(direct0&&!q&&!lyAct(t)&&fr.displayWidth===w&&fr.displayHeight===h){
     enc.encode(fr,{keyFrame:nOut%gop===0})}
    else{
     c.fillStyle="#000";c.fillRect(0,0,w,h);put(fr);
-    if(o4&&O.blur){const y=Math.round(h*.78),hh=Math.max(8,Math.round(h*.2)),sw=Math.max(8,w>>3),sh=Math.max(4,hh>>3);
-     if(!bcv){bcv=document.createElement("canvas");bcv.width=sw;bcv.height=sh}
-     const bc=bcv.getContext("2d");bc.drawImage(cv,0,y,w,hh,0,0,sw,sh);c.imageSmoothingEnabled=true;c.imageSmoothingQuality="high";c.drawImage(bcv,0,0,sw,sh,0,y,w,hh)}
-    if(ovCv)c.drawImage(ovCv,0,0);
+    if(o4)lyDraw(c,w,h,t,cv,false);
     if(q)c.drawImage(capOv(q),0,0);
     const vf=new VideoFrame(cv,{timestamp:fr.timestamp,duration:fdur});
     enc.encode(vf,{keyFrame:nOut%gop===0});vf.close()}
@@ -2582,7 +2909,7 @@ async function doExport(){
   }else why.push("Browser មិនគាំទ្រ WebCodecs");
   throw new Error("Export មិនបាន៖ "+why.join(" | ").slice(0,200));
  }
- const burn=on(0)&&cues.length>0,eff=burn||(on(4)&&!!(O.blur||O.logo||O.text));
+ const burn=on(0)&&cues.length>0,eff=burn||(on(4)&&LY.length>0);
  if(!eff&&typeof AudioEncoder==="function"){
   try{tag("A: ចម្លងវីដេអូ+សំឡេងថ្មី (លឿនបំផុត)");if(await doExportCopy()){return}}
   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("copy export:",e);showToast("⚠ Export លឿនបំផុតមិនបាន ("+String((e&&e.message)||e).slice(0,60)+") — ប្រើវិធីបន្ទាប់",false)}
@@ -2598,6 +2925,7 @@ async function doExportRT(){
  const on=i=>!$$("#opts .b")[i].classList.contains("off"),btn=$("#exp"),old=btn.innerHTML;
  const sc=Math.min(1,1280/Math.max(V.videoWidth,V.videoHeight)),w=Math.round(V.videoWidth*sc),h=Math.round(V.videoHeight*sc);
  const cv=document.createElement("canvas");cv.width=w;cv.height=h;const c=cv.getContext("2d");
+ if(on(4)&&LY.length)await lyPrep(w,h,btn);
  AC=AC||new(window.AudioContext||window.webkitAudioContext)();await AC.resume();
  const dst=AC.createMediaStreamDestination();let bs=null,bgG=null,dub=null,dubBus=null;
  const voiceOn=on(3)&&cues.length>0,base=$("#bgm").value/100;
@@ -2616,11 +2944,10 @@ async function doExportRT(){
  const fin=new Promise(r=>{rec.onstop=r});
  V.pause();V.currentTime=0;await new Promise(r=>{V.onseeked=()=>{V.onseeked=null;r()}});
  const __cs=cues.slice().sort((a,b)=>a.s-b.s),__burn=on(0)&&__cs.length>0;
+ const __ly=on(4)&&LY.length>0;
  const draw=()=>{c.drawImage(V,0,0,w,h);
+  if(__ly)lyDraw(c,w,h,V.currentTime,V,false);
   if(__burn){const t=V.currentTime;let q=null;for(let i=0;i__cs.length;i++){if(__cs[i].s>t)break;if(t__cs[i].e){q=__cs[i];break}}if(q)caption(c,String(q.t).replace(/^\s*\[[1-4]\]\s*/,""),w/2,h*(1-O.sb),w,O.fs*h)}
-  if(on(4)){if(O.blur){c.save();c.beginPath();c.rect(0,h*.78,w,h*.2);c.clip();c.filter="blur(16px)";c.drawImage(V,0,0,w,h);c.restore()}
-   if(O.logo){const lw=w*.2;c.drawImage(O.logo,w-lw-16,16,lw,lw*O.logo.height/O.logo.width)}
-   if(O.text)caption(c,O.text,w/2,h*.12,w,O.fs*h)}
   btn.textContent=`កំពុង Export ${Math.round(V.currentTime/V.duration*100)}%...`;
   if(!stop)requestAnimationFrame(draw)};
  V.onended=()=>{stop=true;rec.stop()};
@@ -3584,7 +3911,7 @@ function zsfFitDur(L,R,F,ks,ke,tk){
           if(gemTLate())break;
           try{r2=r2.concat(await gemTRaw(A,{cs:c,ce:Math.min(p.ce,c+6),last:!!p.last&&c+6>=p.ce-0.5,pad:3,kw:p.kw},idx+50+q,totalSec));}catch(_){}
         }
-        var __c2=gemTChars(r2);if(__c2>ch&&__c2<=Math.max(12,v*6.5)){res=r2;window.__zsfGemRecov=(window.__zsfGemRecov||0)+1;}
+        var __c2=gemTChars(r2);if(__c2>ch&&__c2=Math.max(12,v*6.5)){res=r2;window.__zsfGemRecov=(window.__zsfGemRecov||0)+1;}
       }
     }catch(_){}
     return res;
@@ -6141,7 +6468,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="16.9";
+  var EMB="17.0";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
