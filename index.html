@@ -2206,8 +2206,9 @@ function fxAnalyze(ab){
  return{fs:fl/sr,e,file}}
 async function fxEnsureSpeech(){
  if(window.__spEn&&window.__spEn.file===file)return;
- try{if(file.size>4e8)return;AC=AC||new(window.AudioContext||window.webkitAudioContext)();
-  const ab=await AC.decodeAudioData(await file.arrayBuffer());window.__spEn=fxAnalyze(ab)}catch(e){console.warn("speech analyze",e)}}
+ if(window.__spFail===file)return;
+ try{if(file.size>2e8){window.__spFail=file;return}AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  const ab=await zsTO((async()=>AC.decodeAudioData(await file.arrayBuffer()))(),25000,"វិភាគសំឡេងវីដេអូគាំង");window.__spEn=fxAnalyze(ab)}catch(e){window.__spFail=file;console.warn("speech analyze",e)}}
 
 function zsfPrevCue(q){var best=null;for(var i=0;icues.length;i++){var c=cues[i];if(c!==q&&c.sq.s&&(!best||c.s>best.s))best=c}return best}
 function fxSpeechZones(){
@@ -2260,15 +2261,15 @@ async function doExportFast(){
  const on=i=>!$$("#opts .b")[i].classList.contains("off"),btn=$("#exp"),old=btn.innerHTML,T0=performance.now();
  if(!/\.(mp4|m4v|mov)$/i.test(file.name||"")&&!/mp4|quicktime/i.test(file.type||""))throw new Error("ទម្រង់ឯកសារមិនគាំទ្រ Export លឿន");
  btn.textContent="⚡ កំពុងរៀបចំ Export លឿន...";
- const dm=await SPMP4.demux(fxReader(file),file.size);
+ const dm=await zsTO(SPMP4.demux(fxReader(file),file.size),60000,"អាន MP4 គាំង");
  if(dm.samples.length2)throw new Error("វីដេអូខ្លីពេក");
  const sc=Math.min(1,1280/Math.max(V.videoWidth,V.videoHeight)),w=Math.round(V.videoWidth*sc)&~1,h=Math.round(V.videoHeight*sc)&~1;
  const dW=dm.rot%180?dm.h:dm.w,dH=dm.rot%180?dm.w:dm.h;
  if(Math.abs(dW/dH-V.videoWidth/V.videoHeight)>.02)throw new Error("ទំហំវីដេអូមិនត្រូវគ្នា");
- const vcfg=await fxPickVideo(w,h,dm.fps);if(!vcfg)throw new Error("Encoder H.264 មិនមាន");
+ const vcfg=await zsTO(fxPickVideo(w,h,dm.fps),20000,"Encoder H.264 គាំង");if(!vcfg)throw new Error("Encoder H.264 មិនមាន");
  const dcfg={codec:dm.codec,description:dm.desc,codedWidth:dm.w,codedHeight:dm.h};
- const ds=await VideoDecoder.isConfigSupported(dcfg);if(!ds||!ds.supported)throw new Error("Decoder វីដេអូមិនគាំទ្រ");
- const ae=await fxPickAudio();if(!ae)throw new Error("Audio encoder មិនមាន");
+ const ds=await zsTO(VideoDecoder.isConfigSupported(dcfg),15000,"Decoder គាំង");if(!ds||!ds.supported)throw new Error("Decoder វីដេអូមិនគាំទ្រ");
+ const ae=await zsTO(fxPickAudio(),15000,"ពិនិត្យ AAC គាំង");if(!ae)throw new Error("Audio encoder មិនមាន");
  if(window.__zsNoBurn&&ae.kind!=="aac")throw new Error("Browser មិនអាច encode សំឡេង AAC — វីដេអូនឹងចាក់មិនបាននៅ Android");
  if(ae.kind==="opus"&&window.MediaRecorder&&MediaRecorder.isTypeSupported("video/mp4;codecs=avc1.42E01E,mp4a.40.2"))throw new Error("AAC មិនមាន — ប្រើវិធីធម្មតា");
  AC=AC||new(window.AudioContext||window.webkitAudioContext)();
@@ -2279,7 +2280,7 @@ async function doExportFast(){
   if(!dub){btn.textContent="🎙 កំពុងបង្កើតសំឡេងខ្មែរ...";dub=await buildDub(btn);window.__preDub=dub}
   if(!dub.out.length){const e=new Error("បង្កើតសំឡេង TTS មិនបាន — ពិនិត្យអ៊ីនធឺណិត ឬ TTS Worker");e.fatal=true;throw e}}
  let bed=null;
- if(voiceOn){await fxEnsureBgm(btn)}
+ if(voiceOn){try{await zsTO(fxEnsureBgm(btn),120000,"ភ្លេងអមគាំង")}catch(e){console.warn("bgm",e)}}
  if(voiceOn&&bgmBuf)bed=bgmBuf;
  else{if(file.size>4e8)throw new Error("ឯកសារធំពេកសម្រាប់ Export លឿន");bed=await AC.decodeAudioData(await file.arrayBuffer())}
  /* ---- វីដេអូ ---- */
@@ -2309,7 +2310,7 @@ async function doExportFast(){
     if(q)c.drawImage(capOv(q),0,0);
     const vf=new VideoFrame(cv,{timestamp:fr.timestamp,duration:fdur});
     enc.encode(vf,{keyFrame:nOut%gop===0});vf.close()}
-   nOut++;lastT=t;
+   nOut++;lastT=t;window.__zsAct=performance.now();
    if(nOut%12===0){vp=Math.min(1,t/dur);upd()}
   }catch(e){err=err||e}finally{fr.close()}},error:e=>{err=err||e}});
  dec.configure(dcfg);
@@ -2317,9 +2318,9 @@ async function doExportFast(){
  let mc=0;for(const z of dm.samples)if(z.cts>mc)mc=z.cts;
  const durS=Math.max(dur,(mc-dm.start)/dm.ts+fdur/1e6),SR=ae.sr,total=Math.round(durS*SR);
  const {plan,delayed}=voiceOn?fxPlan(dub.out):{plan:[],delayed:0};
- if(voiceOn)await fxEnsureSpeech();
+ if(voiceOn){btn.textContent="⚡ វិភាគសំឡេង...";await fxEnsureSpeech()}
  const zonesA=voiceOn?fxZones(dub.out):[],zonesP=zonesA.map(z=>({st:z[0],en:z[1]}));
- const as=[];let adesc=null;
+ const as=[];let adesc=null;btn.textContent="⚡ ចាប់ផ្តើម encode វីដេអូ+សំឡេង...";window.__zsAct=performance.now();
  const vidTask=async()=>{
  const rd=fxReader(file),S=dm.samples;
  for(let i=0;iS.length;i++){
@@ -2338,15 +2339,17 @@ async function doExportFast(){
  aenc.configure({codec:ae.codec,sampleRate:SR,numberOfChannels:2,bitrate:ae.bitrate});
  const B=fxBounds(total,SR,voiceOn?zonesP.concat(plan):plan,150);
  for(let k=0;k+1B.length;k++){
-  const buf=await fxRenderWin(B[k],B[k+1],SR,bed,voiceOn?base:1,plan,base,voiceOn,zonesA);
+  const buf=await zsTO(fxRenderWin(B[k],B[k+1],SR,bed,voiceOn?base:1,plan,base,voiceOn,zonesA),90000,"Render សំឡេងគាំង");
   const n=buf.length,pl=new Float32Array(n*2);pl.set(buf.getChannelData(0),0);pl.set(buf.numberOfChannels>1?buf.getChannelData(1):buf.getChannelData(0),n);
   aenc.encode(new AudioData({format:"f32-planar",sampleRate:SR,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(B[k]*1e6/SR),data:pl}));
   while(aenc.encodeQueueSize>8&&!err)await fxWait(1);
   if(err)throw err;
-  ap=(k+1)/(B.length-1);upd()}
- await aenc.flush();if(err)throw err;try{aenc.close()}catch(e){}
+  ap=(k+1)/(B.length-1);window.__zsAct=performance.now();upd()}
+ await zsTO(aenc.flush(),120000,"Encode AAC គាំង");if(err)throw err;try{aenc.close()}catch(e){}
  if(!as.length)throw new Error("Encode សំឡេងមិនបាន");ap=1;upd()};
- await Promise.all([vidTask().catch(e=>{err=err||e;throw e}),audTask().catch(e=>{err=err||e;throw e})]);
+ let wdT;const wd=new Promise((_,rj)=>{wdT=setInterval(()=>{if(performance.now()-window.__zsAct>90000){err=err||new Error("Export គាំង — គ្មានវឌ្ឍនភាព ៩០ វិនាទី");rj(err)}},3000)});
+ const allP=Promise.all([vidTask().catch(e=>{err=err||e;throw e}),audTask().catch(e=>{err=err||e;throw e})]);allP.catch(()=>{});
+ try{await Promise.race([allP,wd])}finally{clearInterval(wdT);if(err){try{dec.close()}catch(e){}try{enc.close()}catch(e){}}}
  if(err)throw err;
  /* ---- Mux ---- */
  const blob=SPMP4.mux({w,h,vdesc,v:vs,fpsHint:dm.fps,a:{kind:ae.kind,sr:SR,ch:2,desc:adesc,fs:ae.fs,s:as},durUs:Math.round(durS*1e6)});
@@ -2865,7 +2868,7 @@ async function doExportKeep(){
   aenc.configure({codec:ae.codec,sampleRate:SR,numberOfChannels:2,bitrate:ae.bitrate});
   const B=fxBounds(total,SR,zonesP.concat(plan),150),NW=B.length-1;
   const rw=q=>fxRenderWin(B[q],B[q+1],SR,bed,base,plan,base,true,zonesA);
-  let nq=0;while(nqMath.min(3,NW))QW.push(rw(nq++));
+  let nq=0;while(nqMath.min(2,NW))QW.push(rw(nq++));
   for(let k=0;kNW;k++){
    if(err)throw err;
    const cur=QW.shift();if(nqNW)QW.push(rw(nq++));
@@ -2906,9 +2909,11 @@ async function doExport(){
    showToast("⚠ Export រក្សាវីដេអូដើមមិនបាន ("+why[0].slice(0,90)+") — ប្រើវិធី encode វីដេអូឡើងវិញ (គ្មាន Subtitle)",false)}
   if(fxSupported()){
    try{window.__zsNoBurn=true;tag("B: Encode វីដេអូឡើងវិញ (គ្មាន Subtitle)");if(await doExportFast()){done("B");return}}
-   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("fast export:",e);why.push(String((e&&e.message)||e))}
+   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("fast export:",e);why.push(String((e&&e.message)||e));showToast("⚠ វិធី B មិនបាន ("+why[why.length-1].slice(0,80)+") — ប្រើវិធី C ថតពេលពិត",false)}
    finally{window.__zsNoBurn=false}
   }else why.push("Browser មិនគាំទ្រ WebCodecs");
+  try{tag("C: ថតពេលពិត (យឺត = ប្រវែងវីដេអូ)");await doExportRT();done("C");return}
+  catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("rt export:",e);why.push(String((e&&e.message)||e))}
   throw new Error("Export មិនបាន៖ "+why.join(" | ").slice(0,200));
  }
  const burn=on(0)&&cues.length>0,eff=burn||(on(4)&&LY.length>0);
@@ -6597,7 +6602,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="18.0";
+  var EMB="18.1";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
