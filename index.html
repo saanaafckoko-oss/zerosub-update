@@ -1260,7 +1260,8 @@ function probe(fl){return new Promise(res=>{const v=document.createElement("vide
 /* V15.5 : ស្ទីលបកប្រែ — ធម្មតា / កំប្លែង ទាក់ទាញ (ជ្រើសក្នុងប្រអប់ "ស្ទីលបកប្រែ") · ប៉ះពាល់គ្រប់ការបកប្រែ Gemini (SRT + ទាញពីវីដេអូ) */
 var ZSF_FUN_PROMPT="STYLE (FUN & ENGAGING): make the Khmer lively and entertaining for viewers, like a witty Khmer social-media movie narrator, ONLY where the scene is light, comedic, teasing, awkward, or the characters are joking or showing off. Keep serious, sad, tense, dangerous, heartfelt-romantic and emotional-climax lines natural and sincere (no jokes there). Use natural spoken Khmer that young viewers really say (colloquial particles and everyday words, playful reactions, light exaggeration, witty comebacks, fitting Khmer sayings) instead of stiff formal written Khmer, and give each character a consistent personality in tone (cocky, shy, cunning, innocent, grumpy). Do NOT change the facts or meaning, do NOT add new information and do NOT drop anything; keep each line about the same length as a normal translation (at most about 15% longer) so the Khmer voice still fits the time slot. No vulgar, insulting or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (genre, era, characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it.";
 var ZSF_AUTO_PROMPT="STYLE (AUTO BY STORY): first infer from the story card, the characters and the whole SRT what kind of story this is, then adapt the Khmer register scene by scene. COMEDIC / light / teasing / awkward / boasting scenes: lively, witty, natural spoken Khmer that young viewers really say, playful reactions, light exaggeration, fitting Khmer sayings. ANCIENT / palace / royal / wuxia / xianxia / historical scenes: archaic, dignified Khmer with proper rank-based address and royal or classical vocabulary (e.g. king, minister, master, disciple, sect), no modern slang. MODERN drama, serious, sad, tense, dangerous, romantic and emotional-climax lines: natural, sincere, no jokes. Keep each character's personality consistent. Do NOT change the facts or meaning, do NOT add information and do NOT drop anything; keep each line at most about 15% longer than a normal translation so it fits the time slot. No vulgar or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (genre, era, characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it.";
-function zsfStyleMode(){try{var v=localStorage.getItem("zsf_tr_style");return(v==="fun"||v==="normal")?v:"auto"}catch(e){return "auto"}}
+function zsfStyleMode(){try{var v=localStorage.getItem("zsf_tr_style");return(v==="fun"||v==="normal"||/^g:[a-z0-9_]+$/.test(v||""))?v:"auto"}catch(e){return "auto"}}
+function zsfStylePrompt(){var m=zsfStyleMode();if(m==="fun")return ZSF_FUN_PROMPT;if(m.slice(0,2)==="g:"){var g=gGenreByCode(m.slice(2));if(g)return "STYLE (GENRE = "+g[2]+"): the user fixed the story genre, so translate EVERY line in this genre's voice. GENRE GUIDANCE (Khmer): "+g[3]+" Keep each character's personality and forms of address consistent; if the story card lists characters from another era, still use their own era's register. Do NOT change the facts or meaning, do NOT add information and do NOT drop anything; keep each line at most about 15% longer than a normal translation so it fits the time slot. No vulgar or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it."}return ZSF_AUTO_PROMPT}
 function zsfFunOn(){return zsfStyleMode()!=="normal"}
 async function zsfEnforce(F0,self,u,o,ENF){
  var r=await F0.call(self,u,o);
@@ -1306,7 +1307,7 @@ async function zsfEnforce(F0,self,u,o,ENF){
   var ENF=false;
   try{
    if(zsfFunOn()&&typeof u==="string"&&u.indexOf("generativelanguage.googleapis.com")>=0&&u.indexOf(":generateContent")>=0&&o&&typeof o.body==="string"&&o.body.indexOf("NO LATIN LETTERS")>=0){
-    var SP=(zsfStyleMode()==="fun"?ZSF_FUN_PROMPT:ZSF_AUTO_PROMPT),j=JSON.parse(o.body),ps=j.contents&&j.contents[0]&&j.contents[0].parts,hit=false;
+    var SP=zsfStylePrompt(),j=JSON.parse(o.body),ps=j.contents&&j.contents[0]&&j.contents[0].parts,hit=false;
     if(ps){for(var i=0;ips.length;i++){var x=ps[i];
      if(x&&typeof x.text==="string"&&x.text.indexOf("NO LATIN LETTERS")>=0&&x.text.indexOf("STYLE (")0){
       x.text=x.text.indexOf("Output only numbered lines.")>=0?x.text.replace("Output only numbered lines.",SP+" Output only numbered lines."):(SP+"\n"+x.text);hit=true}}}
@@ -5166,7 +5167,7 @@ async function googleTr(texts,tl){
  return out}
 /* v21 : បកប្រែ batch ស្របគ្នា (ម្នាក់ៗ Key ផ្សេងគ្នា) · ផ្គូផ្គងតាមលេខ (មិនរអិលជួរ) · ឃ្លាដែលខ្វះ → Google តែឃ្លានោះ · ផ្តល់បរិបទ ២ ឃ្លាមុន */
 async function translateAll(){var Z0=zsfSnap();
- var keys=K.filter(Boolean),tv=$("#target").value,tl=$("#target").selectedOptions[0].text,TAG=/^\s*\[[1-4]\]\s*/,src=cues.slice(),B=20,
+ var keys=K.filter(Boolean),tv=$("#target").value,tl=$("#target").selectedOptions[0].text,TAG=/^\s*\[[1-4]\]\s*/,src=cues.slice(),B=40,
   batches=[],out=new Array(src.length),useGem=keys.length>0,gemFail=0,done=0,next=0,ctxT="",
   strip=function(c){return c.t.replace(TAG,"").replace(/\n/g," ")};
  if(window.zsfEnsureStory)await window.zsfEnsureStory();ctxT=window.zsfAutoStory?window.zsfAutoStory():"";
@@ -5203,7 +5204,7 @@ async function translateAll(){var Z0=zsfSnap();
  async function worker(wi){if(wi>0)await new Promise(function(z){setTimeout(z,wi*250)});while(nextbatches.length){await doBatch(batches[next++],wi)}}
  setProgress(0,"🧠 កំពុងបកប្រែ 0/"+src.length+"...");
  /* កំណត់ concurrency មិនឱ្យលើសចំនួន Key ដែលមាន និងអតិបរមា 3 ដើម្បីកុំឱ្យ Key តែមួយទទួល Request ស្របគ្នាច្រើនពេក។ */
- var conc=Math.max(1,Math.min(batches.length,useGem?Math.max(4,Math.min(8,keys.length*3)):3));
+ var conc=Math.max(1,Math.min(batches.length,useGem?Math.min(16,keys.length):3));
  await Promise.all(Array.from({length:conc},function(_,wi){return worker(wi)}));
  setC(out);try{zsfTrSummary(Z0)}catch(e){}
 }
@@ -5563,6 +5564,15 @@ var ZSF_GENRES=[
  ["sports","កីឡា និងការប្រកួតប្រជែង","sports / competition","កីឡា/ការប្រកួត៖ ពាក្យមានថាមពល និងស្មារតីប្រកួត; ពាក្យបច្ចេកទេសកីឡារក្សាឱ្យត្រឹមត្រូវ; អ្នកអត្ថាធិប្បាយនិយាយលឿន។"],
  ["scifi","វិទ្យាសាស្ត្រ និងការរស់រាន","sci-fi / survival","វិទ្យាសាស្ត្រ/រស់រាន៖ ពាក្យបច្ចេកទេស ឧបករណ៍ បច្ចេកវិទ្យា ប្រើឱ្យថេរ; សម្លេងតឹងតែង បន្ទាន់ ពេលរស់រាន។"],
  ["horror","រន្ធត់ព្រឺក្បាល","horror","រន្ធត់៖ ប្រយោគខ្លី ស្ងាត់ ព្រឺរោម; ជៀសវាងពាក្យកំប្លែង; បង្កើតភាពតានតឹងតាមរយៈពាក្យ។"],
+ ["palace","វាំងក្នុង/ប្រជែងអំណាច","palace intrigue / harem / concubines scheming","វាំងក្នុង/ប្រជែងអំណាច៖ ភាសារាជសព្ទតាមឋានៈ (ព្រះរាជា ព្រះមហេសី ស្នំ ម្ចាស់ក្សត្រី ពេទ្យហ្លួង); ពាក្យទន់ភ្លន់ តែមានល្បិច ចំអកស្ងាត់ៗ គំរាមដោយពាក្យគួរសម; អ្នកបម្រើនិយាយបន្ទាបខ្លួនខ្លាំង; ជៀសវាងពាក្យទំនើប។"],
+ ["transmig","ចូលក្នុងសៀវភៅ/ក្លាយជាតួអាក្រក់","transmigrated into a novel / game as a villain or side character","ចូលក្នុងសៀវភៅ/ក្លាយជាតួអាក្រក់៖ ពេលគិតក្នុងចិត្តរបស់អ្នកឆ្លងភព (ដឹងរឿងដើម) ប្រើភាសាទំនើប កំប្លែង ស្រួលស្តាប់; ពេលនិយាយជាមួយតួក្នុងរឿងប្រើពាក្យតាមសម័យក្នុងរឿង; រក្សាឈ្មោះតួដើម និងឈ្មោះសៀវភៅឱ្យថេរ។"],
+ ["apocalypse","ថ្ងៃសន្ធោ/រស់រានមានជីវិត","apocalypse / zombies / survival with supplies","ថ្ងៃសន្ធោ/រស់រាន៖ ប្រយោគខ្លី បន្ទាន់ តានតឹង; ពាក្យអំពីស្បៀង ទីជម្រក អាវុធ មេរោគ ត្រូវថេរ; តួខ្លាំងនិយាយត្រជាក់ តួខ្សោយភ័យ ឬអង្វរ; ជៀសវាងពាក្យបុរាណ។"],
+ ["medical","គ្រូពេទ្យ/វេជ្ជសាស្ត្រ","doctor / divine physician / medicine","គ្រូពេទ្យ/វេជ្ជសាស្ត្រ៖ ពាក្យវេជ្ជសាស្ត្រ ឈ្មោះជំងឺ ថ្នាំ និងការព្យាបាលត្រូវត្រឹមត្រូវ និងថេរ; គ្រូពេទ្យនិយាយស្ងប់ ទំនុកចិត្ត; អ្នកមើលងាយចំអក ពេលគ្រូពេទ្យបង្ហាញសមត្ថភាព ត្រូវមានអារម្មណ៍វាយមុខ។"],
+ ["food","ចម្អិនអាហារ/ភោជនីយដ្ឋាន","cooking / food / restaurant","ចម្អិនអាហារ/ភោជនីយដ្ឋាន៖ ឈ្មោះម្ហូប គ្រឿងផ្សំ និងវិធីចម្អិន ប្រើពាក្យខ្មែរដែលអ្នកស្តាប់យល់ ហើយថេរ; ពណ៌នារសជាតិឱ្យចាប់អារម្មណ៍ ស្រស់ស្រាយ; អ្នកកាត់ទោសម្ហូបនិយាយអស្ចារ្យ។"],
+ ["rural","ជនបទ/កសិកម្ម/ជីវិតភូមិ","countryside / farming / village life","ជនបទ/ភូមិ៖ ភាសាស្រួល សាមញ្ញ កក់ក្តៅ ដូចអ្នកភូមិនិយាយ; ពាក្យហៅគ្នាតាមញាតិ (មា មីង ពូ អ៊ំ បងប្អូនជីដូនមួយ); ឈ្លោះក្នុងភូមិប្រើពាក្យត្រង់ៗ ប៉ុន្តែមិនអាសអាភាស។"],
+ ["contract","ស្នេហាកិច្ចសន្យា/រៀបការក្លែង","contract marriage / fake relationship romance","ស្នេហាកិច្ចសន្យា/រៀបការក្លែង៖ ពេលមានមនុស្សក្រៅ ទាញពាក្យផ្អែមល្ហែមបញ្ជាក់; ពេលនៅតែពីរនាក់ ពាក្យត្រជាក់ ឬចំអក; ពេលចាប់ផ្តើមស្រលាញ់ពិត ពាក្យទន់ភ្លន់ អៀនខ្មាស; ហៅគ្នាថេរ។"],
+ ["mystery","អាថ៌កំបាំង/ល្បិច/ផ្លាស់ប្តូរ","mystery / suspense / twist","អាថ៌កំបាំង/ភាពស្ទាក់ស្ទើរ៖ ពាក្យត្រៀមទុកសញ្ញា ប្រយោគខ្លីជាក់ស្តែង; កុំបង្ហាញចម្លើយមុនពេល; ពាក្យសួរចម្លើយតឹងតែង; ពេលបើកកម្រាលអាថ៌កំបាំងត្រូវមានទម្ងន់។"],
+ ["military","ទាហានពិសេស/យោធាសម័យទំនើប","modern military / special forces","ទាហានពិសេស/យោធាទំនើប៖ ពាក្យបញ្ជាខ្លី ដាច់ណាត់ គោរពឋានៈ (មេបញ្ជាការ សមមិត្ត អ្នកបើកបរ); ពាក្យបច្ចេកទេសអាវុធ និងបេសកកម្មត្រូវថេរ; ស្មារតីវីរភាព។"],
  ["modern","សាច់រឿងសម័យទំនើប","modern daily life","សម័យទំនើប៖ ភាសាសន្ទនាខ្មែរសម័យទំនើប ធម្មជាតិ រហ័ស ដូចមនុស្សនិយាយពិតៗ; កុំប្រើពាក្យបុរាណ ឬផ្លូវការហួសហេតុ។"]
 ];
 var ZSF_ERA_RULE="ក្បួនសម័យ៖ បើរឿងមានតួអង្គច្រើនសម័យ (បុរាណ និងទំនើប) ត្រូវប្រើភាសាតាមសម័យរបស់អ្នកនិយាយនីមួយៗ — តួបុរាណ (ឃើញពាក្យដូចជា 朕 陛下 臣 咱 草民 在下 ឬឋានៈចាស់ៗ) ប្រើពាក្យបុរាណ/រាជសព្ទតាមឋានៈ; តួទំនើបប្រើភាសាសន្ទនាធម្មតា។ ពាក្យហៅគ្នា និងពាក្យខ្លួនឯងរបស់តួអង្គម្នាក់ៗត្រូវថេរ មិនប្តូរពាក់កណ្តាលរឿង។";
@@ -5599,9 +5609,9 @@ function gCleanBible(j){
 window.zsfStoryBlock=function(){
  var o="";
  try{
-  var b=gBible,g=b&&b.genres&&b.genres.length?gGenreByCode(b.genres[0]):null;
+  var b=gBible,g=b&&b.genres&&b.genres.length?gGenreByCode(b.genres[0]):null,man=null;try{var sm=zsfStyleMode();if(sm.slice(0,2)==="g:"){man=gGenreByCode(sm.slice(2));if(man)g=man}}catch(_){}
   o+="\n\n=== សៀវភៅរឿង (ត្រូវគោរពតាមនេះគ្រប់បន្ទាត់) ===";
-  o+="\nប្រភេទ/បរិយាកាសរឿង: "+(g?(g[1]+" (AI ចាប់បាន)"):"កំណត់តាមបរិបទក្នុងរឿង (ស្វ័យប្រវត្តិ)");
+  o+="\nប្រភេទ/បរិយាកាសរឿង: "+(g?(g[1]+(man?" (អ្នកប្រើជ្រើសដោយដៃ)":" (AI ចាប់បាន)")):"កំណត់តាមបរិបទក្នុងរឿង (ស្វ័យប្រវត្តិ)");
   if(b){
    if(b.synopsis)o+="\nសង្ខេបរឿង: "+b.synopsis;
    if(b.tone)o+="\nសម្លេងរឿង: "+b.tone;
@@ -5617,6 +5627,39 @@ window.zsfStoryBlock=function(){
   }
  }catch(e){console.warn("story block",e)}
  return o};
+/* V17.1: ស្ទីលបកប្រែ = ជ្រើសប្រភេទសាច់រឿងដោយដៃ ឬស្វ័យប្រវត្តិ (វិភាគ SRT) */
+(function(){
+ var t=document.getElementById("trStyle");if(!t||t.getAttribute("data-g"))return;t.setAttribute("data-g","1");
+ var EM={"revenge": "👊", "cross_a2m": "🏯➡️🏙️", "cross_m2a": "🏙️➡️🏯", "rebirth": "⏪", "billionaire": "💰", "system": "🤖", "system_comedy": "🤖😄", "treasure": "🏺", "comedy": "😄", "wuxia": "🥋", "ancient": "🏯", "fantasy": "✨", "xianxia": "☯️", "history_war": "⚔️", "romance": "💕", "ceo": "💼", "family": "👨‍👩‍👧", "school": "🎒", "crime": "🕵️", "sports": "🏅", "scifi": "🚀", "horror": "👻", "modern": "🏙️", "palace": "👑", "transmig": "📖", "apocalypse": "🧟", "medical": "⚕️", "food": "🍜", "rural": "🌾", "contract": "💍", "mystery": "🔍", "military": "🎖️"};
+ try{
+  var o0=t.options;if(o0&&o0[0])o0[0].text="🎭 ស្វ័យប្រវត្តិ (វិភាគ SRT រកប្រភេទសាច់រឿងដោយខ្លួនឯង)";
+  var og=document.createElement("optgroup");og.label="ជ្រើសប្រភេទសាច់រឿងដោយដៃ";
+  ZSF_GENRES.forEach(function(g){var op=document.createElement("option");op.value="g:"+g[0];op.text=(EM[g[0]]||"🎬")+" "+g[1];og.appendChild(op)});
+  t.appendChild(og);
+  t.value=zsfStyleMode();if(t.value!==zsfStyleMode())t.value="auto";
+ }catch(e){console.warn("genre list",e)}
+ var info=document.createElement("div");info.id="trStyleInfo";info.style.cssText="margin-top:6px;font-size:12px;opacity:.85;line-height:1.5";
+ t.parentNode.insertBefore(info,t.nextSibling);
+ var last="";
+ function label(){
+  var m=zsfStyleMode(),s="";
+  if(m==="auto"){
+   var g=null;try{g=gBible&&gBible.genres&&gBible.genres.length?gGenreByCode(gBible.genres[0]):null}catch(_){}
+   s=g?("✅ AI វិភាគ SRT ហើយ ស្គាល់ប្រភេទ៖ "+(EM[g[0]]||"🎬")+" "+g[1]):"🔎 នឹងវិភាគ SRT ស្គាល់ប្រភេទសាច់រឿងដោយស្វ័យប្រវត្តិ ពេលចាប់ផ្ដើមបកប្រែ";
+  }else if(m==="normal")s="បកប្រែត្រង់ៗ មិនកែតាមស្ទីល";
+  else if(m==="fun")s="បកប្រែបែបកំប្លែង សប្បាយ";
+  else{var g2=gGenreByCode(m.slice(2));s=g2?("📌 ចាក់សោប្រភេទ៖ "+(EM[g2[0]]||"🎬")+" "+g2[1]+" (មិនប្រើការស្គាល់ស្វ័យប្រវត្តិ)"):""}
+  if(s!==last){last=s;info.textContent=s}
+ }
+ t.onchange=function(){
+  try{localStorage.setItem("zsf_tr_style",t.value)}catch(e){}
+  label();
+  try{var m=zsfStyleMode(),g=m.slice(0,2)==="g:"?gGenreByCode(m.slice(2)):null;
+   showToast(g?("📌 ប្រភេទសាច់រឿង៖ "+g[1]):(m==="fun"?"😄 ស្ទីលកំប្លែង ទាក់ទាញ បើកហើយ":(m==="auto"?"🎭 វិភាគ SRT ស្វ័យប្រវត្តិ បើកហើយ":"ស្ទីលធម្មតា")),true)}catch(e){}
+ };
+ label();setInterval(label,1500);
+})();
+
 /* V12.9: សៀវភៅរឿងស្វ័យប្រវត្តិ (បង្កប់ក្នុងកូដ — គ្មានប្រអប់បរិបទ/ប៊ូតុងប្រភេទទៀត) */
 window.zsfBibleWaitMs=function(){var mb=0;try{mb=file?file.size/1048576:0}catch(_){}return 30000};
 window.zsfAutoStory=function(){try{if($("#target").value!=="km")return "";return String(window.zsfStoryBlock()||"").replace(/\s+/g," ").trim().slice(0,3500)}catch(_){return ""}};
@@ -5717,25 +5760,43 @@ async function gemDirectRun(prog){
  try{var pre=window.__zsfPre&&window.__zsfPre.store;
   if(pre)lines.forEach(function(l,i){var a=pre[zsfStreamNorm(l.text)];if(!a)return;var bj=-1,bd=2.6;a.forEach(function(x,j){if(x.used)return;var d=Math.abs(x.s-l.s);if(dbd){bd=d;bj=j}});if(bj>=0){a[bj].used=1;out[i]=a[bj].t;hit++}})}catch(e){}
  var groups=[];
- (function(){var run=[];for(var i=0;i=N;i++){if(iN&&!out[i])run.push(i);else if(run.length){var rl=run;gGroups(rl.map(function(j){return lines[j]}),window.__zsfTextOnly?100000:75,window.__zsfTextOnly?50:30).forEach(function(g){groups.push(g.map(function(k){return rl[k]}))});run=[]}}})();
+ (function(){var run=[];for(var i=0;i=N;i++){if(iN&&!out[i])run.push(i);else if(run.length){var rl=run;gGroups(rl.map(function(j){return lines[j]}),window.__zsfTextOnly?100000:150,40).forEach(function(g){groups.push(g.map(function(k){return rl[k]}))});run=[]}}})();
  doneLines=hit;if(hit)showToast("⚡ Gemini ស្តាប់+បកប្រែរួចជាមុន "+hit+"/"+N+" ឃ្លា (ពេលទាញអក្សរ)",true);
  prog(10,window.__zsfTextOnly?"🤖 Gemini កំពុងបកប្រែពី SRT ចិន...":"🤖 Gemini កំពុងស្តាប់សំឡេង និងបកប្រែ...");
- async function part(idxs,depth){
+ var tries=new Array(N).fill(0),MAXT=4,leftover=[],inflight=0,gi=0,fatal=null;
+ var isQ=function(e){return !!(e&&(e.zsfQuota||/quota|resource.?exhausted/i.test(String(e.message||""))))};
+ var cntOut=function(){var c=0;for(var q=0;qN;q++)if(out[q])c++;return c};
+ var sleep=function(ms){return new Promise(function(z){setTimeout(z,ms)})};
+ /* v17.2 : 1 Key = 1 ក្រុម (40 បន្ទាត់) · Key ទាំងអស់ដំណើរការស្របគ្នា · Key ណាចប់ហើយ យកក្រុមបន្ទាប់ · បន្ទាត់ខ្វះ → ដាក់ត្រឡប់ចូលជួរ ឱ្យ Key ទំនេរបកប្រែបន្ត រហូតចប់ */
+ async function part(idxs,depth,w){
   var sub=idxs.map(function(i){var l=lines[i];return known[i]?{s:l.s,time:l.time,text:"["+known[i]+"] "+l.text}:l}),canSplit=idxs.length>=8&&depth3,err=null;
+  var base=(w-(typeof currentApiIndex==="number"?currentApiIndex:0))+keys.length*1000;
   for(var at=0;at3;at++){
    try{
-    var r=await Promise.race([window.__zsfDirectAnalyze(sub,"",(rr=rr+1)),new Promise(function(_,rj){setTimeout(function(){rj(new Error("Gemini យឺតពេក (timeout)"))},150000)})]);
+    var r=await Promise.race([window.__zsfDirectAnalyze(sub,"",base+at),new Promise(function(_,rj){setTimeout(function(){rj(new Error("Gemini យឺតពេក (timeout)"))},150000)})]);
     var got=gParseSrtOut(r&&r.srt,sub),cnt=got.filter(Boolean).length;
-    if(cnt*2>sub.length){got.forEach(function(t,k){if(t&&!out[idxs[k]])out[idxs[k]]=t});doneLines+=idxs.length;prog(10+80*doneLines/N,"🤖 Gemini បកប្រែ "+Math.min(doneLines,N)+"/"+N+" ឃ្លា...");return}
+    if(cnt*2>sub.length){got.forEach(function(t,k){if(t&&!out[idxs[k]])out[idxs[k]]=t});var dn=cntOut();prog(10+80*dn/N,"🤖 Gemini បកប្រែ "+Math.min(dn,N)+"/"+N+" ឃ្លា...");return}
     err=new Error("Gemini ឆ្លើយមិនគ្រប់ ("+cnt+"/"+sub.length+")")
-   }catch(e){err=e;if(e&&(e.zsfQuota||/quota|resource.?exhausted/i.test(String(e.message||""))))throw e}
+   }catch(e){err=e;if(isQ(e))throw e}
    if(canSplit)break;
-   await new Promise(function(z){setTimeout(z,3000*(at+1))})}
-  if(canSplit){var h=Math.ceil(idxs.length/2);await part(idxs.slice(0,h),depth+1);await part(idxs.slice(h),depth+1);return}
+   await sleep(3000*(at+1))}
+  if(canSplit){var h=Math.ceil(idxs.length/2);
+   try{await part(idxs.slice(0,h),depth+1,w)}catch(e){if(isQ(e))throw e}
+   try{await part(idxs.slice(h),depth+1,w)}catch(e){if(isQ(e))throw e}
+   return}
   throw err||new Error("Gemini បរាជ័យ")}
- var gi=0,fatal=null;
- async function wk(){while(!stop&&gigroups.length){var g=groups[gi++];try{await part(g,0)}catch(e){fatal=e;stop=true}}}
- var ws=[];for(var w=0;wMath.min(10,Math.max(4,keys.length*3),groups.length);w++)ws.push(wk());
+ function requeue(g){g.forEach(function(j){if(!out[j]&&leftover.indexOf(j)0){tries[j]++;if(tries[j]MAXT)leftover.push(j)}})}
+ function takeLeft(){if(!leftover.length)return null;var Lo=leftover.slice().sort(function(a,b){return a-b}),G=gGroups(Lo.map(function(j){return lines[j]}),window.__zsfTextOnly?100000:150,40)[0],g=G.map(function(k){return Lo[k]});leftover=Lo.filter(function(j){return g.indexOf(j)0});return g}
+ async function wk(w){
+  if(w>0)await sleep(w*300);
+  while(!stop){
+   var g=gigroups.length?groups[gi++]:takeLeft();
+   if(!g){if(inflight===0)return;await sleep(600);continue}
+   inflight++;
+   try{await part(g,0,w)}catch(e){if(isQ(e)){fatal=e;stop=true}}
+   finally{inflight--}
+   if(!stop)requeue(g)}}
+ var ws=[];for(var w=0;wMath.min(16,keys.length);w++)ws.push(wk(w));
  await Promise.all(ws);
  var have=out.filter(Boolean).length;
  if(fatal&&haveN*.2)throw fatal;
@@ -6468,7 +6529,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="17.0";
+  var EMB="17.2";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
