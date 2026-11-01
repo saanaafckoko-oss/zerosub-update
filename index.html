@@ -5169,10 +5169,18 @@ async function googleTr(texts,tl){
  return out}
 /* v21 : បកប្រែ batch ស្របគ្នា (ម្នាក់ៗ Key ផ្សេងគ្នា) · ផ្គូផ្គងតាមលេខ (មិនរអិលជួរ) · ឃ្លាដែលខ្វះ → Google តែឃ្លានោះ · ផ្តល់បរិបទ ២ ឃ្លាមុន */
 async function translateAll(){var Z0=zsfSnap();
- var keys=K.filter(Boolean),tv=$("#target").value,tl=$("#target").selectedOptions[0].text,TAG=/^\s*\[[1-4]\]\s*/,src=cues.slice(),B=60,
+ var keys=K.filter(Boolean),tv=$("#target").value,tl=$("#target").selectedOptions[0].text,TAG=/^\s*\[[1-4]\]\s*/,src=cues.map(function(c){return {s:c.s,e:c.e,t:c.t}}),B=60,
   batches=[],out=new Array(src.length),useGem=keys.length>0,gemFail=0,done=0,next=0,ctxT="",
   strip=function(c){return c.t.replace(TAG,"").replace(/\n/g," ")};
  if(!keys.length)throw new Error("គ្មាន Gemini API Key");
+ var liveN=0,liveSeen=new Array(src.length);
+ function applyLive(idx,txt){
+  try{var c=cues[idx];if(!c||!txt||!src[idx])return;
+   var m=src[idx].t.match(TAG),t=String(txt).replace(/\[[1-4]\]\s*/g,"").trim();if(!t)return;
+   c.t=(m?m[0].trim()+" ":"")+t;
+   if(!liveSeen[idx]){liveSeen[idx]=1;liveN++;
+    setProgress(Math.round(liveN/src.length*100),"🧠 កំពុងបកប្រែ "+liveN+"/"+src.length+"...")}
+  }catch(_){}}
  var sleep2=function(ms){return new Promise(function(z){setTimeout(z,ms)})},inUse={},kptr=0;
  function keyCooled(k){var ms=zsfTrModels();return ms.every(function(m){return zsfTrCooled(k,m)})}
  function pickKey(){var n=keys.length,t,k;
@@ -5183,7 +5191,7 @@ async function translateAll(){var Z0=zsfSnap();
  async function gemStrict(prompt,wi){
   var t0=Date.now(),pass=0,key=pickKey();inUse[key]=1;
   try{
-   while(Date.now()-t0900000){
+   while(Date.now()-t0300000){
     var models=zsfTrModels();
     for(var kk=0;kkkeys.length;kk++){
      for(var mi=0;mimodels.length;mi++){
@@ -5204,7 +5212,8 @@ async function translateAll(){var Z0=zsfSnap();
      delete inUse[key];key=pickKey();inUse[key]=1;
     }
     pass++;
-    try{setProgress(Math.round(done/src.length*100),"⏳ Key/Gemini កំពុងមមាញឹក — រង់ចាំហើយសាកម្តងទៀត...")}catch(_){}
+    try{for(var zq in zsfTrCool)if(zsfTrCool[zq]>Date.now()+8000)zsfTrCool[zq]=Date.now()+5000}catch(_){}
+    try{setProgress(Math.round(liveN/src.length*100),"⏳ Key/Gemini កំពុងមមាញឹក — រង់ចាំហើយសាកម្តងទៀត...")}catch(_){}
     await sleep2(Math.min(15000,3000+pass*2000));
    }
    throw new Error("Gemini បកប្រែមិនបាន — ពិនិត្យ API Key / Quota")
@@ -5235,24 +5244,27 @@ async function translateAll(){var Z0=zsfSnap();
     var mk=function(idx){return HEAD+(prev?"\nPrevious lines for context only, do NOT translate them: "+prev:"")+"\n"+idx.map(function(j,x){return (x+1)+". "+part[j].t.replace(/\n/g," ")}).join("\n")};
     var fresh=new Array(part.length).fill(false),zk=function(c){return zsfTrKey(tv,ctxT,strip(c))};
     var hits=await zsfTrGetMany(part.map(zk));
-    hits.forEach(function(h,j){if(h){res[j]=h;ZST.hit++}else ZST.miss++});
+    hits.forEach(function(h,j){if(h){res[j]=h;ZST.hit++;applyLive(i0+j,h)}else ZST.miss++});
     var todo=[];res.forEach(function(r,j){if(r===null)todo.push(j)});
-    var parseInto=function(t,idx){t.split("\n").forEach(function(l){var m=/^\s*(\d+)[.)]\s*(.*)$/.exec(l);if(m){var x=+m[1]-1;if(x>=0&&xidx.length&&m[2].trim()&&res[idx[x]]===null&&zsfTrOk(tv,strip(part[idx[x]]),m[2].replace(TAG,"").trim())){res[idx[x]]=m[2].trim();fresh[idx[x]]=true}}})};
+    var parseInto=function(t,idx){t.split("\n").forEach(function(l){var m=/^\s*(\d+)[.)]\s*(.*)$/.exec(l);if(m){var x=+m[1]-1;if(x>=0&&xidx.length&&m[2].trim()&&res[idx[x]]===null&&zsfTrOk(tv,strip(part[idx[x]]),m[2].replace(TAG,"").trim())){res[idx[x]]=m[2].trim();fresh[idx[x]]=true;applyLive(i0+idx[x],res[idx[x]])}}})};
     if(todo.length){
-      var txt=await gemStrict(mk(todo),wi);
-      parseInto(txt,todo);
+      try{var txt=await gemStrict(mk(todo),wi);parseInto(txt,todo)}catch(e){}
       var m2=todo.filter(function(j){return res[j]===null}),rounds=0;
-      while(m2.length&&rounds6){rounds++;ZST.retry++;var t2=await gemStrict(mk(m2),wi);parseInto(t2,m2);m2=todo.filter(function(j){return res[j]===null})}
+      while(m2.length&&rounds2){rounds++;ZST.retry++;try{var t2=await gemStrict(mk(m2),wi);parseInto(t2,m2)}catch(e){break}m2=todo.filter(function(j){return res[j]===null})}
      }
     var puts=[];fresh.forEach(function(f,j){if(f){var v=res[j].replace(TAG,"").trim();if(zsfTrOk(tv,strip(part[j]),v))puts.push([zk(part[j]),v])}});
     if(puts.length)zsfTrPutMany(puts);
   }
   var miss=[];res.forEach(function(r,j){if(r===null)miss.push(j)});
   if(miss.length){
-   for(var mq=0;mqmiss.length;mq++){var jj=miss[mq];try{var t3=await gemStrict(HEAD+"\n1. "+part[jj].t.replace(/\n/g," "),wi);var mm=/^\s*1[.)]\s*(.*)$/m.exec(t3);if(mm&&mm[1].trim())res[jj]=mm[1].trim()}catch(e){}}
+   for(var gr=0;gr8&&miss.length;gr++){
+    for(var cq=0;cqmiss.length;cq+=15){var ch=miss.slice(cq,cq+15);
+     try{var t4=await gemStrict(mk(ch),wi);parseInto(t4,ch)}catch(e){}}
+    miss=miss.filter(function(j){return res[j]===null});
+    if(miss.length)await sleep2(3000)}
   }
   part.forEach(function(c,k){var t=res[k]||c.t.replace(TAG,""),m=c.t.match(TAG);if(m)t=m[0].trim()+" "+t.replace(/\[[1-4]\]\s*/g,"").trim();else t=t.replace(/\[[1-4]\]\s*/g,"").trim();out[i0+k]={s:c.s,e:c.e,t:t}});
-  done+=part.length;setProgress(Math.round(done/src.length*100),"🧠 កំពុងបកប្រែ "+done+"/"+src.length+(useGem?" (Gemini)":" (Google)")+"...");
+  done+=part.length;setProgress(Math.round(liveN/src.length*100),"🧠 កំពុងបកប្រែ "+liveN+"/"+src.length+(useGem?" (Gemini)":" (Google)")+"...");
  }
  async function worker(wi){if(wi>0)await new Promise(function(z){setTimeout(z,wi*250)});while(nextbatches.length){await doBatch(batches[next++],wi)}}
  setProgress(0,"🧠 កំពុងបកប្រែ 0/"+src.length+"...");
@@ -6584,7 +6596,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="17.7";
+  var EMB="17.9";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
