@@ -2637,13 +2637,13 @@ function zfVRGraph(ac,src,out){
  function nf(type,fr,q,g){var b=ac.createBiquadFilter();b.type=type;b.frequency.value=fr;if(q!=null)b.Q.value=q;if(g!=null)b.gain.value=g;return b}
  var hl=nf("highpass",90,0.7071),hr=nf("highpass",90,0.7071),inv=ac.createGain(),sum=ac.createGain();inv.gain.value=-1;
  sp.connect(hl,0);sp.connect(hr,1);hl.connect(sum);hr.connect(inv);inv.connect(sum);
- var e1=nf("peaking",1000,1000/1800,-14),e2=nf("peaking",2800,2800/1600,-10),sh=nf("highshelf",4500,null,-9),lo=nf("lowpass",6000,0.7071),mg=ac.createGain();mg.gain.value=0.75;
+ var e1=nf("peaking",1000,1000/1800,-14),e2=nf("peaking",2800,2800/1600,-10),sh=nf("highshelf",4500,null,-9),lo=nf("lowpass",6000,0.7071),mg=ac.createGain();mg.gain.value=1.0;
  sum.connect(e1);e1.connect(e2);e2.connect(sh);sh.connect(lo);lo.connect(mg);mg.connect(out);
  var bl=nf("lowpass",90,0.7071),br=nf("lowpass",90,0.7071),bg=ac.createGain();bg.gain.value=0.4;
  sp.connect(bl,0);sp.connect(br,1);bl.connect(bg);br.connect(bg);bg.connect(out);
  var md=ac.createGain();md.gain.value=0.5;sp.connect(md,0);sp.connect(md,1);
- var mh=nf("highpass",90,0.7071),k0=nf("peaking",500,0.6,-8),k1=nf("peaking",1000,1000/1800,-14),k2=nf("peaking",2800,2800/1600,-10),k3=nf("highshelf",4500,null,-9),k4=nf("lowpass",6000,0.7071),kg=ac.createGain();kg.gain.value=0.4;
- md.connect(mh);mh.connect(k0);k0.connect(k1);k1.connect(k2);k2.connect(k3);k3.connect(k4);k4.connect(kg);kg.connect(out);
+ var ml=nf("lowpass",220,0.7071),mgl=ac.createGain();mgl.gain.value=0.5;md.connect(ml);ml.connect(mgl);mgl.connect(out);
+ var mh=nf("highpass",6500,0.7071),mgh=ac.createGain();mgh.gain.value=0.35;md.connect(mh);mh.connect(mgh);mgh.connect(out);
 }
 function fxOutName(ext){var b="export";try{b=baseName(file)||"export"}catch(e){}return b+"."+ext}
 /* កាត់សំឡេងតួអង្គចេញ (ទុក Background) ដោយ JS សុទ្ធ — កូដ zfMakeVR ពីកំណែចាស់ មិនពឹង FFmpeg/CDN */
@@ -2868,7 +2868,7 @@ async function doExportKeep(){
   aenc.configure({codec:ae.codec,sampleRate:SR,numberOfChannels:2,bitrate:ae.bitrate});
   const B=fxBounds(total,SR,zonesP.concat(plan),60),NW=B.length-1;
   const rw=q=>fxRenderWin(B[q],B[q+1],SR,bed,base,plan,base,true,zonesA);
-  let nq=0;while(nqMath.min(1,NW))QW.push(rw(nq++));
+  let nq=0;while(nqMath.min(2,NW))QW.push(rw(nq++));
   for(let k=0;kNW;k++){
    if(err)throw err;
    const cur=QW.shift();if(nqNW)QW.push(rw(nq++));
@@ -2942,7 +2942,7 @@ async function doExportNative(){
   if(!bed){
    if(file.size4e8){try{bed=await zsTO(AC.decodeAudioData(await file.arrayBuffer()),30000,"decode គាំង")}catch(e){bed=null}}
    if(!bed)noBed=true}
-  const SR=44100,total=Math.max(1,Math.round((dur+0.3)*SR));
+  const SR=32000,total=Math.max(1,Math.round((dur+0.3)*SR));
   const {plan,delayed}=fxPlan(dub.out);
   lg("សំឡេងខ្មែរ "+dub.out.length+" ឃ្លា • bed="+(bed?"yes":"no")+" • bgm="+(bgmBuf?"yes":"no"));
   prog(9,"វិភាគសំឡេង");try{await zsTO(fxEnsureSpeech(),30000,"វិភាគសំឡេងគាំង")}catch(e){console.warn("speech",e)}
@@ -2952,7 +2952,7 @@ async function doExportNative(){
   lg("Render សំឡេង "+NW+" បំណែក • ប្រវែង "+Math.round(dur)+"s");
   const rw=q=>fxRenderWin(B[q],B[q+1],SR,bed,base,plan,base,true,zonesA);
   const QW=[];let nq=0,first=true;
-  while(nqMath.min(1,NW))QW.push(rw(nq++));
+  while(nqMath.min(2,NW))QW.push(rw(nq++));
   const CH=6*1024*1024;
   try{
    for(let k=0;kNW;k++){
@@ -3006,7 +3006,7 @@ async function doExportNative(){
  function copyTxt(t){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t);return true}}catch(e){}
   try{var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;left:-999px";document.body.appendChild(a);a.select();var ok=document.execCommand("copy");a.remove();return ok}catch(e){return false}}
  function ui(){
-  if(!document.body)return;
+  return;
   if(!box){
    box=document.createElement("div");
    box.style.cssText="position:fixed;left:6px;right:6px;bottom:96px;z-index:99999;background:rgba(0,0,0,.9);color:#9ef;font:11px/1.35 monospace;border:1px solid #0ff;border-radius:10px;padding:6px 8px;max-height:210px;overflow:auto;white-space:pre-wrap;word-break:break-all";
@@ -3017,7 +3017,7 @@ async function doExportNative(){
    pre=document.createElement("div");box.appendChild(bar);box.appendChild(pre);document.body.appendChild(box)}
   box.style.display="block";pre.textContent=L.slice(-16).join("\n");box.scrollTop=box.scrollHeight}
  window.zsxLog=function(m){var t=((performance.now()-T)/1000).toFixed(0);L.push(t+"s "+String(m).slice(0,170));if(L.length>300)L.shift();if(window.__zsxOn)ui()};
- window.zsxStart=function(){clearTimeout(hideT);T=performance.now();L.length=0;window.__zsxOn=1;lastKey="";zsxLog("▶ Export v18.6 • video="+((typeof file!=="undefined"&&file)?Math.round(file.size/1048576)+"MB":"?")+" • ZSNative="+(window.ZSNative?"yes":"no"))};
+ window.zsxStart=function(){clearTimeout(hideT);T=performance.now();L.length=0;window.__zsxOn=1;lastKey="";zsxLog("▶ Export v19.0 • video="+((typeof file!=="undefined"&&file)?Math.round(file.size/1048576)+"MB":"?")+" • ZSNative="+(window.ZSNative?"yes":"no"))};
  window.zsxEnd=function(ok){zsxLog(ok?"✅ ចប់":"⏹ ឈប់");if(ok){hideT=setTimeout(function(){window.__zsxOn=0;if(box)box.style.display="none"},8000)}};
  function hook(){
   try{var b=document.getElementById("exp");
@@ -3037,7 +3037,7 @@ async function doExport(){
  catch(e){try{zsxLog("❌ "+String((e&&e.message)||e));zsxEnd(false)}catch(_){}throw e}
 }
 async function doExport0(){
- const T0x=performance.now(),tag=m=>{try{showToast("ℹ Export វិធី "+m,true)}catch(e){}},done=m=>{try{showToast("⏱ Export វិធី "+m+" ប្រើពេល "+Math.round((performance.now()-T0x)/1000)+" វិនាទី",true)}catch(e){}};
+ const T0x=performance.now(),tag=m=>{},done=m=>{};
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
  const btn=$("#exp"),old=btn.innerHTML,on=i=>!$$("#opts .b")[i].classList.contains("off");
  /* V11.0 : Export ថ្មី (រក្សាវីដេអូដើម, គ្មាន Subtitle). វិធីចាស់ខាងក្រោមនៅដដែល — អាចបើកវិញដោយ window.__zsOldExport=true */
@@ -4959,10 +4959,10 @@ var d=[];for(var i=0;i=N;i++)d.push("radial-gradient(circle at calc(var(--T)/
 var up=function(){r.style.setProperty("--pf",(r.value-r.min)/(r.max-r.min))};r.addEventListener("input",up);up()}
 var g=document.getElementById("gap"),b=document.getElementById("bgm");
 if(g){g.min=.05;g.max=.5;g.step=.05;if(+g.value>.5)g.value=.5}
-if(b){b.min=5;b.max=60;b.step=5}
+if(b){b.min=5;b.max=100;b.step=5}
 mk("gap",9,"cy");mk("bgm",11,"mg");
 try{var gv=parseFloat(localStorage.getItem("zsf_gap"));if(g&&isFinite(gv)){gv=Math.max(.05,Math.min(.5,Math.round(gv/.05)*.05));g.value=gv.toFixed(2);var gvv=document.getElementById("gapv");if(gvv)gvv.textContent=gv.toFixed(2)+"s";g.dispatchEvent(new Event("input"))}}catch(_){}
-try{var sv=parseInt(localStorage.getItem("zsf_bgm"));if(b&&isFinite(sv)){sv=Math.max(5,Math.min(60,Math.round(sv/5)*5));b.value=sv;var bv=document.getElementById("bgmv");if(bv)bv.textContent=sv+"%";b.dispatchEvent(new Event("input"))}}catch(_){}
+try{var sv=parseInt(localStorage.getItem("zsf_bgm"));if(b&&isFinite(sv)){sv=Math.max(5,Math.min(100,Math.round(sv/5)*5));b.value=sv;var bv=document.getElementById("bgmv");if(bv)bv.textContent=sv+"%";b.dispatchEvent(new Event("input"))}}catch(_){}
 var ip=document.querySelector("#p-bgm .ip2");if(ip)ip.innerHTML='svg viewBox="0 0 24 24" fill="currentColor">circle cx="8" cy="18" r="3.6"/>rect x="11" y="3" width="2.6" height="15"/>path d="M13.6 3c2 3.5 5 3.5 5 8-1.5-2.5-3-3-5-3z"/>/svg>';
 })()/script>script>
 /* ===== V16: Groq (4 Keys ដំណាលគ្នា) + បកប្រែ + អានសំឡេង + ភ្លេងអម (FFmpeg ដូច APK) + 1-Click ៥ Step ===== */
@@ -5569,6 +5569,14 @@ $("#exp").onclick=async function(){
   window.__expRunning=false;
   setProgress(100,"✅ Export រួចរាល់ — ពិនិត្យថត Downloads",6);
   zsfDone("✓ Export ជោគជ័យ 100% — បានផ្ញើវីដេអូចូលថត Download រួចហើយ (សូមពិនិត្យ)",true);
+  try{if(!window.__batchCap&&!window.__batchHold){setTimeout(function(){try{
+   V.pause();try{URL.revokeObjectURL(V.src)}catch(e){}V.removeAttribute("src");V.load();file=null;
+   cues=[];bgmBuf=null;window.__bgmAutoBuf=null;window.__bgmFile=null;window.__preDub=null;window.__spEn=null;
+   V.classList.add("hide");$("#noVid").classList.remove("hide");["#tbar","#pbar","#bigPlay"].forEach(function(x){var e=$(x);if(e)e.classList.add("hide")});
+   try{$("#tc").textContent="00:00";$("#seek").value=0}catch(e){}
+   try{var vf=$("#vidFile");if(vf)vf.value=""}catch(e){}
+   try{render()}catch(e){}
+  }catch(e){console.warn("clear",e)}},2500)}}catch(e){}
  }catch(x){
   window.__expRunning=false;window.__preDub=null;
   var m=String((x&&x.message)||x);setProgress(0,"❌ "+m.slice(0,160));showToast(m.slice(0,200),false);
@@ -6753,7 +6761,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="18.6";
+  var EMB="19.0";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
