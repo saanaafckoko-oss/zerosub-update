@@ -4909,6 +4909,7 @@ else if(a=="sp"){c.t="["+(+b.dataset.k+1)+"] "+tx;sync();render()}});
 q("#cueList").addEventListener("change",e=>{if(e.target.dataset.a!="txt")return;const c=cues[+e.target.closest(".cu").dataset.i],m=TAG.exec(c.t);c.t=(m?m[0]:"")+e.target.value;sync()});
 q("#cuDiv").onclick=()=>q("#tagBtn").click();q("#cuExp").onclick=()=>q("#dlSrt").click();
 q("#cuClr").onclick=()=>{if(!cues.length)return;if(!confirm("លុប SRT ទាំងអស់ ("+cues.length+" បន្ទាត់)?"))return;try{cur&&cur.stop()}catch(e){}cues=[];try{srtBlocks=[]}catch(e){}q("#srtText").value="";last="";q("#sub").textContent="";q("#srtFile").value="";render()};
+function wavDataOffset(u8){for(var i=12;i+8<u8.length;){var id=String.fromCharCode(u8[i],u8[i+1],u8[i+2],u8[i+3]);var sz=u8[i+4]|(u8[i+5]<<8)|(u8[i+6]<<16)|(u8[i+7]<<24);if(id==="data")return i+8;i+=8+sz+(sz&1)}return 44}
 /* V16.0 : 🎯 តម្រឹមម៉ោង Subtitle ឱ្យចំសំឡេងពិត (ដូចក្នុង APK Sp) — ប្រើ Mask សំឡេងនិយាយ កែម៉ោងចាប់ផ្តើម/បញ្ចប់ មិនលុបបន្ទាត់ណាមួយឡើយ */
 function zsfAlignCues(pcm,list){
  var M=zsfSpeechMask(pcm),m=M.m,nf=M.nf,FT=0.05,st={s:0,e:0},out=[],prevE=0,i,k;
@@ -6772,7 +6773,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="20.1";
+  var EMB="20.2";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
