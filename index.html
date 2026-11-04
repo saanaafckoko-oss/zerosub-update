@@ -5544,7 +5544,7 @@ function zsBgmBoost(b){try{
  var ch=b.numberOfChannels,n=b.length,step=Math.max(1,Math.floor(n/400000)),cnt=Math.floor((n-1)/step)+1,sum=0,num=0,k,j,i,d;
  for(k=0;k!==ch;k++){d=b.getChannelData(k);for(j=0;j!==cnt;j++){i=j*step;sum+=d[i]*d[i];num++}}
  var rms=Math.sqrt(sum/Math.max(1,num));if(!(rms>0.0005))return;
- var g=Math.min(4.5,Math.max(1,0.18/rms));if(!(g>=1.05))return;
+ var g=Math.min(3.5,Math.max(1,0.141/rms));if(!(g>=1.05))return;
  for(k=0;k!==ch;k++){d=b.getChannelData(k);for(i=0;i!==n;i++)d[i]=Math.tanh(d[i]*g)}
  b.__zsBoost=true;window.__bgmBoostDb=Math.round(20*Math.log10(g)*10)/10;
 }catch(e){console.warn("bgmBoost",e)}}
@@ -5567,7 +5567,7 @@ async function zsBgmDeVoice(b,prog){try{
  if(!b||b.__zsDv)return;
  try{await fxEnsureSpeech()}catch(_){}
  var SP=(window.__spEn&&window.__spEn.file===file)?window.__spEn:null,mk=zsDvMask(b,SP);
- var G=parseFloat(window.__zsDvGain);if(!(G>=0&&G=36))G=13;
+ var G=parseFloat(window.__zsDvGain);if(!(G>=0&&G=36))G=20;
  var sr=b.sampleRate,fl=Math.max(1,Math.round(sr*.02)),n=b.length,ch=b.numberOfChannels,k,i,CH=120;
  var FQ=[300,500,800,1250,1900,2800],BG=-G*.6;
  for(k=0;k!==ch;k++){var d=b.getChannelData(k),EQ=FQ.map(function(f){return zsDvBq(f,BG,1.2,sr)});
@@ -7126,7 +7126,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="22.9";
+  var EMB="23.0";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
