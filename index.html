@@ -154,6 +154,8 @@
     log.push(USAGE[i]+(h===1?"?key":"")+" -> "+(r.status||"network")+(r.text?" "+String(r.text).slice(0,60).replace(/\s+/g," "):""));
     if(r.status===0&&h===0){break}
     if(r.status===404)break}}
+  if(r&&r.status===0){try{var pr=await of.call(window,GW+"/v1/usage",{mode:"no-cors",cache:"no-store"});log.push("probe no-cors: OK type="+pr.type+" (network+SSL good; CORS/header blocks)")}catch(e2){log.push("probe no-cors: FAIL "+String(e2&&e2.message||e2)+" (network/SSL blocks)")}
+   try{log.push("origin="+String(location.origin)+" proto="+String(location.protocol))}catch(e3){}}
   return {ok:false,res:r,log:log}}
  function fmt2(j,raw){var o=fmt(j,raw);return o}
  function build(){
@@ -7244,7 +7246,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="23.7";
+  var EMB="23.8";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
