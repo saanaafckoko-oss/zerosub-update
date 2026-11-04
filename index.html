@@ -9,7 +9,30 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"12.0";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"12.0";})();
+/* V24.1 : NISAY native bridge (OkHttp) — ប្រើតែពេល App មាន NisayNativeBridge; បើគ្មាន វាមិនប៉ះពាល់អ្វីទេ */
+(function(){
+ var of=window.fetch;if(!of||window.__nisayBridgeOn)return;window.__nisayBridgeOn=1;
+ var CB={};
+ window.nisayReceiveResponse=function(id,r){var c=CB[id];if(!c)return;delete CB[id];clearTimeout(c.t);
+  try{c.ok(new Response(String(r&&r.body!=null?r.body:""),{status:(r&&r.status)||500,headers:{"Content-Type":"application/json"}}))}catch(e){c.no(e)}};
+ window.fetch=function(res,opt){
+  opt=opt||{};
+  var url=typeof res==="string"?res:(res&&res.url)||"";
+  var B=window.NisayNativeBridge;
+  if(!B||typeof B.callApi!=="function"||url.indexOf("https://api.nisay.store/")!==0)return of.apply(window,arguments);
+  var body=opt.body==null?null:opt.body;
+  if(body!==null&&typeof body!=="string")return of.apply(window,arguments); /* FormData/Blob មិនទាន់គាំទ្រ */
+  return new Promise(function(ok,no){
+   var id="r"+Date.now().toString(36)+Math.random().toString(36).slice(2);
+   var h={};try{var H=opt.headers;if(H){if(typeof Headers!=="undefined"&&H instanceof Headers){H.forEach(function(v,k){h[k]=v})}else Object.keys(H).forEach(function(k){h[k]=H[k]})}}catch(e){}
+   var t=setTimeout(function(){delete CB[id];no(new TypeError("Failed to fetch (timeout)"))},60000);
+   CB[id]={ok:ok,no:no,t:t};
+   if(opt.signal){if(opt.signal.aborted){clearTimeout(t);delete CB[id];return no(new DOMException("Aborted","AbortError"))}
+    opt.signal.addEventListener("abort",function(){if(CB[id]){clearTimeout(t);delete CB[id];no(new DOMException("Aborted","AbortError"))}})}
+   try{B.callApi(id,url,String(opt.method||"GET").toUpperCase(),JSON.stringify(h),body)}catch(e){clearTimeout(t);delete CB[id];no(new TypeError("Failed to fetch"))}
+  })};
+})();/script>
 script id="zsf-nisay">/* ===== V21.9 : NISAY Gateway — Key បង់ប្រាក់ (api.nisay.store) ===== */
 (function(){
  var GW="https://api.nisay.store",LS="zsf_nisay_key",of=window.fetch;
@@ -1081,10 +1104,11 @@ genView();slots();steps();
 const GM=[["3.1 Flash-Lite","gemini-3.1-flash-lite"],["3.1 Pro","gemini-3.1-pro"],["3.8 Flash","gemini-3.8-flash"],["3.7 Flash","gemini-3.7-flash"],["3.5 Flash-Lite","gemini-3.5-flash-lite"],["3.6 Flash","gemini-3.6-flash"],["3.5 Flash","gemini-3.5-flash"]];{const _g=S.get("gmid",null),_i=GM.findIndex(m=>m[1]===_g);if(_i>=0)gmodel=_i}
 const gmHtml=()=>GM.map((m,i)=>`button class="b pill ${i===gmodel?"on":""}">${i===gmodel?ICO.checkc+" ⚡ ":""}${/Pro/.test(m[0])?"💎 ":""}${m[0]}/button>`).join("");function gms(){$("#gm").innerHTML=gmHtml();S.set("gmid",GM[gmodel][1]);$$("#gm .b").forEach((b,i)=>b.onclick=()=>{gmodel=i;gms()})}gms();
 let K=S.get("gk",Array(10).fill(""));if(!Array.isArray(K))K=Array(10).fill("");while(K.length11)K.push("");
-$("#keys").innerHTML=K.map((x,i)=>`div class="slot" style="flex:0 0 46%">b>${i+1}/b>input type="password" data-i="${i}" value="${x}" placeholder="••••••••">button class="b" data-t="${i}">Test/button>/div>`).join("");
+$("#keys").innerHTML=K.map((x,i)=>`div class="slot" style="flex:0 0 46%">b>${i+1}/b>input type="password" data-i="${i}" value="${x}" placeholder="••••••••">button class="b" data-t="${i}">Test/button>button class="b" data-d="${i}" title="លុប" style="flex:0 0 auto;padding:0 9px;font-size:15px">🗑/button>/div>`).join("");
 const kc=()=>$("#kcount").textContent=K.filter(Boolean).length+"/11 បានកំណត់";kc();
 $$("#keys input").forEach(e=>e.onchange=()=>{K[+e.dataset.i]=e.value.trim();S.set("gk",K);kc()});
-$$("#keys button").forEach(b=>b.onclick=async()=>{const k=K[+b.dataset.t];if(!k)return;b.textContent="…";try{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${k}`);b.textContent=r.ok?"✔":"✘"}catch{b.textContent="✘"}});
+$$("#keys button[data-t]").forEach(b=>b.onclick=async()=>{const k=K[+b.dataset.t];if(!k)return;b.textContent="…";try{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${k}`);b.textContent=r.ok?"✔":"✘"}catch{b.textContent="✘"}});
+$$("#keys button[data-d]").forEach(b=>b.onclick=()=>{const i=+b.dataset.d;const inp=$$("#keys input")[i];K[i]="";S.set("gk",K);if(inp){inp.value="";try{inp.dispatchEvent(new Event("change"))}catch(_){}}kc();try{syncKeys()}catch(_){}});
 $("#keyT").onclick=()=>{$("#gbox").classList.toggle("hide");$("#keyT").innerHTML=($("#gbox").classList.contains("hide")?ICO.down:ICO.up)+" Key Gemini"};
 $("#mk").onclick=()=>window.open("https://aistudio.google.com/apikey","_blank");
 
@@ -1175,10 +1199,11 @@ $("#gooBtn").onclick=async()=>{if(!cues.length)return alert("សូមនាំ�
 
 /* groq keys */
 let G=S.get("gq",[]);if(!Array.isArray(G))G=[];while(G.length10)G.push("");
-$("#gqs").innerHTML=G.map((x,i)=>`div class="slot" style="flex:0 0 48%">b>${i+1}/b>input type="password" data-i="${i}" value="${x}" placeholder="gsk_...">button class="b" data-t="${i}">Test/button>/div>`).join("");
+$("#gqs").innerHTML=G.map((x,i)=>`div class="slot" style="flex:0 0 48%">b>${i+1}/b>input type="password" data-i="${i}" value="${x}" placeholder="gsk_...">button class="b" data-t="${i}">Test/button>button class="b" data-d="${i}" title="លុប" style="flex:0 0 auto;padding:0 9px;font-size:15px">🗑/button>/div>`).join("");
 const gc=()=>{const n=G.filter(Boolean).length;$("#gqn").textContent=n;const c=$("#gqcount");if(c)c.textContent=n+"/10 បានកំណត់"};gc();
 $$("#gqs input").forEach(e=>e.onchange=()=>{G[+e.dataset.i]=e.value.trim();S.set("gq",G);gc()});
-$$("#gqs button").forEach(b=>b.onclick=async()=>{const k=G[+b.dataset.t];if(!k)return;b.textContent="…";try{const r=await fetch("https://api.groq.com/openai/v1/models",{headers:{Authorization:"Bearer "+k}});b.textContent=r.ok?"✔":"✘"}catch{b.textContent="✘"}});
+$$("#gqs button[data-t]").forEach(b=>b.onclick=async()=>{const k=G[+b.dataset.t];if(!k)return;b.textContent="…";try{const r=await fetch("https://api.groq.com/openai/v1/models",{headers:{Authorization:"Bearer "+k}});b.textContent=r.ok?"✔":"✘"}catch{b.textContent="✘"}});
+$$("#gqs button[data-d]").forEach(b=>b.onclick=()=>{const i=+b.dataset.d;const inp=$$("#gqs input")[i];G[i]="";S.set("gq",G);if(inp){inp.value="";try{inp.dispatchEvent(new Event("change"))}catch(_){}}gc()});
 $("#mkq").onclick=()=>window.open("https://console.groq.com/keys","_blank");
 $("#gq").onclick=()=>$("#gqbox").classList.toggle("hide");
 
@@ -7246,7 +7271,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="23.9";
+  var EMB="24.1";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
