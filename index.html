@@ -156,7 +156,7 @@
   if(used!==undefined)L.push("ប្រើរួច: "+n(used));if(tot!==undefined)L.push("សរុប: "+n(tot));if(rem!==undefined)L.push("នៅសល់: "+n(rem));
   if(exp!==undefined){var dt=new Date(exp);L.push("ផុតកំណត់: "+(isNaN(dt)?exp:dt.toLocaleDateString("en-GB")))}
   if(rpm!==undefined)L.push("Rate: "+rpm+" req/min");
-  return L.length?"✅ "+L.join("  •  "):"✅ Key ដំណើរការ\n"+String(raw).slice(0,300)}
+  return L.length?"✅ "+L.join("  •  "):"✅ Key ដំណើរការ\n"+String(raw).slice(0,1200)}
  /* V23.4 : Key NISAY — រក្សាទុកជាប់ (localStorage + Cookie + IndexedDB + Slot Gemini), រក្សាទុកស្វ័យប្រវត្តិ, ពិនិត្យ Token បង្ហាញលទ្ធផល/មូលហេតុបរាជ័យ */
  var CK="zsf_nisay";
  function clean(v){return String(v||"").replace(/[\s\u200b-\u200d\u2060\ufeff]/g,"").replace(/^nisay-/i,"nisay-")}
@@ -186,11 +186,20 @@
     log.push(USAGE[i]+(h===1?"?key":"")+" -> "+(r.status||"network")+(r.text?" "+String(r.text).slice(0,60).replace(/\s+/g," "):""));
     if(r.status===0&&h===0){break}
     if(r.status===404&&!/key/i.test(r.text||""))break}}
+  /* V24.5 : សាក endpoint live ជាមួយឈ្មោះ param ផ្សេងៗ + POST ហើយបង្ហាញលទ្ធផលទាំងអស់ */
+  var pn=["key","api_key","token","apikey"],pi,pr2,ptx;
+  for(pi=0;pi!==pn.length+1;pi++){
+   if(pi===pn.length)pr2=await tryOne(GW+"/api/public/usage/live",{"Content-Type":"application/json"});
+   else pr2=await tryOne(GW+"/api/public/usage/live?"+pn[pi]+"="+encodeURIComponent(key),{});
+   ptx=String(pr2.text||"");
+   if(pi===pn.length){try{var pc=new AbortController(),pt=setTimeout(function(){pc.abort()},15000);var pp=await of.call(window,GW+"/api/public/usage/live",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:key,api_key:key}),signal:pc.signal});clearTimeout(pt);ptx=await pp.text();pr2={ok:pp.ok,status:pp.status,text:ptx}}catch(e6){pr2={ok:false,status:0,text:String(e6&&e6.message||e6)};ptx=pr2.text}}
+   if(pr2.ok&&ptx.trim().charAt(0)!=="\x3c")return {ok:true,res:pr2,log:log};
+   log.push("live "+(pi===pn.length?"POST":"?"+pn[pi])+" -> "+(pr2.status||"network")+" "+ptx.slice(0,70).replace(/\s+/g," "))}
   /* V24.4 : បើ usage មិនបាន → សាកបកប្រែពាក្យ "hello" ១ដង ដើម្បីដឹងថា Key ប្រើបាន ឬអត់ */
   try{var ac2=new AbortController(),tm2=setTimeout(function(){ac2.abort()},20000);
    var tr=await of.call(window,GW+"/v1/translate",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key},body:JSON.stringify({text:"hello",source_lang:"auto",target_lang:"km",model:trModel()}),signal:ac2.signal});
    var trt="";try{trt=await tr.text()}catch(e5){}clearTimeout(tm2);
-   if(tr.ok&&!/^\s*/.test(trt))return {ok:true,res:{ok:true,status:200,text:'{"note":"translate OK"}'},log:log};
+   if(tr.ok&&!/^\s*/.test(trt))return {ok:true,res:{ok:true,status:200,text:"(translate OK)\n"+log.join("\n")},log:log};
    log.push("/v1/translate test -> "+tr.status+" "+String(trt).slice(0,80).replace(/\s+/g," "));
    if(tr.status===401||tr.status===403)r={ok:false,status:tr.status,text:trt};
   }catch(e4){log.push("/v1/translate test -> "+String(e4&&e4.message||e4))}
@@ -233,12 +242,18 @@
     stat("\u274c \u1796\u17b7\u1793\u17b7\u178f\u17d2\u1799\u1798\u17b7\u1793\u1794\u17b6\u1793: "+why+"\n"+R.log.join("\n"))}}
   catch(e){stat("\u274c \u1780\u17c6\u17a0\u17bb\u179f: "+String(e&&e.message||e))}
   finally{if(btn)btn.disabled=false}return okk}
+ /* V24.6 : ពិនិត្យ Token នៅសល់ → បើកទំព័រផ្លូវការ NISAY (checkusage) ហើយចម្លង Key ឱ្យស្រាប់ */
+ function openUsage(){var v=doSave(true);if(!v){var k0=nk();if(isN(k0))v=k0}
+  if(!isN(v)){stat("❌ សូមដាក់ Key ចាប់ផ្តើម nisay- / sk- ជាមុនសិន");return}
+  try{navigator.clipboard.writeText(v)}catch(e){}
+  stat("✅ បានចម្លង Key ហើយ។ ទំព័រ NISAY កំពុងបើក → ចុចដាក់ (Paste) Key រួចចុច Check Usage");
+  try{window.open("https://api.nisay.store/checkusage","_blank")}catch(e2){stat("❌ បើកទំព័រមិនបាន៖ https://api.nisay.store/checkusage")}}
  async function doTest(b){b.disabled=true;b.textContent="\u2026";var ok=false;try{ok=await doCheck()}catch(e){}b.disabled=false;b.textContent=ok?"\u2714":"\u2718";setTimeout(function(){var x=document.getElementById("zsfNisayTest");if(x)x.textContent="Test"},6000)}
  /* Event delegation (capture) — ដំណើរការទោះ Panel ត្រូវបង្កើតឡើងវិញ */
  if(!window.__zsfNisayEv){window.__zsfNisayEv=1;
   document.addEventListener("click",function(e){var t=e.target&&e.target.closest?e.target.closest("#zsfNisaySave,#zsfNisayChk,#zsfNisayEye,#zsfNisayTest"):null;if(!t)return;
    e.preventDefault();e.stopPropagation();
-   if(t.id==="zsfNisaySave")doSave(false);else if(t.id==="zsfNisayChk")doCheck();else if(t.id==="zsfNisayTest")doTest(t);
+   if(t.id==="zsfNisaySave")doSave(false);else if(t.id==="zsfNisayChk")openUsage();else if(t.id==="zsfNisayTest")doTest(t);
    else{var i=document.getElementById("zsfNisayIn");if(i)i.type=i.type==="password"?"text":"password"}},true);
   var __at=null,sv=function(e){var i=e.target;if(!i||i.id!=="zsfNisayIn")return;clearTimeout(__at);__at=setTimeout(function(){var v=clean(i.value);if(isN(v)){persist(v);setSlot(v);stat("\u2705 \u1794\u17b6\u1793\u179a\u1780\u17d2\u179f\u17b6\u1791\u17bb\u1780\u179f\u17d2\u179c\u17d0\u1799\u1794\u17d2\u179a\u179c\u178f\u17d2\u178f\u17b7")}},500)};
   document.addEventListener("input",sv,true);document.addEventListener("change",sv,true);document.addEventListener("blur",function(e){if(e.target&&e.target.id==="zsfNisayIn"){var v=clean(e.target.value);if(isN(v))persist(v)}},true);
@@ -7288,7 +7303,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="24.4";
+  var EMB="24.6";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
