@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"12.0";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"1.1.0";})();/script>
 script id="zsf-nisay">/* ===== V21.9 : NISAY Gateway — Key បង់ប្រាក់ (api.nisay.store) ===== */
 (function(){
  var GW="https://api.nisay.store",LS="zsf_nisay_key",of=window.fetch;
@@ -6775,7 +6775,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"11.8",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"1.1.0",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7021,7 +7021,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="21.9";
+  var EMB="1.1.0";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
@@ -7090,8 +7090,10 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
     setTimeout(function(){ if(document.getElementById("authScreen")||document.getElementById("mainApp")) setTries(0); },8000);
   }
   function embedded(){return document.getElementById("zsfApp").textContent.split("\uE000").join("<")}
+  try{if(localStorage.getItem("zsf_emb_ver")!==EMB){localStorage.setItem("zsf_emb_ver",EMB);dropCached();setTries(0);window.__zsfDropOld=1}}catch(e){}
   getCached(function(c){
     var t=tries(),use=false;
+    if(window.__zsfDropOld){c=null}
     if(c&&typeof c.html==="string"&&c.html.length>100000&&c.html.indexOf("zsf-boot")>0&&c.html.indexOf("ZERO SUB FLASH")>0&&c.ver&&newer(c.ver,EMB)){
       if(t>=2){dropCached();setTries(0);} else {use=true;setTries(t+1);}
     }
