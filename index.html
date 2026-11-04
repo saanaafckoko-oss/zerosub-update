@@ -215,6 +215,7 @@
   box.innerHTML='div style="font-weight:800;font-size:16px">\ud83d\udcb3 Key \u1794\u1784\u17cb\u1794\u17d2\u179a\u17b6\u1780\u17cb (NISAY)/div>'
    +'div class="slot" style="margin-top:8px">input type="password" id="zsfNisayIn" placeholder="sk-km-... / nisay-..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">button class="b" id="zsfNisayEye" type="button" title="show/hide" style="flex:0 0 auto;padding:0 12px">\ud83d\udc41/button>button class="b" id="zsfNisayTest" type="button" style="flex:0 0 auto;padding:0 12px">Test/button>button class="b" id="zsfNisaySave" type="button">\u179a\u1780\u17d2\u179f\u17b6\u1791\u17bb\u1780/button>/div>'
    +'button class="b" id="zsfNisayChk" type="button" style="width:100%;margin-top:8px">\ud83d\udcca \u1796\u17b7\u1793\u17b7\u178f\u17d2\u1799 Token \u1793\u17c5\u179f\u179b\u17cb/button>'
+   +'button class="b" id="zsfNisayTag" type="button" style="width:100%;margin-top:8px">🧪 សាកចាប់ប្រុស/ស្រី [1]-[4] (NISAY)/button>'
    +'div id="zsfNisayStat" style="font-size:13px;margin-top:6px;line-height:1.6;white-space:pre-line;word-break:break-word;min-height:20px">/div>'
    +'div style="font-size:12px;opacity:.7;margin-top:4px;line-height:1.6">\u2139\ufe0f \u1780\u1793\u17d2\u179b\u17c2\u1784\u178a\u17b6\u1780\u17cb Key \u1794\u1784\u17cb\u1794\u17d2\u179a\u17b6\u1780\u17cb (\u1785\u17b6\u1794\u17cb\u1795\u17d2\u178f\u17be\u1798 nisay-int-) \u17d4 Key \u1793\u17b9\u1784\u178f\u17d2\u179a\u17bc\u179c\u1794\u17b6\u1793\u179a\u1780\u17d2\u179f\u17b6\u1791\u17bb\u1780\u179f\u17d2\u179c\u17d0\u1799\u1794\u17d2\u179a\u179c\u178f\u17d2\u178f\u17b7 \u1796\u17c1\u179b\u178a\u17b6\u1780\u17cb\u1785\u17bc\u179b \u17d4 \u1794\u17d2\u179a\u17be\u1787\u17c6\u1793\u17bd\u179f Key Gemini \u179f\u1798\u17d2\u179a\u17b6\u1794\u17cb\u1794\u1780\u1794\u17d2\u179a\u17c2 \u1793\u17b7\u1784\u1791\u17b6\u1789\u17a2\u1780\u17d2\u179f\u179a\u17d4 \u1794\u17be\u1782\u17d2\u1798\u17b6\u1793 Key Groq \u179c\u17b6\u1793\u17b9\u1784\u179f\u17d2\u178f\u17b6\u1794\u17cb\u179f\u17c6\u17a1\u17c1\u1784\u178a\u17c4\u1799 NISAY \u17d4/div>';
   mk.parentNode.insertBefore(box,mk.nextSibling);
@@ -248,12 +249,28 @@
   try{navigator.clipboard.writeText(v)}catch(e){}
   stat("✅ បានចម្លង Key ហើយ។ ទំព័រ NISAY កំពុងបើក → ចុចដាក់ (Paste) Key រួចចុច Check Usage");
   try{window.open("https://api.nisay.store/checkusage","_blank")}catch(e2){stat("❌ បើកទំព័រមិនបាន៖ https://api.nisay.store/checkusage")}}
+ /* V24.7 : សាកល្បងចាប់ប្រុស/ស្រី/គិតក្នុងចិត្ត តាម NISAY /v1/translate + prompt_instructions (ពីអត្ថបទ SRT ១២ ឃ្លាដំបូង · មិនប៉ះ SRT ពិត) */
+ async function tagTest(b){
+  var ta=document.getElementById("srtText"),raw=ta?String(ta.value||""):"";
+  if(!raw.trim()){stat("❌ សូមនាំចូល SRT ជាមុន (ឱ្យមានអក្សរក្នុងប្រអប់ SRT)");return}
+  var v=doSave(true);if(!v){var k0=nk();if(isN(k0))v=k0}
+  if(!isN(v)){stat("❌ សូមដាក់ Key NISAY ជាមុន");return}
+  var blocks=raw.replace(/\r/g,"").trim().split(/\n\n+/).slice(0,12).join("\n\n");
+  var ins="Analyze dialogue context and speaker cues. At the START of every subtitle text line put exactly one tag: [1]=male speaking, [2]=female speaking, [3]=male inner thought (inner monologue), [4]=female inner thought. If one line contains two different speakers, split it into separate parts, each with its own tag. Keep every SRT number and timestamp unchanged. Do not drop any word or meaning.";
+  b.disabled=true;stat("⏳ កំពុងសាក...");
+  try{
+   var ac=new AbortController(),tm=setTimeout(function(){ac.abort()},60000);
+   var r=await of.call(window,GW+"/v1/translate",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+v},body:JSON.stringify({text:blocks,source_lang:"auto",target_lang:"km",model:trModel(),prompt_instructions:ins}),signal:ac.signal});
+   var t=await r.text();clearTimeout(tm);
+   stat("🧪 HTTP "+r.status+"\n"+String(t).slice(0,1500))
+  }catch(e){stat("❌ កំហុស: "+String(e&&e.message||e))}
+  b.disabled=false}
  async function doTest(b){b.disabled=true;b.textContent="\u2026";var ok=false;try{ok=await doCheck()}catch(e){}b.disabled=false;b.textContent=ok?"\u2714":"\u2718";setTimeout(function(){var x=document.getElementById("zsfNisayTest");if(x)x.textContent="Test"},6000)}
  /* Event delegation (capture) — ដំណើរការទោះ Panel ត្រូវបង្កើតឡើងវិញ */
  if(!window.__zsfNisayEv){window.__zsfNisayEv=1;
-  document.addEventListener("click",function(e){var t=e.target&&e.target.closest?e.target.closest("#zsfNisaySave,#zsfNisayChk,#zsfNisayEye,#zsfNisayTest"):null;if(!t)return;
+  document.addEventListener("click",function(e){var t=e.target&&e.target.closest?e.target.closest("#zsfNisaySave,#zsfNisayChk,#zsfNisayTag,#zsfNisayEye,#zsfNisayTest"):null;if(!t)return;
    e.preventDefault();e.stopPropagation();
-   if(t.id==="zsfNisaySave")doSave(false);else if(t.id==="zsfNisayChk")openUsage();else if(t.id==="zsfNisayTest")doTest(t);
+   if(t.id==="zsfNisaySave")doSave(false);else if(t.id==="zsfNisayChk")openUsage();else if(t.id==="zsfNisayTag")tagTest(t);else if(t.id==="zsfNisayTest")doTest(t);
    else{var i=document.getElementById("zsfNisayIn");if(i)i.type=i.type==="password"?"text":"password"}},true);
   var __at=null,sv=function(e){var i=e.target;if(!i||i.id!=="zsfNisayIn")return;clearTimeout(__at);__at=setTimeout(function(){var v=clean(i.value);if(isN(v)){persist(v);setSlot(v);stat("\u2705 \u1794\u17b6\u1793\u179a\u1780\u17d2\u179f\u17b6\u1791\u17bb\u1780\u179f\u17d2\u179c\u17d0\u1799\u1794\u17d2\u179a\u179c\u178f\u17d2\u178f\u17b7")}},500)};
   document.addEventListener("input",sv,true);document.addEventListener("change",sv,true);document.addEventListener("blur",function(e){if(e.target&&e.target.id==="zsfNisayIn"){var v=clean(e.target.value);if(isN(v))persist(v)}},true);
@@ -5431,13 +5448,13 @@ async function groqCall(blob,keys,st){
   throw lastErr}
  throw lastErr||new Error("Groq \u1794\u179a\u17b6\u1787\u17d0\u1799")}
 /* កាត់សំឡេងតាមចន្លោះស្ងាត់ ក្នុងចន្លោះ 60s-90s (ដូចកម្មវិធីចាស់) */
-function planCuts(pcm){
+function planCuts(pcm,fsec){
  var n=pcm.length>>1,dv=new DataView(pcm.buffer,pcm.byteOffset,n*2),FR=800,nf=Math.floor(n/FR),e=new Float32Array(nf),f,k;
  for(f=0;fnf;f++){var sum=0,o=f*FR;for(k=0;kFR;k++){var v=dv.getInt16((o+k)*2,true)/32768;sum+=v*v}e[f]=Math.sqrt(sum/FR)}
  var sm=new Float32Array(nf);for(f=0;fnf;f++){var a=0,c=0;for(k=-2;k=1;k++){if(e[f+k]!==undefined){a+=e[f+k];c++}}sm[f]=a/c}
  var MIN=15*20,MAX=30*20,cuts=[0],st=0,CHm=0;
  try{CHm=parseInt(localStorage.getItem("zsf_gem_chunks"),10)||0}catch(e){}
- if(CHm!==0){var TG=CHm0?-CHm:Math.ceil(nf*0.05/CHm);TG=Math.max(30,Math.min(150,TG));MIN=Math.round(TG*0.8*20);MAX=Math.round(TG*1.2*20)}
+ if(fsec&&!CHm)CHm=-fsec;if(CHm!==0){var TG=CHm0?-CHm:Math.ceil(nf*0.05/CHm);TG=Math.max(30,Math.min(150,TG));MIN=Math.round(TG*0.8*20);MAX=Math.round(TG*1.2*20)}
  while(nf-st>MAX){var best=st+MAX,bv=Infinity;for(f=st+MIN;f=st+MAX&&fnf;f++){if(sm[f]bv){bv=sm[f];best=f}}cuts.push(best);st=best}
  if(cuts.length>1&&nf-st3*20)cuts.pop();
  var res=[];for(f=0;fcuts.length;f++){var s0=cuts[f]*FR,s1=(f+1cuts.length?cuts[f+1]*FR:n);res.push([s0,s1])}
@@ -5615,7 +5632,7 @@ function zsfStreamStart(total){
  S.finish=function(maxMs){flush(true);return new Promise(function(r){if(S.off||(!S.run&&!S.q.length&&(!S.bp||S.ready)))return r();var t=setTimeout(r,maxMs);S.waiters.push(function(){clearTimeout(t);r()})})};
  return S}
 async function groqTranscribe(prog){
- var keys=G.filter(Boolean);if(!keys.length&&window.zsfNisayKey&&window.zsfNisayKey()){var __nk=window.zsfNisayKey();keys=[__nk,__nk,__nk,__nk];try{zsfGq.lim[__nk]=90}catch(e){}}
+ var keys=G.filter(Boolean),__nzf=0;if(!keys.length&&window.zsfNisayKey&&window.zsfNisayKey()){var __nk=window.zsfNisayKey();keys=[__nk,__nk,__nk,__nk];__nzf=120;try{zsfGq.lim[__nk]=90}catch(e){}}
  if(!keys.length){$("#gqbox").classList.remove("hide");throw new Error("សូមបញ្ចូល Groq Key ជាមុន")}
  window.__zsfGqModel=(model==="sens")?"whisper-large-v3":model;if(model==="sens"){try{showToast("SenseVoice ត្រូវការ backend — ប្រើ V3 ជំនួសដោយស្វ័យប្រវត្តិ",true)}catch(e){}}
  prog(3,"🎧 កំពុងទាញសំឡេងពីវីដេអូ...");
@@ -5625,7 +5642,7 @@ async function groqTranscribe(prog){
  prog(8,"🎵 វិភាគរកចន្លោះស្ងាត់ដកដង្ហើម (Silence Points 15s - 30s)...");
  await sleep(30);
  zsfGq.cur=null;zsfGq.sw=0;window.__zsfLockLang=null;
- var plan=planCuts(pcm),total=plan.length;
+ var plan=planCuts(pcm,__nzf),total=plan.length;
  if(window.__zsfStreamWant){try{window.__zsfStream=zsfStreamStart(total)}catch(e){window.__zsfStream=null}}
  prog(10,"🎵 បានបំបែកជា "+total+" កង់ (ចន្លោះ: 15s-30s ចំកន្លែងស្ងាត់)...");
  await sleep(400);
@@ -7303,7 +7320,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="24.6";
+  var EMB="24.8";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
