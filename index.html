@@ -3416,7 +3416,7 @@ function zsfTrSummary(a){var b=zsfSnap(),d={req:b.req-a.req,ok:b.ok-a.ok,inTok:b
  var msg="Gemini: request "+d.ok+"/"+d.req+" ជោគជ័យ | token ចូល "+d.inTok+" ចេញ "+d.outTok+" | cache "+d.hit+"/"+(d.hit+d.miss)+" | retry "+d.retry;
  try{console.log("[ZSF translate] "+msg+" | models "+JSON.stringify(zsfUsage.models))}catch(e){}
  try{if(typeof showToast==="function")showToast(msg,true)}catch(e){}return d}
-var ZSF_TR_PV="v1",zsfTrDB=null,zsfTrMem=new Map();
+var ZSF_TR_PV="v2",zsfTrDB=null,zsfTrMem=new Map();
 function zsfHash(s){s=String(s||"");var h=5381;for(var i=0;is.length;i++)h=((h5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)+"."+s.length}
 function zsfTrKey(tl,ctx,text){return ZSF_TR_PV+"|"+selections.geminiModel+"|"+tl+((typeof zsfFunOn==="function"&&zsfFunOn())?"|"+zsfStyleMode():"")+"|"+zsfHash(ctx)+"|"+text}
 function zsfTrOk(tl,srcText,v){if(!v)return false;var hasL=/[A-Za-z\u00C0-\uFFFF]/.test(srcText);
@@ -5544,7 +5544,7 @@ function zsBgmBoost(b){try{
  var ch=b.numberOfChannels,n=b.length,step=Math.max(1,Math.floor(n/400000)),cnt=Math.floor((n-1)/step)+1,sum=0,num=0,k,j,i,d;
  for(k=0;k!==ch;k++){d=b.getChannelData(k);for(j=0;j!==cnt;j++){i=j*step;sum+=d[i]*d[i];num++}}
  var rms=Math.sqrt(sum/Math.max(1,num));if(!(rms>0.0005))return;
- var g=Math.min(3.5,Math.max(1,0.141/rms));if(!(g>=1.05))return;
+ var g=Math.min(4.5,Math.max(1,0.18/rms));if(!(g>=1.05))return;
  for(k=0;k!==ch;k++){d=b.getChannelData(k);for(i=0;i!==n;i++)d[i]=Math.tanh(d[i]*g)}
  b.__zsBoost=true;window.__bgmBoostDb=Math.round(20*Math.log10(g)*10)/10;
 }catch(e){console.warn("bgmBoost",e)}}
@@ -5567,7 +5567,7 @@ async function zsBgmDeVoice(b,prog){try{
  if(!b||b.__zsDv)return;
  try{await fxEnsureSpeech()}catch(_){}
  var SP=(window.__spEn&&window.__spEn.file===file)?window.__spEn:null,mk=zsDvMask(b,SP);
- var G=parseFloat(window.__zsDvGain);if(!(G>=0&&G=36))G=20;
+ var G=parseFloat(window.__zsDvGain);if(!(G>=0&&G=36))G=13;
  var sr=b.sampleRate,fl=Math.max(1,Math.round(sr*.02)),n=b.length,ch=b.numberOfChannels,k,i,CH=120;
  var FQ=[300,500,800,1250,1900,2800],BG=-G*.6;
  for(k=0;k!==ch;k++){var d=b.getChannelData(k),EQ=FQ.map(function(f){return zsDvBq(f,BG,1.2,sr)});
@@ -6195,6 +6195,7 @@ function gCleanBible(j){
   places:pairs(j.places,12,ZH),
   terms:pairs(j.terms,14,/^[㐀-鿿·A-Za-z0-9]{1,10}$/),
   address:pairs(j.address,16,ZH),
+  relations:(function(){var names={};chars.forEach(function(c){names[c.zh]=1});var seenR={},out=[];arr(j.relations).forEach(function(r){var a=gTxt(r&&r.from_zh,10),b=gTxt(r&&r.to_zh,10),c1=gTxt(r&&r.call_km,30),s1=gTxt(r&&r.self_km,30);if(!a||!b||a===b||!names[a]||!names[b])return;if(c1&&!gKmOnly(c1))c1="";if(s1&&!gKmOnly(s1))s1="";if(!c1&&!s1)return;var k=a+">"+b;if(seenR[k])return;seenR[k]=1;out.push({from:a,to:b,call:c1,self:s1})});return out.slice(0,24)})(),
   keep_latin:arr(j.keep_latin).map(function(x){return gTxt(x,30)}).filter(function(x){return /^[A-Za-z][A-Za-z0-9'’&+\-. ]*$/.test(x)}).slice(0,30)}}
 /* ត្រូវបានហៅដោយកូដចាស់ (__zsfDirectAnalyze) តាមឈ្មោះ zsfStoryBlock — បញ្ចូលក្នុងសំណើ Gemini តែប៉ុណ្ណោះ មិនបង្ហាញក្នុង UI */
 window.zsfStoryBlock=function(){
@@ -6211,6 +6212,7 @@ window.zsfStoryBlock=function(){
   o+="\n"+ZSF_ERA_RULE;
   if(b){
    if(b.characters.length)o+="\nតួអង្គ (ឈ្មោះ = ខ្មែរ | ភេទ | វ័យ | ញាតិ/ទំនាក់ទំនង | សម័យ | តួនាទី): "+b.characters.map(function(c){return c.zh+"="+c.km+" | "+(c.gender||"?")+" | "+(c.age||"?")+" | "+(c.relation||"?")+" | "+(c.era||"?")+" | "+(c.role||"")}).join(" ; ");
+   if(b.relations&&b.relations.length){var nm={};b.characters.forEach(function(c){nm[c.zh]=c.km});o+="\nតារាងហៅគ្នា (អ្នកនិយាយ → អ្នកស្ដាប់: ហៅគេថា / ហៅខ្លួនឯងថា) — ត្រូវប្រើឱ្យត្រូវតាមគូនីមួយៗ គ្រប់បន្ទាត់ មិនត្រូវប្ដូរ ហើយត្រូវកំណត់ថានរណាកំពុងនិយាយទៅកាន់នរណាតាមបរិបទ: "+b.relations.map(function(r){return (nm[r.from]||r.from)+"→"+(nm[r.to]||r.to)+": "+(r.call||"?")+" / "+(r.self||"?")}).join(" ; ")}
    if(b.address.length)o+="\nពាក្យហៅគ្នា/ពាក្យខ្លួនឯង/ឋានៈ (ប្រើដូចគ្នាគ្រប់បន្ទាត់): "+b.address.map(function(a){return a.zh+"="+a.km}).join(" ; ");
    if(b.places.length)o+="\nទីកន្លែង (ប្រើដូចគ្នា): "+b.places.map(function(a){return a.zh+"="+a.km}).join(" ; ");
    if(b.terms.length)o+="\nពាក្យពិសេសរបស់រឿង (ប្រើដូចគ្នា): "+b.terms.map(function(a){return a.zh+"="+a.km}).join(" ; ");
@@ -6254,7 +6256,7 @@ window.zsfStoryBlock=function(){
 
 /* V12.9: សៀវភៅរឿងស្វ័យប្រវត្តិ (បង្កប់ក្នុងកូដ — គ្មានប្រអប់បរិបទ/ប៊ូតុងប្រភេទទៀត) */
 window.zsfBibleWaitMs=function(){var mb=0;try{mb=file?file.size/1048576:0}catch(_){}return 30000};
-window.zsfAutoStory=function(){try{if($("#target").value!=="km")return "";return String(window.zsfStoryBlock()||"").replace(/\s+/g," ").trim().slice(0,3500)}catch(_){return ""}};
+window.zsfAutoStory=function(){try{if($("#target").value!=="km")return "";return String(window.zsfStoryBlock()||"").replace(/\s+/g," ").trim().slice(0,5500)}catch(_){return ""}};
 window.zsfEnsureStory=async function(){try{var ks=K.filter(Boolean);if(!ks.length||!cues.length||$("#target").value!=="km")return;await Promise.race([Promise.resolve(window.__bibleP||null).then(function(){return gPrepareBible(ks,function(){})}),new Promise(function(r){setTimeout(function(){r(null)},window.zsfBibleWaitMs())})])}catch(_){}};
 function gWithTimeout(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error("timeout"))},ms)})])}
 /* AI មើលវីដេអូ (បើតូច) + អាន SRT ទាំងមូល → ចាប់ប្រភេទរឿង តួអង្គ (ភេទ សម័យ តួនាទី) ពាក្យហៅគ្នា ពាក្យពិសេស។ មិនដែល throw — បរាជ័យ = null (បកប្រែបន្តតាមបរិបទដោយ AI) */
@@ -6274,6 +6276,7 @@ async function gPrepareBible(keys,prog,ovr){
 "- synopsis_km: 3-5 sentences in Khmer summarising the whole story, its setting and the main conflict.\n"+
 "- tone_km: a short Khmer phrase describing the emotional tone/atmosphere (e.g. serious and tense, funny, tender).\n"+
 "- characters: up to 14 characters: {zh, km, gender (M/F/?), age (child/teen/adult/elder), era (ancient/modern/other), relation_km, role_km}. km = natural Khmer transliteration of the Chinese pronunciation (e.g. 陈凡 = ឆិនហ្វាន). relation_km = the exact Khmer family/social relation word of this character to the main character or others (បងប្រុស=older brother, បងស្រី=older sister, ប្អូនប្រុស, ប្អូនស្រី, ឪពុក=father, ម្តាយ=mother, ជីតា, ជីដូន, កូនប្រុស, កូនស្រី, ប្តី, ប្រពន្ធ, មិត្ត, ចៅហ្វាយ...). age = child, teen, adult or elder. Read every line carefully to detect who is older brother/sister, father, mother, child or adult. role_km = short Khmer role AND relationship to the others (e.g. ម្ចាស់ហាងសៀវភៅ ប្តីរបស់លីណា). Decide gender from what you see/hear and keep names identical for the whole story. Use the correct Chinese characters even if the subtitle has small speech-recognition typos. If a name is never spoken, use a role name.\n"+
+"- relations: up to 24 directed pairs {from_zh, to_zh, call_km, self_km} = how character FROM addresses/calls character TO when speaking to them (e.g. បង, ប្អូន, ម៉ាក់, ប៉ា, ជីតា, ពូ, មីង, លោកគ្រូ, ប្តី, ប្រពន្ធ, or the name) and how FROM refers to HIMSELF/HERSELF when talking to TO (e.g. ខ្ញុំ, ប្អូន, កូន, បង, ម៉ាក់, អញ, យើង). Work out each pair from age, gender, family or social relation and the era, so that kinship terms are correct and consistent. Include both directions of every important pair (A to B and B to A). Use zh names exactly as in characters.\n"+
 "- places: up to 10 place names {zh, km} (Khmer transliteration or the usual Khmer name).\n"+
 "- terms: up to 12 recurring story-specific terms, titles, items or concepts {zh, km} with ONE fixed Khmer rendering that fits the genre.\n"+
 "- address: up to 14 forms of address / self-reference / titles used between characters (e.g. 陛下, 店家, 咱, 朕, 大哥, 少爷, 老板) {zh, km} with ONE fixed Khmer rendering suited to who speaks to whom and the era.\n"+
@@ -7123,7 +7126,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="22.7";
+  var EMB="22.9";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
