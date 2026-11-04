@@ -173,7 +173,7 @@
   idb("get",null,function(x){x=clean(x);if(isN(x)){try{localStorage.setItem(LS,x)}catch(e){}ckSet(x);cb(x)}else cb("")})}
  nk=function(){try{var v=clean(localStorage.getItem(LS)||"");if(v)return v}catch(e){}return ckGet()};
  window.zsfNisayKey=function(){var k=nk();return isN(k)?k:""};
- var USAGE=["/v1/usage","/api/public/usage","/api/public/usage/live","/api/usage"];
+ var USAGE=["/api/public/usage/live","/api/public/usage","/v1/usage","/api/usage"];
  async function usageAll(key){var log=[],i,r,t,u,hs;
   var tryOne=async function(url,h){var ac=new AbortController(),tm=setTimeout(function(){ac.abort()},15000);
    try{var rr=await of.call(window,url,{headers:h,signal:ac.signal,cache:"no-store"});var tt="";try{tt=await rr.text()}catch(e){}return {ok:rr.ok,status:rr.status,text:tt}}
@@ -185,7 +185,15 @@
     if(r.ok&&!/^\s*</.test(r.text||""))return {ok:true,res:r,log:log};
     log.push(USAGE[i]+(h===1?"?key":"")+" -> "+(r.status||"network")+(r.text?" "+String(r.text).slice(0,60).replace(/\s+/g," "):""));
     if(r.status===0&&h===0){break}
-    if(r.status===404)break}}
+    if(r.status===404&&!/key/i.test(r.text||""))break}}
+  /* V24.4 : បើ usage មិនបាន → សាកបកប្រែពាក្យ "hello" ១ដង ដើម្បីដឹងថា Key ប្រើបាន ឬអត់ */
+  try{var ac2=new AbortController(),tm2=setTimeout(function(){ac2.abort()},20000);
+   var tr=await of.call(window,GW+"/v1/translate",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key},body:JSON.stringify({text:"hello",source_lang:"auto",target_lang:"km",model:trModel()}),signal:ac2.signal});
+   var trt="";try{trt=await tr.text()}catch(e5){}clearTimeout(tm2);
+   if(tr.ok&&!/^\s*/.test(trt))return {ok:true,res:{ok:true,status:200,text:'{"note":"translate OK"}'},log:log};
+   log.push("/v1/translate test -> "+tr.status+" "+String(trt).slice(0,80).replace(/\s+/g," "));
+   if(tr.status===401||tr.status===403)r={ok:false,status:tr.status,text:trt};
+  }catch(e4){log.push("/v1/translate test -> "+String(e4&&e4.message||e4))}
   if(r&&r.status===0){try{var pr=await of.call(window,GW+"/v1/usage",{mode:"no-cors",cache:"no-store"});log.push("probe no-cors: OK type="+pr.type+" (network+SSL good; CORS/header blocks)")}catch(e2){log.push("probe no-cors: FAIL "+String(e2&&e2.message||e2)+" (network/SSL blocks)")}
    try{log.push("origin="+String(location.origin)+" proto="+String(location.protocol))}catch(e3){}}
   return {ok:false,res:r,log:log}}
@@ -7280,7 +7288,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="24.3";
+  var EMB="24.4";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
