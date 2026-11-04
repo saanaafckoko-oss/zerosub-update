@@ -79,40 +79,91 @@
  /* ---------- UI : ប្រអប់ Key បង់ប្រាក់ ---------- */
  function find(o,names,d){d=d||0;if(!o||typeof o!=="object"||d>4)return undefined;var k,v;for(k in o){if(names.indexOf(k.toLowerCase())>=0&&o[k]!=null&&typeof o[k]!=="object")return o[k]}for(k in o){v=find(o[k],names,d+1);if(v!==undefined)return v}}
  function fmt(j,raw){
-  var used=find(j,["usedtokens","used_tokens","used","tokensused"]),tot=find(j,["totalquota","total_quota","quota","tokenlimit","token_limit","limit","total"]),rem=find(j,["remaining","remainingtokens","remaining_tokens","left"]),exp=find(j,["expiresat","expires_at","expiry"]),rpm=find(j,["ratelimitrpm","rpm"]),L=[],n=function(x){return isFinite(+x)?(+x).toLocaleString("en-US"):String(x)};
+  var used=find(j,["usedtokens","used_tokens","used","tokensused","usedquota","used_quota","consumed"]),tot=find(j,["totalquota","total_quota","quota","tokenlimit","token_limit","limit","total"]),rem=find(j,["remaining","remainingtokens","remaining_tokens","left","balance","credits","credit","remainingquota","remaining_quota","tokensremaining","tokens_remaining"]),exp=find(j,["expiresat","expires_at","expiry"]),rpm=find(j,["ratelimitrpm","rpm"]),L=[],n=function(x){return isFinite(+x)?(+x).toLocaleString("en-US"):String(x)};
   if(rem===undefined&&isFinite(+used)&&isFinite(+tot))rem=+tot-+used;
   if(used!==undefined)L.push("ប្រើរួច: "+n(used));if(tot!==undefined)L.push("សរុប: "+n(tot));if(rem!==undefined)L.push("នៅសល់: "+n(rem));
   if(exp!==undefined){var dt=new Date(exp);L.push("ផុតកំណត់: "+(isNaN(dt)?exp:dt.toLocaleDateString("en-GB")))}
   if(rpm!==undefined)L.push("Rate: "+rpm+" req/min");
   return L.length?"✅ "+L.join("  •  "):"✅ Key ដំណើរការ\n"+String(raw).slice(0,300)}
+ /* V23.4 : Key NISAY — រក្សាទុកជាប់ (localStorage + Cookie + IndexedDB + Slot Gemini), រក្សាទុកស្វ័យប្រវត្តិ, ពិនិត្យ Token បង្ហាញលទ្ធផល/មូលហេតុបរាជ័យ */
+ var CK="zsf_nisay";
+ function clean(v){return String(v||"").replace(/[\s\u200b-\u200d\u2060\ufeff]/g,"").replace(/^nisay-/i,"nisay-")}
+ function ckGet(){try{var m=document.cookie.match(new RegExp("(?:^|; )"+CK+"=([^;]*)"));return m?clean(decodeURIComponent(m[1])):""}catch(e){return ""}}
+ function ckSet(v){try{document.cookie=CK+"="+(v?encodeURIComponent(v):"")+"; max-age="+(v?34560000:0)+"; path=/; SameSite=Lax"}catch(e){}}
+ function idb(op,v,cb){try{var q=indexedDB.open("zsf_nisay_db",1);q.onupgradeneeded=function(){q.result.createObjectStore("kv")};q.onerror=function(){cb&&cb("")};
+  q.onsuccess=function(){try{var db=q.result,t=db.transaction("kv",op==="get"?"readonly":"readwrite"),st=t.objectStore("kv");
+   if(op==="get"){var g=st.get("k");g.onsuccess=function(){cb&&cb(g.result||"")};g.onerror=function(){cb&&cb("")}}
+   else{if(v)st.put(v,"k");else st.delete("k");t.oncomplete=function(){cb&&cb()}}}catch(e){cb&&cb("")}}}catch(e){cb&&cb("")}}
+ function persist(v){v=clean(v);try{if(v)localStorage.setItem(LS,v);else localStorage.removeItem(LS)}catch(e){}ckSet(v);idb("set",v)}
+ /* ស្តារ Key បើ localStorage ត្រូវលុប (ពី Cookie ឬ IndexedDB) */
+ var __rest=false;
+ function restore(cb){var k=nk();if(isN(k)){cb(k);return}k=ckGet();if(isN(k)){try{localStorage.setItem(LS,k)}catch(e){}cb(k);return}
+  idb("get",null,function(x){x=clean(x);if(isN(x)){try{localStorage.setItem(LS,x)}catch(e){}ckSet(x);cb(x)}else cb("")})}
+ nk=function(){try{var v=clean(localStorage.getItem(LS)||"");if(v)return v}catch(e){}return ckGet()};
+ window.zsfNisayKey=function(){var k=nk();return isN(k)?k:""};
+ var USAGE=["/api/public/usage","/api/usage","/v1/usage"];
+ async function usageAll(key){var log=[],i,r,t,u,hs;
+  var tryOne=async function(url,h){var ac=new AbortController(),tm=setTimeout(function(){ac.abort()},15000);
+   try{var rr=await of.call(window,url,{headers:h,signal:ac.signal,cache:"no-store"});var tt="";try{tt=await rr.text()}catch(e){}return {ok:rr.ok,status:rr.status,text:tt}}
+   catch(e){return {ok:false,status:0,text:(e&&e.name==="AbortError")?"timeout 15s":String(e&&e.message||e)}}finally{clearTimeout(tm)}};
+  for(i=0;i!==USAGE.length;i++){u=GW+USAGE[i];
+   hs=[{Authorization:"Bearer "+key},null,{"x-api-key":key}];
+   for(var h=0;h!==hs.length;h++){
+    r=await tryOne(h===1?u+"?key="+encodeURIComponent(key):u,hs[h]||{});
+    if(r.ok)return {ok:true,res:r,log:log};
+    log.push(USAGE[i]+(h===1?"?key":"")+" -> "+(r.status||"network")+(r.text?" "+String(r.text).slice(0,60).replace(/\s+/g," "):""));
+    if(r.status===0&&h===0){break}
+    if(r.status===404)break}}
+  return {ok:false,res:r,log:log}}
+ function fmt2(j,raw){var o=fmt(j,raw);return o}
  function build(){
   var mk=document.getElementById("mk"),keys=document.getElementById("keys");
   if(!mk||!keys||!keys.querySelector("input"))return false;
   if(document.getElementById("zsfNisay"))return true;
   var box=document.createElement("div");box.id="zsfNisay";box.style.cssText="margin-top:14px;padding-top:12px;border-top:1px dashed rgba(128,128,128,.45)";
-  box.innerHTML='div style="font-weight:800;font-size:16px">💳 Key បង់ប្រាក់ (NISAY)/div>'
-   +'div class="slot" style="margin-top:8px">input type="password" id="zsfNisayIn" placeholder="nisay-int-..." autocomplete="off">button class="b" id="zsfNisaySave" type="button">រក្សាទុក/button>/div>'
-   +'button class="b" id="zsfNisayChk" type="button" style="width:100%;margin-top:8px">📊 ពិនិត្យ Token នៅសល់/button>'
-   +'div id="zsfNisayStat" style="font-size:13px;margin-top:6px;line-height:1.6;white-space:pre-line">/div>'
-   +'div style="font-size:12px;opacity:.7;margin-top:4px;line-height:1.6">ℹ️ កន្លែងដាក់ Key បង់ប្រាក់ (ចាប់ផ្តើម nisay-int-) ។ ប្រើជំនួស Key Gemini សម្រាប់បកប្រែ និងទាញអក្សរ។ បើគ្មាន Key Groq វានឹងស្តាប់សំឡេងដោយ NISAY ។/div>';
+  box.innerHTML='div style="font-weight:800;font-size:16px">\ud83d\udcb3 Key \u1794\u1784\u17cb\u1794\u17d2\u179a\u17b6\u1780\u17cb (NISAY)/div>'
+   +'div class="slot" style="margin-top:8px">input type="password" id="zsfNisayIn" placeholder="nisay-int-..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">button class="b" id="zsfNisayEye" type="button" title="show/hide" style="flex:0 0 auto;padding:0 12px">\ud83d\udc41/button>button class="b" id="zsfNisayTest" type="button" style="flex:0 0 auto;padding:0 12px">Test/button>button class="b" id="zsfNisaySave" type="button">\u179a\u1780\u17d2\u179f\u17b6\u1791\u17bb\u1780/button>/div>'
+   +'button class="b" id="zsfNisayChk" type="button" style="width:100%;margin-top:8px">\ud83d\udcca \u1796\u17b7\u1793\u17b7\u178f\u17d2\u1799 Token \u1793\u17c5\u179f\u179b\u17cb/button>'
+   +'div id="zsfNisayStat" style="font-size:13px;margin-top:6px;line-height:1.6;white-space:pre-line;word-break:break-word;min-height:20px">/div>'
+   +'div style="font-size:12px;opacity:.7;margin-top:4px;line-height:1.6">\u2139\ufe0f \u1780\u1793\u17d2\u179b\u17c2\u1784\u178a\u17b6\u1780\u17cb Key \u1794\u1784\u17cb\u1794\u17d2\u179a\u17b6\u1780\u17cb (\u1785\u17b6\u1794\u17cb\u1795\u17d2\u178f\u17be\u1798 nisay-int-) \u17d4 Key \u1793\u17b9\u1784\u178f\u17d2\u179a\u17bc\u179c\u1794\u17b6\u1793\u179a\u1780\u17d2\u179f\u17b6\u1791\u17bb\u1780\u179f\u17d2\u179c\u17d0\u1799\u1794\u17d2\u179a\u179c\u178f\u17d2\u178f\u17b7 \u1796\u17c1\u179b\u178a\u17b6\u1780\u17cb\u1785\u17bc\u179b \u17d4 \u1794\u17d2\u179a\u17be\u1787\u17c6\u1793\u17bd\u179f Key Gemini \u179f\u1798\u17d2\u179a\u17b6\u1794\u17cb\u1794\u1780\u1794\u17d2\u179a\u17c2 \u1793\u17b7\u1784\u1791\u17b6\u1789\u17a2\u1780\u17d2\u179f\u179a\u17d4 \u1794\u17be\u1782\u17d2\u1798\u17b6\u1793 Key Groq \u179c\u17b6\u1793\u17b9\u1784\u179f\u17d2\u178f\u17b6\u1794\u17cb\u179f\u17c6\u17a1\u17c1\u1784\u178a\u17c4\u1799 NISAY \u17d4/div>';
   mk.parentNode.insertBefore(box,mk.nextSibling);
-  var inp=document.getElementById("zsfNisayIn"),stat=function(t){document.getElementById("zsfNisayStat").textContent=t};
-  function setSlot(v){var ins=keys.querySelectorAll("input"),t=null,i;for(i=0;iins.length;i++)if(isN(ins[i].value)){t=ins[i];break}
-   if(!t&&v){for(i=0;iins.length;i++)if(!ins[i].value.trim()){t=ins[i];break}}
-   if(!t)return !v;t.value=v;t.dispatchEvent(new Event("change"));return true}
-  inp.value=nk();if(isN(inp.value))setSlot(inp.value);
-  document.getElementById("zsfNisaySave").onclick=function(){
-   var v=inp.value.trim();
-   if(v&&!isN(v)){stat("❌ Key ត្រូវចាប់ផ្តើមដោយ nisay-");return}
-   try{if(v)localStorage.setItem(LS,v);else localStorage.removeItem(LS)}catch(e){}
-   var ok=setSlot(v);stat(v?(ok?"✅ បានរក្សាទុក Key បង់ប្រាក់":"⚠️ បានរក្សាទុក ប៉ុន្តែ Slot Gemini ពេញ — សូមលុប Key ១ ចេញ"):"🗑 បានលុប Key បង់ប្រាក់")};
-  document.getElementById("zsfNisayChk").onclick=async function(){
-   var k=nk();if(!isN(k)){stat("សូមរក្សាទុក Key ជាមុន");return}
-   stat("⏳ កំពុងពិនិត្យ...");var r=await usage(k),t="";try{t=await r.text()}catch(e){}
-   if(!r.ok){stat("❌ មិនបាន ("+(r.status||"network")+") "+String(t).slice(0,150));return}
-   var j=null;try{j=JSON.parse(t)}catch(e){}stat(fmt(j,t))};
+  var inp=document.getElementById("zsfNisayIn");
+  inp.value=nk();
+  if(!inp.value)restore(function(k){var i2=document.getElementById("zsfNisayIn");if(k&&i2&&!i2.value){i2.value=k;setSlot(k);stat("\u2705 \u179f\u17d2\u178f\u17b6\u179a Key \u1794\u17b6\u1793\u179c\u17b7\u1789")}});
+  else setSlot(inp.value);
   return true}
- var tries=0,iv=setInterval(function(){tries++;var ok=false;try{ok=build()}catch(e){}if(ok||tries>200)clearInterval(iv)},300);
+ function stat(t){var e=document.getElementById("zsfNisayStat");if(e)e.textContent=t}
+ function setSlot(v){var keys=document.getElementById("keys");if(!keys)return true;var ins=keys.querySelectorAll("input"),t=null,i;for(i=0;i!==ins.length;i++)if(isN(ins[i].value)){t=ins[i];break}
+  if(!t&&v){for(i=0;i!==ins.length;i++)if(!ins[i].value.trim()){t=ins[i];break}}
+  if(!t)return !v;if(t.value!==v){t.value=v;t.dispatchEvent(new Event("change"))}return true}
+ function doSave(silent){var inp=document.getElementById("zsfNisayIn");if(!inp)return "";var v=clean(inp.value);inp.value=v;
+  if(v&&!isN(v)){stat("\u274c Key \u178f\u17d2\u179a\u17bc\u179c\u1785\u17b6\u1794\u17cb\u1795\u17d2\u178f\u17be\u1798\u178a\u17c4\u1799 nisay-");return ""}
+  persist(v);var ok=setSlot(v);
+  if(!silent)stat(v?(ok?"\u2705 \u1794\u17b6\u1793\u179a\u1780\u17d2\u179f\u17b6\u1791\u17bb\u1780 Key \u1794\u1784\u17cb\u1794\u17d2\u179a\u17b6\u1780\u17cb (\u1787\u17b6\u1794\u17cb\u179a\u17a0\u17bc\u178f)":"\u26a0\ufe0f \u1794\u17b6\u1793\u179a\u1780\u17d2\u179f\u17b6\u1791\u17bb\u1780 \u1794\u17c9\u17bb\u1793\u17d2\u178f\u17c2 Slot Gemini \u1796\u17c1\u1789 \u2014 \u179f\u17bc\u1798\u179b\u17bb\u1794 Key \u17e1 \u1785\u17c1\u1789"):"\ud83d\uddd1 \u1794\u17b6\u1793\u179b\u17bb\u1794 Key \u1794\u1784\u17cb\u1794\u17d2\u179a\u17b6\u1780\u17cb");
+  return v}
+ async function doCheck(){var okk=false,btn=document.getElementById("zsfNisayChk"),inp=document.getElementById("zsfNisayIn");
+  var v=doSave(true);if(!v){var k0=nk();if(isN(k0))v=k0}
+  if(!isN(v)){stat("\u274c \u179f\u17bc\u1798\u178a\u17b6\u1780\u17cb Key \u1785\u17b6\u1794\u17cb\u1795\u17d2\u178f\u17be\u1798 nisay- \u1787\u17b6\u1798\u17bb\u1793\u179f\u17b7\u1793");return}
+  if(btn){btn.disabled=true}stat("\u23f3 \u1780\u17c6\u1796\u17bb\u1784\u1796\u17b7\u1793\u17b7\u178f\u17d2\u1799...");
+  try{var R=await usageAll(v);
+   if(R.ok){okk=true;var t=R.res.text,j=null;try{j=JSON.parse(t)}catch(e){}var o=fmt(j,t);stat(o)}
+   else{var st=R.res&&R.res.status;var why=st===401||st===403?"Key \u1798\u17b7\u1793\u178f\u17d2\u179a\u17b9\u1798\u178f\u17d2\u179a\u17bc\u179c \u17ac\u17a0\u17bd\u179f\u1780\u17c6\u178e\u178f\u17cb":st===0?"\u1798\u17b7\u1793\u17a2\u17b6\u1785\u1797\u17d2\u1787\u17b6\u1794\u17cb api.nisay.store (\u17a2\u17ca\u17b8\u1793\u1792\u17ba\u178e\u17c2\u178f/VPN/CORS)":st===404?"\u179a\u1780\u1782\u17d2\u1798\u17b6\u1793 endpoint \u1796\u17b7\u1793\u17b7\u178f\u17d2\u1799 Token":"\u1798\u17b6\u1793\u1794\u1789\u17d2\u17a0\u17b6\u1796\u17b8 Server";
+    stat("\u274c \u1796\u17b7\u1793\u17b7\u178f\u17d2\u1799\u1798\u17b7\u1793\u1794\u17b6\u1793: "+why+"\n"+R.log.join("\n"))}}
+  catch(e){stat("\u274c \u1780\u17c6\u17a0\u17bb\u179f: "+String(e&&e.message||e))}
+  finally{if(btn)btn.disabled=false}return okk}
+ async function doTest(b){b.disabled=true;b.textContent="\u2026";var ok=false;try{ok=await doCheck()}catch(e){}b.disabled=false;b.textContent=ok?"\u2714":"\u2718";setTimeout(function(){var x=document.getElementById("zsfNisayTest");if(x)x.textContent="Test"},6000)}
+ /* Event delegation (capture) — ដំណើរការទោះ Panel ត្រូវបង្កើតឡើងវិញ */
+ if(!window.__zsfNisayEv){window.__zsfNisayEv=1;
+  document.addEventListener("click",function(e){var t=e.target&&e.target.closest?e.target.closest("#zsfNisaySave,#zsfNisayChk,#zsfNisayEye,#zsfNisayTest"):null;if(!t)return;
+   e.preventDefault();e.stopPropagation();
+   if(t.id==="zsfNisaySave")doSave(false);else if(t.id==="zsfNisayChk")doCheck();else if(t.id==="zsfNisayTest")doTest(t);
+   else{var i=document.getElementById("zsfNisayIn");if(i)i.type=i.type==="password"?"text":"password"}},true);
+  var __at=null,sv=function(e){var i=e.target;if(!i||i.id!=="zsfNisayIn")return;clearTimeout(__at);__at=setTimeout(function(){var v=clean(i.value);if(isN(v)){persist(v);setSlot(v);stat("\u2705 \u1794\u17b6\u1793\u179a\u1780\u17d2\u179f\u17b6\u1791\u17bb\u1780\u179f\u17d2\u179c\u17d0\u1799\u1794\u17d2\u179a\u179c\u178f\u17d2\u178f\u17b7")}},500)};
+  document.addEventListener("input",sv,true);document.addEventListener("change",sv,true);document.addEventListener("blur",function(e){if(e.target&&e.target.id==="zsfNisayIn"){var v=clean(e.target.value);if(isN(v))persist(v)}},true);
+  window.addEventListener("pagehide",function(){var i=document.getElementById("zsfNisayIn");if(i){var v=clean(i.value);if(isN(v))persist(v)}});
+  document.addEventListener("visibilitychange",function(){var i=document.getElementById("zsfNisayIn");if(i&&document.visibilityState==="hidden"){var v=clean(i.value);if(isN(v))persist(v)}})}
+ /* ពិនិត្យជាប់ជានិច្ច ៖ បើ Panel ត្រូវលុប/បង្កើតឡើងវិញ → បង្កើតប្រអប់ Key ម្តងទៀត + ស្តារតម្លៃ */
+ setInterval(function(){try{build()}catch(e){}},1500);try{build()}catch(e){}
 })();
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
@@ -1141,6 +1192,20 @@ function ttsPick(){const L=ttsList(),now=Date.now();let ok=L.filter(u=>!(__ttsH[
  return ok[(__ttsRR++)%ok.length]}
 function ttsBad(u,st){const h=__ttsH[u]=__ttsH[u]||{fail:0,until:0};h.fail++;h.until=Date.now()+Math.min(600000,60000*h.fail*((st===429||st===403)?2:1))}
 function ttsGood(u){if(__ttsH[u]){__ttsH[u].fail=0;__ttsH[u].until=0}}
+/* V23.3 : TTS ស្របគ្នា — Server នីមួយៗអានបានច្រើនឃ្លាក្នុងពេលតែមួយ (លំនាំដើម 5); Server ណាចប់មុន ចាប់ឃ្លាបន្ទាប់ពីជួររួមភ្លាម រហូតចប់ទាំងអស់ */
+function ttsPer(){try{const v=parseInt(localStorage.getItem("zsf_tts_per")||"5",10);if(v>=1&&10>=v)return v}catch(e){}return 5}
+const __ttsBusy={},__ttsWait=[];
+function ttsTryAcquire(ex){
+ const L=ttsList(),now=Date.now(),P=ttsPer(),e=(ex&&L.every(u=>ex.has(u)))?null:ex;
+ const c=L.filter(u=>!(e&&e.has(u))&&P>(__ttsBusy[u]||0));
+ if(!c.length)return null;
+ const ok=c.filter(u=>!(__ttsH[u]&&__ttsH[u].until>now));
+ const pool=ok.length?ok:[c.slice().sort((a,b)=>((__ttsH[a]||{}).until||0)-((__ttsH[b]||{}).until||0))[0]];
+ const m=Math.min.apply(null,pool.map(u=>__ttsBusy[u]||0)),best=pool.filter(u=>(__ttsBusy[u]||0)===m);
+ const u=best[(__ttsRR++)%best.length];__ttsBusy[u]=(__ttsBusy[u]||0)+1;return u}
+function ttsAcquire(ex){return new Promise(res=>{const u=ttsTryAcquire(ex);if(u)return res(u);__ttsWait.push({ex,res})})}
+function ttsRelease(u){__ttsBusy[u]=Math.max(0,(__ttsBusy[u]||0)-1);
+ let i=0;while(i!==__ttsWait.length){const w=__ttsWait[i],g=ttsTryAcquire(w.ex);if(g){__ttsWait.splice(i,1);w.res(g)}else i++}}
 (function(){const t=document.getElementById("ttsUrls");if(!t)return;try{t.value=localStorage.getItem("zsf_tts_urls")||""}catch(e){}
  const inf=document.getElementById("ttsUrlsInfo"),upd=()=>{if(inf)inf.textContent="TTS Server សរុប ៖ "+ttsList().length};
  t.addEventListener("input",()=>{try{localStorage.setItem("zsf_tts_urls",t.value)}catch(e){}upd()});upd()})();let ttsAudio=null;
@@ -1928,18 +1993,18 @@ function stretchRaw(raw,tempo){
 /* ===== v21 : TTS លឿន + ច្បាស់ ៖ retry, cache (មិនបង្កើតឃ្លាដដែលពីរដង), កាត់ស្ងាត់ដើម/ចុង, WSOLA ក្នុង JS (មិនរង់ចាំ FFmpeg) ===== */
 const TTS_CONC=14,TTS_TRIES=3,__ttsCache=new Map(),__sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function ttsRaw(text,slot,speed,pitch){
- const voice=voiceOfSlot(slot);let lastErr;
+ const voice=voiceOfSlot(slot);let lastErr;const ex=new Set();
  const TT=Math.min(6,Math.max(TTS_TRIES,ttsList().length+1));
- for(let n=0;nTT;n++){
-  const url=ttsPick(),ac=new AbortController(),tm=setTimeout(()=>ac.abort(),30000);
+ for(let n=0;n!==TT;n++){
+  const url=await ttsAcquire(ex),ac=new AbortController(),tm=setTimeout(()=>ac.abort(),30000);let stop=false;
   try{
    const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,voice,rate:speed,pitch}),signal:ac.signal});
    if(!r.ok){let m="";try{m=(await r.json()).error}catch(e){}const er=new Error(m||("HTTP "+r.status));er.status=r.status;throw er}
-   const ab=await r.arrayBuffer();if(ab.byteLength200)throw new Error("សំឡេងទទេ");ttsGood(url);return ab;
-  }catch(e){lastErr=e;const st=e.status;if(!st||st>=500||st===429||st===403||st===401||st===408)ttsBad(url,st);
-   if(st>=400&&st500&&st!==429&&st!==408&&!((st===401||st===403)&&ttsList().length>1))break;await __sleep(120*(n+1)+Math.random()*120)}
-  finally{clearTimeout(tm)}
- }
+   const ab=await r.arrayBuffer();if(200>ab.byteLength)throw new Error("សំឡេងទទេ");ttsGood(url);return ab;
+  }catch(e){lastErr=e;const st=e.status;ex.add(url);if(!st||st>=500||st===429||st===403||st===401||st===408)ttsBad(url,st);
+   if(st>=400&&500>st&&st!==429&&st!==408&&!((st===401||st===403)&&ttsList().length>1))stop=true}
+  finally{clearTimeout(tm);ttsRelease(url)}
+  if(stop)break;await __sleep(120*(n+1)+Math.random()*120)}
  throw lastErr}
 /* កាត់ស្ងាត់ដើម/ចុង (-47dB) ទុក 25ms ដើម និង 50ms ចុង + fade 8ms ៖ ឃ្លាចាប់ផ្តើមត្រង់ពេល SRT ពិតៗ មិនយឺត ហើយប្រើ Auto Speed តិចជាងមុន */
 function trimSilence(buf){
@@ -2093,7 +2158,8 @@ async function buildDub(btn){
    done++;btn.textContent=`🎙 កំពុងបង្កើតសំឡេងខ្មែរ ${done}/${jobs.length}`;
   }
  }
- await Promise.all(Array.from({length:Math.max(1,Math.min(TTS_CONC,jobs.length))},wk));
+ const __NW=Math.max(TTS_CONC,ttsList().length*(ttsPer()+1));
+ await Promise.all(Array.from({length:Math.max(1,Math.min(__NW,jobs.length))},wk));
  out.sort((a,b)=>a.q.s-b.q.s);
  return{out,fail,sped,total:jobs.length};
 }
@@ -7138,7 +7204,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="23.2";
+  var EMB="23.5";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
