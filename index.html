@@ -176,7 +176,7 @@
   return true}
  function stat(t){var e=document.getElementById("zsfNisayStat");if(e)e.textContent=t}
  function setSlot(v){var keys=document.getElementById("keys");if(!keys)return true;var ins=keys.querySelectorAll("input"),t=null,i;for(i=0;i!==ins.length;i++)if(isN(ins[i].value)){t=ins[i];break}
-  if(!t&&v){for(i=0;i!==ins.length;i++)if(!ins[i].value.trim()){t=ins[i];break}}
+  if(!t&&v){if(ins.length>=11&&!ins[10].value.trim())t=ins[10];else for(i=0;i!==ins.length;i++)if(!ins[i].value.trim()){t=ins[i];break}}
   if(!t)return !v;if(t.value!==v){t.value=v;t.dispatchEvent(new Event("change"))}return true}
  function doSave(silent){var inp=document.getElementById("zsfNisayIn");if(!inp)return "";var v=clean(inp.value);inp.value=v;
   if(v&&!isN(v)){stat("\u274c Key \u178f\u17d2\u179a\u17bc\u179c\u1785\u17b6\u1794\u17cb\u1795\u17d2\u178f\u17be\u1798\u178a\u17c4\u1799 nisay- / sk-");return ""}
@@ -925,7 +925,7 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
  button class="b vio big" id="tagBtn" style="margin-top:10px;padding:14px;font-size:16px">🎭 ចាប់ប្រុស/ស្រី [1]-[4] (Gemini ស្តាប់សំឡេង)/button>
  div id="gbox" class="card in hide">
   div class="chips2" id="gm" style="margin-bottom:6px">/div>
-  div class="row" style="align-items:center">div class="t ktitle" style="margin:0;font-size:17px;flex:2">🔑 Gemini API Keys (Slot ១-១០)/div>span class="badge" style="color:#34d399;border-color:#34d399;flex:none" id="kcount">0/10 បានកំណត់/span>/div>
+  div class="row" style="align-items:center">div class="t ktitle" style="margin:0;font-size:17px;flex:2">🔑 Gemini API Keys (Slot ១-១១)/div>span class="badge" style="color:#34d399;border-color:#34d399;flex:none" id="kcount">0/11 បានកំណត់/span>/div>
   div class="row wrap" id="keys" style="gap:10px 16px">/div>
   button class="b sel" style="width:100%;color:#6aa5ff;border-color:#3b73f0;box-shadow:none" id="mk">លីងបង្កើត Key Gemini span class="il">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/>path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>/svg>/span>/button>
   div class="row" style="align-items:center;margin-top:14px">div class="t rpt" style="margin:0">span>ជំនួសពាក្យស្វ័យប្រវត្តិ (span id="rpn">0/span>)/span>/div>button class="b rpb" id="rpIn">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M12 3v12M7 10.5l5 5 5-5M4.5 20h15"/>/svg> នាំចូល/button>button class="b rpb" id="rpOut">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M12 16V4M7 8.5l5-5 5 5M4.5 20h15"/>/svg> នាំចេញ/button>/div>
@@ -1080,9 +1080,9 @@ genView();slots();steps();
 /* gemini panel */
 const GM=[["3.1 Flash-Lite","gemini-3.1-flash-lite"],["3.1 Pro","gemini-3.1-pro"],["3.8 Flash","gemini-3.8-flash"],["3.7 Flash","gemini-3.7-flash"],["3.5 Flash-Lite","gemini-3.5-flash-lite"],["3.6 Flash","gemini-3.6-flash"],["3.5 Flash","gemini-3.5-flash"]];{const _g=S.get("gmid",null),_i=GM.findIndex(m=>m[1]===_g);if(_i>=0)gmodel=_i}
 const gmHtml=()=>GM.map((m,i)=>`button class="b pill ${i===gmodel?"on":""}">${i===gmodel?ICO.checkc+" ⚡ ":""}${/Pro/.test(m[0])?"💎 ":""}${m[0]}/button>`).join("");function gms(){$("#gm").innerHTML=gmHtml();S.set("gmid",GM[gmodel][1]);$$("#gm .b").forEach((b,i)=>b.onclick=()=>{gmodel=i;gms()})}gms();
-let K=S.get("gk",Array(10).fill(""));
+let K=S.get("gk",Array(10).fill(""));if(!Array.isArray(K))K=Array(10).fill("");while(K.length11)K.push("");
 $("#keys").innerHTML=K.map((x,i)=>`div class="slot" style="flex:0 0 46%">b>${i+1}/b>input type="password" data-i="${i}" value="${x}" placeholder="••••••••">button class="b" data-t="${i}">Test/button>/div>`).join("");
-const kc=()=>$("#kcount").textContent=K.filter(Boolean).length+"/10 បានកំណត់";kc();
+const kc=()=>$("#kcount").textContent=K.filter(Boolean).length+"/11 បានកំណត់";kc();
 $$("#keys input").forEach(e=>e.onchange=()=>{K[+e.dataset.i]=e.value.trim();S.set("gk",K);kc()});
 $$("#keys button").forEach(b=>b.onclick=async()=>{const k=K[+b.dataset.t];if(!k)return;b.textContent="…";try{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${k}`);b.textContent=r.ok?"✔":"✘"}catch{b.textContent="✘"}});
 $("#keyT").onclick=()=>{$("#gbox").classList.toggle("hide");$("#keyT").innerHTML=($("#gbox").classList.contains("hide")?ICO.down:ICO.up)+" Key Gemini"};
@@ -7246,7 +7246,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="23.8";
+  var EMB="23.9";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
