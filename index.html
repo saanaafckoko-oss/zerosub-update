@@ -23,7 +23,7 @@
    var sig=opt.signal;
    if(sig&&sig.aborted)return no(new DOMException("Aborted","AbortError"));
    var h={};try{var H=opt.headers;if(H){if(typeof Headers!=="undefined"&&H instanceof Headers){H.forEach(function(v,k){h[k]=v})}else Object.keys(H).forEach(function(k){h[k]=H[k]})}}catch(e){}
-   var method=String(opt.method||"GET").toUpperCase();
+   var method=String(opt.method||"GET").toUpperCase();if(!h["Accept"]&&!h["accept"])h["Accept"]="application/json";
    var prep;
    if(opt.body==null||method==="GET")prep=Promise.resolve("");
    else if(typeof opt.body==="string")prep=Promise.resolve(btoa(unescape(encodeURIComponent(opt.body))));
@@ -173,7 +173,7 @@
   idb("get",null,function(x){x=clean(x);if(isN(x)){try{localStorage.setItem(LS,x)}catch(e){}ckSet(x);cb(x)}else cb("")})}
  nk=function(){try{var v=clean(localStorage.getItem(LS)||"");if(v)return v}catch(e){}return ckGet()};
  window.zsfNisayKey=function(){var k=nk();return isN(k)?k:""};
- var USAGE=["/v1/usage","/api/public/usage","/api/usage"];
+ var USAGE=["/v1/usage","/api/public/usage","/api/public/usage/live","/api/usage"];
  async function usageAll(key){var log=[],i,r,t,u,hs;
   var tryOne=async function(url,h){var ac=new AbortController(),tm=setTimeout(function(){ac.abort()},15000);
    try{var rr=await of.call(window,url,{headers:h,signal:ac.signal,cache:"no-store"});var tt="";try{tt=await rr.text()}catch(e){}return {ok:rr.ok,status:rr.status,text:tt}}
@@ -7280,7 +7280,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="24.2";
+  var EMB="24.3";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
