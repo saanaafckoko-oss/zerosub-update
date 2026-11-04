@@ -2099,18 +2099,30 @@ async function buildDub(btn){
 }
 /* កំណត់ពេលចាក់ ៖ ចាប់ផ្តើមត្រង់ពេល SRT; បើឃ្លាមុនមិនទាន់ចប់ រង់ចាំវាចប់សិន (មិនឱ្យជាន់គ្នា) ។ ពេលនិយាយ BGM/សំឡេងដើម = 0% ក្រៅពីនោះតាម slider */
 
+/* V23.1: មិនឱ្យកន្ទុយជាន់ឃ្លាបន្ទាប់ — (១) ពន្លឿន WSOLA ឱ្យចុះក្នុងចន្លោះ (២) កាត់កន្ទុយ + fade-out ត្រង់ពេលចាប់ផ្តើមឃ្លាបន្ទាប់ (៣) ឃ្លាបន្ទាប់ចាប់ផ្តើមទាន់ពេល មិនត្រូវរង់ចាំយូរ */
+function zsfClipFade(buf,maxDur){
+ const sr=buf.sampleRate,n=Math.max(1,Math.floor(maxDur*sr));
+ if(n>=buf.length)return buf;
+ const nb=AC.createBuffer(buf.numberOfChannels,n,sr),f=Math.min(n,Math.floor(.07*sr));
+ for(let c=0;cbuf.numberOfChannels;c++){
+  const s=buf.getChannelData(c),d=nb.getChannelData(c);
+  for(let i=0;in;i++)d[i]=s[i];
+  for(let i=0;if;i++)d[n-1-i]*=i/f}
+ return nb}
 function zsfPlaceItems(items){
- /* V15.3: មិនជាន់ឃ្លា ១០០% — ពន្លឿនឃ្លាឱ្យចុះក្នុងចន្លោះមុន បើនៅតែវែង ឃ្លាបន្ទាប់ត្រូវរង់ចាំឃ្លាមុនចប់ជានិច្ច (មិនឱ្យកន្ទុយជាន់គ្នា) */
- const FM=zsfFit("fmax",1.6),ON=zsfFitOn(),DLY=zsfFit("delay",0),GAPL=zsfFit("gap2",.30),GAP=Math.min(GAPL,zsfFit("gapc",.10)),PUSH=zsfFit("push",.5);
+ const ON=zsfFitOn(),DLY=zsfFit("delay",0),GAPL=zsfFit("gap2",.30),GAP=Math.min(GAPL,zsfFit("gapc",.10)),PUSH=zsfFit("push",.25),HARD=(function(){try{return localStorage.getItem("zsf_tts_hard")!=="0"}catch(e){return true}})();
  let cursor=0,delayed=0,late=0,maxLate=0;const st=[];
  items.forEach((it,i)=>{
   const b0=it.buf0||(it.buf0=it.buf);let buf=b0,o0=Math.max(0,fxOn(it.q)+DLY);
   if(cursor>o0+.02){o0=Math.min(cursor,o0+PUSH);delayed++}
   const nx=items[i+1];
-  if(ON){const __nxs=nx?fxOn(nx.q)+DLY-GAPL:1e9,__ce=it.q.e+DLY+zsfFit("etail",.15),lim=Math.max(.3,Math.min(__nxs,__ce)-o0),dl=b0.duration;
-   if(dl>lim*1.02){const tt=it.tt||1,CAT=zsfFit("catch",1.6),cap=(dl<1.2?Math.min(CAT,1.35):CAT),al=Math.max(1,cap/Math.max(tt,1)),nd=Math.min(dl/lim,al);
-    if(nd>1.01){try{buf=wsolaStretch(b0,nd)}catch(e){buf=b0}}}}
-  it.buf=buf;st.push(o0);{const __ld=o0-(fxOn(it.q)+DLY);if(__ld>.25){late++;if(__ld>maxLate)maxLate=__ld}}cursor=o0+buf.duration+GAP});
+  if(ON){
+   const nxs=nx?fxOn(nx.q)+DLY:1e9,ce=it.q.e+DLY+zsfFit("etail",.15),lim=Math.max(.3,Math.min(nxs-GAPL,ce)-o0),dl=b0.duration;
+   if(dl>lim*1.02){
+    const tt=it.tt||1,CAT=zsfFit("catch",1.9),cap=(dl1.2?Math.min(CAT,1.5):CAT),al=Math.max(1,cap/Math.max(tt,1)),nd=Math.min(dl/lim,al);
+    if(nd>1.01){try{buf=wsolaStretch(b0,nd)}catch(e){buf=b0}}}
+   if(HARD&&nx){const room=nxs-GAP-o0;if(room>.25&&buf.duration>room+.02){try{buf=zsfClipFade(buf,room)}catch(e){}}}}
+  it.buf=buf;st.push(o0);{const ld=o0-(fxOn(it.q)+DLY);if(ld>.25){late++;if(ld>maxLate)maxLate=ld}}cursor=o0+buf.duration+GAP});
  window.__zsLate={n:late,max:maxLate,all:items.length};
  return{st,delayed}}
 function scheduleDub(items,t0,bus,bgG,base){
@@ -7126,7 +7138,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="23.0";
+  var EMB="23.1";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
