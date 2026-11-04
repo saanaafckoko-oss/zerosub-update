@@ -10,28 +10,37 @@
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
 script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"12.0";})();
-/* V24.1 : NISAY native bridge (OkHttp) — ប្រើតែពេល App មាន NisayNativeBridge; បើគ្មាន វាមិនប៉ះពាល់អ្វីទេ */
+/* V24.2 : NISAY native HTTP (ZSNative.httpCall) — WebView ហៅ api.nisay.store មិនបាន ទើបឆ្លងតាម Android; បើ APK ចាស់ វាមិនប៉ះពាល់អ្វីទេ */
 (function(){
  var of=window.fetch;if(!of||window.__nisayBridgeOn)return;window.__nisayBridgeOn=1;
- var CB={};
- window.nisayReceiveResponse=function(id,r){var c=CB[id];if(!c)return;delete CB[id];clearTimeout(c.t);
-  try{c.ok(new Response(String(r&&r.body!=null?r.body:""),{status:(r&&r.status)||500,headers:{"Content-Type":"application/json"}}))}catch(e){c.no(e)}};
+ function b64(buf){var u=new Uint8Array(buf),s="",i,C=32768;for(i=0;iu.length;i+=C)s+=String.fromCharCode.apply(null,u.subarray(i,i+C));return btoa(s)}
  window.fetch=function(res,opt){
-  opt=opt||{};
+  var args=arguments;opt=opt||{};
   var url=typeof res==="string"?res:(res&&res.url)||"";
-  var B=window.NisayNativeBridge;
-  if(!B||typeof B.callApi!=="function"||url.indexOf("https://api.nisay.store/")!==0)return of.apply(window,arguments);
-  var body=opt.body==null?null:opt.body;
-  if(body!==null&&typeof body!=="string")return of.apply(window,arguments); /* FormData/Blob មិនទាន់គាំទ្រ */
+  var N=window.ZSNative;
+  if(!N||typeof N.httpCall!=="function"||url.indexOf("https://api.nisay.store/")!==0)return of.apply(window,args);
   return new Promise(function(ok,no){
-   var id="r"+Date.now().toString(36)+Math.random().toString(36).slice(2);
+   var sig=opt.signal;
+   if(sig&&sig.aborted)return no(new DOMException("Aborted","AbortError"));
    var h={};try{var H=opt.headers;if(H){if(typeof Headers!=="undefined"&&H instanceof Headers){H.forEach(function(v,k){h[k]=v})}else Object.keys(H).forEach(function(k){h[k]=H[k]})}}catch(e){}
-   var t=setTimeout(function(){delete CB[id];no(new TypeError("Failed to fetch (timeout)"))},60000);
-   CB[id]={ok:ok,no:no,t:t};
-   if(opt.signal){if(opt.signal.aborted){clearTimeout(t);delete CB[id];return no(new DOMException("Aborted","AbortError"))}
-    opt.signal.addEventListener("abort",function(){if(CB[id]){clearTimeout(t);delete CB[id];no(new DOMException("Aborted","AbortError"))}})}
-   try{B.callApi(id,url,String(opt.method||"GET").toUpperCase(),JSON.stringify(h),body)}catch(e){clearTimeout(t);delete CB[id];no(new TypeError("Failed to fetch"))}
-  })};
+   var method=String(opt.method||"GET").toUpperCase();
+   var prep;
+   if(opt.body==null||method==="GET")prep=Promise.resolve("");
+   else if(typeof opt.body==="string")prep=Promise.resolve(btoa(unescape(encodeURIComponent(opt.body))));
+   else{var rq=new Request("https://x.invalid/",{method:"POST",body:opt.body});
+    var ct=rq.headers.get("content-type");if(ct&&!h["Content-Type"]&&!h["content-type"])h["Content-Type"]=ct;
+    prep=rq.arrayBuffer().then(b64)}
+   prep.then(function(bodyB64){
+    var cb="__nh_"+Date.now().toString(36)+Math.random().toString(36).slice(2),done=false;
+    function fin(f){if(done)return;done=true;try{delete window[cb]}catch(e){window[cb]=undefined}f()}
+    window[cb]=function(o){fin(function(){
+     var st=(o&&o.status)||0;
+     if(!st)return no(new TypeError("Failed to fetch: "+String(o&&o.body||"")));
+     var nb=(st===204||st===205||st===304)?null:String(o.body==null?"":o.body);
+     try{ok(new Response(nb,{status:st,headers:{"Content-Type":"application/json"}}))}catch(e){no(e)}})};
+    if(sig)sig.addEventListener("abort",function(){fin(function(){no(new DOMException("Aborted","AbortError"))})});
+    try{N.httpCall(JSON.stringify({url:url,method:method,headers:h,bodyB64:bodyB64}),cb)}catch(e){fin(function(){no(new TypeError("Failed to fetch"))})}
+   }).catch(no)})};
 })();/script>
 script id="zsf-nisay">/* ===== V21.9 : NISAY Gateway — Key បង់ប្រាក់ (api.nisay.store) ===== */
 (function(){
@@ -7271,7 +7280,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="24.1";
+  var EMB="24.2";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
