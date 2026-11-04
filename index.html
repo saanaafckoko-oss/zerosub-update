@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"1.1.1";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.0";})();/script>
 script id="zsf-nisay">/* ===== V21.9 : NISAY Gateway — Key បង់ប្រាក់ (api.nisay.store) ===== */
 (function(){
  var GW="https://api.nisay.store",LS="zsf_nisay_key",of=window.fetch;
@@ -6775,7 +6775,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"1.1.1",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.0",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -6823,7 +6823,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
         try{fetch(SRCS[i]+"version.txt?t="+Date.now(),{cache:"no-store",signal:ctl?ctl.signal:undefined}).then(function(r){clearTimeout(tm);return r.ok?r.text():""}).then(function(t){
           t=String(t||"").trim();
           if(!t||t.length>20||!/^\d+(\.\d+)*$/.test(t)){one(i+1);return;}
-          window.__zsfUpdBase=SRCS[i];REMV=t;if(!newer(t,ZSF_VER)){ss("zsfUpdTried",null);window.__zsfUpdErr="";fin("ok");}else fin("new");
+          window.__zsfUpdBase=SRCS[i];REMV=t;if(t===ZSF_VER){ss("zsfUpdTried",null);window.__zsfUpdErr="";fin("ok");}else fin("new");
         }).catch(function(){clearTimeout(tm);one(i+1)});}catch(e){clearTimeout(tm);one(i+1)}
       };
       one(0);
@@ -6865,7 +6865,8 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
     var html=w.slice(s0+12,s1).split("\uE000").join("");
     if(html.length100000||html.indexOf("ZERO SUB FLASH")0)throw new Error("ឯកសារដែលទាញមកមិនត្រឹមត្រូវ");
     if(!nv)throw new Error("ឯកសារដែលទាញមកមិនត្រឹមត្រូវ");
-    if(!newer(nv,ZSF_VER))throw new Error("GitHub មានតែ v"+nv+" — មិនថ្មីជាងកំណែបច្ចុប្បន្ន v"+ZSF_VER);
+    if(nv===ZSF_VER)throw new Error("កំណែ v"+nv+" ដូចគ្នានឹងកំណែបច្ចុប្បន្នរួចហើយ");
+    if(REMV&&nv!==REMV)throw new Error("GitHub មិនស៊ីគ្នា៖ index.html គឺ v"+nv+" តែ version.txt គឺ v"+REMV+" — សូមដាក់ឯកសារទាំងពីរលើ GitHub ឱ្យស៊ីគ្នា");
     await idbPut({ver:nv,html:html});
     try{localStorage.removeItem("zsf_upd_try")}catch(e){}
     return nv;
@@ -7021,7 +7022,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="1.1.1";
+  var EMB="25.0";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
@@ -7094,7 +7095,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   getCached(function(c){
     var t=tries(),use=false;
     if(window.__zsfDropOld){c=null}
-    if(c&&typeof c.html==="string"&&c.html.length>100000&&c.html.indexOf("zsf-boot")>0&&c.html.indexOf("ZERO SUB FLASH")>0&&c.ver&&newer(c.ver,EMB)){
+    if(c&&typeof c.html==="string"&&c.html.length>100000&&c.html.indexOf("zsf-boot")>0&&c.html.indexOf("ZERO SUB FLASH")>0&&c.ver&&c.ver!==EMB){
       if(t>=2){dropCached();setTries(0);} else {use=true;setTries(t+1);}
     }
     if(use){run(c.html,c.ver,true);return}
@@ -7140,12 +7141,12 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
     try{
       var v=String(await fetchT(FIRST_BASE+"version.txt?t="+Date.now(),9000)).trim();
       if(!v||v.length>20)throw new Error("bad version");
-      if(!newer(v,EMB)){firstMark();return null}
+      if(v===EMB){firstMark();return null}
       splash("កំពុងទាញយកកំណែថ្មី v"+v+"\nសូមរង់ចាំបន្តិច…",45);
       var w=await fetchT(FIRST_BASE+"index.html?t="+Date.now(),90000);
       var key='var EMB'+'="',k=w.lastIndexOf(key),nv=k<0?"":w.slice(k+key.length,w.indexOf('"',k+key.length));
       var s0=w.indexOf('id="zsfApp">'),s1=s0<0?-1:w.indexOf("<"+"/script>",s0);
-      if(s0<0||s1<0||!nv||!newer(nv,EMB))throw new Error("bad package");
+      if(s0<0||s1<0||!nv||nv!==v)throw new Error("bad package");
       var html=w.slice(s0+12,s1).split("").join("<");
       if(html.length<100000||html.indexOf("ZERO SUB FLASH")<0||html.indexOf("zsf-boot")<0)throw new Error("bad html");
       splash("កំពុងរៀបចំកំណែ v"+nv+"…",90);
