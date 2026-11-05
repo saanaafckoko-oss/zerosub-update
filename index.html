@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.47";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.48";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -2004,7 +2004,7 @@ async function dubAudio(text,slot,p,slotD){
   if(!(slotD>0)||r0.boost||r0.buf.duration>slotD*.88)return r0;
   const bt=window.zsfBreath?window.zsfBreath(text,true):text;if(bt===text)return r0;
   const r1=await dubAudioCore(bt,slot,p,slotD);
-  if(!r1.boost&&r1.tt<=r0.tt*1.02&&r1.buf.duration<=slotD*.97)return r1;
+  if(!r1.boost&&r1.tt=r0.tt*1.02&&r1.buf.duration=slotD*.97)return r1;
  }catch(e){}
  return r0}
 async function dubAudioCore(text,slot,p,slotD){
@@ -2276,7 +2276,7 @@ async function fxPickAudio(){
 const fxCopy=d=>{if(!d)return null;return d.byteLength!==undefined&&d.buffer?new Uint8Array(d.buffer.slice(d.byteOffset,d.byteOffset+d.byteLength)):new Uint8Array(d.slice(0))};
 /* ទីតាំងចាក់សំឡេងខ្មែរ (ដូច scheduleDub ៖ មិនឱ្យជាន់គ្នា) */
 /* V15.5: តម្រឹមសំឡេងខ្មែរតាមពេលតួអង្គចាប់ផ្តើមនិយាយពិត (_on ពីការវិភាគសំឡេងវីដេអូ) ។ ប្រើតែពេល SRT មកមុនសំឡេងដើម ១០០ms–onmax(1.0s) ហើយមិនដែលចាប់ផ្តើមមុនម៉ោង SRT ទេ ។ បើវាស់មិនបាន/មិនច្បាស់ → ត្រឡប់ម៉ោង SRT ដើម ។ បិទដោយ localStorage zsf_tts_onmax=0 */
-const fxOn=q=>{try{const on=q._on,off=q._off,mx=zsfFit("onmax",1.0);if(mx>0&&on!=null&&isFinite(on)){const d=on-q.s;if(d>=.1&&d<=mx&&on<q.e-.3&&(off==null||off>on+.2))return on-.03}}catch(e){}return q.s};
+const fxOn=q=>{try{const on=q._on,off=q._off,mx=zsfFit("onmax",1.0);if(mx>0&&on!=null&&isFinite(on)){const d=on-q.s;if(d>=.1&&d=mx&&onq.e-.3&&(off==null||off>on+.2))return on-.03}}catch(e){}return q.s};
 function fxPlan(items){let prevEnd=0,delayed=0;
  try{fxSpeechZones()}catch(e){}
  const __P=zsfPlaceItems(items);delayed=__P.delayed;const plan=items.map((it,__i)=>{const st=__P.st[__i],en=st+it.buf.duration;return{it,st,en}});
@@ -5052,7 +5052,7 @@ else if(a=="sp"){c.t="["+(+b.dataset.k+1)+"] "+tx;sync();render()}});
 q("#cueList").addEventListener("change",e=>{if(e.target.dataset.a!="txt")return;const c=cues[+e.target.closest(".cu").dataset.i],m=TAG.exec(c.t);c.t=(m?m[0]:"")+e.target.value;sync()});
 q("#cuDiv").onclick=()=>q("#tagBtn").click();q("#cuExp").onclick=()=>q("#dlSrt").click();
 q("#cuClr").onclick=()=>{if(!cues.length)return;if(!confirm("លុប SRT ទាំងអស់ ("+cues.length+" បន្ទាត់)?"))return;try{cur&&cur.stop()}catch(e){}cues=[];try{srtBlocks=[]}catch(e){}q("#srtText").value="";last="";q("#sub").textContent="";q("#srtFile").value="";render()};
-function wavDataOffset(u8){for(var i=12;i+8<u8.length;){var id=String.fromCharCode(u8[i],u8[i+1],u8[i+2],u8[i+3]);var sz=u8[i+4]|(u8[i+5]<<8)|(u8[i+6]<<16)|(u8[i+7]<<24);if(id==="data")return i+8;i+=8+sz+(sz&1)}return 44}
+function wavDataOffset(u8){for(var i=12;i+8u8.length;){var id=String.fromCharCode(u8[i],u8[i+1],u8[i+2],u8[i+3]);var sz=u8[i+4]|(u8[i+5]8)|(u8[i+6]16)|(u8[i+7]24);if(id==="data")return i+8;i+=8+sz+(sz&1)}return 44}
 /* V16.0 : 🎯 តម្រឹមម៉ោង Subtitle ឱ្យចំសំឡេងពិត (ដូចក្នុង APK Sp) — ប្រើ Mask សំឡេងនិយាយ កែម៉ោងចាប់ផ្តើម/បញ្ចប់ មិនលុបបន្ទាត់ណាមួយឡើយ */
 function zsfAlignCues(pcm,list){
  var M=zsfSpeechMask(pcm),m=M.m,nf=M.nf,FT=0.05,st={s:0,e:0},out=[],prevE=0,i,k;
@@ -5533,40 +5533,45 @@ async function translateAll(){var Z0=zsfSnap();
   }catch(_){}}
  var sleep2=function(ms){return new Promise(function(z){setTimeout(z,ms)})},inUse={},kptr=0;
  function keyCooled(k){var ms=zsfTrModels();return ms.every(function(m){return zsfTrCooled(k,m)})}
- function pickKey(){var n=keys.length,t,k;
-  for(t=0;tn;t++){k=keys[(kptr+t)%n];if(!inUse[k]&&!keyCooled(k)){kptr=(kptr+t+1)%n;return k}}
-  for(t=0;tn;t++){k=keys[(kptr+t)%n];if(!inUse[k]){kptr=(kptr+t+1)%n;return k}}
-  k=keys[kptr%n];kptr=(kptr+1)%n;return k}
- /* ១ ក្រុម (60 បន្ទាត់) = ១ Key · Key គាំង/អស់ Quota → Key បន្ទាប់ · Model មមាញឹក → Model បន្ទាប់ភ្លាមៗ · មិនប្រើ Google */
- async function gemStrict(prompt,wi){
-  var t0=Date.now(),pass=0,key=pickKey();inUse[key]=1;
+ var zsfRateN={},trOk=new Array(src.length).fill(false),repairQ=[],pendingFix=0,wDone=false;
+ var reserve=keys.length>=4?2:(keys.length===3?1:0),nW=Math.max(1,keys.length-reserve),wKeys=keys.slice(0,nW),fKeys=keys.slice(nW);
+ function pickKey(pool,home){pool=(pool&&pool.length)?pool:keys;var n=pool.length,t,k;
+  if(home&&!inUse[home]&&!keyCooled(home))return home;
+  for(t=0;tn;t++){k=pool[(kptr+t)%n];if(!inUse[k]&&!keyCooled(k)){kptr=(kptr+t+1)%n;return k}}
+  for(t=0;tn;t++){k=pool[(kptr+t)%n];if(!inUse[k]){kptr=(kptr+t+1)%n;return k}}
+  k=pool[kptr%n];kptr=(kptr+1)%n;return k}
+ /* V25.48: ១ កំណាត់ (~40 វិនាទី SRT) = ១ Key (home key) · Key អស់ Quota → សម្រាកពិតប្រាកដ (90s→15នាទី) រួចដំណើរការឡើងវិញ · Key ផ្សេងមកជំនួសភ្លាម · Model មមាញឹក → Model បន្ទាប់ */
+ async function gemStrict(prompt,wi,pool,home){
+  pool=(pool&&pool.length)?pool:keys;
+  var t0=Date.now(),pass=0,key=pickKey(pool,home);inUse[key]=1;
   try{
-   while(Date.now()-t0300000){
+   while(Date.now()-t0900000){
     var models=zsfTrModels();
-    for(var kk=0;kkkeys.length;kk++){
+    for(var kk=0;kkpool.length;kk++){
      for(var mi=0;mimodels.length;mi++){
       var m=models[mi];
       if(zsfTrCooled(key,m))continue;
       try{
        var txt=await Promise.race([requestGeminiOnce(prompt,key,m,false),new Promise(function(_,rj){setTimeout(function(){rj(new Error("timeout"))},90000)})]);
-       if(txt)return txt;
+       if(txt){zsfRateN[key+"|"+m]=0;return txt}
        zsfTrCool[key+"|"+m]=Date.now()+20000;
       }catch(e){
        var kd=zsfErrKind(e);
        if(kd==="auth"){zsfTrCool[key+"|*"]=Date.now()+600000;break}
-       if(kd==="rate"){zsfTrCool[key+"|"+m]=Date.now()+90000;continue}
+       if(kd==="rate"){var rn=zsfRateN[key+"|"+m]=(zsfRateN[key+"|"+m]||0)+1;zsfTrCool[key+"|"+m]=Date.now()+Math.min(900000,90000*Math.pow(2,rn-1));continue}
        if(kd==="model"){zsfTrCool[key+"|"+m]=Date.now()+1800000;continue}
        zsfTrCool[key+"|"+m]=Date.now()+(/timeout|abort/i.test(String((e&&e.message)||e))?60000:20000);
        continue}
      }
-     delete inUse[key];key=pickKey();inUse[key]=1;
+     delete inUse[key];key=pickKey(pool,home);inUse[key]=1;
     }
     pass++;
-    try{for(var zq in zsfTrCool)if(zsfTrCool[zq]>Date.now()+8000)zsfTrCool[zq]=Date.now()+5000}catch(_){}
-    try{setProgress(Math.round(liveN/src.length*100),"⏳ Key/Gemini កំពុងមមាញឹក — រង់ចាំហើយសាកម្តងទៀត...")}catch(_){}
-    await sleep2(Math.min(15000,3000+pass*2000));
+    var soon=Infinity,nowT=Date.now(),mm=zsfTrModels();
+    pool.forEach(function(k){var best=Infinity;mm.forEach(function(m){var u=zsfTrCool[k+"|"+m]||zsfTrCool[k+"|*"];var d=(u&&u>nowT)?u-nowT:0;if(dbest)best=d});if(best>0&&bestsoon)soon=best});
+    try{setProgress(Math.round(liveN/src.length*100),"😴 Key សម្រាក (អស់ Quota/មមាញឹក) · នឹងដំណើរការឡើងវិញដោយស្វ័យប្រវត្តិ...")}catch(_){}
+    await sleep2(Math.max(1500,Math.min(15000,isFinite(soon)?soon:3000+pass*2000)));
    }
-   throw new Error("Gemini បកប្រែមិនបាន — ពិនិត្យ API Key / Quota")
+   throw new Error("Gemini មមាញឹកពេក · សូមពិនិត្យ API Key / Quota")
   }finally{delete inUse[key]}}
  /* ចាប់ប្រភេទសាច់រឿងពី SRT ឱ្យបានជាមុន (មិនរំលង) — សាកម្តងទៀតដោយប្តូរ Key រហូតបាន ទើបចាប់ផ្តើមបកប្រែ */
  if(tv==="km"){
@@ -5585,9 +5590,10 @@ async function translateAll(){var Z0=zsfSnap();
   try{setProgress(3,"✅ ចាប់បានប្រភេទសាច់រឿង"+(gname?": "+gname:"")+" — ចាប់ផ្តើមបកប្រែ...")}catch(_){}
  }
  ctxT=window.zsfAutoStory?window.zsfAutoStory():"";
- for(var i=0;isrc.length;i+=B)batches.push(i);
- async function doBatch(i0,wi){
-  var part=src.slice(i0,i0+B),res=new Array(part.length).fill(null);
+ var SEC40=40,MAXC=60;
+ for(var bi=0;bisrc.length;){var bj=bi+1;while(bjsrc.length&&bj-biMAXC&&src[bj].e-src[bi].s=SEC40)bj++;batches.push([bi,bj]);bi=bj}
+ async function doBatch(i0,i1,wi){
+  var part=src.slice(i0,i1),res=new Array(part.length).fill(null),home=wKeys[wi%wKeys.length];
   if(useGem){
     var prev=src.slice(Math.max(0,i0-2),i0).map(strip).join(" / ");
     var HEAD="You are a professional Khmer subtitle translator. Translate each numbered line to "+tl+". Story context: "+ctxT+". Keep numbering, one line per item. If a line starts with a tag like [1], [2], [3] or [4], keep that tag unchanged at the start of the translated line. NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). LIP-SYNC & CONCISENESS (CRITICAL): The Khmer translation will be used for AI dubbing. Khmer naturally takes longer to speak than Chinese. You MUST translate as concisely and compactly as possible. Use short, punchy, natural spoken Khmer. Keep the syllable count as close to the original as possible to fit the strict SRT time slots and the actor's lip movements. It is better to summarize the core meaning perfectly than to over-explain and overflow the time limit. SPEAKER TAGS: You MUST keep the exact speaker tags (e.g., [1], [2], [3], [4]) at the beginning of every translated line. Each input line ends with a hint like {max 40 chars}: it is a STRICT length guide for the mouth timing; stay within it. NEVER output the {max N chars} hint. ONE INPUT LINE = ONE OUTPUT LINE: never split a sentence across two lines and never break a word. NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. Output only numbered lines.";
@@ -5598,39 +5604,56 @@ async function translateAll(){var Z0=zsfSnap();
     hits.forEach(function(h,j){if(h){res[j]=h;ZST.hit++;applyLive(i0+j,h)}else ZST.miss++});
     var todo=[];res.forEach(function(r,j){if(r===null)todo.push(j)});
     var parseInto=function(t,idx){window.zsfParseNumbered(t,idx.length).forEach(function(v,x){if(v){var m2=v.replace(/\s*\{(max|about) \d+ chars?\}\s*$/i,"").trim();if(m2&&res[idx[x]]===null&&zsfTrOk(tv,strip(part[idx[x]]),m2.replace(TAG,"").trim())){res[idx[x]]=m2;fresh[idx[x]]=true;applyLive(i0+idx[x],m2)}}})};
-    if(todo.length){
-      try{var txt=await gemStrict(mk(todo),wi);parseInto(txt,todo)}catch(e){}
-      var m2=todo.filter(function(j){return res[j]===null}),rounds=0;
-      while(m2.length&&rounds2){rounds++;ZST.retry++;try{var t2=await gemStrict(mk(m2),wi);parseInto(t2,m2)}catch(e){break}m2=todo.filter(function(j){return res[j]===null})}
-     }
-    try{
-     var over=[],lim=function(j){return Math.max(8,Math.round((part[j].e-part[j].s)*22))};
-     res.forEach(function(r,j){if(r&&String(r).replace(TAG,"").length>lim(j)*1.3)over.push(j)});
-     if(over.length){
-      var sp="You are a professional Khmer subtitle translator. Rewrite each numbered Khmer line SHORTER so it can be spoken within its time. Each item is: Chinese => current Khmer {max N chars}. The new Khmer must be at or under N characters. Keep the meaning, every name, the speaker's tone and the address terms; drop filler and polite padding, merge clauses, use short everyday spoken words. Do not split or merge lines. Output only numbered lines.\n"+over.map(function(j,x){return (x+1)+". "+strip(part[j])+" => "+String(res[j]).replace(TAG,"")+" {max "+lim(j)+" chars}"}).join("\n");
-      var ts=await gemStrict(sp,wi),sr=window.zsfParseNumbered(ts,over.length);
-      over.forEach(function(j,x){var v=sr[x];if(v){v=v.replace(/\s*\{(max|about) \d+ chars?\}\s*$/i,"").replace(TAG,"").trim();if(v&&zsfTrOk(tv,strip(part[j]),v)&&v.lengthString(res[j]).replace(TAG,"").length){res[j]=v;fresh[j]=true;applyLive(i0+j,v)}}});
-     }
-    }catch(e){}
-    var puts=[];fresh.forEach(function(f,j){if(f){var v=res[j].replace(TAG,"").trim();if(zsfTrOk(tv,strip(part[j]),v))puts.push([zk(part[j]),v])}});
-    if(puts.length)zsfTrPutMany(puts);
-  }
-  var miss=[];res.forEach(function(r,j){if(r===null)miss.push(j)});
-  if(miss.length){
-   for(var gr=0;gr8&&miss.length;gr++){
-    for(var cq=0;cqmiss.length;cq+=15){var ch=miss.slice(cq,cq+15);
-     try{var t4=await gemStrict(mk(ch),wi);parseInto(t4,ch)}catch(e){}}
-    miss=miss.filter(function(j){return res[j]===null});
-    if(miss.length)await sleep2(3000)}
-  }
-  part.forEach(function(c,k){if(!res[k])untr++;var t=res[k]||c.t.replace(TAG,""),m=c.t.match(TAG);if(m)t=m[0].trim()+" "+t.replace(/\[[1-4]\]\s*/g,"").trim();else t=t.replace(/\[[1-4]\]\s*/g,"").trim();out[i0+k]={s:c.s,e:c.e,t:t}});
-  done+=part.length;setProgress(Math.round(liveN/src.length*100),"🧠 កំពុងបកប្រែ "+liveN+"/"+src.length+(useGem?" (Gemini)":" (Google)")+"...");
+    var putD=new Array(part.length).fill(false);
+    var lim=function(j){return Math.max(8,Math.round((part[j].e-part[j].s)*22))};
+    var flush=function(){var puts=[];fresh.forEach(function(f,j){if(f&&!putD[j]){putD[j]=true;var v=String(res[j]).replace(TAG,"").trim();if(zsfTrOk(tv,strip(part[j]),v))puts.push([zk(part[j]),v])}});if(puts.length)zsfTrPutMany(puts)};
+    /* សរសេរលទ្ធផលតាមម៉ោង SRT ដើម (s/e មិនប្តូរ) · បន្ទាត់ដែលមិនទាន់បកបានបណ្ដោះអាសន្នជាអត្ថបទដើម រង់ចាំអ្នកជួសជុល */
+    var wr=function(){part.forEach(function(c,k){var t=res[k]||c.t.replace(TAG,""),m=c.t.match(TAG);if(m)t=m[0].trim()+" "+t.replace(/\[[1-4]\]\s*/g,"").trim();else t=t.replace(/\[[1-4]\]\s*/g,"").trim();out[i0+k]={s:c.s,e:c.e,t:t};trOk[i0+k]=!!res[k]})};
+    var nulls=function(){var a=[];res.forEach(function(r,j){if(r===null)a.push(j)});return a};
+    var finish=async function(pool,hk,wid){
+      var m2=nulls(),rounds=0;
+      while(m2.length&&rounds2){rounds++;ZST.retry++;try{var t2=await gemStrict(mk(m2),wid,pool,hk);parseInto(t2,m2)}catch(e){break}m2=nulls()}
+      var miss=nulls();
+      for(var gr=0;gr8&&miss.length;gr++){
+       for(var cq=0;cqmiss.length;cq+=15){var ch=miss.slice(cq,cq+15);
+        try{var t4=await gemStrict(mk(ch),wid,pool,hk);parseInto(t4,ch)}catch(e){}}
+       miss=nulls();
+       if(miss.length)await sleep2(3000)}
+      try{
+       var over=[];
+       res.forEach(function(r,j){if(r&&String(r).replace(TAG,"").length>lim(j)*1.3)over.push(j)});
+       if(over.length){
+        var sp="You are a professional Khmer subtitle translator. Rewrite each numbered Khmer line SHORTER so it can be spoken within its time. Each item is: Chinese => current Khmer {max N chars}. The new Khmer must be at or under N characters. Keep the meaning, every name, the speaker's tone and the address terms; drop filler and polite padding, merge clauses, use short everyday spoken words. Do not split or merge lines. Output only numbered lines.\n"+over.map(function(j,x){return (x+1)+". "+strip(part[j])+" => "+String(res[j]).replace(TAG,"")+" {max "+lim(j)+" chars}"}).join("\n");
+        var ts=await gemStrict(sp,wid,pool,hk),sr=window.zsfParseNumbered(ts,over.length);
+        over.forEach(function(j,x){var v=sr[x];if(v){v=v.replace(/\s*\{(max|about) \d+ chars?\}\s*$/i,"").replace(TAG,"").trim();if(v&&zsfTrOk(tv,strip(part[j]),v)&&v.lengthString(res[j]).replace(TAG,"").length){res[j]=v;fresh[j]=true;putD[j]=false;applyLive(i0+j,v)}}})
+       }
+      }catch(e){}
+      flush();wr()};
+    if(todo.length){try{var txt=await gemStrict(mk(todo),wi,keys,home);parseInto(txt,todo)}catch(e){}}
+    if(fKeys.length){
+     /* Key បម្រុង: ផ្ទេរបន្ទាត់ខ្វះ/វែងពេកទៅអ្នកជួសជុល (ស្ងាត់ៗ) · Worker ទៅបកកំណាត់បន្ទាប់ភ្លាម */
+     flush();wr();pendingFix++;
+     repairQ.push(function(pool,hk,wid){return finish(keys,hk,wid)});
+    }else{
+     await finish(keys,home,wi)
+    }
+   }
+  done+=part.length;setProgress(Math.round(liveN/src.length*100),"🧠 កំពុងបកប្រែ "+liveN+"/"+src.length+" · Key ដំណើរការ "+(keys.length-keys.filter(keyCooled).length)+"/"+keys.length+(pendingFix>0?" · កំពុងជួសជុល "+pendingFix:"")+"...");
  }
- async function worker(wi){if(wi>0)await new Promise(function(z){setTimeout(z,wi*250)});while(nextbatches.length){await doBatch(batches[next++],wi)}}
+ async function worker(wi){if(wi>0)await sleep2(wi*250);
+  while(nextbatches.length){var bb=batches[next++];await doBatch(bb[0],bb[1],wi)}
+  while(pendingFix>0){var tk=repairQ.shift();if(tk){try{await tk(keys,wKeys[wi%wKeys.length],wi)}catch(e){}pendingFix--}else await sleep2(400)}}
+ async function fixer(fi){var hk=fKeys[fi%fKeys.length];
+  while(true){var tk=repairQ.shift();if(tk){try{await tk(keys,hk,100+fi)}catch(e){}pendingFix--;continue}
+   if(wDone&&pendingFix=0)break;await sleep2(400)}}
  setProgress(0,"🧠 កំពុងបកប្រែ 0/"+src.length+"...");
- /* កំណត់ concurrency មិនឱ្យលើសចំនួន Key ដែលមាន និងអតិបរមា 3 ដើម្បីកុំឱ្យ Key តែមួយទទួល Request ស្របគ្នាច្រើនពេក។ */
- var conc=Math.max(1,Math.min(batches.length,(keys.length===1&&keys[0]==="LOCAL_AI")?5:2));
- await Promise.all(Array.from({length:conc},function(_,wi){return worker(wi)}));
+ /* V25.48: Worker = ចំនួន Key − Key បម្រុង (10 Key → 8 Worker + 2 អ្នកជួសជុល) · ១ Worker = ១ កំណាត់ 40 វិនាទី */
+ var conc=Math.max(1,Math.min(batches.length,reserve>0?nW:((keys.length===1&&keys[0]==="LOCAL_AI")?5:Math.max(2,keys.length))));
+ var wTasks=Array.from({length:conc},function(_,wi){return worker(wi)});
+ var wAll=Promise.all(wTasks).then(function(){wDone=true});
+ var fTasks=fKeys.map(function(_,fi){return fixer(fi)});
+ await Promise.all([wAll].concat(fTasks));
+ untr=src.length-trOk.filter(Boolean).length;
  if(untr>0&&tv==="km"){setC(out);throw new Error("បកប្រែមិនបាន "+untr+"/"+src.length+" ជួរ · "+(window.__laiLast||"គ្មានចម្លើយពី Server"))}
  setC(out);try{zsfTrSummary(Z0)}catch(e){}
 }
@@ -6722,7 +6745,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"25.47",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.48",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7098,7 +7121,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   var msgs=[],si=j.systemInstruction||j.system_instruction,gc=j.generationConfig||{};
   if(si&&si.parts)msgs.push({role:"system",content:si.parts.map(function(p){return p.text||""}).join("")});
   (j.contents||[]).forEach(function(c){msgs.push({role:c.role==="model"?"assistant":"user",content:(c.parts||[]).map(function(p){return p.text||""}).join("")})});
-  try{var lm0=msgs[msgs.length-1];if(typeof zsfStylePrompt==="function"&&lm0&&lm0.role==="user"&&lm0.content.indexOf("NO LATIN LETTERS")>=0&&lm0.content.indexOf("STYLE (")<0){var SP0=zsfStylePrompt();lm0.content=lm0.content.indexOf("Output only numbered lines.")>=0?lm0.content.replace("Output only numbered lines.",SP0+" Output only numbered lines."):(SP0+"\n"+lm0.content)}}catch(e){}
+  try{var lm0=msgs[msgs.length-1];if(typeof zsfStylePrompt==="function"&&lm0&&lm0.role==="user"&&lm0.content.indexOf("NO LATIN LETTERS")>=0&&lm0.content.indexOf("STYLE (")0){var SP0=zsfStylePrompt();lm0.content=lm0.content.indexOf("Output only numbered lines.")>=0?lm0.content.replace("Output only numbered lines.",SP0+" Output only numbered lines."):(SP0+"\n"+lm0.content)}}catch(e){}
   try{var RL=window.__ZSF_RULES,lm=msgs[msgs.length-1];if(RL&&lm&&lm.role==="user"&&lm.content.indexOf("Khmer")>=0&&(lm.content.indexOf("numbered line")>=0||lm.content.indexOf("Khmer subtitle translator")>=0)&&lm.content.indexOf("PRO DUBBING RULES")===-1)lm.content=lm.content+"\n\n"+RL}catch(e){}
   var body={model:g("zsf_lai_model","gemini-3.5-flash-lite")||"gemini-3.5-flash-lite",messages:msgs,stream:false};
   if(typeof gc.temperature==="number")body.temperature=gc.temperature;
@@ -7344,7 +7367,7 @@ window.zsfKeywordGenre=function(text){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="25.47";
+  var EMB="25.48";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
