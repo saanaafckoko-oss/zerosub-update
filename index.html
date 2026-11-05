@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.24";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.26";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -5470,7 +5470,7 @@ async function googleTr(texts,tl){
 /* v21 : បកប្រែ batch ស្របគ្នា (ម្នាក់ៗ Key ផ្សេងគ្នា) · ផ្គូផ្គងតាមលេខ (មិនរអិលជួរ) · ឃ្លាដែលខ្វះ → Google តែឃ្លានោះ · ផ្តល់បរិបទ ២ ឃ្លាមុន */
 async function translateAll(){var Z0=zsfSnap();
  var keys=zsfKF(K),tv=$("#target").value,tl=$("#target").selectedOptions[0].text,TAG=/^\s*\[[1-4]\]\s*/,src=cues.map(function(c){return {s:c.s,e:c.e,t:c.t}}),B=60,
-  batches=[],out=new Array(src.length),useGem=keys.length>0,gemFail=0,done=0,next=0,ctxT="",
+  batches=[],out=new Array(src.length),useGem=keys.length>0,gemFail=0,done=0,untr=0,next=0,ctxT="",
   strip=function(c){return c.t.replace(TAG,"").replace(/\n/g," ")};
  if(!keys.length)throw new Error("គ្មាន Gemini API Key");
  var liveN=0,liveSeen=new Array(src.length);
@@ -5573,7 +5573,7 @@ async function translateAll(){var Z0=zsfSnap();
     miss=miss.filter(function(j){return res[j]===null});
     if(miss.length)await sleep2(3000)}
   }
-  part.forEach(function(c,k){var t=res[k]||c.t.replace(TAG,""),m=c.t.match(TAG);if(m)t=m[0].trim()+" "+t.replace(/\[[1-4]\]\s*/g,"").trim();else t=t.replace(/\[[1-4]\]\s*/g,"").trim();out[i0+k]={s:c.s,e:c.e,t:t}});
+  part.forEach(function(c,k){if(!res[k])untr++;var t=res[k]||c.t.replace(TAG,""),m=c.t.match(TAG);if(m)t=m[0].trim()+" "+t.replace(/\[[1-4]\]\s*/g,"").trim();else t=t.replace(/\[[1-4]\]\s*/g,"").trim();out[i0+k]={s:c.s,e:c.e,t:t}});
   done+=part.length;setProgress(Math.round(liveN/src.length*100),"🧠 កំពុងបកប្រែ "+liveN+"/"+src.length+(useGem?" (Gemini)":" (Google)")+"...");
  }
  async function worker(wi){if(wi>0)await new Promise(function(z){setTimeout(z,wi*250)});while(nextbatches.length){await doBatch(batches[next++],wi)}}
@@ -5581,6 +5581,7 @@ async function translateAll(){var Z0=zsfSnap();
  /* កំណត់ concurrency មិនឱ្យលើសចំនួន Key ដែលមាន និងអតិបរមា 3 ដើម្បីកុំឱ្យ Key តែមួយទទួល Request ស្របគ្នាច្រើនពេក។ */
  var conc=Math.max(1,Math.min(batches.length,(keys.length===1&&keys[0]==="LOCAL_AI")?5:2));
  await Promise.all(Array.from({length:conc},function(_,wi){return worker(wi)}));
+ if(untr>0&&tv==="km"){setC(out);throw new Error("បកប្រែមិនបាន "+untr+"/"+src.length+" ជួរ · "+(window.__laiLast||"គ្មានចម្លើយពី Server"))}
  setC(out);try{zsfTrSummary(Z0)}catch(e){}
 }
 async function tagSpeakers(){
@@ -5679,7 +5680,7 @@ $("#exp").onclick=async function(){
   }
   /* Step 2 */
   phase(3,35,50);
-  if(!on(1))setProgress(100,"⏭ រំលងការបកប្រែ (បិទជម្រើស Gemini)");
+  if(!on(1)&&!on(5)){if($("#target").value==="km"&&!isKm())throw new Error("[1-Click Export គាំង!] ត្រូវបើក ✓ Gemini ឬ ✓ Local AI ដើម្បីបកប្រែ SRT មុនអានសំឡេង");setProgress(100,"⏭ រំលងការបកប្រែ (បិទជម្រើស Gemini)")}
   else if($("#target").value==="km"&&isKm())setProgress(100,"✅ SRT ជាភាសាខ្មែររួចហើយ — រំលងការបកប្រែ");
   else{
    /* FIX: Step 2 បកប្រែ SRT ដោយផ្ទាល់។ កុំរត់ gemWorkerRun នៅទីនេះ ព្រោះវាអាចវិភាគ/ផ្ទុកវីដេអូ និងសាក Model ជាច្រើនមុនពេលបកប្រែ។ ការចែកតួត្រូវធ្វើនៅ Step 3 ដូចដើម។ */
@@ -6670,7 +6671,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"25.24",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.26",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7051,14 +7052,14 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   if(typeof gc.topP==="number")body.top_p=gc.topP;
   try{
    var r=await F0(HOST+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify(body),signal:sig}),raw=await r.text(),d;
-   try{d=JSON.parse(raw)}catch(e){return err(r.status||502,"Local AI ឆ្លើយមិនត្រឹមត្រូវ (HTTP "+r.status+")")}
+   window.__laiLast="HTTP "+r.status+": "+String(raw).replace(/\s+/g," ").slice(0,180);try{d=JSON.parse(raw)}catch(e){return err(r.status||502,"Local AI ឆ្លើយមិនត្រឹមត្រូវ (HTTP "+r.status+")")}
    if(!r.ok||d.error){var em=(d.error&&(d.error.message||d.error))||d.detail||d.message||("HTTP "+r.status);return err(r.status||500,typeof em==="string"?em:JSON.stringify(em))}
    var ch=d.choices&&d.choices[0],tx=ch&&ch.message&&ch.message.content;
-   if(Array.isArray(tx))tx=tx.map(function(p){return p&&p.text||""}).join("");
+   if(Array.isArray(tx))tx=tx.map(function(p){return p&&p.text||""}).join("");if(tx)window.__laiLast="ចម្លើយ: "+String(tx).replace(/\s+/g," ").slice(0,180);
    var u=d.usage||{},pt=u.prompt_tokens||0,ct=u.completion_tokens||0,tt=u.total_tokens||(pt+ct);
    consume(tt);
    return new Response(JSON.stringify({candidates:[{content:{role:"model",parts:[{text:tx||""}]},finishReason:"STOP"}],usageMetadata:{promptTokenCount:pt,candidatesTokenCount:ct,totalTokenCount:tt}}),{status:200,headers:{"Content-Type":"application/json"}});
-  }catch(e){if(e&&e.name==="AbortError")throw e;return err(503,"Local AI ភ្ជាប់មិនបាន: "+(e&&e.message||e))}
+  }catch(e){if(e&&e.name==="AbortError")throw e;window.__laiLast="ភ្ជាប់មិនបាន: "+(e&&e.message||e);return err(503,"Local AI ភ្ជាប់មិនបាន: "+(e&&e.message||e))}
  }
  window.fetch=function(u,o){
   try{
@@ -7081,7 +7082,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="25.24";
+  var EMB="25.26";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
