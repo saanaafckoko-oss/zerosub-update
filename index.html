@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.13";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.14";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -1927,9 +1927,10 @@ async function dubAudioLocal(text,slot,p,slotD){
   try{buf=wsolaStretch(buf,pl.tempo)}
   catch(e){try{buf=trimSilence(await ttsFetch(text,slot,Math.round(pl.tempo*100-100),pitch))}catch(e2){throw e2}}}
  return{buf,boost:pl.boost,tt:pl.tempo}}
+function zsfProsody(x){x=String(x||"");return /[!！]/.test(x)?2:(/[?？]/.test(x)?1:0)}
 async function dubAudio(text,slot,p,slotD){
  if(window.__zsfRateOK===false)return dubAudioLocal(text,slot,p,slotD);
- const pitch=Math.round(p.pitch),auto=+p.auto||0,base=clampTempo(Math.max(1+p.speed/100,auto>0?zsfFit("mintempo",1.15):0));
+ const pitch=Math.round(p.pitch)+zsfProsody(text),auto=+p.auto||0,base=clampTempo(Math.max(1+p.speed/100,auto>0?zsfFit("mintempo",1.15):0));
  let cur=base,buf;
  try{buf=await ttsBuf(text,slot,pitch,Math.round((base-1)*100))}catch(e){return dubAudioLocal(text,slot,p,slotD)}
  if(!(slotD>0))return{buf,boost:false,tt:cur};
@@ -6617,7 +6618,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"25.13",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.14",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -6855,6 +6856,22 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
  window.zfSetLang=setLang;
 })();
 /script>
+script id="zsf-pro-rules">
+(function(){
+ if(window.__zsfProRules)return;window.__zsfProRules=1;
+ var RULES="PRO DUBBING RULES (highest priority; they override anything above that conflicts):\n1) KINSHIP AND ADDRESS: from the story decide each character's age, role, family relation and social rank, then use the natural Khmer address word for that pair and keep it identical every time: 妈/娘/母亲 = ម៉ាក់; 爸/爹/父亲 = ប៉ា; 哥/哥哥 = បងប្រុស; 姐/姐姐 = បងស្រី; 弟弟 = ប្អូនប្រុស; 妹妹 = ប្អូនស្រី; 爷爷 = ជីតា; 奶奶 = ជីដូន; 叔叔/舅舅 = ពូ; 姨/婶 = មីង; 老公/相公 = ប្តី; 老婆/娘子 = ប្រពន្ធ; 亲爱的/宝贝 = សម្លាញ់; 老师 = លោកគ្រូ/អ្នកគ្រូ. For a boss, elder, official, master or any rank use the proper Khmer title of that rank. Use ខ្ញុំ/អ្នក only between strangers or equals. A younger person speaking to an elder uses respectful words.\n2) CLEAN LANGUAGE: never use vulgar, rude, insulting or swear words. Show anger, threat or contempt with firm but clean Khmer.\n3) SHORTER BUT COMPLETE: Chinese packs much meaning into few characters, so write each Khmer line noticeably shorter and easier to speak than a literal translation, but lose no meaning: keep every person, object, place, number, action, reason and emotion, cut only filler and repetition, use short common Khmer words, name every person and object clearly and never leave anything ambiguous or confusing.\n4) MOUTH SYNC AND BREATH: the Khmer line must take about the same time to say as the original line, with the same number of sentences and beats. Put a comma only where a real speaker would breathe between clauses, never inside a short line or in the middle of a phrase. Use ! ? and ... to carry the real emotion of the scene.\n5) PROFESSIONAL VOICE ACTING: write natural spoken Khmer like a real person talking, never textbook style.",MK="PRO DUBBING RULES",of=window.fetch;
+ window.fetch=function(u,o){
+  try{
+   if(typeof u==="string"&&u.indexOf("generativelanguage.googleapis.com")>=0&&o&&typeof o.body==="string"&&o.body.indexOf("Khmer")>=0&&(o.body.indexOf("numbered line")>=0||o.body.indexOf("Khmer subtitle translator")>=0)&&o.body.indexOf(MK)0){
+    var b=JSON.parse(o.body),done=false;
+    (b.contents||[]).forEach(function(c){(c.parts||[]).forEach(function(p){
+     if(!done&&typeof p.text==="string"&&(p.text.indexOf("numbered line")>=0||p.text.indexOf("Khmer subtitle translator")>=0)){p.text=p.text+"\n\n"+RULES;done=true}})});
+    if(done){o=Object.assign({},o,{body:JSON.stringify(b)})}
+   }
+  }catch(e){}
+  return of.call(this,u,o)};
+})();
+/script>
 /body>/html>
 </script>
 <script id="zsf-wrap">
@@ -6863,7 +6880,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="25.13";
+  var EMB="25.14";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
