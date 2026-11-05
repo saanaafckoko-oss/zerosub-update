@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.29";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.33";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -1849,7 +1849,7 @@ function stretchRaw(raw,tempo){
  __stLock=job.catch(()=>{});return job}
 /* ===== v21 : TTS លឿន + ច្បាស់ ៖ retry, cache (មិនបង្កើតឃ្លាដដែលពីរដង), កាត់ស្ងាត់ដើម/ចុង, WSOLA ក្នុង JS (មិនរង់ចាំ FFmpeg) ===== */
 const TTS_CONC=14,TTS_TRIES=3,__ttsCache=new Map(),__sleep=ms=>new Promise(r=>setTimeout(r,ms));
-async function ttsRaw(text,slot,speed,pitch){
+async function ttsRaw(text,slot,speed,pitch){text=window.zsfNoThai?window.zsfNoThai(text):text;
  const voice=voiceOfSlot(slot);let lastErr;
  const TT=Math.min(6,Math.max(TTS_TRIES,ttsList().length+1));
  for(let n=0;nTT;n++){
@@ -5961,7 +5961,7 @@ var ZSF_GENRES=[
  ["military","ទាហានពិសេស/យោធាសម័យទំនើប","modern military / special forces","ទាហានពិសេស/យោធាទំនើប៖ ពាក្យបញ្ជាខ្លី ដាច់ណាត់ គោរពឋានៈ (មេបញ្ជាការ សមមិត្ត អ្នកបើកបរ); ពាក្យបច្ចេកទេសអាវុធ និងបេសកកម្មត្រូវថេរ; ស្មារតីវីរភាព។"],
  ["modern","សាច់រឿងសម័យទំនើប","modern daily life","សម័យទំនើប៖ ភាសាសន្ទនាខ្មែរសម័យទំនើប ធម្មជាតិ រហ័ស ដូចមនុស្សនិយាយពិតៗ; កុំប្រើពាក្យបុរាណ ឬផ្លូវការហួសហេតុ។"]
 ];
-var ZSF_ERA_RULE="ក្បួនសម័យ៖ បើរឿងមានតួអង្គច្រើនសម័យ (បុរាណ និងទំនើប) ត្រូវប្រើភាសាតាមសម័យរបស់អ្នកនិយាយនីមួយៗ — តួបុរាណ (ឃើញពាក្យដូចជា 朕 陛下 臣 咱 草民 在下 ឬឋានៈចាស់ៗ) ប្រើពាក្យបុរាណ/រាជសព្ទតាមឋានៈ; តួទំនើបប្រើភាសាសន្ទនាធម្មតា។ ពាក្យហៅគ្នា និងពាក្យខ្លួនឯងរបស់តួអង្គម្នាក់ៗត្រូវថេរ មិនប្តូរពាក់កណ្តាលរឿង។";
+var ZSF_ERA_RULE="ហាមដាច់ខាត៖ បកប្រែជាខ្មែរសុទ្ធ — មិនត្រូវប្រើអក្សរថៃ (ภาษาไทย) ឬអក្សរចិន/ឡាតាំង ក្នុងលទ្ធផលបកប្រែឡើយ; ភាសាចិនក្នុងរឿងគឺចិន មិនមែនថៃទេ។ NEVER output Thai script; the source is Chinese and the output must be Khmer script only. ក្បួនសម័យ៖ បើរឿងមានតួអង្គច្រើនសម័យ (បុរាណ និងទំនើប) ត្រូវប្រើភាសាតាមសម័យរបស់អ្នកនិយាយនីមួយៗ — តួបុរាណ (ឃើញពាក្យដូចជា 朕 陛下 臣 咱 草民 在下 ឬឋានៈចាស់ៗ) ប្រើពាក្យបុរាណ/រាជសព្ទតាមឋានៈ; តួទំនើបប្រើភាសាសន្ទនាធម្មតា។ ពាក្យហៅគ្នា និងពាក្យខ្លួនឯងរបស់តួអង្គម្នាក់ៗត្រូវថេរ មិនប្តូរពាក់កណ្តាលរឿង។";
 var gBible=null,gBibleSig="",gBibleFail={};
 function gGenreByCode(c){return ZSF_GENRES.find(function(g){return g[0]===c})||null}
 function gTxt(x,max){return String(x==null?"":x).replace(/[\r\n]+/g," ").replace(/\s{2,}/g," ").trim().slice(0,max||80)}
@@ -6673,7 +6673,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"25.29",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.33",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7217,6 +7217,33 @@ window.zsfKeywordGenre=function(text){
  if(sc.cross_m2a&&(sc.ancient||sc.palace)&&best==="cross_m2a")best="cross_m2a";
  return bs>=Math.max(3,T.length/4000)?best:""};
 
+
+/* V25.30: ហាមភាសាថៃ — បញ្ចូលក្នុងសៀវភៅរឿង (ទៅគ្រប់ prompt) + លុបអក្សរថៃចេញពីចម្លើយ AI + មុនផ្ញើ TTS */
+(function(){
+ var TH=/[\u0E00-\u0E7F]/g;
+ window.zsfNoThai=function(t){return String(t==null?"":t).replace(TH,"")};
+ var F=window.fetch;
+ window.fetch=async function(u,o){
+  var r=await F.apply(this,arguments);
+  try{if(typeof u==="string"&&u.indexOf(":generateContent")>=0&&r.ok){
+   var t=await r.clone().text();
+   if(TH.test(t)){TH.lastIndex=0;var j=JSON.parse(t);
+    (j.candidates||[]).forEach(function(c){((c.content&&c.content.parts)||[]).forEach(function(p){if(p&&typeof p.text==="string")p.text=window.zsfNoThai(p.text)})});
+    return new Response(JSON.stringify(j),{status:r.status,headers:{"Content-Type":"application/json"}})}
+   TH.lastIndex=0}}catch(e){}
+  return r};
+})();
+
+/* V25.31: ដកប៊ូតុងផ្គូផ្គង (ធ្វើឱ្យសំឡេងខូច) → Preset លំនាំដើមស្វ័យប្រវត្តិ ជិតសំឡេងគំរូ (ប្រុស ~134Hz, ស្រី ~220Hz, ល្បឿន ~5.2 ព្យាង្គ/វិ) ក្នុងដែនសុវត្ថិភាព */
+(function(){
+ try{var b=document.getElementById("matchBtn");if(b&&b.parentNode)b.parentNode.style.display="none"}catch(e){}
+ try{
+  var ch=false,done=null;try{done=localStorage.getItem("zsf_v2533")}catch(e){}
+  if(!done){for(var i=0;i4;i++){P[i]=P[i]||{};P[i].pitch=-2;P[i].speed=15;P[i].auto=35;P[i].eq="ref";ch=true}
+   try{localStorage.setItem("zsf_v2533","1");localStorage.setItem("zsf_tts_tail","0.25");localStorage.setItem("zsf_tts_margin","0.20");localStorage.setItem("zsf_tts_force","1")}catch(e){}}
+  if(ch){S.set("pre",P);try{steps()}catch(e){}}
+ }catch(e){}
+})();
 /script>
 /body>/html>
 </script>
@@ -7226,7 +7253,7 @@ window.zsfKeywordGenre=function(text){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="25.29";
+  var EMB="25.33";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
