@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.28";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.29";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -718,6 +718,7 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
  /div>
  div class="row">button class="b" id="tryV" style="flex:1.7;font-size:14px;padding:14px 4px">span class="ia">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/>path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/>/svg>/span> សាកល្បងសំឡេង/button>button class="b acc" id="saveP" style="font-size:14px;padding:14px 4px">svg class="i" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">path d="M7 19a5 5 0 0 1-.7-9.95A6.5 6.5 0 0 1 18.7 9.6 4.7 4.7 0 0 1 18 19H7z"/>path d="M12 16.5v-6M9.3 13l2.7-2.7 2.7 2.7" style="stroke:var(--dk,#10172b)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>/svg> រក្សាទុក/button>button class="b gold" id="gen" style="font-size:14px;padding:14px 4px">កំណត់ទូទៅ svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M6 15l6-6 6 6"/>/svg>/button>/div>
 
+div class="row" style="margin-top:10px;flex-direction:column;align-items:stretch;gap:6px">button class="b gold" id="matchBtn" style="font-size:14px;padding:14px 6px">🎯 ផ្គូផ្គងសំឡេងគំរូ (MP3) — ប្រុស/ស្រី + ល្បឿន/button>input type="file" id="matchFile" accept="audio/*,.mp3,.wav,.m4a" style="display:none">div id="matchInfo" style="font-size:12px;opacity:.9;line-height:1.6;white-space:pre-wrap;min-height:18px">ជ្រើស MP3 សំឡេងគំរូ → កម្មវិធីវាស់ Pitch (Hz) ប្រុស/ស្រី និងល្បឿន ហើយកែ Preset ពិសិដ្ឋ/ស្រីមុំ តាម TTS ពិត។/div>/div>
 /section>
 
 section class="card">
@@ -6087,7 +6088,7 @@ async function gPrepareBible(keys,prog,ovr){
     if(vpart){try{raw=await gdGenerate([vpart,{text:mk(true)}],key,models[mi])}catch(ve){console.warn("story video analysis → text only",ve);vpart=null;raw=null}}
     if(raw===null)raw=await gWithTimeout(gdGenerate([{text:mk(false)}],key,models[mi]),45000);
     var b=gCleanBible(gParseJson(raw));
-    if(b.genres.length||b.characters.length||b.terms.length||b.address.length){
+    if(b.genres.length||b.characters.length||b.terms.length||b.address.length){if(!b.genres.length){try{var kg0=window.zsfKeywordGenre(all);if(kg0)b.genres=[kg0]}catch(_){}}
      var EB=window.__zsfEarlyBible;
      if(typeof ovr==="string")window.__zsfEarlyBible=b;
      else if(EB){try{if(EB.genres&&EB.genres.length)b.genres=EB.genres.slice(0,1);
@@ -6098,6 +6099,7 @@ async function gPrepareBible(keys,prog,ovr){
   }
  }
  if(typeof ovr!=="string"&&window.__zsfEarlyBible){gBible=window.__zsfEarlyBible;gBibleSig=sig;return gBible}
+ if(typeof ovr!=="string"){try{var kg1=window.zsfKeywordGenre(all);if(kg1){gBible={genres:[kg1],synopsis:"",tone:"",characters:[],places:[],terms:[],address:[],keep_latin:[]};gBibleSig=sig;try{showToast("ℹ️ AI ចាប់ប្រភេទមិនបាន — ប្រើពាក្យគន្លឹះចាប់បាន៖ "+kg1,true)}catch(_){}return gBible}}catch(_){}}
  gBibleFail[sig]=(gBibleFail[sig]||0)+1;
  return null}
 /* V7.8: សៀវភៅរឿងដំបូង ពីឃ្លាដំបូងៗ មុន Gemini ស្តាប់+បកប្រែដំណាលគ្នា */
@@ -6671,7 +6673,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"25.28",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.29",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7075,6 +7077,147 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
  };
 })();
 /script>
+script id="zsf-match">
+/* ===== V25.29 : ផ្គូផ្គងសំឡេងគំរូ (MP3) — វាស់ F0 ប្រុស/ស្រី + ល្បឿនអាន ពីសំឡេងគំរូ ហើយកែ Pitch/Speed របស់ Preset ដោយវាស់ TTS ពិត (closed-loop) ===== */
+(function(){
+ var TXT="ព្រះអាទិត្យរះឡើងពីទិសខាងកើត ហើយពន្លឺរបស់វាបានភ្លឺចាំងពាសពេញភូមិ។ បងប្អូនទាំងអស់គ្នាបានមកជួបជុំគ្នានៅទីធ្លាធំ ដើម្បីសំណេះសំណាលអំពីរឿងរ៉ាវដែលបានកើតឡើងកាលពីម្សិលមិញ។ ខ្ញុំមិនដឹងថាត្រូវនិយាយយ៉ាងម៉េចទេ ប៉ុន្តែខ្ញុំជឿថាអ្វីៗនឹងល្អប្រសើរឡើងវិញ។";
+ var tick=function(){return new Promise(function(r){setTimeout(r,0)})};
+ function med(a){if(!a.length)return 0;a=a.slice().sort(function(x,y){return x-y});return a[a.length>>1]}
+ /* វិភាគសំឡេង៖ កំណត់ឃ្លាសំឡេងនិយាយ → F0 មធ្យម (autocorrelation) + ល្បឿន (peak envelope/វិនាទី) + ការផ្អាក */
+ async function analyze(buf,prog){
+  var ch=buf.numberOfChannels,dec=Math.max(1,Math.round(buf.sampleRate/8000)),sr=buf.sampleRate/dec,N=Math.floor(buf.length/dec),x=new Float32Array(N),d=[];
+  for(var c=0;cch;c++)d.push(buf.getChannelData(c));
+  for(var i=0;iN;i++){var s=0;for(var k=0;kdec;k++)for(c=0;cch;c++)s+=d[c][i*dec+k];x[i]=s/(dec*ch)}
+  var fl=Math.round(.025*sr),hop=Math.round(.010*sr),n=Math.floor((x.length-fl)/hop);
+  if(n100)return null;
+  var db=new Float32Array(n),ab=new Float32Array(n);
+  for(i=0;in;i++){var e=0,a=0,o=i*hop;for(var j=0;jfl;j++){var v=x[o+j];e+=v*v;a+=Math.abs(v)}db[i]=10*Math.log10(e/fl+1e-18);ab[i]=a/fl}
+  var srt=Float32Array.from(db).sort(),thr=srt[Math.floor(n*.95)]-35;
+  var env=new Float32Array(n);for(i=0;in;i++){var q=0,m=0;for(j=-2;j=2;j++){var t=i+j;if(t>=0&&tn){q+=ab[t];m++}}env[i]=q/m}
+  var es=Float32Array.from(env).sort(),eh=es[Math.floor(n*.6)]*.8;
+  /* ឃ្លានិយាយ (ដកគម្លាត ≤150ms) */
+  var segs=[],st=-1,gap=0,end=0,pauses=[],pstart=-1;
+  for(i=0;in;i++){
+   if(db[i]>thr){if(st0){st=i;if(pstart>=0&&i-pstart>=8)pauses.push((i-pstart)*.01);pstart=-1}gap=0;end=i}
+   else if(st>=0){gap++;if(gap>15){segs.push([st,end]);st=-1;pstart=end+1}}}
+  if(st>=0)segs.push([st,end]);
+  var fl2=Math.round(.04*sr),lo=Math.round(sr/400),hi=Math.round(sr/70),out=[],cnt=0;
+  for(var si=0;sisegs.length;si++){
+   var a0=segs[si][0],b0=segs[si][1];if(b0-a060)continue;
+   var fs=[];
+   for(i=a0;ib0-4;i+=3){
+    if(db[i]thr+10)continue;
+    var off=i*hop;if(off+fl2+hi>=x.length)break;
+    var mu=0;for(j=0;jfl2;j++)mu+=x[off+j];mu/=fl2;
+    var r0=0;for(j=0;jfl2;j++){var y=x[off+j]-mu;r0+=y*y}if(r0=0)continue;
+    var R=new Float32Array(hi+2),best=-1e9;
+    for(var k2=lo;k2=hi;k2++){var cc=0;for(j=0;jfl2-k2;j++)cc+=(x[off+j]-mu)*(x[off+j+k2]-mu);R[k2]=cc;if(cc>best)best=cc}
+    if(best/r0=.5)continue;
+    var bk=0;for(k2=lo+1;k2hi;k2++){if(R[k2]>=.9*best&&R[k2]>=R[k2-1]&&R[k2]>=R[k2+1]){bk=k2;break}}
+    if(bk)fs.push(sr/bk)}
+   if(fs.length8)continue;
+   var dur=(b0-a0)*.01,pk=0,last=-99;
+   for(i=a0+1;ib0-1;i++){if(env[i]>=eh&&env[i]>=env[i-1]&&env[i]>env[i+1]&&i-last>=8){pk++;last=i}}
+   var mm=0;for(i=a0;i=b0;i++)mm+=db[i];
+   out.push({t:a0*.01,d:dur,f0:med(fs),rate:pk/dur,db:mm/(b0-a0+1)});
+   if(++cnt%20===0){if(prog)prog(si/segs.length);await tick()}}
+  return {segs:out,pauseMed:med(pauses),pauseN:pauses.length}}
+ function wavg(a,k){var s=0,w=0;a.forEach(function(z){s+=z[k]*z.d;w+=z.d});return w?s/w:0}
+ /* ចែកជា ២ ក្រុម (ប្រុស/ស្រី) ដោយ k-means លើ log2(F0) */
+ function split2(segs){
+  var c1=Math.log2(130),c2=Math.log2(220),g1=[],g2=[];
+  for(var it=0;it12;it++){g1=[];g2=[];segs.forEach(function(z){var l=Math.log2(z.f0);(Math.abs(l-c1)=Math.abs(l-c2)?g1:g2).push(z)});
+   if(g1.length)c1=g1.reduce(function(s,z){return s+Math.log2(z.f0)},0)/g1.length;if(g2.length)c2=g2.reduce(function(s,z){return s+Math.log2(z.f0)},0)/g2.length}
+  return {male:g1,female:g2,gapSemi:(c2-c1)*12}}
+ function stats(g){return {f0:wavg(g,"f0"),rate:wavg(g,"rate"),time:g.reduce(function(s,z){return s+z.d},0),n:g.length}}
+ async function measureTTS(slot,pitch,speed){
+  AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  var buf=await ttsBuf(TXT,slot,pitch,Math.round(speed));
+  var r=await analyze(buf);if(!r||!r.segs.length)throw new Error("វាស់ TTS មិនបាន");
+  return {f0:wavg(r.segs,"f0"),rate:wavg(r.segs,"rate")}}
+ /* closed-loop ៖ កែ pitch (Hz) និង speed (%) រហូតចេញពី TTS ពិតដូចគំរូ */
+ async function tune(slot,tgt,say){
+  var pitch=0,speed=0,m=null,ok=false;
+  for(var it=0;it5;it++){
+   say("🔧 កំពុងវាស់ "+(slot%2?"ស្រីមុំ":"ពិសិដ្ឋ")+" (ជុំ "+(it+1)+"/5) ...");
+   m=await measureTTS(slot,pitch,speed);
+   var eF=tgt.f0-m.f0,ratio=m.rate>0?tgt.rate/m.rate:1;
+   if(Math.abs(eF)2&&Math.abs(ratio-1).025){ok=true;break}
+   pitch=Math.max(-50,Math.min(50,+(pitch+eF*.9).toFixed(1)));
+   speed=Math.max(-50,Math.min(100,+(((1+speed/100)*ratio-1)*100).toFixed(1)))}
+  return {pitch:pitch,speed:speed,f0:m.f0,rate:m.rate,ok:ok}}
+ function init(){
+  var b=document.getElementById("matchBtn"),f=document.getElementById("matchFile"),info=document.getElementById("matchInfo");if(!b||!f||!info)return;
+  var say=function(t){info.textContent=t};
+  b.onclick=function(){f.value="";f.click()};
+  f.onchange=async function(){
+   var file=f.files&&f.files[0];if(!file)return;b.disabled=true;
+   try{
+    say("⏳ កំពុងអានសំឡេងគំរូ...");
+    var ab=await file.arrayBuffer(),oc=new(window.OfflineAudioContext||window.webkitOfflineAudioContext)(1,8000,8000),buf=await oc.decodeAudioData(ab);
+    var r=await analyze(buf,function(p){say("🔎 កំពុងវិភាគសំឡេងគំរូ "+Math.round(p*100)+"%")});
+    if(!r||r.segs.length6)throw new Error("សំឡេងគំរូខ្លីពេក ឬគ្មានសំឡេងនិយាយ");
+    var sp=split2(r.segs),M=stats(sp.male),F=stats(sp.female);
+    if(sp.gapSemi6||M.n3||F.n3)throw new Error("ស្គាល់សំឡេងប្រុស/ស្រីមិនបាន (សំឡេងគំរូមានតែម្នាក់?) — F0 មធ្យម "+Math.round(wavg(r.segs,"f0"))+"Hz");
+    var rm=await tune(0,M,say),rf=await tune(1,F,say);
+    [0,2].forEach(function(i){P[i]=P[i]||{};P[i].pitch=rm.pitch;P[i].speed=rm.speed});
+    [1,3].forEach(function(i){P[i]=P[i]||{};P[i].pitch=rf.pitch;P[i].speed=rf.speed});
+    S.set("pre",P);try{steps()}catch(e){}
+    try{if(r.pauseMed>0)localStorage.setItem("zsf_match_pause",String(r.pauseMed.toFixed(2)))}catch(e){}
+    var L=["✅ បានកែ Preset ពិសិដ្ឋ/ស្រីមុំ តាមសំឡេងគំរូ (រក្សាទុកស្វ័យប្រវត្តិ)",
+     "គំរូ ប្រុស: F0 "+M.f0.toFixed(0)+"Hz · ល្បឿន "+M.rate.toFixed(2)+" ព្យាង្គ/វិ  |  TTS ក្រោយកែ: F0 "+rm.f0.toFixed(0)+"Hz · "+rm.rate.toFixed(2)+(rm.ok?" ✓":" (ជិតបំផុត)"),
+     "គំរូ ស្រី: F0 "+F.f0.toFixed(0)+"Hz · ល្បឿន "+F.rate.toFixed(2)+" ព្យាង្គ/វិ  |  TTS ក្រោយកែ: F0 "+rf.f0.toFixed(0)+"Hz · "+rf.rate.toFixed(2)+(rf.ok?" ✓":" (ជិតបំផុត)"),
+     "ពិសិដ្ឋ: Pitch "+rm.pitch+"Hz · Speed "+rm.speed+"%   ស្រីមុំ: Pitch "+rf.pitch+"Hz · Speed "+rf.speed+"%",
+     "ការផ្អាកមធ្យមរបស់គំរូ ≈ "+r.pauseMed.toFixed(2)+" វិនាទី"];
+    info.textContent=L.join("\n");try{showToast("✅ ផ្គូផ្គងសំឡេងគំរូរួចរាល់",true)}catch(e){}
+   }catch(e){say("⚠ "+(e&&e.message||e));try{showToast("⚠ "+(e&&e.message||e),false)}catch(_){}}
+   finally{b.disabled=false}};
+ }
+ window.__zsfMatch={analyze:analyze,split2:split2,stats:stats};
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+
+/* V25.29: ចាប់ប្រភេទរឿងបម្រុង ដោយពាក្យគន្លឹះ (មិនប្រើ AI) — ប្រើពេល AI/Local AI ឆ្លើយ JSON មិនត្រឹមត្រូវ ឬមិនបានប្រភេទ */
+window.zsfKeywordGenre=function(text){
+ var T=String(text||"");if(T.length20)return "";
+ var R=[
+  ["palace",/皇上|皇后|娘娘|嫔妃|贵妃|臣妾|太后|后宫|太子妃|本宫/g,2],
+  ["ancient",/朕|陛下|爱卿|圣旨|草民|王爷|殿下|微臣|在下|本王|朝廷/g,1.5],
+  ["wuxia",/武林|江湖|内力|掌门|少侠|门派|侠|剑法|高手|比武/g,2],
+  ["xianxia",/修仙|仙尊|灵气|宗门|渡劫|修炼|仙界|丹药|仙子|神仙|飞升/g,2],
+  ["fantasy",/魔法|魔王|精灵|异能|神兽|魔族|法术|龙族/g,2],
+  ["system",/系统|宿主|叮|绑定|签到|任务奖励/g,2],
+  ["billionaire",/首富|亿万|亿元|财富|资产过|身价/g,1.5],
+  ["rebirth",/重生|前世|上一世|回到过去|这一世|再活一次/g,3],
+  ["cross_m2a",/穿越|穿到|穿成|回到古代|回到了古代/g,2],
+  ["cross_a2m",/来自古代|古人|现代社会|这是什么地方|什么东西/g,1],
+  ["transmig",/穿书|原著|炮灰|恶毒女配|反派|女配|剧情|原书/g,2.5],
+  ["apocalypse",/末世|丧尸|病毒|物资|基地|变异|避难/g,2.5],
+  ["ceo",/总裁|董事长|集团|总经理|股东|合同|公司|项目/g,1],
+  ["contract",/契约|协议结婚|假结婚|结婚协议|婚约|假扮/g,3],
+  ["medical",/医生|医术|病人|针灸|药方|医院|治病|诊断|把脉/g,2],
+  ["treasure",/古董|鉴宝|文物|拍卖|真品|赝品|玉器|瓷器|捡漏/g,3],
+  ["crime",/警察|案件|凶手|侦探|嫌疑|警局|破案|证据|法医/g,2],
+  ["military",/特种兵|部队|首长|战友|连长|营长|军区|军人|兵王/g,2.5],
+  ["history_war",/大军|城池|出征|将士|战场|攻城|兵马|元帅|主帅/g,2],
+  ["school",/同学|老师|学校|高考|班级|校园|考试|校长/g,1.5],
+  ["family",/婆婆|儿媳|奶奶|妈妈|爸爸|女儿|儿子|哥哥|姐姐|弟弟|妹妹/g,0.7],
+  ["rural",/村长|种地|赶集|乡亲|村里|农民|庄稼|进城/g,2.5],
+  ["food",/厨师|美食|餐厅|做饭|食材|菜品|厨艺|味道|开店/g,2],
+  ["romance",/喜欢你|爱你|老公|老婆|男朋友|女朋友|结婚|谈恋爱|吻/g,1],
+  ["horror",/鬼|恐怖|诡异|阴森|僵尸|冤魂|鬼魂|闹鬼/g,2],
+  ["scifi",/星际|飞船|机甲|外星|基因|实验室|人工智能/g,2.5],
+  ["sports",/比赛|冠军|教练|球队|选手|赛场|拳击|运动员/g,1.5],
+  ["mystery",/线索|真相|悬疑|秘密|谜|失踪|调查/g,1],
+  ["revenge",/打脸|废物|跪下|后悔|离婚|报仇|复仇|羞辱|滚出去|看不起/g,1.5],
+  ["comedy",/哈哈|搞笑|逗比|笑死/g,1.5]
+ ],best="",bs=0,sc={};
+ R.forEach(function(r){var m=T.match(r[1]);if(m){var s=m.length*r[2];sc[r[0]]=s;if(s>bs){bs=s;best=r[0]}}});
+ /* ឆ្លងភព ៖ បើទាំង 穿越 និងពាក្យបុរាណ → បុរាណ↔ទំនើប */
+ if(sc.cross_m2a&&(sc.ancient||sc.palace)&&best==="cross_m2a")best="cross_m2a";
+ return bs>=Math.max(3,T.length/4000)?best:""};
+
+/script>
 /body>/html>
 </script>
 <script id="zsf-wrap">
@@ -7083,7 +7226,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="25.28";
+  var EMB="25.29";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
