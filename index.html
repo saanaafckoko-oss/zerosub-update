@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.21";})();/script>
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.22";})();/script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 title>ZERO FLASH/title>
@@ -726,16 +726,45 @@ html[data-mode=light] .zf-lgm button.on{color:#7a4a00;background:rgba(255,179,0,
  div class="row">button class="b ind" id="gemBtn">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M12 3a6.5 6.5 0 0 0-6.5 6.5c0 2 .9 3.2 1.8 4.3.7.9 1.2 1.7 1.2 2.7V18h7v-1.5c0-1 .5-1.8 1.2-2.7.9-1.1 1.8-2.3 1.8-4.3A6.5 6.5 0 0 0 12 3z"/>path d="M9.5 21h5"/>circle cx="12" cy="9.5" r="1.8"/>/svg> Gemini/button>button class="b sky" id="gooBtn">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">rect x="2.5" y="3" width="12" height="12" rx="2.5"/>path d="M5.5 6.5h6M8.5 5v1.5M6 12c1.8-.8 3.2-2.2 3.8-4.5M7 9.5c.8 1.2 2 2.2 3.3 2.7"/>path d="M12.5 21l4.5-10 4.5 10M14.2 17.5h5.6"/>/svg> Google/button>button class="b" id="keyT">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M6 9l6 6 6-6"/>/svg> Key Gemini/button>/div>
  button class="b vio big" id="tagBtn" style="margin-top:10px;padding:14px;font-size:16px">🎭 ចាប់ប្រុស/ស្រី [1]-[4] (Gemini ស្តាប់សំឡេង)/button>
  div id="gbox" class="card in hide">
-  div id="laiCard" style="margin:0 0 12px;padding:14px;border-radius:18px;background:#16213a;border:1px solid #2a3a5c">
-  style>#laiCard .lbx{flex:1;min-width:0;padding:8px 10px;border-radius:12px;font-weight:800}#laiCard .lbx small{display:block;font-size:13px;font-weight:600;opacity:.9}#laiCard .lbx b{display:block;font-size:20px;margin-top:2px}#laiCard .lbt{flex:1;padding:10px 6px;border-radius:12px;border:1.5px solid #3a4c7a;background:#101a30;font-weight:800;font-size:14px;text-align:center;color:#8aa4ff}/style>
-  div style="display:flex;align-items:center;gap:10px">span style="width:38px;height:38px;border-radius:10px;background:#2b2a5e;display:flex;align-items:center;justify-content:center;font-size:20px">⚡/span>b style="font-size:21px;flex:1;color:#fff">Local AI/b>span id="laiBadge" style="padding:5px 12px;border-radius:999px;border:1.5px solid #9ca3af;color:#9ca3af;font-weight:800;font-size:15px">មិនទាន់ភ្ជាប់/span>/div>
-  label style="display:none">input type="checkbox" id="laiOn">/label>
-  div style="display:flex;align-items:center;gap:8px;margin-top:12px;padding:0 12px;border:2px solid #f5b800;border-radius:12px;background:#0b1220">span style="font-size:20px">🔑/span>input type="password" id="laiKey" placeholder="Local AI Key" style="flex:1;min-width:0;background:transparent;border:0;outline:0;color:#fff;padding:14px 4px;font-size:16px">/div>
-  div style="display:flex;align-items:center;gap:10px;margin-top:12px">span style="color:#9fb0cf;font-weight:800">ម៉ូដែល ៖/span>select id="laiModel" style="flex:1;min-width:0;padding:12px;border-radius:12px;font-size:16px;font-weight:800;color:#f5b800;background:#0b1220;border:1px solid #2a3a5c">option value="gemini-3.5-flash-lite">🛡️ 3.5 Flash Lite (ណែនាំ)/option>option value="gemini-3.1-flash-lite">3.1 Flash Lite/option>option value="gemini-3-flash">3 Flash/option>option value="gemini-3.8-flash">3.8 Flash/option>option value="gemini-3.1-pro">3.1 Pro/option>/select>/div>
-  div style="margin-top:12px;padding:12px;border-radius:14px;background:#0f1830;border:1px solid #2a3a5c">div id="laiInfo" style="color:#9fb0cf;font-size:15px">/div>
-   div style="display:flex;gap:8px;margin-top:10px">button class="b" id="laiRef" style="flex:1;border:1.5px solid #3a4c7a;background:#101a30;color:#8aa4ff;font-weight:800;font-size:14px">↻ ធ្វើបច្ចុប្បន្នភាព/button>button class="b" id="laiDash" style="flex:1;border:1.5px solid #3a4c7a;background:#101a30;color:#a78bfa;font-weight:800;font-size:14px">↗ បើក Dashboard/button>/div>/div>
+div id="laiCard" style="margin:0 0 12px;padding:12px;border-radius:10px;background:#1e293b;border:1px solid #2b3549">
+style>
+#laiCard,#laiCard *{box-sizing:border-box}
+#laiCard input,#laiCard select,#laiCard button{box-shadow:none!important;text-shadow:none!important;transform:none!important;filter:none!important;background-image:none!important;min-height:0!important;margin:0!important;font-family:inherit!important;letter-spacing:0!important;text-transform:none!important;line-height:1.2!important;-webkit-appearance:none!important;appearance:none!important;outline:0!important}
+#laiCard input{letter-spacing:.4px!important}
+#laiCard button{cursor:pointer}
+/style>
+div style="display:flex;align-items:center;gap:7px">
+span style="width:23px;height:23px;border-radius:6px;background:#302c5f;display:flex;align-items:center;justify-content:center;flex:none">svg width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24">path d="M7 2v11h3v9l7-12h-4l4-8z"/>/svg>/span>
+b style="font-size:14.5px;flex:1;color:#fff;font-weight:700;line-height:20px">Local AI/b>
+span id="laiBadge" style="display:inline-flex;align-items:center;height:25px;padding:0 8px;border-radius:6px;border:1px solid #9ca3af59;background:#9ca3af1f;color:#9ca3af;font-weight:700;font-size:12.3px;margin-right:13px;white-space:nowrap">មិនទាន់ភ្ជាប់/span>
 /div>
-  div class="chips2" id="gm" style="margin-bottom:6px">/div>
+label style="display:none">input type="checkbox" id="laiOn">/label>
+div style="display:flex;align-items:center;gap:12px;margin-top:11px;padding:0 15px;height:38px;border:1px solid #ffb703;border-radius:9px;background:#0f172a">
+svg width="15" height="15" viewBox="0 0 24 24" fill="#94a3b8" style="flex:none">path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>/svg>
+input type="password" id="laiKey" placeholder="Local AI Key" style="flex:1;min-width:0;height:100%;background:transparent;border:0;color:#e2e8f0;padding:0;font-size:14px">
+/div>
+div style="display:flex;align-items:center;gap:13px;margin-top:9px">
+span style="color:#94a3b8;font-weight:600;font-size:13px;line-height:18px;white-space:nowrap">ម៉ូដែល ៖/span>
+div style="position:relative;flex:1;min-width:0">
+select id="laiModel" style="display:block;width:100%;height:32px;padding:0 28px 0 10px;border-radius:8px;border:1px solid #1e293b;background:#0f172a;color:#ffb703;font-size:12.5px;font-weight:700">
+option value="gemini-3.5-flash-lite">🛡️ 3.5 Flash Lite (ណែនាំ)/option>
+option value="gemini-3.1-flash-lite">3.1 Flash Lite/option>
+option value="gemini-3-flash">3 Flash/option>
+option value="gemini-3.8-flash">3.8 Flash/option>
+option value="gemini-3.1-pro">3.1 Pro/option>
+/select>
+svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffb703" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:9px;top:10px;pointer-events:none">path d="M6 9l6 6 6-6"/>/svg>
+/div>
+/div>
+div style="margin-top:11px;padding:10px;border-radius:7px;background:#0f172a;border:1px solid #1c2740">
+div id="laiInfo" style="color:#9fb0cf;font-size:13px">/div>
+div style="display:flex;align-items:center;gap:9px;margin-top:8px">
+button type="button" id="laiRef" style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:5px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#38bdf8;font-size:13px;font-weight:700;white-space:nowrap">svg width="12" height="12" viewBox="0 0 24 24" fill="#38bdf8">path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>/svg>ធ្វើបច្ចុប្បន្នភាព/button>
+button type="button" id="laiDash" style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:5px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#a78bfa;font-size:13px;font-weight:700;white-space:nowrap">svg width="12" height="12" viewBox="0 0 24 24" fill="#a78bfa">path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>/svg>បើក Dashboard/button>
+/div>
+/div>
+/div>
+    div class="chips2" id="gm" style="margin-bottom:6px">/div>
   div class="row" style="align-items:center">div class="t ktitle" style="margin:0;font-size:17px;flex:2">🔑 Gemini API Keys (Slot ១-១០)/div>span class="badge" style="color:#34d399;border-color:#34d399;flex:none" id="kcount">0/10 បានកំណត់/span>/div>
   div class="row wrap" id="keys" style="gap:10px 16px">/div>
   button class="b sel" style="width:100%;color:#6aa5ff;border-color:#3b73f0;box-shadow:none" id="mk">លីងបង្កើត Key Gemini span class="il">svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/>path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>/svg>/span>/button>
@@ -6641,7 +6670,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"25.21",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.22",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -6913,33 +6942,86 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
  function on(){return g("zsf_lai_on","0")==="1"&&!!key()}
  window.zsfKF=function(arr){var a=(arr||[]).filter(Boolean);if(!a.length&&on())return["LOCAL_AI"];return a};
  function $i(id){return document.getElementById(id)}
- function badge(t,c){var b=$i("laiBadge");if(!b)return;b.textContent=t;b.style.color=c;b.style.borderColor=c}
+ function badge(t,c){var b=$i("laiBadge");if(!b)return;b.textContent=t;b.style.color=c;b.style.borderColor=c+"59";b.style.background=c+"1f"}
  function num(n){n=Number(n);return isFinite(n)?n.toLocaleString("en-US"):"-"}
+ function esc(t){return String(t).replace(/&/g,"&amp;").replace(//g,"&lt;")}
+ function flat(o,out,d){
+  if(!o||typeof o!=="object"||d>6)return;
+  Object.keys(o).forEach(function(k){
+   var v=o[k],lk=String(k).toLowerCase();
+   if(v!==null&&typeof v==="object"){flat(v,out,d+1)}
+   else if(!out[lk]||dout[lk].d){out[lk]={v:v,d:d}}
+  })
+ }
+ function pickN(out,names){
+  for(var i=0;inames.length;i++){var e=out[names[i]];if(e&&e.v!==null&&e.v!==""&&e.v!==undefined){var n=Number(e.v);if(isFinite(n))return n}}
+  return null
+ }
+ function pickS(out,names){
+  for(var i=0;inames.length;i++){var e=out[names[i]];if(e&&e.v!==null&&e.v!==""&&e.v!==undefined)return e.v}
+  return null
+ }
  function show(d){
-  var j=(d&&(d.data||d.key||d))||{},tot=j.total_tokens,used=j.used_tokens,rem=j.remaining_tokens,days=j.days_left,rpm=j.rate_limit_rpm;
+  var out={};flat(d,out,0);
+  var tot=pickN(out,["total_tokens","quota_tokens","token_limit","tokens_limit","total_quota","quota_total","max_tokens","total","limit","quota"]),
+      used=pickN(out,["used_tokens","tokens_used","consumed_tokens","used","consumed","usage"]),
+      rem=pickN(out,["remaining_tokens","tokens_remaining","tokens_left","remaining","balance","left"]),
+      days=pickN(out,["days_left","remaining_days","days_remaining","day_left"]),
+      rpm=pickN(out,["rate_limit_rpm","rpm","rate_limit_per_minute","rate_limit"]),
+      ex=pickS(out,["expires_at","expire_at","expired_at","expiry_date","expiry","expiration","expires"]);
   if(rem==null&&tot!=null&&used!=null)rem=tot-used;
-  if(days==null&&j.expires_at){var t=Date.parse(j.expires_at);if(t)days=Math.max(0,Math.ceil((t-Date.now())/864e5))}
+  if(tot==null&&used!=null&&rem!=null)tot=used+rem;
+  if(used==null&&tot!=null&&rem!=null)used=tot-rem;
+  if(days==null&&ex!=null){var t=(typeof ex==="number"||/^\d+$/.test(String(ex)))?Number(ex)*(Number(ex)1e12?1000:1):Date.parse(ex);if(t)days=Math.max(0,Math.ceil((t-Date.now())/864e5))}
+  if(tot==null&&used==null&&rem==null&&days==null){
+   $i("laiInfo").innerHTML="div style='color:#fcd34d;font-size:13px'>⚠️ មិនស្គាល់ទិន្នន័យកូតាពី Server/div>div style='margin-top:6px;color:#94a3b8;font-size:11px;word-break:break-all'>"+esc(JSON.stringify(d).slice(0,400))+"/div>";
+   badge("● User_Apk","#34d399");return
+  }
   function mm(n){n=Number(n);return n>=1e6?(n/1e6).toFixed(2)+"M":num(n)}
-  var h="div style='display:flex;align-items:center;justify-content:space-between;gap:8px'>span style='font-weight:800;font-size:16px'>⏳ នៅសល់៖ "+(days!=null?days:"-")+" ថ្ងៃ/span>"+(rpm?"span style='padding:4px 10px;border-radius:8px;border:1.5px solid #3b82f6;color:#60a5fa;font-weight:800;font-size:14px'>⚡ "+rpm+" RPM/span>":"")+"/div>";
-  h+="div style='display:flex;gap:8px;margin-top:10px'>";
-  h+="div class='lbx' style='border:1.5px solid #3b82f6;background:#0f2447;color:#9fb0cf'>small>📊 កូតាសរុប/small>b style='color:#38bdf8'>"+(tot!=null?num(tot):"-")+"/b>/div>";
-  h+="div class='lbx' style='border:1.5px solid #ef4444;background:#2a1220;color:#9fb0cf'>small>🔻 បានប្រើ/small>b style='color:#f87171'>"+(used!=null?num(used):"-")+"/b>/div>";
-  h+="div class='lbx' style='border:1.5px solid #10b981;background:#0f2a2a;color:#9fb0cf'>small>🟢 នៅសល់/small>b style='color:#34d399'>"+(rem!=null?"~"+mm(rem):"-")+"/b>"+(rem!=null?"small style='color:#34d399'>(~"+num(Math.floor(rem/33))+" ជួរ)/small>":"")+"/div>";
+  var bx="flex:1;min-width:0;padding:5px 6px;border-radius:6px;",lb="font-size:12.5px;line-height:17px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis",vb="font-size:15px;line-height:20px;font-weight:700;margin-top:1px;white-space:nowrap";
+  var h="div style='display:flex;align-items:center;justify-content:space-between;height:20px'>span style='color:#fcd34d;font-size:14px;font-weight:500;line-height:20px'>⏳ នៅសល់: "+(days!=null?days:"-")+" ថ្ងៃ/span>"+(rpm?"span style='display:inline-flex;align-items:center;gap:3px;height:20px;padding:0 8px;border-radius:5px;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.12);color:#38bdf8;font-size:11.5px;font-weight:700'>⚡ "+rpm+" RPM/span>":"")+"/div>";
+  h+="div style='display:flex;align-items:center;gap:4px;margin-top:8px'>";
+  h+="div style='"+bx+"border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.08)'>div style='"+lb+"'>📊 កូតាសរុប/div>div style='"+vb+";color:#38bdf8'>"+(tot!=null?num(tot):"-")+"/div>/div>";
+  h+="div style='"+bx+"border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.08)'>div style='"+lb+"'>🔻 បានប្រើ/div>div style='"+vb+";color:#f87171'>"+(used!=null?num(used):"-")+"/div>/div>";
+  h+="div style='"+bx+"border:1px solid rgba(52,211,153,.35);background:rgba(52,211,153,.1)'>div style='"+lb+"'>🟢 នៅសល់/div>div style='"+vb+";color:#34d399'>"+(rem!=null?"~"+mm(rem):"-")+"/div>"+(rem!=null?"div style='font-size:12px;line-height:14px;color:#34d399;opacity:.85;white-space:nowrap'>(~"+num(Math.floor(rem/33))+" ជួរ)/div>":"")+"/div>";
   h+="/div>";
   $i("laiInfo").innerHTML=h;
   badge("● User_Apk","#34d399");
  }
-  async function check(){
+ async function getJ(url,opt){
+  var ac=new AbortController(),tm=setTimeout(function(){ac.abort()},12000);
+  try{
+   opt=opt||{};opt.signal=ac.signal;
+   var r=await F0(url,opt),raw=await r.text(),d=null;
+   try{d=JSON.parse(raw)}catch(e){}
+   return{ok:r.ok,status:r.status,d:d,raw:raw}
+  }finally{clearTimeout(tm)}
+ }
+ async function check(){
   var k=key();if(!k){$i("laiInfo").textContent="";badge("មិនទាន់ភ្ជាប់","#9ca3af");return}
   badge("កំពុងពិនិត្យ...","#f5b800");
-  try{
-   var r=await F0(HOST+"/v1/key/info",{headers:{"Authorization":"Bearer "+k}}),raw=await r.text(),d=null;
-   try{d=JSON.parse(raw)}catch(e){}
-   if(!r.ok){badge("✘ Key មិនត្រឹមត្រូវ","#f87171");$i("laiInfo").textContent=(d&&(d.detail||d.message||(d.error&&d.error.message)))||("HTTP "+r.status);return}
-   show(d)
-  }catch(e){badge("✘ ភ្ជាប់មិនបាន","#f87171");$i("laiInfo").textContent="ភ្ជាប់ម៉ាស៊ីនមិនបាន ("+(e&&e.message||e)+")"}
+  var tries=[
+   [HOST+"/v1/key/info",{headers:{"Authorization":"Bearer "+k}}],
+   [HOST+"/key/info",{headers:{"Authorization":"Bearer "+k}}],
+   [HOST+"/v1/key/info",{headers:{"x-api-key":k}}],
+   [HOST+"/v1/key/info?key="+encodeURIComponent(k),{}],
+   [HOST+"/v1/key/info",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+k},body:JSON.stringify({key:k})}]
+  ],first=null,netErr=null;
+  for(var i=0;itries.length;i++){
+   try{
+    var R=await getJ(tries[i][0],tries[i][1]);
+    if(R.ok&&R.d&&typeof R.d==="object"){show(R.d);return}
+    if(!first)first=R;
+   }catch(e){if(!netErr)netErr=e}
+  }
+  if(first){
+   var d=first.d;badge("✘ Key មិនត្រឹមត្រូវ","#f87171");
+   $i("laiInfo").textContent=(d&&(d.detail||d.message||(d.error&&d.error.message)))||("HTTP "+first.status);return
+  }
+  badge("✘ ភ្ជាប់មិនបាន","#f87171");
+  $i("laiInfo").textContent="ភ្ជាប់ម៉ាស៊ីនមិនបាន ("+(netErr&&netErr.message||netErr)+")"
  }
- function chip(i){return document.querySelectorAll("#opts .b")[i]}
+  function chip(i){return document.querySelectorAll("#opts .b")[i]}
  function syncChip(){var c=chip(5);if(!c)return;if(g("zsf_lai_on","0")==="1")c.classList.remove("off");else c.classList.add("off")}
  function gemOn(){var c=chip(1);if(c)c.classList.remove("off")}
  try{var st=document.createElement("style");st.textContent="#opts .b{order:2}#opts .b:nth-child(1){order:0}#opts .b:nth-child(6){order:1}";document.head.appendChild(st)}catch(e){}
@@ -6999,7 +7081,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="25.21";
+  var EMB="25.22";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
