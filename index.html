@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.68";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.69";})();
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -1385,8 +1385,8 @@ function probe(fl){return new Promise(res=>{const v=document.createElement("vide
  const done=r=>{if(dn)return;dn=true;URL.revokeObjectURL(u);res(r)};
  v.preload="metadata";v.muted=true;v.onloadedmetadata=()=>done({w:v.videoWidth,h:v.videoHeight,d:v.duration});v.onerror=()=>done(null);setTimeout(()=>done(null),8000);v.src=u})}
 /* V15.5 : ស្ទីលបកប្រែ — ធម្មតា / កំប្លែង ទាក់ទាញ (ជ្រើសក្នុងប្រអប់ "ស្ទីលបកប្រែ") · ប៉ះពាល់គ្រប់ការបកប្រែ Gemini (SRT + ទាញពីវីដេអូ) */
-var ZSF_FUN_PROMPT="STYLE (FUN & ENGAGING): make the Khmer lively and entertaining for viewers, like a witty Khmer social-media movie narrator, ONLY where the scene is light, comedic, teasing, awkward, or the characters are joking or showing off. Keep serious, sad, tense, dangerous, heartfelt-romantic and emotional-climax lines natural and sincere (no jokes there). Use natural spoken Khmer that young viewers really say (colloquial particles and everyday words, playful reactions, light exaggeration, witty comebacks, fitting Khmer sayings) instead of stiff formal written Khmer, and give each character a consistent personality in tone (cocky, shy, cunning, innocent, grumpy). Do NOT change the facts or meaning, do NOT add new information and do NOT drop anything; keep each line about the same length as a normal translation (at most about 15% longer) so the Khmer voice still fits the time slot. No vulgar, insulting or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (genre, era, characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it.";
-var ZSF_NARR_PROMPT="STYLE (STORY NARRATOR + DIALOGUE): translate like a professional Khmer drama-recap storyteller who tells the story aloud while the characters speak. Rules: (1) Every line is still the SAME spoken line of the SAME character, in first person, keeping its exact meaning and emotion. Never turn a character's words into third-person narration and never merge or split lines. (2) Make the Khmer flow like one continuous story told aloud: natural spoken Khmer, vivid but simple words, smooth connection between neighbouring lines, strong emotional vocabulary where the scene is tense, sad, angry, romantic or funny. (3) Match the genre and era of the STORY CARD (palace, wuxia, modern, comedy, revenge and so on). (4) Do NOT add any new information, event, name or feeling, do NOT drop anything, keep each line at most about 15% longer than a normal translation so the Khmer voice still fits the time slot. No vulgar or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: follow the STORY CARD and this STYLE on EVERY line.";
+var ZSF_FUN_PROMPT="STYLE (FUN & ENGAGING): make the Khmer lively and entertaining for viewers, like a witty Khmer social-media movie narrator, ONLY where the scene is light, comedic, teasing, awkward, or the characters are joking or showing off. Keep serious, sad, tense, dangerous, heartfelt-romantic and emotional-climax lines natural and sincere (no jokes there). Use natural spoken Khmer that young viewers really say (colloquial particles and everyday words, playful reactions, light exaggeration, witty comebacks, fitting Khmer sayings) instead of stiff formal written Khmer, and give each character a consistent personality in tone (cocky, shy, cunning, innocent, grumpy). Do NOT change the facts or meaning, do NOT add new information and do NOT drop anything; keep each line about the same length as a normal translation (at most about 15% longer) so the Khmer voice still fits the time slot. No vulgar, insulting or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (era, characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it.";
+var ZSF_NARR_PROMPT="STYLE (STORY NARRATOR + DIALOGUE): translate like a professional Khmer drama-recap storyteller who tells the story aloud while the characters speak. Rules: (1) Every line is still the SAME spoken line of the SAME character, in first person, keeping its exact meaning and emotion. Never turn a character's words into third-person narration and never merge or split lines. (2) Make the Khmer flow like one continuous story told aloud: natural spoken Khmer, vivid but simple words, smooth connection between neighbouring lines, strong emotional vocabulary where the scene is tense, sad, angry, romantic or funny. (3) Match the era of the characters in the STORY CARD; the user chose this narrator style manually, so do NOT guess or switch to any other genre voice. (4) Do NOT add any new information, event, name or feeling, do NOT drop anything, keep each line at most about 15% longer than a normal translation so the Khmer voice still fits the time slot. No vulgar or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: follow the STORY CARD and this STYLE on EVERY line.";
 var ZSF_AUTO_PROMPT="STYLE (AUTO BY STORY): first infer from the story card, the characters and the whole SRT what kind of story this is, then adapt the Khmer register scene by scene. COMEDIC / light / teasing / awkward / boasting scenes: lively, witty, natural spoken Khmer that young viewers really say, playful reactions, light exaggeration, fitting Khmer sayings. ANCIENT / palace / royal / wuxia / xianxia / historical scenes: no modern slang, but keep the Khmer EASY TO HEAR. Use royal or classical vocabulary ONLY for real court characters (emperor, empress, concubines, ministers, eunuchs) when they speak to or about royalty. Villagers, farmers, blacksmiths, servants, soldiers, bailiffs, merchants and ordinary people in an ancient setting speak plain everyday colloquial Khmer, only with the right rank-based address terms. MODERN drama, serious, sad, tense, dangerous, romantic and emotional-climax lines: natural, sincere, no jokes. Keep each character's personality consistent. Do NOT change the facts or meaning, do NOT add information and do NOT drop anything; keep each line at most about 15% longer than a normal translation so it fits the time slot. No vulgar or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (genre, era, characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it.";
 function zsfStyleMode(){try{var v=localStorage.getItem("zsf_tr_style");return(v==="fun"||v==="narr"||v==="normal"||/^g:[a-z0-9_]+$/.test(v||""))?v:"auto"}catch(e){return "auto"}}
 function zsfStylePrompt(){var m=zsfStyleMode();if(m==="fun")return ZSF_FUN_PROMPT;if(m==="narr")return ZSF_NARR_PROMPT;if(m.slice(0,2)==="g:"){var g=gGenreByCode(m.slice(2));if(g)return "STYLE (GENRE = "+g[2]+"): the user fixed the story genre, so translate EVERY line in this genre's voice. GENRE GUIDANCE (Khmer): "+g[3]+" Keep each character's personality and forms of address consistent; if the story card lists characters from another era, still use their own era's register. Do NOT change the facts or meaning, do NOT add information and do NOT drop anything; keep each line at most about 15% longer than a normal translation so it fits the time slot. No vulgar or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it."}return ZSF_AUTO_PROMPT}
@@ -5715,9 +5715,9 @@ async function translateAll(){var Z0=zsfSnap();
    if(!bible&&btmaxTry){try{showToast("⚠ ចាប់ប្រភេទសាច់រឿងមិនទាន់បាន — កំពុងសាកម្តងទៀត ("+bt+"/"+maxTry+")",false)}catch(_){}await sleep2(Math.min(8000,2000*bt))}
   }
   if(!bible)throw new Error("ចាប់ប្រភេទសាច់រឿងពី SRT មិនបាន — ពិនិត្យ Gemini Key / Quota ហើយសាកម្តងទៀត");
-  var gname="";try{var gcode=bible.genres&&bible.genres[0],gg=gcode?gGenreByCode(gcode):null;gname=gg?gg[1]:""}catch(_){}
-  try{showToast("✓ ចាប់បានប្រភេទសាច់រឿងពី SRT"+(gname?": "+gname:"")+" — បកប្រែតាមស្ទីលសាច់រឿងនេះ",true)}catch(_){}
-  try{setProgress(3,"✅ ចាប់បានប្រភេទសាច់រឿង"+(gname?": "+gname:"")+" — ចាប់ផ្តើមបកប្រែ...")}catch(_){}
+  var gname="",__man=false;try{__man=zsfStyleMode()!=="auto";if(!__man){var gcode=bible.genres&&bible.genres[0],gg=gcode?gGenreByCode(gcode):null;gname=gg?gg[1]:""}}catch(_){}
+  try{showToast(__man?"📌 បកប្រែតាមស្ទីលដែលអ្នកបានជ្រើសរើស (មិនប្រើការទាយស្វ័យប្រវត្តិ)":"✓ ចាប់បានប្រភេទសាច់រឿងពី SRT"+(gname?": "+gname:"")+" — បកប្រែតាមស្ទីលសាច់រឿងនេះ",true)}catch(_){}
+  try{setProgress(3,__man?"📌 ប្រើស្ទីលដែលអ្នកជ្រើស — ចាប់ផ្តើមបកប្រែ...":"✅ ចាប់បានប្រភេទសាច់រឿង"+(gname?": "+gname:"")+" — ចាប់ផ្តើមបកប្រែ...")}catch(_){}
  }
  ctxT=window.zsfAutoStory?window.zsfAutoStory():"";
  for(var i=0;isrc.length;i+=B)batches.push(i);
@@ -6184,12 +6184,12 @@ function gCleanBible(j){
 window.zsfStoryBlock=function(){
  var o="";
  try{
-  var b=gBible,g=b&&b.genres&&b.genres.length?gGenreByCode(b.genres[0]):null,man=null;try{var sm=zsfStyleMode();if(sm.slice(0,2)==="g:"){man=gGenreByCode(sm.slice(2));if(man)g=man}}catch(_){}
+  var b=gBible,sm="auto";try{sm=zsfStyleMode()}catch(_){}var g=(sm==="auto"&&b&&b.genres&&b.genres.length)?gGenreByCode(b.genres[0]):null,man=null;try{if(sm.slice(0,2)==="g:"){man=gGenreByCode(sm.slice(2));if(man)g=man}}catch(_){}
   o+="\n\n=== សៀវភៅរឿង (ត្រូវគោរពតាមនេះគ្រប់បន្ទាត់) ===";
-  o+="\nប្រភេទ/បរិយាកាសរឿង: "+(g?(g[1]+(man?" (អ្នកប្រើជ្រើសដោយដៃ)":" (AI ចាប់បាន)")):"កំណត់តាមបរិបទក្នុងរឿង (ស្វ័យប្រវត្តិ)");
+  o+="\nប្រភេទ/បរិយាកាសរឿង: "+(g?(g[1]+(man?" (អ្នកប្រើជ្រើសដោយដៃ — ត្រូវតាមនេះជានិច្ច)":" (AI ចាប់បាន)")):(sm==="auto"?"កំណត់តាមបរិបទក្នុងរឿង (ស្វ័យប្រវត្តិ)":"អ្នកប្រើបានជ្រើសស្ទីលដោយដៃ — មិនត្រូវទាយប្រភេទរឿងដោយខ្លួនឯង ត្រូវបកប្រែតាមស្ទីលដែលបានកំណត់ប៉ុណ្ណោះ"));
   if(b){
    if(b.synopsis)o+="\nសង្ខេបរឿង: "+b.synopsis;
-   if(b.tone)o+="\nសម្លេងរឿង: "+b.tone;
+   if(b.tone&&sm==="auto")o+="\nសម្លេងរឿង: "+b.tone;
   }
   if(g)o+="\nការណែនាំតាមប្រភេទ:\n- "+g[3];
   o+="\n"+ZSF_ERA_RULE;
@@ -6222,9 +6222,9 @@ window.zsfStoryBlock=function(){
   if(m==="auto"){
    var g=null;try{g=gBible&&gBible.genres&&gBible.genres.length?gGenreByCode(gBible.genres[0]):null}catch(_){}
    s=g?("✅ AI វិភាគ SRT ហើយ ស្គាល់ប្រភេទ៖ "+(EM[g[0]]||"🎬")+" "+g[1]):"🔎 នឹងវិភាគ SRT ស្គាល់ប្រភេទសាច់រឿងដោយស្វ័យប្រវត្តិ ពេលចាប់ផ្ដើមបកប្រែ";
-  }else if(m==="normal")s="បកប្រែត្រង់ៗ មិនកែតាមស្ទីល";
-  else if(m==="narr")s="📖 បកប្រែបែបនិទានរឿង (មិនទាន់ដាក់ការនិទានចន្លោះស្ងៀម)";
-  else if(m==="fun")s="បកប្រែបែបកំប្លែង សប្បាយ";
+  }else if(m==="normal")s="បកប្រែត្រង់ៗ មិនកែតាមស្ទីល (មិនប្រើការស្គាល់ប្រភេទស្វ័យប្រវត្តិ)";
+  else if(m==="narr")s="📖 បកប្រែបែបនិទានរឿង (មិនប្រើការស្គាល់ប្រភេទស្វ័យប្រវត្តិ)";
+  else if(m==="fun")s="😄 បកប្រែបែបកំប្លែង សប្បាយ (មិនប្រើការស្គាល់ប្រភេទស្វ័យប្រវត្តិ)";
   else{var g2=gGenreByCode(m.slice(2));s=g2?("📌 ចាក់សោប្រភេទ៖ "+(EM[g2[0]]||"🎬")+" "+g2[1]+" (មិនប្រើការស្គាល់ស្វ័យប្រវត្តិ)"):""}
   if(s!==last){last=s;info.textContent=s}
  }
@@ -6863,7 +6863,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"25.68",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.69",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7109,7 +7109,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="25.68";
+  var EMB="25.69";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
