@@ -5942,6 +5942,8 @@ $("#exp").onclick=async function(){
    }
    window.__zsfTextOnly=false;
    if(!__direct){setProgress(5,"🧠 កំពុងបកប្រែដោយ Gemini...");try{await translateAll()}catch(e){throw new Error("[1-Click Export គាំង!] បរាជ័យក្នុងការបកប្រែ Subtitle! "+e.message)}}
+   try{var __bad=0,__tv=$("#target").value;cues.forEach(function(q){var t=String(q.t||"").replace(/\[[1-4]\]/g,"").trim();if(!t)return;var hasKm=/[\u1780-\u17FF]/.test(t),cjk=/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF]/.test(t),lt=(t.match(/\p{L}/gu)||[]).length;if(__tv==="km"){if(!hasKm&&(cjk||lt>=6))__bad++}else if(__tv!=="zh"&&__tv!=="ja"&&__tv!=="ko"&&cjk)__bad++});
+   if(__bad>0)throw new Error("[1-Click Export គាំង!] បកប្រែមិនបាន "+__bad+"/"+cues.length+" ឃ្លា (នៅតែជាភាសាដើម)។ ពិនិត្យ Gemini Key / Quota ឬ Local AI រួចសាកម្តងទៀត។"+(window.__laiLast&&!$$("#opts .b")[5].classList.contains("off")?" Local AI: "+window.__laiLast:""))}catch(e){if(/1-Click/.test(String(e&&e.message)))throw e}
    setProgress(100,"✅ បកប្រែរួចរាល់ "+cues.length+" ឃ្លា");
   }
   window.__zsfPre=null;try{zsfSafeCues()}catch(e){}
