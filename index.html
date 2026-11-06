@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.60";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.61";})();
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -935,17 +935,28 @@ function zsfKmNums(c){try{if(!zsfKmDominant(c))return c;c.forEach(function(x){if
 function zsZhCapture(c){try{var t=c.map(function(x){return String(x.t||"").replace(/^\s*\[[1-4]\]\s*/,"")}).join(""),h=(t.match(/[\u4E00-\u9FFF]/g)||[]).length,k=(t.match(/[\u1780-\u17FF]/g)||[]).length,o=(t.match(/[A-Za-z]/g)||[]).length;if(c.length&&h>0&&h/(h+k+o)>0.5)window.__zsZhSrc=c.map(function(x){return {s:x.s,e:x.e,t:x.t}})}catch(_){}}
 const setC=c=>{try{zsZhCapture(c)}catch(_){}if(typeof RP!=="undefined"&&RP.length)c.forEach(x=>{RP.forEach(a=>{x.t=x.t.split(a[0]).join(a[1])})});zsfKmNums(c);zsfKmLatin(c);cues=c;$("#srtText").value=toSrt(c)};
 $("#srtText").onchange=()=>{cues=parse($("#srtText").value);try{zsZhCapture(cues)}catch(_){}};
-$("#srtBtn").onclick=()=>$("#srtFile").click();$("#srtFile").onchange=async e=>{const f=e.target.files[0];if(f)setC(parse(await f.text()))};
-$("#clr").onclick=()=>{cues=[];$("#srtText").value="";$("#sub").textContent=""};
+$("#srtBtn").onclick=()=>$("#srtFile").click();$("#srtFile").onchange=async e=>{const f=e.target.files[0];if(f){window.__zsSrtName=f.name;setC(parse(await f.text()))}};
+$("#clr").onclick=()=>{cues=[];window.__zsSrtName=null;$("#srtText").value="";$("#sub").textContent=""};
 const save=(n,t)=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/plain"}));a.download=n;a.click()};
-$("#dlSrt").onclick=()=>save("subtitle.srt",toSrt(cues));
+/* V25.61: ឈ្មោះ SRT ស្វ័យប្រវត្តិ — យកឈ្មោះ SRT ដែលនាំចូល (បើគ្មាន → ឈ្មោះវីដេអូ) · SRT ខ្មែរ = ឈ្មោះ + 🇰🇭 (ឧ. EP01🇰🇭.srt) · Google = ឈ្មោះ_ភាសា.srt */
+function zsfSrtName(lg){
+ var base="";
+ try{base=window.__zsSrtName||((typeof file!=="undefined"&&file&&file.name)?file.name:"")}catch(e){}
+ base=String(base||"").replace(/\.[^.\/\\]+$/,"").replace(/[\\\/:*?"\x3c>|]/g,"_").split("\u{1F1F0}\u{1F1ED}").join("").replace(/[_\-\s.]*(khmer|km)$/i,"").trim();
+ if(!base)base="subtitle";
+ if(lg)return base+"_"+lg+".srt";
+ var n=0;try{cues.forEach(function(c){if(/[\u1780-\u17FF]/.test(String(c.t||"")))n++})}catch(e){}
+ var kh=cues.length>0&&n/cues.length>=0.5;
+ return base+(kh?"\u{1F1F0}\u{1F1ED}":"")+".srt";
+}
+$("#dlSrt").onclick=()=>{var n=zsfSrtName();save(n,toSrt(cues));try{showToast("📄 SRT: "+n,true)}catch(e){}};
 $("#cuEn").onclick=async()=>{const sel=$("#cuLang"),lg=sel.value,ln=sel.selectedOptions[0].text,zs=window.__zsZhSrc,src=(zs&&zs.length)?zs:cues;
  if(!src.length)return alert("សូមនាំចូល SRT ជាមុន");const b=$("#cuEn"),ob=b.innerHTML;b.textContent="...";
  try{const TG=/^\s*\[[1-4]\]\s*/,tx=src.map(c=>String(c.t||"").replace(TG,"").replace(/\n/g," "));
   const g=await googleTr(tx,lg,(d,n)=>{b.textContent=d+"/"+n});
   if(!g.filter(Boolean).length)throw new Error("គ្មានលទ្ធផលបកប្រែ");
-  save("subtitle_"+lg+".srt",toSrt(src.map((c,i)=>({s:c.s,e:c.e,t:g[i]||tx[i]}))));
-  try{showToast("✅ SRT "+ln+" រួច — subtitle_"+lg+".srt"+((zs&&zs.length)?" (បកប្រែពី SRT ចិនដើម)":" (បកប្រែពី SRT បច្ចុប្បន្ន)"),true)}catch(_){}}
+  save(zsfSrtName(lg),toSrt(src.map((c,i)=>({s:c.s,e:c.e,t:g[i]||tx[i]}))));
+  try{showToast("✅ SRT "+ln+" រួច — "+zsfSrtName(lg)+((zs&&zs.length)?" (បកប្រែពី SRT ចិនដើម)":" (បកប្រែពី SRT បច្ចុប្បន្ន)"),true)}catch(_){}}
  catch(e){alert("Google: "+e.message)}b.innerHTML=ob};
 $("#gemBtn").onclick=async()=>{
  if(!cues.length)return alert("សូមនាំចូល SRT ជាមុន");const keys=K.filter(Boolean);if(!keys.length){$("#gbox").classList.remove("hide");return alert("សូមបញ្ចូល Gemini Key")}
@@ -1003,7 +1014,7 @@ $("#bigPlay").onclick=$("#play").onclick=()=>V.play();$("#stop").onclick=()=>{V.
 /* tabs */
 $$("#tabs .b").forEach(b=>b.onclick=()=>{const TC={export:"grn",cut:"orng",asr:"teal",bgm:"vio"};$$("#tabs .b").forEach(x=>{x.classList.remove("grn","orng","teal","vio");x.classList.toggle("gold",x.dataset.t==="cut")});b.classList.remove("gold");b.classList.add(TC[b.dataset.t]);$$(".pane").forEach(p=>p.classList.remove("on"));$("#p-"+b.dataset.t).classList.add("on")});
 $("#opts").innerHTML=["Subtitle","Gemini","ចែកតួ","Voice","Effect"].map(n=>`button class="b">${n}/button>`).join("");$$("#opts .b").forEach(b=>b.onclick=()=>b.classList.toggle("off"));
-$("#exp").onclick=()=>cues.length?save("subtitle.srt",toSrt(cues)):alert("មិនទាន់មានអក្សរ។ ទាញអក្សរ ឬនាំចូល SRT ជាមុន");
+$("#exp").onclick=()=>cues.length?save(zsfSrtName(),toSrt(cues)):alert("មិនទាន់មានអក្សរ។ ទាញអក្សរ ឬនាំចូល SRT ជាមុន");
 
 /* cut */
 let hms=[0,1,0];const lbs=["ម៉ោង","នាទី","វិនាទី"];
@@ -5075,7 +5086,7 @@ else if(a=="s0"||a=="s1")say(tx,+a[1],b);else if(a=="tts")say(tx,slotOfText(c.t)
 else if(a=="sp"){c.t="["+(+b.dataset.k+1)+"] "+tx;sync();render()}});
 q("#cueList").addEventListener("change",e=>{if(e.target.dataset.a!="txt")return;const c=cues[+e.target.closest(".cu").dataset.i],m=TAG.exec(c.t);c.t=(m?m[0]:"")+e.target.value;sync()});
 q("#cuDiv").onclick=()=>q("#tagBtn").click();q("#cuExp").onclick=()=>q("#dlSrt").click();
-q("#cuClr").onclick=()=>{if(!cues.length)return;if(!confirm("លុប SRT ទាំងអស់ ("+cues.length+" បន្ទាត់)?"))return;try{cur&&cur.stop()}catch(e){}cues=[];try{srtBlocks=[]}catch(e){}q("#srtText").value="";last="";q("#sub").textContent="";q("#srtFile").value="";render()};
+q("#cuClr").onclick=()=>{if(!cues.length)return;if(!confirm("លុប SRT ទាំងអស់ ("+cues.length+" បន្ទាត់)?"))return;try{cur&&cur.stop()}catch(e){}cues=[];window.__zsSrtName=null;try{srtBlocks=[]}catch(e){}q("#srtText").value="";last="";q("#sub").textContent="";q("#srtFile").value="";render()};
 function wavDataOffset(u8){for(var i=12;i+8<u8.length;){var id=String.fromCharCode(u8[i],u8[i+1],u8[i+2],u8[i+3]);var sz=u8[i+4]|(u8[i+5]<<8)|(u8[i+6]<<16)|(u8[i+7]<<24);if(id==="data")return i+8;i+=8+sz+(sz&1)}return 44}
 /* V16.0 : 🎯 តម្រឹមម៉ោង Subtitle ឱ្យចំសំឡេងពិត (ដូចក្នុង APK Sp) — ប្រើ Mask សំឡេងនិយាយ កែម៉ោងចាប់ផ្តើម/បញ្ចប់ មិនលុបបន្ទាត់ណាមួយឡើយ */
 function zsfAlignCues(pcm,list){
@@ -6771,7 +6782,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"25.60",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.61",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7017,7 +7028,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="25.60";
+  var EMB="25.61";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
