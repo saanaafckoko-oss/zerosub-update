@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.82";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.83";})();
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -5738,7 +5738,7 @@ async function translateAll(){var Z0=zsfSnap();
  async function gemStrict(prompt,wi){
   var t0=Date.now(),pass=0,key=pickKey();inUse[key]=1;
   try{
-   while(Date.now()-t0300000){
+   while(Date.now()-t0120000){
     var models=zsfTrModels();
     for(var kk=0;kkkeys.length;kk++){
      for(var mi=0;mimodels.length;mi++){
@@ -5749,7 +5749,7 @@ async function translateAll(){var Z0=zsfSnap();
        if(txt)return txt;
        zsfTrCool[key+"|"+m]=Date.now()+20000;
       }catch(e){
-       var kd=zsfErrKind(e);
+       window.__gemErr=String((e&&e.message)||e).slice(0,90);var kd=zsfErrKind(e);
        if(kd==="auth"){zsfTrCool[key+"|*"]=Date.now()+600000;break}
        if(kd==="rate"){zsfTrCool[key+"|"+m]=Date.now()+90000;continue}
        if(kd==="model"){zsfTrCool[key+"|"+m]=Date.now()+1800000;continue}
@@ -5760,23 +5760,23 @@ async function translateAll(){var Z0=zsfSnap();
     }
     pass++;
     try{for(var zq in zsfTrCool)if(zsfTrCool[zq]>Date.now()+8000)zsfTrCool[zq]=Date.now()+5000}catch(_){}
-    try{setProgress(Math.round(liveN/src.length*100),"⏳ Key/Gemini កំពុងមមាញឹក — រង់ចាំហើយសាកម្តងទៀត...")}catch(_){}
+    try{setProgress(Math.round(liveN/src.length*100),"⏳ Key/Gemini កំពុងមមាញឹក — រង់ចាំហើយសាកម្តងទៀត..."+(window.__gemErr?" ["+window.__gemErr+"]":""))}catch(_){}
     await sleep2(Math.min(15000,3000+pass*2000));
    }
    throw new Error("Gemini បកប្រែមិនបាន — ពិនិត្យ API Key / Quota")
   }finally{delete inUse[key]}}
  /* ចាប់ប្រភេទសាច់រឿងពី SRT ឱ្យបានជាមុន (មិនរំលង) — សាកម្តងទៀតដោយប្តូរ Key រហូតបាន ទើបចាប់ផ្តើមបកប្រែ */
  if(tv==="km"){
-  var bible=null,maxTry=10;
+  var bible=null,maxTry=1;
   for(var bt=1;bt=maxTry&&!bible;bt++){
    try{setProgress(2,"📖 កំពុងអាន SRT ទាំងមូល ដើម្បីចាប់ប្រភេទសាច់រឿង... (លើកទី "+bt+"/"+maxTry+")")}catch(_){}
    try{
-    if(bt===1&&window.__bibleP){bible=await window.__bibleP}
-    if(!bible){try{gBibleFail={}}catch(_){}var ro=(bt-1)%keys.length,rk=keys.slice(ro).concat(keys.slice(0,ro));bible=await gPrepareBible(rk,function(){})}
+    if(bt===1&&window.__bibleP){bible=await Promise.race([window.__bibleP,new Promise(function(r){setTimeout(function(){r(null)},45000)})])}
+    if(!bible){try{gBibleFail={}}catch(_){}var ro=(bt-1)%keys.length,rk=keys.slice(ro).concat(keys.slice(0,ro));bible=await Promise.race([gPrepareBible(rk,function(){}),new Promise(function(r){setTimeout(function(){r(null)},45000)})])}
    }catch(e){bible=null}
    if(!bible&&btmaxTry){try{showToast("⚠ ចាប់ប្រភេទសាច់រឿងមិនទាន់បាន — កំពុងសាកម្តងទៀត ("+bt+"/"+maxTry+")",false)}catch(_){}await sleep2(Math.min(8000,2000*bt))}
   }
-  if(!bible)throw new Error("ចាប់ប្រភេទសាច់រឿងពី SRT មិនបាន — ពិនិត្យ Gemini Key / Quota ហើយសាកម្តងទៀត");
+  if(!bible){try{showToast("⚠ ចាប់ប្រភេទសាច់រឿងមិនបាន — បកប្រែបន្តតាមស្ទីលដែលជ្រើស",false)}catch(_){}}
   var gname="",__man=false;try{__man=zsfStyleMode()!=="auto";if(!__man){var gcode=bible.genres&&bible.genres[0],gg=gcode?gGenreByCode(gcode):null;gname=gg?gg[1]:""}}catch(_){}
   try{showToast(__man?"📌 បកប្រែតាមស្ទីលដែលអ្នកបានជ្រើសរើស (មិនប្រើការទាយស្វ័យប្រវត្តិ)":"✓ ចាប់បានប្រភេទសាច់រឿងពី SRT"+(gname?": "+gname:"")+" — បកប្រែតាមស្ទីលសាច់រឿងនេះ",true)}catch(_){}
   try{setProgress(3,__man?"📌 ប្រើស្ទីលដែលអ្នកជ្រើស — ចាប់ផ្តើមបកប្រែ...":"✅ ចាប់បានប្រភេទសាច់រឿង"+(gname?": "+gname:"")+" — ចាប់ផ្តើមបកប្រែ...")}catch(_){}
@@ -5805,7 +5805,7 @@ async function translateAll(){var Z0=zsfSnap();
   }
   var miss=[];res.forEach(function(r,j){if(r===null)miss.push(j)});
   if(miss.length){
-   for(var gr=0;gr8&&miss.length;gr++){
+   for(var gr=0;gr3&&miss.length;gr++){
     for(var cq=0;cqmiss.length;cq+=15){var ch=miss.slice(cq,cq+15);
      try{var t4=await gemStrict(mk(ch),wi);parseInto(t4,ch)}catch(e){}}
     miss=miss.filter(function(j){return res[j]===null});
@@ -6928,7 +6928,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"25.82",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.83",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7348,7 +7348,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="25.82";
+  var EMB="25.83";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
