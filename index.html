@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.77";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.80";})();
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -828,7 +828,8 @@ html[data-mode=light] #zfAuth .zf-top button{color:#0369a1}#zfAuth .zf-top{z-ind
 span style="color:#94a3b8;font-weight:600;font-size:13px;line-height:18px;white-space:nowrap">ម៉ូដែល ៖/span>
 div style="position:relative;flex:1;min-width:0">
 select id="laiModel" style="display:block;width:100%;height:33px;padding:0 28px 0 10px;border-radius:8px;border:1px solid #1e293b;background:#0f172a;color:#ffb703;font-size:12.5px;font-weight:700">
-option value="gemini-3.5-flash-lite">🛡️ 3.5 Flash Lite (ណែនាំ)/option>
+option value="auto">⭐ Auto — ម៉ូដែលល្អបំផុតមុន (3.8 Flash) រួចបម្រុង/option>
+option value="gemini-3.5-flash-lite">🛡️ 3.5 Flash Lite (លឿន)/option>
 option value="gemini-3.1-flash-lite">3.1 Flash Lite/option>
 option value="gemini-3-flash">3 Flash/option>
 option value="gemini-3.8-flash">3.8 Flash/option>
@@ -5715,7 +5716,7 @@ async function googleTr(texts,tl,pg){
  return out}
 /* v21 : បកប្រែ batch ស្របគ្នា (ម្នាក់ៗ Key ផ្សេងគ្នា) · ផ្គូផ្គងតាមលេខ (មិនរអិលជួរ) · ឃ្លាដែលខ្វះ → Google តែឃ្លានោះ · ផ្តល់បរិបទ ២ ឃ្លាមុន */
 async function translateAll(){var Z0=zsfSnap();
- var keys=zsfKF(K),tv=$("#target").value,tl=$("#target").selectedOptions[0].text,TAG=/^\s*\[[1-4]\]\s*/,src=cues.map(function(c){return {s:c.s,e:c.e,t:c.t}}),B=60,
+ var keys=zsfKF(K),tv=$("#target").value,tl=$("#target").selectedOptions[0].text,TAG=/^\s*\[[1-4]\]\s*/,src=cues.map(function(c){return {s:c.s,e:c.e,t:c.t}}),B=((keys.length===1&&keys[0]==="LOCAL_AI")?Math.min(60,Math.max(8,Math.ceil(cues.length/25))):60),
   batches=[],out=new Array(src.length),useGem=keys.length>0,gemFail=0,done=0,next=0,ctxT="",
   strip=function(c){return c.t.replace(TAG,"").replace(/\n/g," ")};
  if(!keys.length)throw new Error("គ្មាន Gemini API Key");
@@ -5816,7 +5817,7 @@ async function translateAll(){var Z0=zsfSnap();
  async function worker(wi){if(wi>0)await new Promise(function(z){setTimeout(z,wi*250)});while(nextbatches.length){await doBatch(batches[next++],wi)}}
  setProgress(0,"🧠 កំពុងបកប្រែ 0/"+src.length+"...");
  /* កំណត់ concurrency មិនឱ្យលើសចំនួន Key ដែលមាន និងអតិបរមា 3 ដើម្បីកុំឱ្យ Key តែមួយទទួល Request ស្របគ្នាច្រើនពេក។ */
- var conc=Math.max(1,Math.min(batches.length,(keys.length===1&&keys[0]==="LOCAL_AI")?5:2));
+ var conc=Math.max(1,Math.min(batches.length,(keys.length===1&&keys[0]==="LOCAL_AI")?25:2));
  await Promise.all(Array.from({length:conc},function(_,wi){return worker(wi)}));
  setC(out);try{zsfTrSummary(Z0)}catch(e){}
 }
@@ -5929,7 +5930,7 @@ $("#exp").onclick=async function(){
   }
   /* Step 2 */
   phase(3,35,50);
-  if(!on(1))setProgress(100,"⏭ រំលងការបកប្រែ (បិទជម្រើស Gemini)");
+  if(!on(1)&&!on(5))setProgress(100,"⏭ រំលងការបកប្រែ (បិទជម្រើស Gemini និង Local AI)");
   else if($("#target").value==="km"&&isKm())setProgress(100,"✅ SRT ជាភាសាខ្មែររួចហើយ — រំលងការបកប្រែ");
   else{
    /* FIX: Step 2 បកប្រែ SRT ដោយផ្ទាល់។ កុំរត់ gemWorkerRun នៅទីនេះ ព្រោះវាអាចវិភាគ/ផ្ទុកវីដេអូ និងសាក Model ជាច្រើនមុនពេលបកប្រែ។ ការចែកតួត្រូវធ្វើនៅ Step 3 ដូចដើម។ */
@@ -6925,7 +6926,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"25.77",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.80",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7258,7 +7259,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
  try{var st=document.createElement("style");st.textContent="#opts .b{order:2}#opts .b:nth-child(1){order:0}#opts .b:nth-child(6){order:1}";document.head.appendChild(st)}catch(e){}
  function init(){
   var o=$i("laiOn"),k=$i("laiKey"),m=$i("laiModel");if(!o||!k||!m)return;
-  o.checked=g("zsf_lai_on","0")==="1";k.value=key();syncChip();m.value=g("zsf_lai_model","gemini-3.5-flash-lite")||"gemini-3.5-flash-lite";
+  o.checked=g("zsf_lai_on","0")==="1";k.value=key();syncChip();m.value=g("zsf_lai_model","auto")||"auto";
   o.onchange=function(){s("zsf_lai_on",o.checked?"1":"0");syncChip();if(o.checked)gemOn();try{showToast(o.checked?"⚡ បើក Local AI":"បិទ Local AI",true)}catch(e){}};
   k.onchange=function(){s("zsf_lai_key",k.value.trim());check()};
   m.onchange=function(){s("zsf_lai_model",m.value)};
@@ -7277,13 +7278,20 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   var msgs=[],si=j.systemInstruction||j.system_instruction,gc=j.generationConfig||{};
   if(si&&si.parts)msgs.push({role:"system",content:si.parts.map(function(p){return p.text||""}).join("")});
   (j.contents||[]).forEach(function(c){msgs.push({role:c.role==="model"?"assistant":"user",content:(c.parts||[]).map(function(p){return p.text||""}).join("")})});
-  try{var lm0=msgs[msgs.length-1];if(typeof zsfStylePrompt==="function"&&lm0&&lm0.role==="user"&&lm0.content.indexOf("NO LATIN LETTERS")>=0&&lm0.content.indexOf("STYLE (")0){var SP0=zsfStylePrompt();lm0.content=lm0.content.indexOf("Output only numbered lines.")>=0?lm0.content.replace("Output only numbered lines.",SP0+" Output only numbered lines."):(SP0+"\n"+lm0.content)}}catch(e){}
+  try{var lm0=msgs[msgs.length-1];if(typeof zsfStylePrompt==="function"&&typeof zsfFunOn==="function"&&zsfFunOn()&&lm0&&lm0.role==="user"&&lm0.content.indexOf("NO LATIN LETTERS")>=0&&lm0.content.indexOf("STYLE (")0){var SP0=zsfStylePrompt();lm0.content=lm0.content.indexOf("Output only numbered lines.")>=0?lm0.content.replace("Output only numbered lines.",SP0+" Output only numbered lines."):(SP0+"\n"+lm0.content)}}catch(e){}
   try{var RL=window.__ZSF_RULES,lm=msgs[msgs.length-1];if(RL&&lm&&lm.role==="user"&&lm.content.indexOf("Khmer")>=0&&(lm.content.indexOf("numbered line")>=0||lm.content.indexOf("Khmer subtitle translator")>=0)&&lm.content.indexOf("PRO DUBBING RULES")===-1)lm.content=lm.content+"\n\n"+RL}catch(e){}
-  var body={model:g("zsf_lai_model","gemini-3.5-flash-lite")||"gemini-3.5-flash-lite",messages:msgs,stream:false};
+  try{if(gc.responseMimeType==="application/json"){var lj=msgs[msgs.length-1];if(lj&&lj.role==="user"&&!/json/i.test(lj.content))lj.content+="\n\nReturn ONLY valid JSON, no markdown, no explanation."}}catch(e){}
+  var sel=g("zsf_lai_model","auto")||"auto",AO=["gemini-3.8-flash","gemini-3.1-pro","gemini-3-flash","gemini-3.5-flash-lite"],bad0=window.__laiBad||{},order=sel==="auto"?AO.filter(function(x){return !bad0[x]}):[sel];if(!order.length)order=[AO[AO.length-1]];
+  var body={model:order[0],messages:msgs,stream:false};
   if(typeof gc.temperature==="number")body.temperature=gc.temperature;
   if(typeof gc.topP==="number")body.top_p=gc.topP;
   try{
-   var r=await F0(HOST+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify(body),signal:sig}),raw=await r.text(),d;
+   var r,raw,d,mi=0;
+   for(;;){body.model=order[mi];r=await F0(HOST+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify(body),signal:sig});raw=await r.text();
+    var mbad=!r.ok&&(r.status===404||(/model/i.test(raw)&&/not found|not support|unsupported|unavailable|unknown|invalid|does not exist|no longer/i.test(raw)));
+    if(mbad&&sel==="auto"&&mi<order.length-1){(window.__laiBad=window.__laiBad||{})[order[mi]]=1;mi++;continue}
+    break}
+   window.__laiModel=order[mi];
    window.__laiLast="HTTP "+r.status+": "+String(raw).replace(/\s+/g," ").slice(0,180);try{d=JSON.parse(raw)}catch(e){return err(r.status||502,"Local AI ឆ្លើយមិនត្រឹមត្រូវ (HTTP "+r.status+")")}
    if(!r.ok||d.error){var em=(d.error&&(d.error.message||d.error))||d.detail||d.message||("HTTP "+r.status);return err(r.status||500,typeof em==="string"?em:JSON.stringify(em))}
    var ch=d.choices&&d.choices[0],tx=ch&&ch.message&&ch.message.content;
@@ -7338,7 +7346,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="25.77";
+  var EMB="25.80";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
