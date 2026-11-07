@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.1";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.5";})();
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -2084,6 +2084,9 @@ function tempoPlan(p,dur,slotD){
    បន្ទាប់មក force-fit (WSOLA) រហូតដល់ ×1.8 សរុប ។ ពេលដាក់ចូលវីដេអូ ៖ រុញបានអតិបរមា 0.5s ហើយបន្តឹងមិនឱ្យជាន់ឃ្លាបន្ទាប់ */
 function zsfFit(k,d){try{const v=parseFloat(localStorage.getItem("zsf_tts_"+k));if(isFinite(v))return v}catch(e){}return d}
 function zsfFitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch(e){return true}}
+/* V26.0.5 reference rhythm: pace measured from the reference video (~6.2 syllable-peaks/s); Khmer syllables counted as consonants + independent vowels - coeng marks */
+function zsfRhythmOn(){try{return localStorage.getItem("zsf_rhythm")!=="0"}catch(e){return true}}
+function zsfKhSyl(t){let c=0;for(const ch of String(t||"")){const k=ch.codePointAt(0);if((k>=0x1780&&k<=0x17B3))c++;else if(k===0x17D2)c--}return Math.max(0,c)}
 function zsfAvail(q,dur,nx){
  const tail=zsfFit("tail",.15),mg=zsfFit("margin",.20),sp=nx?zsfFit("spill",0):0,gap=nx?(nx.s-q.e):1.0,room=gap-.10;
  if(room>0){const tl=tail;return dur+Math.min(room,tl)+sp}
@@ -2125,7 +2128,8 @@ async function dubAudio(text,slot,p,slotD){
    try{buf=wsolaStretch(buf,need)}catch(e){break}
    forced*=need;const nl=buf.duration;if(nl=slotD)break;
    need=Math.min(nl/(slotD*.97),Math.max(1,allow/need))}}
- return{buf,boost:cur>base+.005||forced>1.01,tt:cur*forced}}
+ try{if(zsfRhythmOn()){const syl=zsfKhSyl(text);if(syl>=3){const refD=syl/1.5/zsfFit("rate",6.2),r=buf.duration/refD;if(r>1.06){const need=Math.min(r,zsfFit("rmax",1.45));buf=wsolaStretch(buf,need);forced*=need}}}}catch(e){}
+  return{buf,boost:cur>base+.005||forced>1.01,tt:cur*forced}}
 /* V14.6: ឃ្លាខ្មោច — មិនបង្កើតសំឡេងខ្មែរសម្រាប់ឃ្លាដែលក្នុងវីដេអូដើមគ្មានសំឡេងនិយាយពិតទាល់តែសោះ */
 function zsfVoicedSec(q){const SP=window.__spEn;if(!SP||SP.file!==file||!SP.e.length)return -1;const fs=SP.fs,e=SP.e;
  if(SP.__fl===undefined){const db=Array.from(e,v=>10*Math.log10(v+1e-10)).sort((a,b)=>a-b);SP.__fl=db[Math.floor(db.length*.1)]}
@@ -2168,7 +2172,7 @@ function zsfClipFade(buf,maxDur){
   for(let i=0;if;i++)d[n-1-i]*=i/f}
  return nb}
 function zsfPlaceItems(items){
- const ON=zsfFitOn(),DLY=zsfFit("delay",0),GAPL=zsfFit("gap2",.30),GAP=Math.min(GAPL,zsfFit("gapc",.10)),PUSH=zsfFit("push",.25),HARD=(function(){try{return localStorage.getItem("zsf_tts_hard")!=="0"}catch(e){return true}})();
+ const ON=zsfFitOn(),DLY=zsfFit("delay",0),GAPL=zsfFit("gap2",.30),GAP=Math.min(GAPL,zsfFit("gapc",.10)),PUSH=zsfFit("push",.9),HARD=(function(){try{return localStorage.getItem("zsf_tts_hard")==="1"}catch(e){return false}})();
  let cursor=0,delayed=0,late=0,maxLate=0;const st=[];
  items.forEach((it,i)=>{
   const b0=it.buf0||(it.buf0=it.buf);let buf=b0,o0=Math.max(0,fxOn(it.q)+DLY);
@@ -6929,7 +6933,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.1",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.5",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7233,7 +7237,19 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    return{ok:r.ok,status:r.status,d:d,raw:raw}
   }finally{clearTimeout(tm)}
  }
- async function check(){
+ async function testModel(){
+  var sel=g("zsf_lai_model","auto")||"auto",mdl=sel==="auto"?"gemini-3.8-flash":sel,box=$i("laiInfo"),line=document.createElement("div");
+  line.style.cssText="margin-top:8px;font-size:12.5px;color:#fcd34d;word-break:break-all";line.textContent="🧪 សាកម៉ូដែល "+mdl+" ...";box.appendChild(line);
+  var ac=new AbortController(),tm=setTimeout(function(){ac.abort()},40000),t0=Date.now();
+  try{
+   var r=await F0(HOST+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify({model:mdl,messages:[{role:"user",content:"Say hi in one word."}],max_tokens:20,stream:false}),signal:ac.signal});
+   var raw=await r.text(),sec=((Date.now()-t0)/1000).toFixed(1);
+   if(r.ok){var tx="";try{tx=JSON.parse(raw).choices[0].message.content}catch(e){}line.style.color="#34d399";line.textContent="🧪 "+mdl+": ដំណើរការ ✓ ("+sec+" វិនាទី) ចម្លើយ៖ "+String(tx).slice(0,40)}
+   else{line.style.color="#f87171";line.textContent="🧪 "+mdl+": HTTP "+r.status+" ("+sec+" វិនាទី) "+String(raw).replace(/\s+/g," ").slice(0,200)}
+  }catch(e){line.style.color="#f87171";line.textContent="🧪 "+mdl+": "+(e&&e.name==="AbortError"?"មិនឆ្លើយក្នុង 40 វិនាទី":(e&&e.message||e))}
+  finally{clearTimeout(tm)}
+ }
+ async function check(withTest){
   var k=key();if(!k){$i("laiInfo").textContent="";badge("មិនទាន់ភ្ជាប់","#9ca3af");return}
   badge("កំពុងពិនិត្យ...","#f5b800");
   var tries=[
@@ -7246,7 +7262,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   for(var i=0;itries.length;i++){
    try{
     var R=await getJ(tries[i][0],tries[i][1]);
-    if(R.ok&&R.d&&typeof R.d==="object"){show(R.d);return}
+    if(R.ok&&R.d&&typeof R.d==="object"){show(R.d);if(withTest===true)testModel();return}
     if(!first)first=R;
    }catch(e){if(!netErr)netErr=e}
   }
@@ -7267,7 +7283,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   o.onchange=function(){s("zsf_lai_on",o.checked?"1":"0");syncChip();if(o.checked)gemOn();try{showToast(o.checked?"⚡ បើក Local AI":"បិទ Local AI",true)}catch(e){}};
   k.onchange=function(){s("zsf_lai_key",k.value.trim());check()};
   m.onchange=function(){s("zsf_lai_model",m.value)};
-  $i("laiRef").onclick=check;
+  $i("laiRef").onclick=function(){check(true)};
   var c5=chip(5);if(c5)c5.addEventListener("click",function(){var want=!c5.classList.contains("off");
    if(want&&!key()){c5.classList.add("off");try{showToast("សូមដាក់ Local AI Key ជាមុន",false)}catch(e){}try{$i("gbox").classList.remove("hide")}catch(e){}return}
    s("zsf_lai_on",want?"1":"0");o.checked=want;if(want)gemOn()});
@@ -7353,7 +7369,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.1";
+  var EMB="26.0.5";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
