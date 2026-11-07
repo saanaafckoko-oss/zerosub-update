@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.33";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.34";})();
 (function(){var F0=window.fetch;if(!F0||window.__zsfHiFb)return;window.__zsfHiFb=1;
 var H="gemini-3.8-flash-high",L="gemini-3.8-flash";
 window.fetch=async function(u,o){
@@ -7283,7 +7283,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.33",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.34",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7605,6 +7605,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   var k=key();if(!k){$i("laiInfo").textContent="";badge("មិនទាន់ភ្ជាប់","#9ca3af");return}
   badge("កំពុងពិនិត្យ...","#f5b800");
   var tries=[
+   [HOST+"/v1/key/info?api_key="+encodeURIComponent(k),{}],
    [HOST+"/v1/key/info",{headers:{"Authorization":"Bearer "+k}}],
    [HOST+"/key/info",{headers:{"Authorization":"Bearer "+k}}],
    [HOST+"/v1/key/info",{headers:{"x-api-key":k}}],
@@ -7662,7 +7663,12 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   if(typeof gc.topP==="number")body.top_p=gc.topP;
   try{
    var r,raw,d,mi=0;
-   for(;;){body.model=order[mi];r=await F0(HOST+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify(body),signal:sig});raw=await r.text();
+   for(;;){body.model=order[mi];
+    try{r=await F0(HOST+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify(body),signal:sig})}
+    catch(ne){if(ne&&ne.name==="AbortError")throw ne;
+     /* v26.0.34: បើ preflight/CORS បរាជ័យ សាកម្តងទៀតដោយគ្មាន header ពិសេស (simple request) */
+     r=await F0(HOST+"/v1/chat/completions?api_key="+encodeURIComponent(key()),{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(body),signal:sig})}
+    raw=await r.text();
     var mbad=!r.ok;
     if(mbad&&sel==="auto"&&mi<order.length-1){if(r.status===404)(window.__laiBad=window.__laiBad||{})[order[mi]]=1;mi++;continue}
     break}
@@ -7674,7 +7680,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    var u=d.usage||{},pt=u.prompt_tokens||0,ct=u.completion_tokens||0,tt=u.total_tokens||(pt+ct);
    consume(tt);
    return new Response(JSON.stringify({candidates:[{content:{role:"model",parts:[{text:tx||""}]},finishReason:"STOP"}],usageMetadata:{promptTokenCount:pt,candidatesTokenCount:ct,totalTokenCount:tt}}),{status:200,headers:{"Content-Type":"application/json"}});
-  }catch(e){if(e&&e.name==="AbortError")throw e;window.__laiLast="ភ្ជាប់មិនបាន: "+(e&&e.message||e);return err(503,"Local AI ភ្ជាប់មិនបាន: "+(e&&e.message||e))}
+  }catch(e){if(e&&e.name==="AbortError")throw e;window.__laiLast="ភ្ជាប់មិនបាន: "+(e&&e.message||e);return err(503,"Local AI ភ្ជាប់មិនបាន: "+(e&&e.message||e)+" — ប្រហែលជា server មិនបើក CORS (Access-Control-Allow-Origin) ។ សូមបិទ Local AI ហើយប្រើ Gemini ជំនួស")}
  }
  window.fetch=function(u,o){
   try{
@@ -7721,7 +7727,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.33";
+  var EMB="26.0.34";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
