@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.35";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.36";})();
 (function(){var F0=window.fetch;if(!F0||window.__zsfHiFb)return;window.__zsfHiFb=1;
 var H="gemini-3.8-flash-high",L="gemini-3.8-flash";
 window.fetch=async function(u,o){
@@ -3974,6 +3974,20 @@ function zsfFitDur(L,R,F,ks,ke,tk){
     "NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). ",
     "4) The tag decides the Khmer wording: a male speaker ([1]/[3]) uses ខ្ញុំ / ខ្ញុំបាទ and the reply «បាទ»; a female speaker ([2]/[4]) uses ខ្ញុំ / នាងខ្ញុំ and the reply «ចាស». Never mix them. An inner thought ([3]/[4]) is a private first-person monologue: address nobody and add no polite reply particles.",
     "",
+    "EXTRA QUALITY RULES (very important, apply to every line):",
+    "- PUNCTUATION: the source has almost no punctuation (speech recognition), so add it to carry the emotion: ! anger, shouting, orders, excitement; ? questions; ?! shocked or disbelieving questions; ... hesitation, crying, broken speech; ។ end of calm statements. Never more than two marks in a row.",
+    "- REAL SPOKEN KHMER: natural particles and interjections where they fit (ហ្នឹង, ហ្អី, ម៉េចក៏, តើ, ណា៎, អើយ, អាឡូ on the phone, តោះ, ចុះ, អញ្ចឹង), short everyday words, no textbook Khmer; do not overuse them.",
+    "- ADDRESS TERMS BY RELATIONSHIP, fixed for each pair of characters for the whole story: parents and children = ប៉ា/ម៉ាក់ and កូន; husband and wife = បង/អូន (ខ្ញុំ/ឯង when quarrelling); older relatives = ពូ, មីង, អ៊ំ; boss, bank staff and strangers = លោក/នាង with ខ្ញុំ or យើងខ្ញុំ; friends = ខ្ញុំ/ឯង or បង/អូន by age.",
+    "- SPEECH-RECOGNITION ERRORS: the Chinese text may contain homophone mistakes, garbled or merged fragments and wrong names. Use the story card, the characters and the neighbouring lines to find the real meaning and translate that; a name written with a similar-sounding character is the same person; job and slang words follow the scene (a rider's 单 = a delivery order). Keep every line, never leave one empty or in Chinese.",
+    "- NAME CONSISTENCY: ONE fixed Khmer spelling for every person, nickname, company and place, based on Mandarin pronunciation, identical in every line (never two spellings for the same person); the story card spelling comes first.",
+    "- MONEY UNITS: 万 = ម៉ឺន, 亿 = មួយរយលាន (35亿 = បីពាន់ប្រាំរយលាន); always keep the money or measure unit (块 or 元 = យ័ន) after the number.",
+    "",
+    "- CHINESE DRAMA PHRASES (short punchy dubbing Khmer, never word by word): 放肆/大胆 = ថ្លើមធំមែន!; 你想干什么 = ឯងចង់ធ្វើស្អី?; 不知死活/找死 = ឯងចង់ងាប់មែនទេ?!; 废话少说 = កុំនិយាយច្រើន!; 凭什么 = អាងអី?; 没门儿 = គ្មានផ្លូវទេ!; 给我滚 = ចេញទៅ!; 饶命 = លើកលែងជីវិតផង!; 属下遵命 = ខ្ញុំទទួលបញ្ជា!",
+    "- NAMES AND TITLES by Mandarin sound: 张=ចាង, 李=លី, 王=វ៉ាង, 陈=ឆិន, 杨=យ៉ាង, 赵=ចាវ, 林=លីន, 顾=គូ, 萧=ស៊ាវ, 楚=ឈូ, 叶=យេ, 白=បៃ, 龙=ឡុង; 顾总 = លោកប្រធានគូ, 师兄 = សិស្សច្បង, 师姐 = សិស្សច្បងស្រី, 师弟 = សិស្សប្អូន, 师父 = លោកគ្រូ, 陛下 = ព្រះករុណា, 殿下 = ព្រះអង្គ. Never leave Pinyin or Latin letters.",
+    "- SHORT PUNCHY KHMER: stiff 'សូមអ្នកកុំធ្វើការព្រួយបារម្ភច្រើនពេកអំពីបញ្ហានេះអី' becomes 'កុំបារម្ភអី!'; 'ហេតុអ្វីបានជាអ្នកអាចធ្វើបែបនេះមកលើរូបខ្ញុំបាន?' becomes 'ម៉េចក៏ឯងធ្វើដាក់ខ្ញុំចឹង?!'. Cut only filler words, never a fact, name, number or emotion.",
+    "- REPEATED WORDS: write the repeated adjective or last word in full (ស្រីស្រី, លឿនលឿន, ទេទេ), never the whole phrase twice and never ៗ.",
+    "- THE WORD អ្នក: do not use it as 'you' for family, friends, lovers or enemies (use ឯង, បង, អូន, ពូ, មីង); inside normal words it is correct (អ្នកណា, អ្នកផ្សេង, អ្នកចាត់ការ).",
+    "",
     "STRICT RULES:",
     "- Do NOT change sequence numbers or timestamps. The number of entries in your output MUST equal the number in the input.",
     "- Do NOT merge or split entries. Keep the same number of text lines per entry; the tag goes only on the first line.",
@@ -6655,7 +6669,25 @@ window.ZSF_PROMPT_NEW=[
  "7. Return the translations as numbered lines mapped to their original numbers, exactly as described in OUTPUT FORMAT below (NOT JSON).",
  "8. The output must be concise enough for subtitle reading speeds.",
  "9. GENDER IDENTIFICATION: If a line contains the tag [1] or [M], it indicates a male voice. If it contains the tag [2] or [F], it indicates a female voice. Use this to understand the dialogue context and choose appropriate gender-based language in Khmer.",
- "10. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write \"ទេទេ\" instead of \"ទេៗ\")."
+ "10. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write \"ទេទេ\" instead of \"ទេៗ\").",
+ "11. EXPRESSIVE PUNCTUATION: the Chinese source has almost no punctuation because it comes from speech recognition, so YOU must add it to carry the speaker's emotion. Use ! for anger, shouting, orders and excitement; ? for questions (also rhetorical ones); ?! for shocked or disbelieving questions; ... for hesitation, trailing off, crying or broken speech; ។ only at the end of calm statements. Put marks on every line that needs them, never more than two marks in a row, and never inside a word.",
+ "12. REAL SPOKEN KHMER: write the way Khmer people really talk, not like a textbook. Use natural spoken particles and interjections where they fit the emotion and the character, for example ហ្នឹង, ហ្អី, ម៉េចក៏, តើ, ទេ, ណា៎, អើយ, អាឡូ (on the phone), តោះ, ចុះ, អញ្ចឹង, កុំ. Do not overuse them and never make a polite character sound rude. Prefer short everyday words over formal written Khmer.",
+ "13. ADDRESS TERMS BY RELATIONSHIP (decide once for each pair of characters and keep it for the whole story): parents and children = ប៉ា/ម៉ាក់ and កូន; husband and wife = បង/អូន (or ខ្ញុំ/ឯង when they quarrel); older relatives and neighbours = ពូ, មីង, អ៊ំ, លោកតា, លោកយាយ; boss, bank staff, officials and strangers = លោក/នាង/អ្នក with ខ្ញុំ or យើងខ្ញុំ for the speaker; friends and equals = ខ្ញុំ/ឯង or បង/អូន by age; an angry or contemptuous speaker may switch to ខ្ញុំ/ឯង or អញ/ឯង. Male polite reply = បាទ, female polite reply = ចាស. Never mix registers inside one conversation unless the emotion changes on purpose.",
+ "14. SPEECH-RECOGNITION ERRORS: the source subtitles may contain wrong characters (homophones), garbled phrases, repeated or merged fragments, or a wrong name. Use the story context, the character list, the neighbouring lines and common sense to find what the speaker really meant, and translate THAT meaning. A name written with a similar-sounding character is still the same person. Job and slang words must follow the scene (for example 单 said by a delivery rider means a delivery order, not a bill). If a line is truly unreadable, translate it as closely as the neighbouring lines allow, keep the line, and never leave it empty or in Chinese.",
+ "15. NAME CONSISTENCY: give every person, nickname, company and place ONE fixed Khmer spelling based on the Mandarin pronunciation, and use exactly the same spelling in every line (never two spellings for the same person). Use the spelling given in the story context or character list first. Keep nickname prefixes in one fixed form (小 = ស៊ាវ, 老 = ឡៅ, 阿 = អា).",
+ "16. NUMBERS AND MONEY: convert units correctly (万 = ម៉ឺន = 10000, 亿 = មួយរយលាន = 100000000, so 35亿 = បីពាន់ប្រាំរយលាន and 一亿 = មួយរយលាន) and ALWAYS keep the unit of money or measure (块 or 元 = យ័ន, 岁, 点 and so on) so that a number never stands alone. Numbers may be written as Khmer digits or Khmer words; the program turns them into spoken words afterwards.",
+ "17. FINAL CHECK before you answer: (a) every source line has exactly one translated line, in the same order; (b) no Latin letters and no ៗ; (c) every name is spelled the same everywhere; (d) address terms match each speaker's relationship and gender; (e) every line has punctuation that matches its emotion; (f) every number keeps its unit.",
+ "18. CHINESE DRAMA SPOKEN PHRASES (never translate word by word; use short punchy dubbing Khmer): 放肆/大胆 = ថ្លើមធំមែន! / ឈ្លើយណាស់!; 你想干什么/你到底想怎样 = ឯងចង់យ៉ាងម៉េច? / ចង់ធ្វើស្អី?; 不知死活 = ឯងចង់ងាប់មែនទេ?!; 废话少说/少废话 = កុំនិយាយច្រើន! / ឈប់រអ៊ូទៅ!; 凭什么 = អាងអី?; 找死/自寻死路 = ចង់ងាប់មែន?!; 没门儿 = គ្មានផ្លូវទេ! / កុំសង្ឃឹម!; 给我滚 = ចេញទៅ!; 饶命 = លើកលែងជីវិតផង! / មេត្តាផង!; 属下遵命 = ខ្ញុំទទួលបញ្ជា!",
+ "19. NAMES AND TITLES: surnames by Mandarin sound: 张=ចាង, 李=លី, 王=វ៉ាង, 陈=ឆិន, 杨=យ៉ាង, 赵=ចាវ, 林=លីន, 顾=គូ, 萧/肖=ស៊ាវ, 楚=ឈូ, 叶=យេ, 白=បៃ, 龙=ឡុង. Titles: 顾总 = លោកប្រធានគូ (same pattern for other surnames + 总), 师兄 = សិស្សច្បង, 师姐 = សិស្សច្បងស្រី, 师弟 = សិស្សប្អូន, 师父 = លោកគ្រូ, 陛下 = ព្រះករុណា, 殿下 = ព្រះអង្គ. English names and loanwords are written in Khmer sound (John = ចន, David = ដេវីដ, CEO = អគ្គនាយក, VIP = វីអាយភី, OK = អូខេ, Boss = បូស). Never leave Pinyin or Latin letters.",
+ "20. SHORT PUNCHY EXAMPLES (long and stiff = wrong, short and natural = right, meaning kept): 'តើអ្នកកំពុងតែនិយាយអំពីអ្វីនៅពេលនេះ?' = wrong, 'ឯងនិយាយស្អីហ្នឹង?' = right; 'សូមអ្នកកុំធ្វើការព្រួយបារម្ភច្រើនពេកអំពីបញ្ហានេះអី' = wrong, 'កុំបារម្ភអី!' = right; 'ហេតុអ្វីបានជាអ្នកអាចធ្វើបែបនេះមកលើរូបខ្ញុំបាន?' = wrong, 'ម៉េចក៏ឯងធ្វើដាក់ខ្ញុំចឹង?!' = right; 'យើងនឹងមិនធ្វើការលើកលែងទោសឱ្យអ្នកជាដាច់ខាត' = wrong, 'យើងមិនលើកលែងឱ្យឯងដាច់ខាត!' = right. Cut only filler words (ដែលវាជា, នៅក្នុងខណៈពេលដែល); never cut a fact, name, number or emotion.",
+ "21. REPEATED WORDS: when the source repeats a word, write the repeated adjective or last word in full, never the whole phrase twice and never ៗ: right = ស្រីស្រី, ប្រុសប្រុស, ផ្សេងផ្សេង, លេងលេង, លឿនលឿន, ទេទេ; wrong = repeating the whole phrase twice.",
+ "22. THE WORD អ្នក: do not use អ្នក as the word 'you' for family, friends, lovers or enemies (use ឯង, បង, អូន, ពូ, មីង and so on). Using អ្នក inside normal words is correct and allowed (អ្នកណា, អ្នកផ្សេង, អ្នកចាត់ការ, អ្នកទិញ).",
+ "23. OUTPUT SCRIPT LOCK: the translated text must be 100% Khmer script (Khmer Unicode). Never write Latin letters (A-Z, a-z), Chinese, Japanese or Korean characters, and NEVER Thai script or Thai words (do not confuse Khmer with Thai), not even one character. The only things allowed outside Khmer script are the line number, the [n] tag and the {emotion} marker required by OUTPUT FORMAT.",
+ "24. NO ARABIC DIGITS: inside the translated text never write Arabic digits 0-9. Write every number (amount, quantity, year, date, time) as Khmer digits (០-៩) or as Khmer words, and keep its unit as in rule 16.",
+ "25. CONTINUOUS SCENE: treat the whole batch as one continuous living scene, not as separate lines. Follow who is talking to whom, make every question and its answer match logically, let the emotion flow naturally from line to line, and keep the same pronouns for the same speaker through the whole scene.",
+ "26. NO SKIPPING: every source line gets its own translated line even if it is very short or has no clear meaning (a sigh, a single syllable, an interjection, a lone name). Translate it as closely as the context allows; never merge it into another line and never leave it out.",
+ "27. MORE NAMES AND LOANWORDS: example names = 张伟 / Zhang Wei = ចាង វ៉ី, 顾海 / Gu Hai = គូ ហៃ, 萧炎 / Xiao Yan = ស៊ាវ យ៉ាន, 唐三 / Tang San = ថាង សាន, 叶凡 / Ye Fan = យេ ហ្វាន; surname 唐 = ថាង; 陈总 = លោកប្រធានឆិន; 殿下 may also be ទ្រង់; CEO may be ស៊ីអ៊ីអូ or អគ្គនាយក; Dr. = លោកវេជ្ជបណ្ឌិត; FBI = អេហ្វប៊ីអាយ; Tom = ថម, Alex = អាឡិច, Sam = សេម, Chris = គ្រីស.",
+ "28. MORE SPOKEN EXAMPLES: natural phrases such as 'ឯងនិយាយស្អីហ្នឹង?', 'មែនអត់?', 'ចឹងតើ!', 'កុំចេះដឹង!', 'ទៅណា?', 'កើតរឿងអី?' show the right dubbing feel. More short-versus-long pairs: 'តើអ្នកកំពុងតែចង់បានអ្វីពីខ្ញុំឱ្យប្រាកដទៅ?' = wrong, 'ឯងចង់បានអីពីខ្ញុំ?!' = right; 'ប្រសិនបើគ្មានរឿងអ្វីផ្សេងទៀតដែលត្រូវធ្វើនោះទេ ខ្ញុំនឹងសុំការអនុញ្ញាតចេញទៅមុនហើយ' = wrong, 'បើគ្មានការអីទៀតទេ ខ្ញុំទៅមុនហើយ!' = right. Each line must still be a complete thought, never a cut-off fragment."
 ].join("\n");
 /* ផ្នែកបច្ចេកទេស (កុំលុប) — កូដអានលទ្ធផលពឹងលើទម្រង់នេះ: លេខបន្ទាត់, tag [1]-[4], emotion marker, length hint */
 window.zsfTrHead=function(tl,ctx,lv){var T=["OUTPUT FORMAT: keep the numbering and the order, one line per item, never skip or add an item. Output ONLY the numbered lines: no JSON, no explanations, no timestamps, no Markdown.","TAGS: if a source line starts with a tag [1], [2], [3] or [4] (or any tag in square brackets), keep that tag exactly at the start of the translated line; never translate, delete, rename or modify it."],H1=["LENGTH HINT: each input line ends with a hint like {about 40 chars}. It is the maximum length that fits the speaking time. Stay within the hint when possible, but never lose a fact, name, number or the main emotion. NEVER output the {about N chars} hint."],H2=["EMOTION MARKER: after the number (and after the [n] tag when the line has one) write exactly ONE emotion code in curly braces that says how the speaker says THIS line: {angry} {sad} {sweet} {scared} {shocked} {mocking} {pleading} {cold} {joking} {happy} {calm}, for example '3. [1] {angry} text' or '4. {sad} text'. The code is only a marker for the program: write it once, right after the number or tag, never inside the sentence."];var head=String(window.ZSF_PROMPT_NEW||"");var P=[head];if(ctx&&head.indexOf("{CTX}")===-1)P.push("","STORY CONTEXT: {CTX}");P.push("");P=P.concat(T);if(lv>=2)P=P.concat([""],H1);if(lv===2)P=P.concat([""],H2);return P.join("\n").split("{TL}").join(tl).split("{CTX}").join(ctx||"")};
@@ -7283,7 +7315,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.35",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.36",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7524,7 +7556,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script>
 (function(){
  if(window.__zsfLai)return;window.__zsfLai=1;
- var HOST="https://solitary-art-1686.saanaafckoko.workers.dev",F0=window.fetch;
+ var HOST="https://khmerapi.duckdns.org",F0=window.fetch;
  function g(k,d){try{var v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}}
  function s(k,v){try{localStorage.setItem(k,v)}catch(e){}}
  function key(){return String(g("zsf_lai_key","")).trim()}
@@ -7727,7 +7759,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.35";
+  var EMB="26.0.36";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
