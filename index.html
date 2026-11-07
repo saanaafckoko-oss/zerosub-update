@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.85";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.90";})();
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -833,11 +833,13 @@ html[data-mode=light] #zfAuth .zf-top button{color:#0369a1}#zfAuth .zf-top{z-ind
 option value="gemini-3.1-flash-lite">3.1 Flash Lite/option>
 option value="gemini-3-flash">3 Flash/option>
 option value="gemini-3.8-flash">3.8 Flash/option>
+option value="gemini-3.8-flash-high">🧠 3.8 Flash High (គុណភាពខ្ពស់)/option>
 option value="gemini-3.1-pro">3.1 Pro/option>
 /select>
 svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffb703" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:9px;top:10px;pointer-events:none">path d="M6 9l6 6 6-6"/>/svg>
 /div>
 /div>
+div style="margin-top:11px">div style="display:flex;align-items:center;justify-content:space-between;gap:8px">span style="color:#94a3b8;font-weight:600;font-size:13px">📝 Prompt បកប្រែខ្មែរ/span>label style="color:#94a3b8;font-size:12px;display:flex;align-items:center;gap:5px">input type="checkbox" id="laiPromptOn">បើក/label>/div>textarea id="laiPrompt" rows="6" style="display:block;width:100%;margin-top:6px;padding:8px;border-radius:8px;border:1px solid #1e293b;background:#0f172a;color:#e2e8f0;font-size:12px;line-height:1.5;box-sizing:border-box">/textarea>button id="laiPromptReset" type="button" style="margin-top:6px;padding:6px 10px;border-radius:7px;border:1px solid #1e293b;background:#0f172a;color:#94a3b8;font-size:12px">↺ ត្រឡប់ទៅ Prompt ដើម/button>/div>
 div style="margin-top:11px;padding:10px;border-radius:7px;background:#0f172a;border:1px solid #1c2740">
 div id="laiInfo" style="color:#9fb0cf;font-size:13px">/div>
 div style="display:flex;align-items:center;gap:9px;margin-top:8px">
@@ -3696,7 +3698,7 @@ function zsfFitDur(L,R,F,ks,ke,tk){
   function toastS(m,ok){try{showToast(m,ok!==false)}catch(_){}}
   function keys(){var k=[];try{var sv=JSON.parse(localStorage.getItem("zero_user_api_keys")||"null");if(Array.isArray(sv))k=sv;}catch(_){}
     try{if(Array.isArray(userApiKeys)&&userApiKeys.filter(Boolean).length)k=userApiKeys;}catch(_){}
-    return k.filter(Boolean);}
+    k=k.filter(Boolean);if(!k.length&&typeof window.zsfKF==="function")k=window.zsfKF(k);return k;}
   function fmtT(ms){ms=Math.max(0,Math.round(ms));var m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000),x=ms%1000;return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")+"."+String(x).padStart(3,"0");}
   function times(b){var p=String(b.time||"").split("-->");return {s:srtToMs((p[0]||"").trim()),e:srtToMs((p[1]||p[0]||"").trim())};}
   function prog(t,p){try{toggleProgressBar(true,t,p)}catch(_){}}
@@ -4442,7 +4444,7 @@ function zsfFitDur(L,R,F,ks,ke,tk){
   function toastS(m,ok){try{showToast(m,ok!==false)}catch(_){}}
   function keys(){var k=[];try{var sv=JSON.parse(localStorage.getItem("zero_user_api_keys")||"null");if(Array.isArray(sv))k=sv;}catch(_){}
     try{if(Array.isArray(userApiKeys)&&userApiKeys.filter(Boolean).length)k=userApiKeys;}catch(_){}
-    return k.filter(Boolean);}
+    k=k.filter(Boolean);if(!k.length&&typeof window.zsfKF==="function")k=window.zsfKF(k);return k;}
   function fmtT(ms){ms=Math.max(0,Math.round(ms));var m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000),x=ms%1000;return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")+"."+String(x).padStart(3,"0");}
   function times(b){var p=String(b.time||"").split("-->");return {s:srtToMs((p[0]||"").trim()),e:srtToMs((p[1]||p[0]||"").trim())};}
   function prog(t,p){try{toggleProgressBar(true,t,p)}catch(_){}}
@@ -4927,7 +4929,7 @@ var prep=function(g){return (async function(){try{
       }catch(e){console.warn("prep failed",e);return null;}})();};
     var __mt=false;try{__mt=await masterTagRun(f)}catch(e){console.warn("masterTag",e)}
     var prepP=(groups.length&&!__mt)?prep(0):null;
-    var tagConc=Math.min(8,Math.max(4,K.filter(Boolean).length*2));if(__chm!==0)tagConc=Math.min(12,Math.max(6,K.filter(Boolean).length*3));try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=6)tagConc=tcv}catch(_){}
+    var tagConc=Math.min(8,Math.max(4,zsfKF(K).length*2));if(__chm!==0)tagConc=Math.min(12,Math.max(6,zsfKF(K).length*3));try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=6)tagConc=tcv}catch(_){}
     var inflight=[];
     var runGroup=async function(g,P0,ctx0){
       var idxs=groups[g];
@@ -5716,7 +5718,7 @@ async function googleTr(texts,tl,pg){
  return out}
 /* v21 : បកប្រែ batch ស្របគ្នា (ម្នាក់ៗ Key ផ្សេងគ្នា) · ផ្គូផ្គងតាមលេខ (មិនរអិលជួរ) · ឃ្លាដែលខ្វះ → Google តែឃ្លានោះ · ផ្តល់បរិបទ ២ ឃ្លាមុន */
 async function translateAll(){var Z0=zsfSnap();
- var keys=zsfKF(K),tv=$("#target").value,tl=$("#target").selectedOptions[0].text,TAG=/^\s*\[[1-4]\]\s*/,src=cues.map(function(c){return {s:c.s,e:c.e,t:c.t}}),B=((keys.length===1&&keys[0]==="LOCAL_AI")?Math.min(60,Math.max(8,Math.ceil(cues.length/25))):30),
+ var keys=zsfKF(K),tv=$("#target").value,tl=$("#target").selectedOptions[0].text,TAG=/^\s*\[[1-4]\]\s*/,src=cues.map(function(c){return {s:c.s,e:c.e,t:c.t}}),B=((keys.length===1&&keys[0]==="LOCAL_AI")?Math.min(60,Math.max(8,Math.ceil(cues.length/25))):40),
   batches=[],out=new Array(src.length),useGem=keys.length>0,gemFail=0,done=0,next=0,ctxT="",
   strip=function(c){return c.t.replace(TAG,"").replace(/\n/g," ")};
  if(!keys.length)throw new Error("គ្មាន Gemini API Key");
@@ -5728,25 +5730,26 @@ async function translateAll(){var Z0=zsfSnap();
    if(!liveSeen[idx]){liveSeen[idx]=1;liveN++;
     setProgress(Math.round(liveN/src.length*100),"🧠 កំពុងបកប្រែ "+liveN+"/"+src.length+"...")}
   }catch(_){}}
- var sleep2=function(ms){return new Promise(function(z){setTimeout(z,ms)})},inUse={},kptr=0;
+ var sleep2=function(ms){return new Promise(function(z){setTimeout(z,ms)})},inUse={},kptr=0;var repairQ=[],fixed=[],HEADG="",rateN={};
  function keyCooled(k){var ms=zsfTrModels();return ms.every(function(m){return zsfTrCooled(k,m)})}
  function pickKey(){var n=keys.length,t,k;
   for(t=0;tn;t++){k=keys[(kptr+t)%n];if(!inUse[k]&&!keyCooled(k)){kptr=(kptr+t+1)%n;return k}}
   for(t=0;tn;t++){k=keys[(kptr+t)%n];if(!inUse[k]){kptr=(kptr+t+1)%n;return k}}
   k=keys[kptr%n];kptr=(kptr+1)%n;return k}
  /* ១ ក្រុម (60 បន្ទាត់) = ១ Key · Key គាំង/អស់ Quota → Key បន្ទាប់ · Model មមាញឹក → Model បន្ទាប់ភ្លាមៗ · មិនប្រើ Google */
- async function gemStrict(prompt,wi){
-  var t0=Date.now(),pass=0,key=pickKey();inUse[key]=1;
+ async function gemStrict(prompt,wi,pool,fast){
+  var bound=!!(pool&&pool.length===1),t0=Date.now(),pass=0,key=bound?pool[0]:pickKey();
+  if(!bound)inUse[key]=1;
   try{
    while(Date.now()-t0120000){
-    var models=zsfTrModels();
-    for(var kk=0;kkkeys.length;kk++){
+    var models=zsfTrModels(),kn=bound?1:keys.length;
+    for(var kk=0;kkkn;kk++){
      for(var mi=0;mimodels.length;mi++){
       var m=models[mi];
       if(zsfTrCooled(key,m))continue;
       try{
        var txt=await Promise.race([requestGeminiOnce(prompt,key,m,false),new Promise(function(_,rj){setTimeout(function(){rj(new Error("timeout"))},60000)})]);
-       if(txt)return txt;
+       if(txt){rateN[key]=0;return txt}
        zsfTrCool[key+"|"+m]=Date.now()+20000;
       }catch(e){
        window.__gemErr=String((e&&e.message)||e).slice(0,90);var kd=zsfErrKind(e);
@@ -5756,18 +5759,21 @@ async function translateAll(){var Z0=zsfSnap();
        zsfTrCool[key+"|"+m]=Date.now()+(/timeout|abort/i.test(String((e&&e.message)||e))?60000:20000);
        continue}
      }
-     delete inUse[key];key=pickKey();inUse[key]=1;
+     if(!bound){delete inUse[key];key=pickKey();inUse[key]=1}
     }
+    if(bound&&fast){
+     if(keyCooled(key)){rateN[key]=(rateN[key]||0)+1;if(rateN[key]>=2)zsfTrCool[key+"|*"]=Date.now()+Math.min(90000*rateN[key],900000)}
+     throw new Error("KEY_REST")}
     pass++;
     try{for(var zq in zsfTrCool)if(zsfTrCool[zq]>Date.now()+8000)zsfTrCool[zq]=Date.now()+5000}catch(_){}
     try{setProgress(Math.round(liveN/src.length*100),"⏳ Key/Gemini កំពុងមមាញឹក — រង់ចាំហើយសាកម្តងទៀត..."+(window.__gemErr?" ["+window.__gemErr+"]":""))}catch(_){}
     await sleep2(Math.min(15000,3000+pass*2000));
    }
    throw new Error("Gemini បកប្រែមិនបាន — ពិនិត្យ API Key / Quota")
-  }finally{delete inUse[key]}}
+  }finally{if(!bound)delete inUse[key]}}
  /* ចាប់ប្រភេទសាច់រឿងពី SRT ឱ្យបានជាមុន (មិនរំលង) — សាកម្តងទៀតដោយប្តូរ Key រហូតបាន ទើបចាប់ផ្តើមបកប្រែ */
  if(tv==="km"){
-  var bible=null,maxTry=1;
+  var bible=null,maxTry=(zsfStyleMode()==="auto"?3:1);
   for(var bt=1;bt=maxTry&&!bible;bt++){
    try{setProgress(2,"📖 កំពុងអាន SRT ទាំងមូល ដើម្បីចាប់ប្រភេទសាច់រឿង... (លើកទី "+bt+"/"+maxTry+")")}catch(_){}
    try{
@@ -5783,12 +5789,12 @@ async function translateAll(){var Z0=zsfSnap();
  }
  ctxT=window.zsfAutoStory?window.zsfAutoStory():"";
  for(var i=0;isrc.length;i+=B)batches.push(i);
- async function doBatch(i0,wi){
+ async function doBatch(i0,wi,key){
   var part=src.slice(i0,i0+B),res=new Array(part.length).fill(null);
   if(useGem){
     var prev=src.slice(Math.max(0,i0-2),i0).map(strip).join(" / ");
     var HEAD=window.zsfTrHead(tl,ctxT,2);
-    if(tv!=="km"){HEAD="You are a professional subtitle translator. Translate each numbered line into "+tl+". Keep numbering, one line per item. If a line starts with a tag like [1], [2], [3] or [4], keep that tag unchanged at the start of the translated line. Translate as natural spoken dialogue in "+tl+", keep the full meaning and emotion, never drop or add anything, and keep the same name for the same character through the whole story. Each input line ends with a hint like {about 40 chars}: it is only a length hint, never output it. Output only numbered lines."}
+    if(tv!=="km"){HEAD="You are a professional subtitle translator. Translate each numbered line into "+tl+". Keep numbering, one line per item. If a line starts with a tag like [1], [2], [3] or [4], keep that tag unchanged at the start of the translated line. Translate as natural spoken dialogue in "+tl+", keep the full meaning and emotion, never drop or add anything, and keep the same name for the same character through the whole story. Each input line ends with a hint like {about 40 chars}: it is only a length hint, never output it. Output only numbered lines."}HEADG=HEAD;
     var mk=function(idx){return HEAD+(prev?"\nPrevious lines for context only, do NOT translate them: "+prev:"")+"\n"+idx.map(function(j,x){return (x+1)+". "+part[j].t.replace(/\n/g," ")+" {about "+Math.max(8,Math.round((part[j].e-part[j].s)*(typeof zsfFit==="function"?zsfFit("hint",20):20)))+" chars}"}).join("\n")};
     var fresh=new Array(part.length).fill(false),emo=new Array(part.length).fill(null),zk=function(c){return zsfTrKey(tv,ctxT+"#fit23",strip(c))};
     var hits=await zsfTrGetMany(part.map(zk));
@@ -5796,14 +5802,14 @@ async function translateAll(){var Z0=zsfSnap();
     var todo=[];res.forEach(function(r,j){if(r===null)todo.push(j)});
     var parseInto=function(t,idx){t.split("\n").forEach(function(l){var m=/^\s*(\d+)[.)]\s*(.*)$/.exec(l);if(m){m[2]=m[2].replace(/\s*\{(max|about) \d+ chars?\}\s*$/i,"");var __em=null;m[2]=m[2].replace(/\{(angry|sad|sweet|scared|shocked|mocking|pleading|cold|joking|happy|calm)\}\s*/gi,function(_q,e){if(!__em)__em=e.toLowerCase();return ""});var x=+m[1]-1;if(x>=0&&xidx.length&&m[2].trim()&&res[idx[x]]===null&&zsfTrOk(tv,strip(part[idx[x]]),m[2].replace(TAG,"").trim())){res[idx[x]]=m[2].trim();fresh[idx[x]]=true;if(__em)emo[idx[x]]=__em;applyLive(i0+idx[x],res[idx[x]])}}})};
     if(todo.length){
-      try{var txt=await gemStrict(mk(todo),wi);parseInto(txt,todo)}catch(e){}
+      try{var txt=await gemStrict(mk(todo),wi,key?[key]:null,true);parseInto(txt,todo)}catch(e){}
       var m2=todo.filter(function(j){return res[j]===null}),rounds=0;
-      while(m2.length&&rounds2){rounds++;ZST.retry++;try{var t2=await gemStrict(mk(m2),wi);parseInto(t2,m2)}catch(e){break}m2=todo.filter(function(j){return res[j]===null})}
+      while(m2.length&&rounds2){rounds++;ZST.retry++;try{var t2=await gemStrict(mk(m2),wi,key?[key]:null,true);parseInto(t2,m2)}catch(e){break}m2=todo.filter(function(j){return res[j]===null})}
      }
     var puts=[];fresh.forEach(function(f,j){if(f){var v=res[j].replace(TAG,"").trim();if(zsfTrOk(tv,strip(part[j]),v))puts.push([zk(part[j]),v])}});
     if(puts.length)zsfTrPutMany(puts);
   }
-  var miss=[];res.forEach(function(r,j){if(r===null)miss.push(j)});
+  var miss=[];res.forEach(function(r,j){if(r===null)miss.push(j)});if(miss.length&&key){repairQ.push({idx:miss.map(function(j){return i0+j}),n:0});miss=[]}
   if(miss.length){
    for(var gr=0;gr3&&miss.length;gr++){
     for(var cq=0;cqmiss.length;cq+=15){var ch=miss.slice(cq,cq+15);
@@ -5817,8 +5823,29 @@ async function translateAll(){var Z0=zsfSnap();
  async function worker(wi){if(wi>0)await new Promise(function(z){setTimeout(z,wi*250)});while(nextbatches.length){await doBatch(batches[next++],wi)}}
  setProgress(0,"🧠 កំពុងបកប្រែ 0/"+src.length+"...");
  /* កំណត់ concurrency មិនឱ្យលើសចំនួន Key ដែលមាន និងអតិបរមា 3 ដើម្បីកុំឱ្យ Key តែមួយទទួល Request ស្របគ្នាច្រើនពេក។ */
- var conc=Math.max(1,Math.min(batches.length,(keys.length===1&&keys[0]==="LOCAL_AI")?25:Math.min(12,Math.max(4,keys.length*2))));
- await Promise.all(Array.from({length:conc},function(_,wi){return worker(wi)}));
+ var conc=Math.max(1,Math.min(batches.length,(keys.length===1&&keys[0]==="LOCAL_AI")?(typeof window.__laiConc==="function"?window.__laiConc():25):Math.min(12,Math.max(4,keys.length*2))));
+ var geminiMode=!(keys.length===1&&keys[0]==="LOCAL_AI"),lastProg=Date.now(),busy=0,lastMsg=0;
+  function mkG(idx){var f=idx[0],prev=src.slice(Math.max(0,f-2),f).map(strip).join(" / ");return HEADG+(prev?"\nPrevious lines for context only, do NOT translate them: "+prev:"")+"\n"+idx.map(function(j,x){var c=src[j];return (x+1)+". "+c.t.replace(/\n/g," ")+" {about "+Math.max(8,Math.round((c.e-c.s)*(typeof zsfFit==="function"?zsfFit("hint",20):20)))+" chars}"}).join("\n")}
+  function applyRepair(txt,idx){var n=0;String(txt).split("\n").forEach(function(l){var m=/^\s*(\d+)[.)]\s*(.*)$/.exec(l);if(!m)return;var v=m[2].replace(/\s*\{(max|about) \d+ chars?\}\s*$/i,""),em=null;v=v.replace(/\{(angry|sad|sweet|scared|shocked|mocking|pleading|cold|joking|happy|calm)\}\s*/gi,function(_q,e){if(!em)em=e.toLowerCase();return ""});var x=+m[1]-1;if(x0||x>=idx.length||!v.trim())return;var g=idx[x];if(fixed[g])return;var c=src[g];if(!zsfTrOk(tv,strip(c),v.replace(TAG,"").trim()))return;fixed[g]=1;var mt=c.t.match(TAG),tt=v.replace(/\[[1-4]\]\s*/g,"").trim();tt=mt?mt[0].trim()+" "+tt:tt;out[g]={s:c.s,e:c.e,t:tt,emo:em};applyLive(g,v.trim());try{zsfTrPutMany([[zsfTrKey(tv,ctxT+"#fit23",strip(c)),v.replace(TAG,"").trim()]])}catch(_){}n++});return n}
+  async function doRepair(it,key){var idx=it.idx.filter(function(g){return !fixed[g]});if(!idx.length)return;var any=0,rested=false;
+   for(var c=0;cidx.length;c+=15){var ch=idx.slice(c,c+15);try{var tx=await gemStrict(mkG(ch),0,[key],true);any+=applyRepair(tx,ch)}catch(e){if(/KEY_REST/.test(String((e&&e.message)||e))){rested=true;break}}}
+   var rem=idx.filter(function(g){return !fixed[g]});if(rem.length&&(rested||it.n6))repairQ.push({idx:rem,n:rested?it.n:it.n+1});if(any)lastProg=Date.now()}
+  async function gworker(wi,MAIN){var key=keys[wi],isMain=wiMAIN;if(wi>0)await sleep2(wi*250);
+   for(;;){
+    if(Date.now()-lastProg>600000)break;
+    if(keyCooled(key)){
+     if(Date.now()-lastMsg>8000){lastMsg=Date.now();try{setProgress(Math.round(liveN/src.length*100),"⏳ Key "+(wi+1)+" អស់កូតា/មមាញឹក — សម្រាក រួចបន្តដោយស្វ័យប្រវត្តិ...")}catch(_){}}
+     if(next>=batches.length&&busy===0&&repairQ.length===0)break;
+     await sleep2(3000);continue}
+    if(isMain&&nextbatches.length){var bi=batches[next++];busy++;try{await doBatch(bi,wi,key)}catch(e){}busy--;lastProg=Date.now();continue}
+    if(repairQ.length){var it=repairQ.shift();busy++;try{await doRepair(it,key)}catch(e){}busy--;continue}
+    if(next>=batches.length&&busy===0)break;
+    await sleep2(500)}}
+  async function runGemini(){var N=keys.length,RES=N>=6?2:(N>=3?1:0),MAIN=N-RES;
+   try{showToast("🔑 "+N+" Key: បកប្រែ "+MAIN+" · ទុកជួសជុល "+RES,true)}catch(_){}
+   await Promise.all(Array.from({length:N},function(_,wi){return gworker(wi,MAIN)}));
+   for(var q=0;qsrc.length;q++)if(!out[q])out[q]={s:src[q].s,e:src[q].e,t:src[q].t,emo:null}}
+  if(geminiMode)await runGemini();else await Promise.all(Array.from({length:conc},function(_,wi){return worker(wi)}));
  setC(out);try{zsfTrSummary(Z0)}catch(e){}
 }
 
@@ -5835,7 +5862,7 @@ var ZSF_EMO={angry:["😠",8,-6],sad:["😢",-6,-6],sweet:["🥰",-4,2],scared:[
 function zsfEmoMark(c){return ""}
 function zsfEmoPreset(p,emo){var e=emo&&ZSF_EMO[emo];try{if(localStorage.getItem("zsf_emo")==="0")return p}catch(_){}if(!e||!p)return p;var q=Object.assign({},p);q.speed=Math.max(-50,Math.min(100,(+q.speed||0)+e[1]));q.pitch=Math.max(-50,Math.min(50,(+q.pitch||0)+e[2]));return q}
 async function tagSpeakers(){
- if(!K.filter(Boolean).length||typeof window.zsfAutoClassifyTags!=="function")return;
+ if(!zsfKF(K).length||typeof window.zsfAutoClassifyTags!=="function")return;
  window.__zsfTagAbort=false;
  try{cuesToBlocks();window.__zsfForceTag=true;var __tp=window.zsfAutoClassifyTags(),__tid;await Promise.race([__tp,new Promise(function(r){__tid=setTimeout(function(){window.__zsfTagAbort=true;try{showToast("⏱ ចែកតូយូរពេក — បន្តជំហានបន្ទាប់",false)}catch(e){}r()},360000)})]);clearTimeout(__tid);renderEditor()}catch(e){try{renderEditor()}catch(_){}}
 }
@@ -5922,7 +5949,7 @@ $("#exp").onclick=async function(){
   /* Step 2a (v10): ស្តាប់សំឡេងចាប់ប្រុស/ស្រី/គិតក្នុងចិត្ត មុនបកប្រែ */
   window.__preTag=false;window.__preTried=false;window.__bibleP=null;
   try{if(on(1)&&cues.length&&K.filter(Boolean).length&&$("#target").value==="km"){window.__bibleP=gPrepareBible(K.filter(Boolean),function(){}).catch(function(){return null})}}catch(e){window.__bibleP=null}
-  if(on(2)&&cues.length&&K.filter(Boolean).length){
+  if(on(2)&&cues.length&&zsfKF(K).length){
    window.__preTried=true;phase(2,20,35);setProgress(0,"🎭 កំពុងស្តាប់សំឡេង ចាប់ប្រុស/ស្រី/គិតក្នុងចិត្ត...");
    try{await tagSpeakers()}catch(e){console.warn("pretag",e)}
    window.__preTag=cues.some(function(q){return /^\s*\[[1-4]\]/.test(q.t)});
@@ -5950,7 +5977,7 @@ $("#exp").onclick=async function(){
   /* Step 3 : ចែកតួ ប្រុស/ស្រី */
   if(window.__preTag){}
   else if(on(2)&&window.__workerTagged&&cues.some(function(c){return /^\s*\[[1-4]\]/.test(c.t)})){}
-  else if(on(2)&&K.filter(Boolean).length&&!window.__preTried){phase(2,50,56);setProgress(0,"🎭 កំពុងចាប់ប្រុស/ស្រី...");await tagSpeakers();setProgress(100,"✅ ចែកតួរួចរាល់")}
+  else if(on(2)&&zsfKF(K).length&&!window.__preTried){phase(2,50,56);setProgress(0,"🎭 កំពុងចាប់ប្រុស/ស្រី...");await tagSpeakers();setProgress(100,"✅ ចែកតួរួចរាល់")}
   if(on(2)){var tc=[0,0,0,0,0];cues.forEach(function(q){var m=/^\s*\[([1-4])\]/.exec(q.t);if(m)tc[+m[1]]++});
    if(tc[1]+tc[2]+tc[3]+tc[4])zsfDone("✓ ចែកតួរួច: ប្រុស "+tc[1]+" • ស្រី "+tc[2]+" • គិតក្នុងចិត្តប្រុស "+tc[3]+" • គិតក្នុងចិត្តស្រី "+tc[4],false);
    else zsfDone("⚠ មិនឃើញ tag ប្រុស/ស្រី ក្នុង SRT ទេ",false)}
@@ -6928,7 +6955,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"25.85",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.90",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7203,7 +7230,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
       days=pickN(out,["days_left","remaining_days","days_remaining","day_left"]),
       rpm=pickN(out,["rate_limit_rpm","rpm","rate_limit_per_minute","rate_limit"]),
       ex=pickS(out,["expires_at","expire_at","expired_at","expiry_date","expiry","expiration","expires"]);
-  if(rem==null&&tot!=null&&used!=null)rem=tot-used;
+  if(rpm>0)window.__laiRpm=rpm;if(rem==null&&tot!=null&&used!=null)rem=tot-used;
   if(tot==null&&used!=null&&rem!=null)tot=used+rem;
   if(used==null&&tot!=null&&rem!=null)used=tot-rem;
   if(days==null&&ex!=null){var t=(typeof ex==="number"||/^\d+$/.test(String(ex)))?Number(ex)*(Number(ex)1e12?1000:1):Date.parse(ex);if(t)days=Math.max(0,Math.ceil((t-Date.now())/864e5))}
@@ -7255,6 +7282,16 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   badge("✘ ភ្ជាប់មិនបាន","#f87171");
   $i("laiInfo").textContent="ភ្ជាប់ម៉ាស៊ីនមិនបាន ("+(netErr&&netErr.message||netErr)+")"
  }
+  async function loadModels(){var k=key();if(!k)return;
+   try{var R=await getJ(HOST+"/v1/models",{headers:{"Authorization":"Bearer "+k}});
+    var arr=R&&R.ok&&R.d&&(R.d.data||R.d.models);if(!Array.isArray(arr)||!arr.length)return;
+    var av={},n=0;arr.forEach(function(x){var id=typeof x==="string"?x:(x&&(x.id||x.name));if(id){av[String(id).replace(/^models\//,"")]=1;n++}});
+    if(!n)return;window.__laiAvail=av;
+    var m=$i("laiModel");if(!m)return;var bad=false,have={};
+    Array.prototype.forEach.call(m.options,function(o){have[o.value]=1;if(o.value==="auto")return;var ok=!!av[o.value];o.disabled=!ok;o.hidden=!ok;if(!ok&&m.value===o.value)bad=true});
+    Object.keys(av).forEach(function(id){if(!have[id]&&/gemini/i.test(id)){var op=document.createElement("option");op.value=id;op.textContent=id;m.appendChild(op)}});
+    if(bad){m.value="auto";s("zsf_lai_model","auto")}
+   }catch(e){}}
   function chip(i){return document.querySelectorAll("#opts .b")[i]}
  function syncChip(){var c=chip(5);if(!c)return;if(g("zsf_lai_on","0")==="1")c.classList.remove("off");else c.classList.add("off")}
  function gemOn(){var c=chip(1);if(c)c.classList.remove("off")}
@@ -7263,39 +7300,81 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   var o=$i("laiOn"),k=$i("laiKey"),m=$i("laiModel");if(!o||!k||!m)return;
   o.checked=g("zsf_lai_on","0")==="1";k.value=key();syncChip();m.value=g("zsf_lai_model","auto")||"auto";
   o.onchange=function(){s("zsf_lai_on",o.checked?"1":"0");syncChip();if(o.checked)gemOn();try{showToast(o.checked?"⚡ បើក Local AI":"បិទ Local AI",true)}catch(e){}};
-  k.onchange=function(){s("zsf_lai_key",k.value.trim());check()};
+  k.onchange=function(){s("zsf_lai_key",k.value.trim());check();loadModels()};
   m.onchange=function(){s("zsf_lai_model",m.value)};
+   var pe=$i("laiPrompt"),pt=$i("laiPromptOn"),pr=$i("laiPromptReset");
+   if(pe){pe.value=customPrompt()||String(g("zsf_lai_prompt",DEF_PROMPT));pe.onchange=function(){s("zsf_lai_prompt",pe.value)}}
+   if(pt){pt.checked=g("zsf_lai_pon","1")==="1";pt.onchange=function(){s("zsf_lai_pon",pt.checked?"1":"0");try{showToast(pt.checked?"✅ បើក Prompt ខ្មែរ":"បិទ Prompt ខ្មែរ",true)}catch(e){}}}
+   if(pr)pr.onclick=function(){try{localStorage.removeItem("zsf_lai_prompt")}catch(e){}if(pe)pe.value=DEF_PROMPT;try{showToast("↺ ត្រឡប់ទៅ Prompt ដើមរួចរាល់",true)}catch(e){}};
   $i("laiRef").onclick=check;
   var c5=chip(5);if(c5)c5.addEventListener("click",function(){var want=!c5.classList.contains("off");
    if(want&&!key()){c5.classList.add("off");try{showToast("សូមដាក់ Local AI Key ជាមុន",false)}catch(e){}try{$i("gbox").classList.remove("hide")}catch(e){}return}
    s("zsf_lai_on",want?"1":"0");o.checked=want;if(want)gemOn()});
   $i("laiDash").onclick=function(){window.open(HOST+":8502","_blank")};
-  if(key())check();
+  if(key()){check();loadModels()}
  }
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
  function hasMedia(j){var r=false;(j.contents||[]).forEach(function(c){(c.parts||[]).forEach(function(p){if(p&&(p.inlineData||p.inline_data||p.fileData||p.file_data))r=true})});return r}
  function err(st,m){return new Response(JSON.stringify({error:{message:m}}),{status:st,headers:{"Content-Type":"application/json"}})}
- function consume(n){if(!(n>0))return;try{F0(HOST+"/v1/key/consume",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify({tokens:n})}).then(function(){setTimeout(check,500)}).catch(function(){})}catch(e){}}
+ var DEF_PROMPT="You are a professional subtitle translator (Subtitle Translator) and an expert movie story adapter.\nYour task is to translate the provided subtitle text into natural, conversational, and highly engaging Khmer (\"ភាសាខ្មែរ\") following these extremely strict guidelines:\n\n១. ប្រើប្រាស់ភាសានិយាយប្រចាំថ្ងៃ (Natural & Conversational)៖\n- Translate using conversational words that Khmer people naturally use in daily life.\n- Avoid word-for-word translation that sounds rigid or violates natural Khmer grammar.\n\n២. កែសម្រួល និងសង្ខេបឱ្យទាក់ទាញ (Adaptation & Conciseness)៖\n- If the original sentences are long, or use complex/difficult idioms, adapt and condense them into shorter, easy-to-read Khmer that remains synced to subtitle reading speeds while fully retaining the original intent and essence.\n- Make the dialogue punchy, smooth, dramatic, and captivating to keep the audience hooked.\n\n៣. ប្រើប្រាស់សព្វនាមឱ្យស័ក្តិសម (Appropriate Pronouns)៖\n- Based on the context of the dialogue, use Khmer pronouns that represent the character's status, age, power dynamics, and relationship (e.g., ខ្ញុំ/ឯង, បង/អូន, កូន/ម៉ែ, លោកម្ចាស់/ឯកឧត្ដម...).\n- Reflect the character's exact emotions in the context (anger, pleading, teasing, respect, sarcasm, etc.).\n\n៤. ហាមប្រើប្រាស់សញ្ញា 'ៗ' (No Repetition Symbol)៖\n- ABSOLUTE STRICT RULE: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the translation. Instead, you MUST spell out the repeated words directly. For example, write \"ទេទេ\" instead of \"ទេៗ\"; write \"លឿនលឿន\" instead of \"លឿនៗ\"; write \"ទេទេទេទេ\" instead of \"ទេៗៗៗ\"; write \"យឺតយឺត\" instead of \"យឺតៗ\". This is extremely critical because the Text-to-Speech (TTS) program cannot read or understand the 'ៗ' symbol and will fail to announce it.\n\nAtmosphere/Genre Context: follow the story genre/style given in the user message.\n\nRules:\n1. Maintain the emotional tone and context of the conversation according to the specified atmosphere.\n2. Keep the translation natural and fluent in Khmer.\n3. Preserve the meaning of each block exactly.\n4. STRICT RULE: Do not attempt to modify, suggest, or return any changes to timestamps or subtitle indices.\n5. TAG PRESERVATION: If you see tags like [1], [2], [3], [M], [F], etc. (any letter, word, or number enclosed in square brackets) in the source text, you MUST preserve them exactly in the Khmer translation. Do not translate or modify these tags.\n6. NAME TRANSLITERATION: All proper names (people, places, brands) MUST be translated or transliterated into Khmer script. DO NOT leave any names in English or Latin characters.\n7. OUTPUT FORMAT: Return ONLY the numbered lines, in the same order and the same numbering as the input (format: \"1. translation\"). One line per input item. Do NOT return JSON, no explanation, no extra text.\n8. The output must be concise enough for subtitle reading speeds.\n9. GENDER IDENTIFICATION: If a line contains the tag [1] or [M], it indicates a male voice. If it contains the tag [2] or [F], it indicates a female voice. Use this to understand the dialogue context and choose appropriate gender-based language in Khmer.\n10. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write \"ទេទេ\" instead of \"ទេៗ\").";
+  function customPrompt(){if(g("zsf_lai_pon","1")!=="1")return"";var v=g("zsf_lai_prompt",null);return String(v==null?DEF_PROMPT:v).trim()}
+  var chkT=0;function chkSoon(){if(chkT)return;chkT=setTimeout(function(){chkT=0;check()},8000)}
+  /* V25.86 gate: rate-limit + adaptive concurrency + retry */
+  var G={max:0,cur:0,q:[],nxt:0,ok:0};
+  function rpmv(){var r=Number(window.__laiRpm);return isFinite(r)&&r>0?r:120}
+  function capMax(){var r=rpmv();return r>=300?10:r>=180?8:r>=120?6:r>=60?4:r>=45?3:2}
+  window.__laiConc=capMax;
+  function wait(ms){return new Promise(function(z){setTimeout(z,ms)})}
+  function backoff(n){return Math.min(1000*Math.pow(2,n-1),8000)+Math.random()*400}
+  function pump(){var cm=capMax();if(!G.max||G.max>cm)G.max=cm;
+   while(G.q.length&&G.max>G.cur){var w=G.q.shift();G.cur++;var now=Date.now(),iv=60000/(rpmv()*0.9),at=Math.max(now,G.nxt);G.nxt=at+iv;(function(w,d){if(d>0)setTimeout(w.res,d);else w.res()})(w,at-now)}}
+  function acq(sig){return new Promise(function(res,rej){var w={res:res,rej:rej};G.q.push(w);pump();
+   if(sig){sig.addEventListener("abort",function(){var i=G.q.indexOf(w);if(i>=0){G.q.splice(i,1);var e=new Error("Aborted");e.name="AbortError";rej(e)}})}})}
+  function rel(){G.cur=Math.max(0,G.cur-1);pump()}
+  function good(){G.ok++;if(G.ok>=8&&capMax()>G.max){G.max++;G.ok=0;pump()}}
+  function slow(){G.ok=0;G.max=Math.max(2,Math.floor((G.max||capMax())/2))}
+  function consume(n){if(!(n>0))return;try{F0(HOST+"/v1/key/consume",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify({tokens:n})}).then(function(){chkSoon()}).catch(function(){})}catch(e){}}
  async function call(j,sig){
   var msgs=[],si=j.systemInstruction||j.system_instruction,gc=j.generationConfig||{};
   if(si&&si.parts)msgs.push({role:"system",content:si.parts.map(function(p){return p.text||""}).join("")});
-  (j.contents||[]).forEach(function(c){msgs.push({role:c.role==="model"?"assistant":"user",content:(c.parts||[]).map(function(p){return p.text||""}).join("")})});
+  (j.contents||[]).forEach(function(c){var mm={role:c.role==="model"?"assistant":"user",content:(c.parts||[]).map(function(p){return p.text||""}).join("")};if(hasMedia({contents:[c]}))mm._p=c.parts;msgs.push(mm)});
   try{var lm0=msgs[msgs.length-1];if(typeof zsfStylePrompt==="function"&&typeof zsfFunOn==="function"&&zsfFunOn()&&lm0&&lm0.role==="user"&&lm0.content.indexOf("NO LATIN LETTERS")>=0&&lm0.content.indexOf("STYLE (")0){var SP0=zsfStylePrompt();lm0.content=lm0.content.indexOf("Output only numbered lines.")>=0?lm0.content.replace("Output only numbered lines.",SP0+" Output only numbered lines."):(SP0+"\n"+lm0.content)}}catch(e){}
-  try{var RL=window.__ZSF_RULES,lm=msgs[msgs.length-1];if(RL&&lm&&lm.role==="user"&&lm.content.indexOf("Khmer")>=0&&(lm.content.indexOf("numbered line")>=0||lm.content.indexOf("Khmer subtitle translator")>=0)&&lm.content.indexOf("PRO DUBBING RULES")===-1)lm.content=lm.content+"\n\n"+RL}catch(e){}
+  try{var CP=customPrompt(),lc=msgs[msgs.length-1];if(CP&&lc&&lc.role==="user"&&lc.content.indexOf("Khmer")>=0&&(lc.content.indexOf("numbered line")>=0||lc.content.indexOf("Khmer subtitle translator")>=0)){if(msgs[0]&&msgs[0].role==="system"){if(msgs[0].content.indexOf("CUSTOM KHMER PROMPT")===-1)msgs[0].content+="\n\n"+CP}else msgs.unshift({role:"system",content:"CUSTOM KHMER PROMPT\n"+CP})}}catch(e){}
+   try{var RL=window.__ZSF_RULES,lm=msgs[msgs.length-1];if(RL&&lm&&lm.role==="user"&&lm.content.indexOf("Khmer")>=0&&(lm.content.indexOf("numbered line")>=0||lm.content.indexOf("Khmer subtitle translator")>=0)&&lm.content.indexOf("PRO DUBBING RULES")===-1)lm.content=lm.content+"\n\n"+RL}catch(e){}
   try{if(gc.responseMimeType==="application/json"){var lj=msgs[msgs.length-1];if(lj&&lj.role==="user"&&!/json/i.test(lj.content))lj.content+="\n\nReturn ONLY valid JSON, no markdown, no explanation."}}catch(e){}
-  var sel=g("zsf_lai_model","auto")||"auto",AO=["gemini-3.8-flash","gemini-3.1-pro","gemini-3-flash","gemini-3.5-flash-lite"],bad0=window.__laiBad||{},order=sel==="auto"?AO.filter(function(x){return !bad0[x]}):[sel];if(!order.length)order=[AO[AO.length-1]];
-  var body={model:order[0],messages:msgs,stream:false};
+  var sel=g("zsf_lai_model","auto")||"auto",AO=["gemini-3.8-flash","gemini-3.8-flash-high","gemini-3.1-pro","gemini-3-flash","gemini-3.5-flash-lite"],bad0=window.__laiBad||{},AV=window.__laiAvail,order=sel==="auto"?AO.filter(function(x){return (!bad0[x]||Date.now()-bad0[x]>300000)&&(!AV||AV[x])}):[sel];if(!order.length)order=[AO[AO.length-1]];
+  var HM=hasMedia(j);msgs.forEach(function(m){var ps=m._p;delete m._p;if(!ps)return;var arr=[];ps.forEach(function(p){var id=p.inlineData||p.inline_data;if(id&&id.data){var mt=String(id.mimeType||id.mime_type||"");if(/^audio\//i.test(mt)){var f=mt.split("/")[1].split(";")[0].toLowerCase();f=(f==="mpeg"||f==="mp3")?"mp3":((f==="x-wav"||f==="wave")?"wav":f);arr.push({type:"input_audio",input_audio:{data:id.data,format:f}})}else if(/^image\//i.test(mt)){arr.push({type:"image_url",image_url:{url:"data:"+mt+";base64,"+id.data}})}}else if(typeof p.text==="string")arr.push({type:"text",text:p.text})});var jn=ps.map(function(p){return p.text||""}).join("");if(typeof m.content==="string"&&m.content.length>jn.length&&m.content.indexOf(jn)===0)arr.push({type:"text",text:m.content.slice(jn.length)});m.content=arr});
+   var LIM=HM?150000:40000;
+   var body={model:order[0],messages:msgs,stream:false,max_tokens:(typeof gc.maxOutputTokens==="number"&&gc.maxOutputTokens>0?gc.maxOutputTokens:8192)};
   if(typeof gc.temperature==="number")body.temperature=gc.temperature;
   if(typeof gc.topP==="number")body.top_p=gc.topP;
   try{
    var r,raw,d,mi=0;
-   for(;;){body.model=order[mi];r=await F0(HOST+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify(body),signal:sig});raw=await r.text();
-    var mbad=!r.ok&&(r.status===404||(/model/i.test(raw)&&/not found|not support|unsupported|unavailable|unknown|invalid|does not exist|no longer/i.test(raw)));
-    if(mbad&&sel==="auto"&&mi<order.length-1){(window.__laiBad=window.__laiBad||{})[order[mi]]=1;mi++;continue}
-    break}
+    await acq(sig);var t0=Date.now(),tries=0;
+    try{
+    for(;;){body.model=order[mi];var ac=new AbortController(),onab=function(){try{ac.abort()}catch(e){}};
+     if(sig){if(sig.aborted)onab();else sig.addEventListener("abort",onab)}
+     var tmr=setTimeout(onab,HM?160000:55000);
+     try{r=await F0(HOST+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify(body),signal:ac.signal});raw=await r.text()}
+     catch(fe){clearTimeout(tmr);if(sig)sig.removeEventListener("abort",onab);
+      if((sig&&sig.aborted)||tries>=3||Date.now()-t0>LIM)throw fe;
+      tries++;slow();await wait(backoff(tries));continue}
+     clearTimeout(tmr);if(sig)sig.removeEventListener("abort",onab);
+     var st=r.status,trans=st===429||st===500||st===502||st===503||st===504;
+     var mbad=!r.ok&&st!==401&&st!==403&&(st===404||(!trans&&/model/i.test(raw)&&/not found|not support|unsupported|unknown|invalid|does not exist|no longer/i.test(raw)));
+     if(mbad&&sel==="auto"&&mi!==order.length-1){(window.__laiBad=window.__laiBad||{})[order[mi]]=Date.now();mi++;continue}
+     if(mbad&&sel!=="auto"){var bm=sel;(window.__laiBad=window.__laiBad||{})[bm]=Date.now();var o2=AO.filter(function(x){return x!==bm&&(!AV||AV[x])});
+      if(o2.length){order=o2;sel="auto";mi=0;try{showToast("⚠ ម៉ូដែល "+bm+" មិនមានក្នុង Server — ប្តូរទៅ Auto",false)}catch(e){}continue}}
+     if(trans&&tries!==3&&LIM>Date.now()-t0){tries++;if(st===429)slow();
+      var ra=parseFloat(r.headers&&r.headers.get&&r.headers.get("Retry-After"));
+      await wait(ra>0?Math.min(ra*1000,15000):backoff(tries));
+      if(sel==="auto"&&tries>=2&&mi!==order.length-1)mi++;continue}
+     break}
+    if(r&&r.ok)good();
+    }finally{rel()}
    window.__laiModel=order[mi];
    window.__laiLast="HTTP "+r.status+": "+String(raw).replace(/\s+/g," ").slice(0,180);try{d=JSON.parse(raw)}catch(e){return err(r.status||502,"Local AI ឆ្លើយមិនត្រឹមត្រូវ (HTTP "+r.status+")")}
-   if(!r.ok||d.error){var em=(d.error&&(d.error.message||d.error))||d.detail||d.message||("HTTP "+r.status);return err(r.status||500,typeof em==="string"?em:JSON.stringify(em))}
+   if(!r.ok||d.error){var em=(d.error&&(d.error.message||d.error))||d.detail||d.message||("HTTP "+r.status);em=typeof em==="string"?em:JSON.stringify(em);if(HM&&r.status>=400&&r.status<500&&r.status!==429)em="Local AI server មិនទាន់គាំទ្រ audio/រូបភាព (input_audio) ៖ "+em;return err(r.status||500,em)}
    var ch=d.choices&&d.choices[0],tx=ch&&ch.message&&ch.message.content;
    if(Array.isArray(tx))tx=tx.map(function(p){return p&&p.text||""}).join("");if(tx)window.__laiLast="ចម្លើយ: "+String(tx).replace(/\s+/g," ").slice(0,180);
    var u=d.usage||{},pt=u.prompt_tokens||0,ct=u.completion_tokens||0,tt=u.total_tokens||(pt+ct);
@@ -7308,7 +7387,8 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    if(typeof u==="string"&&u.indexOf("generativelanguage.googleapis.com")>=0&&u.indexOf(":generateContent")>=0&&o&&typeof o.body==="string"){
     var hk="";try{hk=(o.headers&&o.headers["x-goog-api-key"])||""}catch(e){}
     var j=JSON.parse(o.body),media=hasMedia(j);
-    if(on()&&!media){var lf=function(u2,o2){return call(JSON.parse(o2.body),o2.signal)};if(typeof zsfEnforce==="function"&&typeof zsfFunOn==="function"&&zsfFunOn()&&o.body.indexOf("NO LATIN LETTERS")>=0)return zsfEnforce(lf,this,u,o,true);return call(j,o.signal)}
+    if(on()&&media)return call(j,o.signal);
+     if(on()&&!media){var lf=function(u2,o2){return call(JSON.parse(o2.body),o2.signal)};if(typeof zsfEnforce==="function"&&typeof zsfFunOn==="function"&&zsfFunOn()&&o.body.indexOf("NO LATIN LETTERS")>=0)return zsfEnforce(lf,this,u,o,true);return call(j,o.signal)}
     if(media&&hk==="LOCAL_AI")return Promise.resolve(err(400,"Local AI មិនគាំទ្រសំឡេង/វីដេអូ — ត្រូវការ Gemini Key"));
    }
   }catch(e){}
@@ -7348,7 +7428,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="25.85";
+  var EMB="25.90";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
