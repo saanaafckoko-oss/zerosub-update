@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.90";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"25.91";})();
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -1146,7 +1146,7 @@ $("#bigPlay").onclick=$("#play").onclick=()=>V.play();$("#stop").onclick=()=>{V.
 
 /* tabs */
 $$("#tabs .b").forEach(b=>b.onclick=()=>{const TC={export:"grn",cut:"orng",asr:"teal",bgm:"vio"};$$("#tabs .b").forEach(x=>{x.classList.remove("grn","orng","teal","vio");x.classList.toggle("gold",x.dataset.t==="cut")});b.classList.remove("gold");b.classList.add(TC[b.dataset.t]);$$(".pane").forEach(p=>p.classList.remove("on"));$("#p-"+b.dataset.t).classList.add("on")});
-$("#opts").innerHTML=["Subtitle","Gemini","ចែកតួ","Voice","Effect","Local AI"].map(n=>`button class="b">${n}/button>`).join("");$$("#opts .b").forEach(b=>b.onclick=()=>b.classList.toggle("off"));try{if(localStorage.getItem("zsf_lai_on")!=="1")$$("#opts .b")[5].classList.add("off")}catch(e){}
+$("#opts").innerHTML=["Subtitle","Gemini","ចែកតួ Gemini","Voice","Effect","Local AI","ចែកតួ Local AI"].map(n=>`button class="b">${n}/button>`).join("");$$("#opts .b").forEach(b=>b.onclick=()=>b.classList.toggle("off"));try{if(localStorage.getItem("zsf_lai_on")!=="1")$$("#opts .b")[5].classList.add("off")}catch(e){}try{var __c6=$$("#opts .b")[6];if(__c6&&localStorage.getItem("zsf_lai_tag")!=="1")__c6.classList.add("off")}catch(e){}
 $("#exp").onclick=()=>cues.length?save(zsfSrtName(),toSrt(cues)):alert("មិនទាន់មានអក្សរ។ ទាញអក្សរ ឬនាំចូល SRT ជាមុន");
 
 /* cut */
@@ -2463,7 +2463,7 @@ async function fxRenderWin(s0,s1,SR,bed,bedGain,plan,base,duck,zones){
  return oc.startRendering()}
 
 async function doExportFast(){
- const on=i=>!$$("#opts .b")[i].classList.contains("off"),btn=$("#exp"),old=btn.innerHTML,T0=performance.now();
+ const on=i=>window.zsfChipOn(i),btn=$("#exp"),old=btn.innerHTML,T0=performance.now();
  if(!/\.(mp4|m4v|mov)$/i.test(file.name||"")&&!/mp4|quicktime/i.test(file.type||""))throw new Error("ទម្រង់ឯកសារមិនគាំទ្រ Export លឿន");
  btn.textContent="⚡ កំពុងរៀបចំ Export លឿន...";
  const dm=await zsTO(SPMP4.demux(fxReader(file),file.size),60000,"អាន MP4 គាំង");
@@ -2888,7 +2888,7 @@ async function fxEnsureBgm(btn){
 }
 /* Export លឿនបំផុត (ដូចកំណែចាស់) ៖ មិន decode/encode វីដេអូឡើងវិញ — ទុក video ដើមទាំងស្រុង, Encode តែសំឡេង AAC រួច zfAssemble ជំនួស audio track */
 async function doExportCopy(){
- const on=i=>!$$("#opts .b")[i].classList.contains("off"),btn=$("#exp"),old=btn.innerHTML,T0=performance.now();
+ const on=i=>window.zsfChipOn(i),btn=$("#exp"),old=btn.innerHTML,T0=performance.now();
  if(!/\.(mp4|m4v)$/i.test(file.name||"")&&!/mp4/i.test(file.type||""))throw new Error("វីដេអូមិនមែន MP4");
  if(typeof AudioEncoder!=="function"||typeof AudioData!=="function"||typeof OfflineAudioContext!=="function")throw new Error("Browser មិនមាន AudioEncoder");
  btn.textContent="⚡ កំពុងរៀបចំ Export លឿន...";
@@ -3036,7 +3036,7 @@ async function zsKeepSave(name,blob){
 }
 const zsTO=(p,ms,m)=>{let t;return Promise.race([Promise.resolve(p),new Promise((_,j)=>{t=setTimeout(()=>j(new Error(m+" (>"+Math.round(ms/1000)+"s)")),ms)})]).finally(()=>clearTimeout(t))};
 async function doExportKeep(){
- const on=i=>!$$("#opts .b")[i].classList.contains("off"),btn=$("#exp"),old=btn.innerHTML,T0=performance.now();
+ const on=i=>window.zsfChipOn(i),btn=$("#exp"),old=btn.innerHTML,T0=performance.now();
  const prog=(p,m)=>{btn.textContent="កំពុង Export "+Math.max(0,Math.min(99,Math.round(p)))+"%..."+(m?" • "+m:"")};
  const fatal=m=>{const e=new Error(m);e.fatal=true;return e};
  if(!file||!V.videoWidth)throw fatal("សូមជ្រើសវីដេអូជាមុន");
@@ -3289,7 +3289,7 @@ async function doExport0(){
 }
 async function doExportRT(){
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
- const on=i=>!$$("#opts .b")[i].classList.contains("off"),btn=$("#exp"),old=btn.innerHTML;
+ const on=i=>window.zsfChipOn(i),btn=$("#exp"),old=btn.innerHTML;
  const sc=Math.min(1,1280/Math.max(V.videoWidth,V.videoHeight)),w=Math.round(V.videoWidth*sc),h=Math.round(V.videoHeight*sc);
  const cv=document.createElement("canvas");cv.width=w;cv.height=h;const c=cv.getContext("2d");
  if(on(4)&&LY.length)await lyPrep(w,h,btn);
@@ -5923,7 +5923,7 @@ $("#exp").onclick=async function(){
  if(running)return;
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
  var __on0=!$$("#opts .b")[0].classList.contains("off"),c;if(!__on0){if(!cues.length)return alert("មិនទាន់មាន SRT ទេ។ សូមនាំចូល SRT ឬបើក ✓ Subtitle");c="keep"}else{c=await ask();if(!c)return}
- var btn=$("#exp"),old=btn.innerHTML,on=function(i){return !$$("#opts .b")[i].classList.contains("off")};
+ var btn=$("#exp"),old=btn.innerHTML,on=function(i){return window.zsfChipOn(i)};
  running=true;btn.disabled=true;window.__pipe=true;window.__workerTagged=false;
  try{
   AC=AC||new(window.AudioContext||window.webkitAudioContext)();try{await AC.resume()}catch(e){}
@@ -6955,7 +6955,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"25.90",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"25.91",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7201,7 +7201,9 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
  function s(k,v){try{localStorage.setItem(k,v)}catch(e){}}
  function key(){return String(g("zsf_lai_key","")).trim()}
  function on(){return g("zsf_lai_on","0")==="1"&&!!key()}
- window.zsfKF=function(arr){var a=(arr||[]).filter(Boolean);if(!a.length&&on())return["LOCAL_AI"];return a};
+ function tagLocal(){return g("zsf_lai_tag","0")==="1"&&!!key()}
+ window.zsfChipOn=function(i){var b=document.querySelectorAll("#opts .b");if(i===2)return !!((b[2]&&!b[2].classList.contains("off"))||(b[6]&&!b[6].classList.contains("off")));return !!(b[i]&&!b[i].classList.contains("off"))};
+ window.zsfKF=function(arr){var a=(arr||[]).filter(Boolean);if(!a.length&&(on()||tagLocal()))return["LOCAL_AI"];return a};
  function $i(id){return document.getElementById(id)}
  function badge(t,c){var b=$i("laiBadge");if(!b)return;b.textContent=t;b.style.color=c;b.style.borderColor=c+"59";b.style.background=c+"1f"}
  function num(n){n=Number(n);return isFinite(n)?n.toLocaleString("en-US"):"-"}
@@ -7250,7 +7252,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   badge("● User_Apk","#34d399");
  }
  async function getJ(url,opt){
-  var ac=new AbortController(),tm=setTimeout(function(){ac.abort()},12000);
+  var ac=new AbortController(),tm=setTimeout(function(){ac.abort()},30000);
   try{
    opt=opt||{};opt.signal=ac.signal;
    var r=await F0(url,opt),raw=await r.text(),d=null;
@@ -7273,14 +7275,14 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
     var R=await getJ(tries[i][0],tries[i][1]);
     if(R.ok&&R.d&&typeof R.d==="object"){show(R.d);return}
     if(!first)first=R;
-   }catch(e){if(!netErr)netErr=e}
+   }catch(e){if(!netErr)netErr=e;if(e&&e.name==="AbortError")break}
   }
   if(first){
    var d=first.d;badge("✘ Key មិនត្រឹមត្រូវ","#f87171");
    $i("laiInfo").textContent=(d&&(d.detail||d.message||(d.error&&d.error.message)))||("HTTP "+first.status);return
   }
   badge("✘ ភ្ជាប់មិនបាន","#f87171");
-  $i("laiInfo").textContent="ភ្ជាប់ម៉ាស៊ីនមិនបាន ("+(netErr&&netErr.message||netErr)+")"
+  $i("laiInfo").textContent="ភ្ជាប់ម៉ាស៊ីនមិនបាន ("+(netErr&&netErr.name==="AbortError"?"server ឆ្លើយយឺតលើស 30 វិនាទី — អាចកំពុងរវល់ ឬ VPN/បណ្ដាញយឺត សូមព្យាយាមម្ដងទៀត":(netErr&&netErr.message||netErr))+")"
  }
   async function loadModels(){var k=key();if(!k)return;
    try{var R=await getJ(HOST+"/v1/models",{headers:{"Authorization":"Bearer "+k}});
@@ -7295,7 +7297,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   function chip(i){return document.querySelectorAll("#opts .b")[i]}
  function syncChip(){var c=chip(5);if(!c)return;if(g("zsf_lai_on","0")==="1")c.classList.remove("off");else c.classList.add("off")}
  function gemOn(){var c=chip(1);if(c)c.classList.remove("off")}
- try{var st=document.createElement("style");st.textContent="#opts .b{order:2}#opts .b:nth-child(1){order:0}#opts .b:nth-child(6){order:1}";document.head.appendChild(st)}catch(e){}
+ try{var st=document.createElement("style");st.textContent="#opts .b{order:2}#opts .b:nth-child(1){order:0}#opts .b:nth-child(6){order:1}#opts .b:nth-child(2){order:2}#opts .b:nth-child(3){order:3}#opts .b:nth-child(7){order:4}#opts .b:nth-child(4){order:5}#opts .b:nth-child(5){order:6}";document.head.appendChild(st)}catch(e){}
  function init(){
   var o=$i("laiOn"),k=$i("laiKey"),m=$i("laiModel");if(!o||!k||!m)return;
   o.checked=g("zsf_lai_on","0")==="1";k.value=key();syncChip();m.value=g("zsf_lai_model","auto")||"auto";
@@ -7310,7 +7312,14 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   var c5=chip(5);if(c5)c5.addEventListener("click",function(){var want=!c5.classList.contains("off");
    if(want&&!key()){c5.classList.add("off");try{showToast("សូមដាក់ Local AI Key ជាមុន",false)}catch(e){}try{$i("gbox").classList.remove("hide")}catch(e){}return}
    s("zsf_lai_on",want?"1":"0");o.checked=want;if(want)gemOn()});
-  $i("laiDash").onclick=function(){window.open(HOST+":8502","_blank")};
+  var c2=chip(2),c6=chip(6);
+   if(c6){if(g("zsf_lai_tag","0")==="1"&&key()){c6.classList.remove("off");if(c2)c2.classList.add("off")}else{c6.classList.add("off");s("zsf_lai_tag","0")}
+    c6.addEventListener("click",function(){var want=!c6.classList.contains("off");
+     if(want&&!key()){c6.classList.add("off");s("zsf_lai_tag","0");try{showToast("សូមដាក់ Local AI Key ជាមុន",false)}catch(e){}try{$i("gbox").classList.remove("hide")}catch(e){}return}
+     s("zsf_lai_tag",want?"1":"0");if(want&&c2)c2.classList.add("off");
+     try{showToast(want?"🎙️ ចែកតួ ប្រើ Local AI (បិទ Gemini)":"🎙️ ចែកតួ Local AI បានបិទ",true)}catch(e){}})}
+   if(c2)c2.addEventListener("click",function(){if(!c2.classList.contains("off")&&c6&&!c6.classList.contains("off")){c6.classList.add("off");s("zsf_lai_tag","0")}});
+   $i("laiDash").onclick=function(){window.open(HOST+":8502","_blank")};
   if(key()){check();loadModels()}
  }
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
@@ -7323,7 +7332,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   var G={max:0,cur:0,q:[],nxt:0,ok:0};
   function rpmv(){var r=Number(window.__laiRpm);return isFinite(r)&&r>0?r:120}
   function capMax(){var r=rpmv();return r>=300?10:r>=180?8:r>=120?6:r>=60?4:r>=45?3:2}
-  window.__laiConc=capMax;
+  window.__laiConc=capMax;window.__laiBusy=function(){return G.cur>0||G.q.length>0};
   function wait(ms){return new Promise(function(z){setTimeout(z,ms)})}
   function backoff(n){return Math.min(1000*Math.pow(2,n-1),8000)+Math.random()*400}
   function pump(){var cm=capMax();if(!G.max||G.max>cm)G.max=cm;
@@ -7343,7 +7352,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    try{var RL=window.__ZSF_RULES,lm=msgs[msgs.length-1];if(RL&&lm&&lm.role==="user"&&lm.content.indexOf("Khmer")>=0&&(lm.content.indexOf("numbered line")>=0||lm.content.indexOf("Khmer subtitle translator")>=0)&&lm.content.indexOf("PRO DUBBING RULES")===-1)lm.content=lm.content+"\n\n"+RL}catch(e){}
   try{if(gc.responseMimeType==="application/json"){var lj=msgs[msgs.length-1];if(lj&&lj.role==="user"&&!/json/i.test(lj.content))lj.content+="\n\nReturn ONLY valid JSON, no markdown, no explanation."}}catch(e){}
   var sel=g("zsf_lai_model","auto")||"auto",AO=["gemini-3.8-flash","gemini-3.8-flash-high","gemini-3.1-pro","gemini-3-flash","gemini-3.5-flash-lite"],bad0=window.__laiBad||{},AV=window.__laiAvail,order=sel==="auto"?AO.filter(function(x){return (!bad0[x]||Date.now()-bad0[x]>300000)&&(!AV||AV[x])}):[sel];if(!order.length)order=[AO[AO.length-1]];
-  var HM=hasMedia(j);msgs.forEach(function(m){var ps=m._p;delete m._p;if(!ps)return;var arr=[];ps.forEach(function(p){var id=p.inlineData||p.inline_data;if(id&&id.data){var mt=String(id.mimeType||id.mime_type||"");if(/^audio\//i.test(mt)){var f=mt.split("/")[1].split(";")[0].toLowerCase();f=(f==="mpeg"||f==="mp3")?"mp3":((f==="x-wav"||f==="wave")?"wav":f);arr.push({type:"input_audio",input_audio:{data:id.data,format:f}})}else if(/^image\//i.test(mt)){arr.push({type:"image_url",image_url:{url:"data:"+mt+";base64,"+id.data}})}}else if(typeof p.text==="string")arr.push({type:"text",text:p.text})});var jn=ps.map(function(p){return p.text||""}).join("");if(typeof m.content==="string"&&m.content.length>jn.length&&m.content.indexOf(jn)===0)arr.push({type:"text",text:m.content.slice(jn.length)});m.content=arr});
+  var HM=hasMedia(j);if(HM)window.__laiTagN=(window.__laiTagN||0)+1;msgs.forEach(function(m){var ps=m._p;delete m._p;if(!ps)return;var arr=[];ps.forEach(function(p){var id=p.inlineData||p.inline_data;if(id&&id.data){var mt=String(id.mimeType||id.mime_type||"");if(/^audio\//i.test(mt)){var f=mt.split("/")[1].split(";")[0].toLowerCase();f=(f==="mpeg"||f==="mp3")?"mp3":((f==="x-wav"||f==="wave")?"wav":f);arr.push({type:"input_audio",input_audio:{data:id.data,format:f}})}else if(/^image\//i.test(mt)){arr.push({type:"image_url",image_url:{url:"data:"+mt+";base64,"+id.data}})}}else if(typeof p.text==="string")arr.push({type:"text",text:p.text})});var jn=ps.map(function(p){return p.text||""}).join("");if(typeof m.content==="string"&&m.content.length>jn.length&&m.content.indexOf(jn)===0)arr.push({type:"text",text:m.content.slice(jn.length)});m.content=arr});
    var LIM=HM?150000:40000;
    var body={model:order[0],messages:msgs,stream:false,max_tokens:(typeof gc.maxOutputTokens==="number"&&gc.maxOutputTokens>0?gc.maxOutputTokens:8192)};
   if(typeof gc.temperature==="number")body.temperature=gc.temperature;
@@ -7374,12 +7383,12 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
     }finally{rel()}
    window.__laiModel=order[mi];
    window.__laiLast="HTTP "+r.status+": "+String(raw).replace(/\s+/g," ").slice(0,180);try{d=JSON.parse(raw)}catch(e){return err(r.status||502,"Local AI ឆ្លើយមិនត្រឹមត្រូវ (HTTP "+r.status+")")}
-   if(!r.ok||d.error){var em=(d.error&&(d.error.message||d.error))||d.detail||d.message||("HTTP "+r.status);em=typeof em==="string"?em:JSON.stringify(em);if(HM&&r.status>=400&&r.status<500&&r.status!==429)em="Local AI server មិនទាន់គាំទ្រ audio/រូបភាព (input_audio) ៖ "+em;return err(r.status||500,em)}
+   if(!r.ok||d.error){var em=(d.error&&(d.error.message||d.error))||d.detail||d.message||("HTTP "+r.status);em=typeof em==="string"?em:JSON.stringify(em);if(HM&&r.status>=400&&r.status<500&&r.status!==429)em="Local AI server មិនទាន់គាំទ្រ audio/រូបភាព (input_audio) ៖ "+em;if(HM){window.__laiTagErr=em;try{window.__laiRender&&window.__laiRender()}catch(e){}}return err(r.status||500,em)}
    var ch=d.choices&&d.choices[0],tx=ch&&ch.message&&ch.message.content;
    if(Array.isArray(tx))tx=tx.map(function(p){return p&&p.text||""}).join("");if(tx)window.__laiLast="ចម្លើយ: "+String(tx).replace(/\s+/g," ").slice(0,180);
    var u=d.usage||{},pt=u.prompt_tokens||0,ct=u.completion_tokens||0,tt=u.total_tokens||(pt+ct);
-   consume(tt);
-   return new Response(JSON.stringify({candidates:[{content:{role:"model",parts:[{text:tx||""}]},finishReason:"STOP"}],usageMetadata:{promptTokenCount:pt,candidatesTokenCount:ct,totalTokenCount:tt}}),{status:200,headers:{"Content-Type":"application/json"}});
+   consume(tt);if(HM){window.__laiTagOk=(window.__laiTagOk||0)+1;try{window.__laiRender&&window.__laiRender()}catch(e){}}
+   return new Response(JSON.stringify({candidates:[{content:{role:"model",parts:[{text:tx||""}]},finishReason:"STOP"}],usageMetadata:{promptTokenCount:pt,candidatesTokenCount:ct,totalTokenCount:tt}}),{status:200,headers:{"Content-Type":"application/json","X-ZSF-LAI":"1"}});
   }catch(e){if(e&&e.name==="AbortError")throw e;window.__laiLast="ភ្ជាប់មិនបាន: "+(e&&e.message||e);return err(503,"Local AI ភ្ជាប់មិនបាន: "+(e&&e.message||e))}
  }
  window.fetch=function(u,o){
@@ -7387,7 +7396,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    if(typeof u==="string"&&u.indexOf("generativelanguage.googleapis.com")>=0&&u.indexOf(":generateContent")>=0&&o&&typeof o.body==="string"){
     var hk="";try{hk=(o.headers&&o.headers["x-goog-api-key"])||""}catch(e){}
     var j=JSON.parse(o.body),media=hasMedia(j);
-    if(on()&&media)return call(j,o.signal);
+    if(tagLocal()&&media)return call(j,o.signal);
      if(on()&&!media){var lf=function(u2,o2){return call(JSON.parse(o2.body),o2.signal)};if(typeof zsfEnforce==="function"&&typeof zsfFunOn==="function"&&zsfFunOn()&&o.body.indexOf("NO LATIN LETTERS")>=0)return zsfEnforce(lf,this,u,o,true);return call(j,o.signal)}
     if(media&&hk==="LOCAL_AI")return Promise.resolve(err(400,"Local AI មិនគាំទ្រសំឡេង/វីដេអូ — ត្រូវការ Gemini Key"));
    }
@@ -7405,19 +7414,21 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
  function stamp(){var d=new Date();return two(d.getHours())+":"+two(d.getMinutes())+":"+two(d.getSeconds())}
  var lastChk="--:--:--";
  function render(){var x=document.getElementById("laiExtra");if(!x)return;
-  x.textContent="🕒 ពិនិត្យម៉ាស៊ីនចុងក្រោយ៖ "+lastChk+"\n📊 កម្មវិធីរាប់ដោយខ្លួនឯង (ចាប់ពីបើកកម្មវិធី)៖ "+cnt.toLocaleString("en-US")+" tokens · "+calls+" ដង\nℹ️ «បានប្រើ/នៅសល់» ខាងលើជាតួលេខពីម៉ាស៊ីន Local AI ពិត។ ផ្ទៀងផ្ទាត់៖ ចុចធ្វើបច្ចុប្បន្នភាពមុន/ក្រោយបកប្រែ ផលត្រូវតែជិតនឹងចំនួន token ខាងលើ។"}
+  x.textContent="🕒 ពិនិត្យម៉ាស៊ីនចុងក្រោយ៖ "+lastChk+"\n📊 កម្មវិធីរាប់ដោយខ្លួនឯង (ចាប់ពីបើកកម្មវិធី)៖ "+cnt.toLocaleString("en-US")+" tokens · "+calls+" ដង\nℹ️ «បានប្រើ/នៅសល់» ខាងលើជាតួលេខពីម៉ាស៊ីន Local AI ពិត។ ផ្ទៀងផ្ទាត់៖ ចុចធ្វើបច្ចុប្បន្នភាពមុន/ក្រោយបកប្រែ ផលត្រូវតែជិតនឹងចំនួន token ខាងលើ។";x.textContent+=tagLine()}
+ function tagLine(){var n=window.__laiTagN||0;if(!n)return"";return"\n🎙️ ចែកតួ Local AI: ជោគជ័យ "+(window.__laiTagOk||0)+"/"+n+" ដង"+(window.__laiTagErr?" · កំហុសចុងក្រោយ: "+String(window.__laiTagErr).slice(0,140):"")}
+ window.__laiRender=function(){render()};
  function setup(){
   var inf=document.getElementById("laiInfo");if(!inf||document.getElementById("laiExtra"))return;
   var x=document.createElement("div");x.id="laiExtra";x.style.cssText="margin-top:8px;font-size:11.5px;line-height:1.6;color:#8ea0c4;white-space:pre-wrap";inf.parentNode.insertBefore(x,inf.nextSibling);
   try{new MutationObserver(function(){lastChk=stamp();render()}).observe(inf,{childList:true,characterData:true,subtree:true})}catch(e){}
   render();
-  setInterval(function(){try{if(localStorage.getItem("zsf_lai_key")&&!document.hidden){var b=document.getElementById("laiRef");if(b)b.click()}}catch(e){}},60000)};
+  setInterval(function(){try{if(localStorage.getItem("zsf_lai_key")&&!document.hidden&&!(window.__laiBusy&&window.__laiBusy())){var b=document.getElementById("laiRef");if(b)b.click()}}catch(e){}},60000)};
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup);else setup();
  window.__zsfLaiCount=function(j){try{var u=j&&j.usageMetadata;if(u&&u.totalTokenCount>0){cnt+=u.totalTokenCount;calls++;render()}}catch(e){}};
 })();
 /* ផ្តល់ចំនួន token ពីចម្លើយ Local AI ទៅកម្មវិធីរាប់ (មិនកែចម្លើយ) */
 (function(){var F=window.fetch;window.fetch=async function(u,o){var r=await F.apply(this,arguments);
- try{if(typeof u==="string"&&u.indexOf(":generateContent")>=0&&r.ok&&localStorage.getItem("zsf_lai_on")==="1"&&window.__zsfLaiCount){var t=await r.clone().text();window.__zsfLaiCount(JSON.parse(t))}}catch(e){}
+ try{if(typeof u==="string"&&u.indexOf(":generateContent")>=0&&r.ok&&r.headers.get("X-ZSF-LAI")==="1"&&window.__zsfLaiCount){var t=await r.clone().text();window.__zsfLaiCount(JSON.parse(t))}}catch(e){}
  return r}})();
 /script>
 /body>/html>
@@ -7428,7 +7439,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="25.90";
+  var EMB="25.91";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
