@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.0";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.1";})();
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -5721,7 +5721,7 @@ async function translateAll(){var Z0=zsfSnap();
   batches=[],out=new Array(src.length),useGem=keys.length>0,gemFail=0,done=0,next=0,ctxT="",
   strip=function(c){return c.t.replace(TAG,"").replace(/\n/g," ")};
  if(!keys.length)throw new Error("គ្មាន Gemini API Key");
- var liveN=0,liveSeen=new Array(src.length);
+ var liveN=0,liveSeen=new Array(src.length),__lite=false;try{__lite=(keys.length===1&&keys[0]==="LOCAL_AI")&&localStorage.getItem("zsf_lai_lite")!=="0"}catch(_){}
  function applyLive(idx,txt){
   try{var c=cues[idx];if(!c||!txt||!src[idx])return;
    var m=src[idx].t.match(TAG),t=String(txt).replace(/\[[1-4]\]\s*/g,"").trim();if(!t)return;
@@ -5767,7 +5767,7 @@ async function translateAll(){var Z0=zsfSnap();
    throw new Error("Gemini បកប្រែមិនបាន — ពិនិត្យ API Key / Quota")
   }finally{delete inUse[key]}}
  /* ចាប់ប្រភេទសាច់រឿងពី SRT ឱ្យបានជាមុន (មិនរំលង) — សាកម្តងទៀតដោយប្តូរ Key រហូតបាន ទើបចាប់ផ្តើមបកប្រែ */
- if(tv==="km"){
+ if(tv==="km"&&!__lite){
   var bible=null,maxTry=1;
   for(var bt=1;bt=maxTry&&!bible;bt++){
    try{setProgress(2,"📖 កំពុងអាន SRT ទាំងមូល ដើម្បីចាប់ប្រភេទសាច់រឿង... (លើកទី "+bt+"/"+maxTry+")")}catch(_){}
@@ -5788,7 +5788,7 @@ async function translateAll(){var Z0=zsfSnap();
   var part=src.slice(i0,i0+B),res=new Array(part.length).fill(null);
   if(useGem){
     var prev=src.slice(Math.max(0,i0-2),i0).map(strip).join(" / ");
-    var HEAD=window.zsfTrHead(tl,ctxT,2);
+    var HEAD=__lite?("You are a professional subtitle translator. Translate each numbered line into natural, conversational spoken "+tl+", like a dubbed movie. Keep the numbering, one line per item. If a line starts with a tag like [1], [2], [3] or [4], keep that tag unchanged at the start of the translated line. Keep the full meaning and emotion, never drop or add anything. Write names in "+tl+" letters and use the same name for the same character through the whole story. Do not use the \u17D7 symbol. Each input line ends with a hint like {about 40 chars}: it is only a length hint, never output it. Output only numbered lines."):window.zsfTrHead(tl,ctxT,2);
     if(tv!=="km"){HEAD="You are a professional subtitle translator. Translate each numbered line into "+tl+". Keep numbering, one line per item. If a line starts with a tag like [1], [2], [3] or [4], keep that tag unchanged at the start of the translated line. Translate as natural spoken dialogue in "+tl+", keep the full meaning and emotion, never drop or add anything, and keep the same name for the same character through the whole story. Each input line ends with a hint like {about 40 chars}: it is only a length hint, never output it. Output only numbered lines."}
     var mk=function(idx){return HEAD+(prev?"\nPrevious lines for context only, do NOT translate them: "+prev:"")+"\n"+idx.map(function(j,x){return (x+1)+". "+part[j].t.replace(/\n/g," ")+" {about "+Math.max(8,Math.round((part[j].e-part[j].s)*(typeof zsfFit==="function"?zsfFit("hint",20):20)))+" chars}"}).join("\n")};
     var fresh=new Array(part.length).fill(false),emo=new Array(part.length).fill(null),zk=function(c){return zsfTrKey(tv,ctxT+"#fit23",strip(c))};
@@ -6929,7 +6929,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.0",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.1",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7353,7 +7353,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.0";
+  var EMB="26.0.1";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
