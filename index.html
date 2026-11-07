@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.13";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.18";})();
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -1437,11 +1437,11 @@ function probe(fl){return new Promise(res=>{const v=document.createElement("vide
  const done=r=>{if(dn)return;dn=true;URL.revokeObjectURL(u);res(r)};
  v.preload="metadata";v.muted=true;v.onloadedmetadata=()=>done({w:v.videoWidth,h:v.videoHeight,d:v.duration});v.onerror=()=>done(null);setTimeout(()=>done(null),8000);v.src=u})}
 /* V15.5 : ស្ទីលបកប្រែ — ធម្មតា / កំប្លែង ទាក់ទាញ (ជ្រើសក្នុងប្រអប់ "ស្ទីលបកប្រែ") · ប៉ះពាល់គ្រប់ការបកប្រែ Gemini (SRT + ទាញពីវីដេអូ) */
-var ZSF_FUN_PROMPT="STYLE (FUN & ENGAGING): make the Khmer lively and entertaining for viewers, like a witty Khmer social-media movie narrator, ONLY where the scene is light, comedic, teasing, awkward, or the characters are joking or showing off. Keep serious, sad, tense, dangerous, heartfelt-romantic and emotional-climax lines natural and sincere (no jokes there). Use natural spoken Khmer that young viewers really say (colloquial particles and everyday words, playful reactions, light exaggeration, witty comebacks, fitting Khmer sayings) instead of stiff formal written Khmer, and give each character a consistent personality in tone (cocky, shy, cunning, innocent, grumpy). Do NOT change the facts or meaning, do NOT add new information and do NOT drop anything; keep each line about the same length as a normal translation (at most about 15% longer) so the Khmer voice still fits the time slot. No vulgar, insulting or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (era, characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it.";
-var ZSF_NARR_PROMPT="STYLE (STORY NARRATOR + DIALOGUE): translate like a professional Khmer drama-recap storyteller who tells the story aloud while the characters speak. Rules: (1) Every line is still the SAME spoken line of the SAME character, in first person, keeping its exact meaning and emotion. Never turn a character's words into third-person narration and never merge or split lines. (2) Make the Khmer flow like one continuous story told aloud: natural spoken Khmer, vivid but simple words, smooth connection between neighbouring lines, strong emotional vocabulary where the scene is tense, sad, angry, romantic or funny. (3) Match the era of the characters in the STORY CARD; the user chose this narrator style manually, so do NOT guess or switch to any other genre voice. (4) Do NOT add any new information, event, name or feeling, do NOT drop anything, keep each line at most about 15% longer than a normal translation so the Khmer voice still fits the time slot. No vulgar or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: follow the STORY CARD and this STYLE on EVERY line.";
-var ZSF_AUTO_PROMPT="STYLE (AUTO BY STORY): first infer from the story card, the characters and the whole SRT what kind of story this is, then adapt the Khmer register scene by scene. COMEDIC / light / teasing / awkward / boasting scenes: lively, witty, natural spoken Khmer that young viewers really say, playful reactions, light exaggeration, fitting Khmer sayings. ANCIENT / palace / royal / wuxia / xianxia / historical scenes: no modern slang, but keep the Khmer EASY TO HEAR. Use royal or classical vocabulary ONLY for real court characters (emperor, empress, concubines, ministers, eunuchs) when they speak to or about royalty. Villagers, farmers, blacksmiths, servants, soldiers, bailiffs, merchants and ordinary people in an ancient setting speak plain everyday colloquial Khmer, only with the right rank-based address terms. MODERN drama, serious, sad, tense, dangerous, romantic and emotional-climax lines: natural, sincere, no jokes. Keep each character's personality consistent. Do NOT change the facts or meaning, do NOT add information and do NOT drop anything; keep each line at most about 15% longer than a normal translation so it fits the time slot. No vulgar or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (genre, era, characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it.";
+var ZSF_FUN_PROMPT="STYLE (FUN & ENGAGING): make the Khmer lively and entertaining for viewers, like a witty Khmer social-media movie narrator, ONLY where the scene is light, comedic, teasing, awkward, or the characters are joking or showing off. Keep serious, sad, tense, dangerous, heartfelt-romantic and emotional-climax lines natural and sincere (no jokes there). Use natural spoken Khmer that young viewers really say (colloquial particles and everyday words, playful reactions, light exaggeration, witty comebacks, fitting Khmer sayings) instead of stiff formal written Khmer, and give each character a consistent personality in tone (cocky, shy, cunning, innocent, grumpy). Do NOT change the facts or meaning, do NOT add new information and do NOT drop anything; keep each line about the same length as a normal translation (at most about 15% longer) so the Khmer voice still fits the time slot. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (era, characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it.";
+var ZSF_NARR_PROMPT="STYLE (STORY NARRATOR + DIALOGUE): translate like a professional Khmer drama-recap storyteller who tells the story aloud while the characters speak. Rules: (1) Every line is still the SAME spoken line of the SAME character, in first person, keeping its exact meaning and emotion. Never turn a character's words into third-person narration and never merge or split lines. (2) Make the Khmer flow like one continuous story told aloud: natural spoken Khmer, vivid but simple words, smooth connection between neighbouring lines, strong emotional vocabulary where the scene is tense, sad, angry, romantic or funny. (3) Match the era of the characters in the STORY CARD; the user chose this narrator style manually, so do NOT guess or switch to any other genre voice. (4) Do NOT add any new information, event, name or feeling, do NOT drop anything, keep each line at most about 15% longer than a normal translation so the Khmer voice still fits the time slot. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: follow the STORY CARD and this STYLE on EVERY line.";
+var ZSF_AUTO_PROMPT="STYLE (AUTO BY STORY): first infer from the story card, the characters and the whole SRT what kind of story this is, then adapt the Khmer register scene by scene. COMEDIC / light / teasing / awkward / boasting scenes: lively, witty, natural spoken Khmer that young viewers really say, playful reactions, light exaggeration, fitting Khmer sayings. ANCIENT / palace / royal / wuxia / xianxia / historical scenes: no modern slang, but keep the Khmer EASY TO HEAR. Use royal or classical vocabulary ONLY for real court characters (emperor, empress, concubines, ministers, eunuchs) when they speak to or about royalty. Villagers, farmers, blacksmiths, servants, soldiers, bailiffs, merchants and ordinary people in an ancient setting speak plain everyday colloquial Khmer, only with the right rank-based address terms. MODERN drama, serious, sad, tense, dangerous, romantic and emotional-climax lines: natural, sincere, no jokes. Keep each character's personality consistent. Do NOT change the facts or meaning, do NOT add information and do NOT drop anything; keep each line at most about 15% longer than a normal translation so it fits the time slot. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (genre, era, characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it.";
 function zsfStyleMode(){try{var v=localStorage.getItem("zsf_tr_style");return(v==="fun"||v==="narr"||v==="normal"||/^g:[a-z0-9_]+$/.test(v||""))?v:"auto"}catch(e){return "auto"}}
-function zsfStylePrompt(){var m=zsfStyleMode();if(m==="fun")return ZSF_FUN_PROMPT;if(m==="narr")return ZSF_NARR_PROMPT;if(m.slice(0,2)==="g:"){var g=gGenreByCode(m.slice(2));if(g)return "STYLE (GENRE = "+g[2]+"): the user fixed the story genre, so translate EVERY line in this genre's voice. GENRE GUIDANCE (Khmer): "+g[3]+" Keep each character's personality and forms of address consistent; if the story card lists characters from another era, still use their own era's register. Do NOT change the facts or meaning, do NOT add information and do NOT drop anything; keep each line at most about 15% longer than a normal translation so it fits the time slot. No vulgar or offensive words. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it."}return ZSF_AUTO_PROMPT}
+function zsfStylePrompt(){var m=zsfStyleMode();if(m==="fun")return ZSF_FUN_PROMPT;if(m==="narr")return ZSF_NARR_PROMPT;if(m.slice(0,2)==="g:"){var g=gGenreByCode(m.slice(2));if(g)return "STYLE (GENRE = "+g[2]+"): the user fixed the story genre, so translate EVERY line in this genre's voice. GENRE GUIDANCE (Khmer): "+g[3]+" Keep each character's personality and forms of address consistent; if the story card lists characters from another era, still use their own era's register. Do NOT change the facts or meaning, do NOT add information and do NOT drop anything; keep each line at most about 15% longer than a normal translation so it fits the time slot. All other rules (numbers as Khmer words, no Latin letters, address terms, tags, numbering) still apply. MANDATORY: you MUST follow the STORY CARD (characters, forms of address, place and term names) and this STYLE on EVERY line. A line that ignores them is WRONG and will be rejected and re-requested, so never skip it."}return ZSF_AUTO_PROMPT}
 function zsfFunOn(){return zsfStyleMode()!=="normal"}
 async function zsfEnforce(F0,self,u,o,ENF){
  var r=await F0.call(self,u,o);
@@ -4547,6 +4547,16 @@ function zsfFitDur(L,R,F,ks,ke,tk){
     if(!ok||!(v.videoWidth>0)||!(v.videoHeight>0)){closeVideo();return null;}
     fvVid=v;return v;
   }
+  async function openVideoExtra(f){
+    try{
+      if(!f||!fvUrl)return null;
+      var v=document.createElement("video");v.muted=true;v.playsInline=true;v.preload="auto";
+      var ok=await new Promise(function(res){var to=setTimeout(function(){res(false)},12000);
+        v.onloadeddata=function(){clearTimeout(to);res(true)};v.onerror=function(){clearTimeout(to);res(false)};v.src=fvUrl;try{v.load()}catch(_){}});
+      if(!ok||!(v.videoWidth>0)||!(v.videoHeight>0))return null;
+      return v;
+    }catch(_){return null}
+  }
   function fvSeek(v,t){return new Promise(function(res){var done=false,to;
     function fin(r){if(done)return;done=true;clearTimeout(to);v.removeEventListener("seeked",on);res(r)}
     function on(){fin(true)}
@@ -4933,9 +4943,13 @@ function zsfFitDur(L,R,F,ks,ke,tk){
     prog("🎭 កំពុងរៀបចំសំឡេង សម្រាប់ចាប់ប្រុស/ស្រី...",1);
     var A=await getAudio(f),bps=A.info.fmt.sr*(A.info.fmt.ba||2);
     var V=null;try{V=await openVideo(f);}catch(_){V=null;}
-    var maxLines=V?20:24;
+    var VP=[];if(V){try{var __ex=await Promise.all([openVideoExtra(f),openVideoExtra(f)]);__ex.forEach(function(x){if(x)VP.push(x)})}catch(_){}}
+    var pool=V?[V].concat(VP):[],pq=pool.map(function(){return Promise.resolve()}),pickN=0;
+    var nextEl=function(){for(var t=0;tpool.length;t++){var e=(pickN++)%pool.length;if(pool[e])return e}return -1};
+    var grabPooled=function(e,idxs,clipMs,maxPer){var r=pq[e].then(function(){return grabFramesFor(pool[e],idxs,clipMs,maxPer)});pq[e]=r.catch(function(){});return r};
+    var maxLines=V?14:16;
     var __chm=0;try{__chm=parseInt(localStorage.getItem("zsf_gem_chunks"),10)||0}catch(_){}
-    var maxSec=Math.max(20,Math.min(60,Math.floor(11*1024*1024/bps))),PAD=3,groups=[],cur=[];
+    var maxSec=Math.max(20,Math.min(30,Math.floor(11*1024*1024/bps))),PAD=3,groups=[],cur=[];
     if(__chm!==0)maxSec=Math.min(maxSec,__chm0?Math.min(180,-__chm)+2*PAD:66);
     srtBlocks.forEach(function(b,i){var t=times(b);
       if(cur.length){var span=(t.e-times(srtBlocks[cur[0]]).s)/1000;if(span>maxSec-2*PAD||cur.length>=maxLines){groups.push(cur);cur=[];}}
@@ -4948,12 +4962,15 @@ var prep=function(g){return (async function(){try{
         var wav=b64(sliceWav(A.ab,A.info,Math.max(0,clipMs/1000-A.offset),(t1e/1000+PAD)-A.offset));
         var lines=idxs.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-clipMs)+" --> "+fmtT(t.e-clipMs),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,""),f0:f0Of(A,t.s,t.e)};});
         var fr=[];
-        if(V){try{fr=await grabFramesFor(V,idxs,clipMs);}catch(_){fr=[];}if(!fr.length){V=null;closeVideo();}}
+        var e1=pool.length?nextEl():-1;
+        if(e1>=0){try{fr=await grabPooled(e1,idxs,clipMs);}catch(_){fr=[];}if(!fr.length){pool[e1]=null;if(!pool.some(Boolean))V=null;}}
         return {idxs:idxs,wav:wav,lines:lines,fr:fr};
       }catch(e){console.warn("prep failed",e);return null;}})();};
-    var __mt=false;try{__mt=await masterTagRun(f)}catch(e){console.warn("masterTag",e)}
-    var prepP=(groups.length&&!__mt)?prep(0):null;
-    var tagConc=Math.min(8,Math.max(4,K.filter(Boolean).length*2));if(__chm!==0)tagConc=Math.min(12,Math.max(6,K.filter(Boolean).length*3));try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=6)tagConc=tcv}catch(_){}
+    var __mt=false;try{if(localStorage.getItem("zsf_tag_master")==="1")__mt=await masterTagRun(f)}catch(e){console.warn("masterTag",e)}
+    var PW=Math.max(2,pool.length+1),preps=[];
+    var schedPrep=function(g){if(ggroups.length&&!preps[g])preps[g]=prep(g)};
+    if(!__mt){for(var s0=0;s0PW;s0++)schedPrep(s0)}
+    var tagConc=Math.min(12,Math.max(6,K.filter(Boolean).length*3));if(__chm!==0)tagConc=Math.min(16,Math.max(8,K.filter(Boolean).length*4));try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=16)tagConc=tcv}catch(_){}
     var inflight=[];
     var runGroup=async function(g,P0,ctx0){
       var idxs=groups[g];
@@ -4967,8 +4984,8 @@ var prep=function(g){return (async function(){try{
     };
     for(var g=0;!__mt&&ggroups.length;g++){
       if(window.__zsfTagAbort)break;
-      var P0=await prepP;
-      prepP=(g+1groups.length)?prep(g+1):null;
+      var P0=await preps[g];preps[g]=null;
+      schedPrep(g+PW);
       var rec={done:false,p:null};
       rec.p=runGroup(g,P0,ctx).then(function(){this.done=true}.bind(rec));
       inflight.push(rec);
@@ -4995,22 +5012,23 @@ var prep=function(g){return (async function(){try{
       for(var q2=1;q2srtBlocks.length;q2++){var g1=gOf(q2-1),g2=gOf(q2);if(g1>=0&&g2>=0&&g1!==g2){var ta=times(srtBlocks[q2-1]),tb=times(srtBlocks[q2]);if(tb.s-ta.e=250&&!/[。！？!?…”"」』.]\s*$/.test(String(srtBlocks[q2-1].text||"").replace(/\[[1-4]\]\s*/g,"")))mark(q2,3,"C")}}
       srtBlocks.forEach(function(b,i){var m=TAG_RE.exec(b.text||"");if(m&&+m[1]>=3)mark(i,4,"T");});
       var PS=null;try{PS=zsfPitchSplit(A)}catch(_){}try{srtBlocks.forEach(function(b,i){var m=TAG_RE.exec(b.text||"");if(!m)return;var tt=times(b),h=f0Of(A,tt.s,tt.e);if(!h)return;var male=(+m[1])%2===1;if(PS?((male&&h>=PS.hi)||(!male&&h=PS.lo)):((male&&h>195)||(!male&&h125)))mark(i,5,"P");});}catch(_){}
-      var sl=Object.keys(sus).map(Number).sort(function(a,b){return (sus[b]-sus[a])||(a-b)}).slice(0,40).sort(function(a,b){return a-b}),wins=[];
+      var sl=Object.keys(sus).map(Number).sort(function(a,b){return (sus[b]-sus[a])||(a-b)}).slice(0,80).sort(function(a,b){return a-b}),wins=[];
       sl.forEach(function(i){var a0=Math.max(0,i-2),b0=Math.min(srtBlocks.length-1,i+2),L=wins[wins.length-1];
         if(L&&a0=L.b+1){L.b=Math.max(L.b,b0);L.t.push(i);}else wins.push({a:a0,b:b0,t:[i]});});
-      var rcIn=[],RC=5;
+      var rcIn=[],RC=Math.min(8,tagConc);
       for(var w=0;wwins.length;w++){
         var W=wins[w],widx=[];for(var z=W.a;z=W.b;z++)widx.push(z);
         if(widx.length>40)continue;
-        if(window.__zsfTagAbort||Date.now()-__tTag0>300000){prog("🎭 រំលងការពិនិត្យឡើងវិញ (យូរពេក)",9);break}prog("🎭 ពិនិត្យឡើងវិញបន្ទាត់មិនច្បាស់ "+(w+1)+"/"+wins.length,10);
+        if(window.__zsfTagAbort||Date.now()-__tTag0>600000){prog("🎭 រំលងការពិនិត្យឡើងវិញ (យូរពេក)",9);break}prog("🎭 ពិនិត្យឡើងវិញបន្ទាត់មិនច្បាស់ "+(w+1)+"/"+wins.length,10);
         var c0=Math.max(0,times(srtBlocks[widx[0]]).s-PAD*1000),c1=times(srtBlocks[widx[widx.length-1]]).e;
         var wv=b64(sliceWav(A.ab,A.info,Math.max(0,c0/1000-A.offset),(c1/1000+PAD)-A.offset));
         var wl=widx.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-c0)+" --> "+fmtT(t.e-c0),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,""),f0:f0Of(A,t.s,t.e)};});
-        var wf=[];if(V){try{wf=await grabFramesFor(V,widx,c0,2);}catch(_){wf=[];}}
-        (function(W,wl,wv,wf){
+        var wf=[];
+        (function(W,wl,wv,wf,widx,c0){
           var rec={done:false,p:null};
           rec.p=(async function(){
             try{
+              if(pool.length){var e2=nextEl();if(e2>=0){try{wf=await grabPooled(e2,widx,c0,2)}catch(_){wf=[]}}}
               var r2=await classifyChunk(wl,"RE-CHECK PASS: some lines in this clip were unclear in a first pass. Listen very carefully to every line. Lines separated by a tiny gap whose first line has no sentence-ending punctuation are usually fragments of ONE sentence spoken by ONE voice (never both male and female). Known voices: "+profText(profile),wv,wf);
               W.t.forEach(function(i){var id=String(srtBlocks[i].id),tg=r2.map[id];rechecked++;
                 if(typeof tg==="number"&&!(r2.low&&r2.low[id])&&!(thoughtLock[id]&&tg=2)){confirmed[id]=1;var old=TAG_RE.exec(srtBlocks[i].text||"");if(!old||+old[1]!==tg){srtBlocks[i].text=applyTag(srtBlocks[i].text,tg);changed++;why[i]=(why[i]||"")+">"+tg;}}});
@@ -5018,7 +5036,7 @@ var prep=function(g){return (async function(){try{
             rec.done=true;
           })();
           rcIn.push(rec);
-        })(W,wl,wv,wf);
+        })(W,wl,wv,wf,widx,c0);
         while(rcIn.filter(function(r){return !r.done}).length>=RC){await Promise.race(rcIn.filter(function(r){return !r.done}).map(function(r){return r.p}));}
       }
       await Promise.all(rcIn.map(function(r){return r.p}));
@@ -5031,6 +5049,7 @@ var prep=function(g){return (async function(){try{
       var bid=String(b.id);if(((male&&h>=PS.hi*1.1)||(!male&&h=PS.lo*0.9))&&lowIds.indexOf(bid)>=0&&!confirmed[bid]){b.text=applyTag(tx,male?tg+1:tg-1);flipped++;try{why[i]=(why[i]||"")+"A"}catch(_){}}
     });}}catch(e){console.warn("pitch arbitration",e)}
     try{window.__zsfTagReport="ZSF "+(window.__ZSF_VER||"")+" tag report | line = id | tag | pitchHz | flags (A=fixed by pitch P=pitch conflict T=thought L=low conf M=lip moves in thought S=still lips in speech F=isolated flip >x=changed by recheck to x)\n"+srtBlocks.map(function(b,i){var m=TAG_RE.exec(b.text||""),tt=times(b),h=0;try{h=f0Of(A,tt.s,tt.e)}catch(_){}return "#"+b.id+"|"+(m?m[1]:"-")+"|"+h+"|"+((typeof why!=="undefined"&&why[i])||"")}).join("\n")}catch(_){}
+    try{VP.forEach(function(x){try{x.removeAttribute("src");x.load()}catch(_){}})}catch(_){}
     closeVideo();
     try{renderEditor();saveData();}catch(_){}
     if(done>0&&failed===0)lastKey=key;
@@ -5813,8 +5832,8 @@ async function translateAll(){var Z0=zsfSnap();
   var part=src.slice(i0,i0+B),res=new Array(part.length).fill(null);
   if(useGem){
     var prev=src.slice(Math.max(0,i0-2),i0).map(strip).join(" / ");
-    var HEAD=__lite?("You are a professional subtitle translator. Translate each numbered line into natural, conversational spoken "+tl+", like a dubbed movie. Keep the numbering, one line per item. If a line starts with a tag like [1], [2], [3] or [4], keep that tag unchanged at the start of the translated line. Keep the full meaning and emotion, never drop or add anything. Write names in "+tl+" letters and use the same name for the same character through the whole story. Do not use the \u17D7 symbol. Each input line ends with a hint like {about 40 chars}: it is only a length hint, never output it. Output only numbered lines."):window.zsfTrHead(tl,ctxT,2);
-    if(tv!=="km"){HEAD="You are a professional subtitle translator. Translate each numbered line into "+tl+". Keep numbering, one line per item. If a line starts with a tag like [1], [2], [3] or [4], keep that tag unchanged at the start of the translated line. Translate as natural spoken dialogue in "+tl+", keep the full meaning and emotion, never drop or add anything, and keep the same name for the same character through the whole story. Each input line ends with a hint like {about 40 chars}: it is only a length hint, never output it. Output only numbered lines."}
+    var HEAD=window.zsfTrHead(tl,ctxT,tv==="km"?2:3);
+    /* (Prompt ចាស់សម្រាប់ភាសាមិនមែនខ្មែរ ត្រូវបានលុប — ប្រើ zsfTrHead តែមួយ) */
     var mk=function(idx){return HEAD+(prev?"\nPrevious lines for context only, do NOT translate them: "+prev:"")+"\n"+idx.map(function(j,x){return (x+1)+". "+part[j].t.replace(/\n/g," ")+" {about "+Math.max(8,Math.round((part[j].e-part[j].s)*(typeof zsfFit==="function"?zsfFit("hint",20):20)))+" chars}"}).join("\n")};
     var fresh=new Array(part.length).fill(false),emo=new Array(part.length).fill(null),zk=function(c){return zsfTrKey(tv,ctxT+"#fit23",strip(c))};
     var hits=await zsfTrGetMany(part.map(zk));
@@ -5849,7 +5868,7 @@ async function translateAll(){var Z0=zsfSnap();
 }
 
 /* V25.54 : ត្រងពាក្យអាភាស/ពាក្យទាបក្រោយបកប្រែ (សុវត្ថិភាពបន្ថែមក្រៅពី prompt — ព្រោះ Google ជំនួសមិនធ្វើតាម prompt) · បន្ថែមពាក្យបានតាម localStorage zsf_ban (មួយបន្ទាត់ ៖ ពាក្យ=>ពាក្យជំនួស) */
-var ZSF_SAFE_LIST=[["ស្រីពេស្យា","ស្ត្រីអាក្រក់"],["ពេស្យា","ស្ត្រីអាក្រក់"],["អាឆ្កែ","ឯង"],["មេឆ្កែ","ឯង"],["អាចង្រៃ","អ្នកអាក្រក់"],["ចង្រៃ","អាក្រក់"]];
+var ZSF_SAFE_LIST=[]; /* បញ្ជីពាក្យជំនួសត្រូវបានសំអាតទទេ — ដាក់ពាក្យថ្មីនៅទីនេះ ទម្រង់ ["ពាក្យ","ពាក្យជំនួស"] */
 function zsfSafeList(){var a=ZSF_SAFE_LIST.slice();try{var r=localStorage.getItem("zsf_ban")||"";r.split(/\r?\n/).forEach(function(l){var m=l.split("=>");if(m.length>=2&&m[0].trim())a.push([m[0].trim(),m.slice(1).join("=>").trim()])})}catch(e){}a.sort(function(x,y){return y[0].length-x[0].length});return a}
 function zsfSafeKm(t){var o=String(t==null?"":t),L=zsfSafeList(),k,n=0;for(k=0;k!==L.length;k++){if(o.indexOf(L[k][0])!==-1){o=o.split(L[k][0]).join(L[k][1]);n++}}return {t:o,n:n}}
 function zsfSafeCues(){var tot=0;try{if($("#target").value!=="km")return 0}catch(e){}cues.forEach(function(q){var r=zsfSafeKm(q.t);if(r.n){q.t=r.t;tot+=r.n}});if(tot){try{showToast("🧹 បានប្តូរពាក្យមិនសមរម្យ "+tot+" កន្លែង",true)}catch(e){}}return tot}
@@ -6233,7 +6252,7 @@ var ZSF_GENRES=[
  ["apocalypse","ថ្ងៃសន្ធោ/រស់រានមានជីវិត","apocalypse / zombies / survival with supplies","ថ្ងៃសន្ធោ/រស់រាន៖ ប្រយោគខ្លី បន្ទាន់ តានតឹង; ពាក្យអំពីស្បៀង ទីជម្រក អាវុធ មេរោគ ត្រូវថេរ; តួខ្លាំងនិយាយត្រជាក់ តួខ្សោយភ័យ ឬអង្វរ; ជៀសវាងពាក្យបុរាណ។"],
  ["medical","គ្រូពេទ្យ/វេជ្ជសាស្ត្រ","doctor / divine physician / medicine","គ្រូពេទ្យ/វេជ្ជសាស្ត្រ៖ ពាក្យវេជ្ជសាស្ត្រ ឈ្មោះជំងឺ ថ្នាំ និងការព្យាបាលត្រូវត្រឹមត្រូវ និងថេរ; គ្រូពេទ្យនិយាយស្ងប់ ទំនុកចិត្ត; អ្នកមើលងាយចំអក ពេលគ្រូពេទ្យបង្ហាញសមត្ថភាព ត្រូវមានអារម្មណ៍វាយមុខ។"],
  ["food","ចម្អិនអាហារ/ភោជនីយដ្ឋាន","cooking / food / restaurant","ចម្អិនអាហារ/ភោជនីយដ្ឋាន៖ ឈ្មោះម្ហូប គ្រឿងផ្សំ និងវិធីចម្អិន ប្រើពាក្យខ្មែរដែលអ្នកស្តាប់យល់ ហើយថេរ; ពណ៌នារសជាតិឱ្យចាប់អារម្មណ៍ ស្រស់ស្រាយ; អ្នកកាត់ទោសម្ហូបនិយាយអស្ចារ្យ។"],
- ["rural","ជនបទ/កសិកម្ម/ជីវិតភូមិ","countryside / farming / village life","ជនបទ/ភូមិ៖ ភាសាស្រួល សាមញ្ញ កក់ក្តៅ ដូចអ្នកភូមិនិយាយ; ពាក្យហៅគ្នាតាមញាតិ (មា មីង ពូ អ៊ំ បងប្អូនជីដូនមួយ); ឈ្លោះក្នុងភូមិប្រើពាក្យត្រង់ៗ ប៉ុន្តែមិនអាសអាភាស។"],
+ ["rural","ជនបទ/កសិកម្ម/ជីវិតភូមិ","countryside / farming / village life","ជនបទ/ភូមិ៖ ភាសាស្រួល សាមញ្ញ កក់ក្តៅ ដូចអ្នកភូមិនិយាយ; ពាក្យហៅគ្នាតាមញាតិ (មា មីង ពូ អ៊ំ បងប្អូនជីដូនមួយ); ឈ្លោះក្នុងភូមិប្រើពាក្យត្រង់ៗ។"],
  ["contract","ស្នេហាកិច្ចសន្យា/រៀបការក្លែង","contract marriage / fake relationship romance","ស្នេហាកិច្ចសន្យា/រៀបការក្លែង៖ ពេលមានមនុស្សក្រៅ ទាញពាក្យផ្អែមល្ហែមបញ្ជាក់; ពេលនៅតែពីរនាក់ ពាក្យត្រជាក់ ឬចំអក; ពេលចាប់ផ្តើមស្រលាញ់ពិត ពាក្យទន់ភ្លន់ អៀនខ្មាស; ហៅគ្នាថេរ។"],
  ["mystery","អាថ៌កំបាំង/ល្បិច/ផ្លាស់ប្តូរ","mystery / suspense / twist","អាថ៌កំបាំង/ភាពស្ទាក់ស្ទើរ៖ ពាក្យត្រៀមទុកសញ្ញា ប្រយោគខ្លីជាក់ស្តែង; កុំបង្ហាញចម្លើយមុនពេល; ពាក្យសួរចម្លើយតឹងតែង; ពេលបើកកម្រាលអាថ៌កំបាំងត្រូវមានទម្ងន់។"],
  ["military","ទាហានពិសេស/យោធាសម័យទំនើប","modern military / special forces","ទាហានពិសេស/យោធាទំនើប៖ ពាក្យបញ្ជាខ្លី ដាច់ណាត់ គោរពឋានៈ (មេបញ្ជាការ សមមិត្ត អ្នកបើកបរ); ពាក្យបច្ចេកទេសអាវុធ និងបេសកកម្មត្រូវថេរ; ស្មារតីវីរភាព។"],
@@ -6329,7 +6348,42 @@ window.zsfStoryBlock=function(){
 
 /* V12.9: សៀវភៅរឿងស្វ័យប្រវត្តិ (បង្កប់ក្នុងកូដ — គ្មានប្រអប់បរិបទ/ប៊ូតុងប្រភេទទៀត) */
 window.zsfBibleWaitMs=function(){var mb=0;try{mb=file?file.size/1048576:0}catch(_){}return 30000};
-window.zsfTrHead=function(tl,ctx,lv){var C=["You are a professional multilingual subtitle translator, an expert movie story analyst, a character-relationship identifier, a terminology specialist and a Khmer language adaptation expert.", "Your task: translate each numbered subtitle line into natural, accurate, conversational {TL}. The translation must show deep understanding of the storyline, character identities, family relationships, social status, names, objects and terminology.", "CRITICAL PRINCIPLE: UNDERSTAND FIRST, TRANSLATE SECOND. NEVER GUESS, INVENT OR FABRICATE information that is not supported by the source or the established story context. ACCURACY IS MORE IMPORTANT THAN CREATIVITY.", "", "PART 1 - STORY ANALYSIS (do silently before translating)", "1. CHARACTERS: identify every character and keep an internal Character Database: original name, ONE fixed Khmer-transliterated name, gender (only when reliably established), role, family relationships, social position, relationships with others, and the Khmer forms of address. Distinguish exactly: older/younger brother, older/younger sister, father/mother, grandfather/grandmother, grandson/granddaughter, uncle/aunt, husband/wife, parents-in-law, master/disciple, teacher/student, boss/employee, emperor/empress/prince/princess, family master/servants. NEVER confuse these relationships. Do not assume two characters are related only because they use similar forms of address. Only state a relationship supported by explicit dialogue, the story card or clear context; otherwise treat it as UNKNOWN and stay neutral.", "2. NAME CONSISTENCY: once a name is established use the exact same Khmer spelling for the whole story. Never change a name randomly, never translate a name by its dictionary meaning, never swap one character's name for another's, never leave a Chinese or English name untranslated, use consistent Khmer phonetic transliteration. If a name is unclear, do not invent a replacement.", "3. PRONOUNS: understand who speaks to whom before choosing Khmer pronouns. Decide by age, family relationship, social hierarchy, respect and authority, emotional relationship, formal or informal situation, and historical or modern setting (e.g. older brother to younger sibling: បង/អូន; younger sibling to older brother: បង/ខ្ញុំ; mother to child: កូន/ម៉ែ; father to child: កូន/ប៉ា; grandparent to grandchild: ចៅ/តា/យាយ; servant to master: លោកម្ចាស់/ខ្ញុំ; husband to wife: បង/អូន or what the context requires). These are examples, not fixed replacements. NEVER choose pronouns from the speaker's gender alone. Keep the same pronouns for the same pair of characters through the whole story.", "4. OBJECTS AND TERMS: identify important objects and terminology first (weapons, fighting techniques, medicine, ancient objects, jewelry, money, family titles and ranks, royal titles, official positions, cultivation levels, supernatural powers, technology, places, organizations) and give each ONE consistent Khmer equivalent. Translate the meaning when a term has an established meaning; transliterate only genuine names; do not confuse an object's name with its function; do not invent terminology; avoid meaningless phonetic renderings Khmer viewers cannot understand; prefer clear familiar Khmer.", "", "PART 2 - STORY MEMORY AND CONSISTENCY", "The STORY CARD / context given below (characters, relations, places, terms, forms of address) is the primary reference: follow it exactly. Lines are submitted in sections, so carry the same names, relationships, pronouns and terminology across sections and never create a new identity for an already identified character or change an established Khmer rendering without reliable new evidence. Use the 'previous lines' only as context. NEVER pretend to remember anything that was not supplied.", "", "PART 3 - ACCURACY AND ANTI-HALLUCINATION (highest priority)", "Never invent a name, a family relationship, an object's identity or any information absent from the original. Never replace unclear words with unrelated words. Never change the meaning to make dialogue more dramatic. Never treat ambiguous dialogue as confirmed fact. Never use a voice or gender tag as proof of identity or relationship. Never assume the speaker and the person being discussed are the same person. When a word has several meanings, decide from the full sentence, the nearby dialogue, the story card and the established relationships. If the meaning cannot be established, use a neutral natural Khmer expression that keeps the source meaning without adding unsupported information.", "", "PART 4 - NATURAL KHMER", "- Use everyday spoken Khmer that Cambodian viewers understand at once; follow Khmer grammar; avoid rigid word-for-word translation; sound like real people talking; keep the original meaning and intention.", "- Adaptation: make each line SHORT and smooth (drop only filler words, empty particles and needless repetition; shorten long sentences), but translate every clause, fact, name, number, emotion and implied meaning, never merge lines, never skip a part of a line, and never shorten so much that the meaning changes.", "- Keep the original emotional tone (anger, sadness, fear, happiness, romance, sarcasm, threat, respect, pleading, humiliation, revenge, surprise) without exaggerating it.", "- ABSOLUTE RULE: NEVER use the Khmer repetition symbol 'ៗ' (Lek To). Write repeated words in full (ទេៗ -> ទេទេ, លឿនៗ -> លឿនលឿន, យឺតៗ -> យឺតយឺត, ទេៗៗៗ -> ទេទេទេទេ) because the Khmer Text-to-Speech cannot read 'ៗ'.", "", "PART 5 - ATMOSPHERE / GENRE CONTEXT", "The genre influences vocabulary, tone and expressions but MUST NOT change the original meaning. Atmosphere/Genre Context (story context): {CTX}.", "", "PART 6 - TAGS, NAMES, TTS-READY TEXT", "- TAGS: if a source line starts with a tag [1], [2], [3] or [4] (or any tag in square brackets), keep that tag exactly at the start of the Khmer line; never translate, delete, rename or modify it. [1] and [3] = male voice, [2] and [4] = female voice ([3]/[4] are private inner thoughts, first-person monologue). Voice gender only helps choose gender-appropriate wording; it is NOT proof of identity, age, family relationship or status.", "- NAMES: all proper names (people, places, brands) MUST be written in Khmer script with the established spelling. Never leave a Chinese or English name in Latin letters.", "- NUMBERS: write EVERY number, amount, year, date, time and percentage as Khmer WORDS, never as digits (the Khmer voice must read them correctly).", "- NO LATIN LETTERS anywhere: translate English words, technical terms and abbreviations into Khmer, or write them phonetically in Khmer script, so the Khmer voice never reads a foreign-language sound.", "- SOURCE TEXT MAY BE WRONG: the subtitles come from automatic speech recognition and may contain homophone mistakes; use the story context to translate the intended meaning."],F=["", "OUTPUT FORMAT: keep the numbering and the order, one line per item, never skip or add an item. Output ONLY the numbered lines: no JSON, no explanations, no timestamps, no Markdown.", "FINAL SILENT CHECK before answering: names consistent; relationships and pronouns correct; objects and terms correct; nothing invented, omitted or changed; natural Khmer; no 'ៗ'; no Latin letters and no digits; tags preserved exactly; every number present. If a check fails, correct the line first."],H=["", "LENGTH HINT: each input line ends with a hint like {about 40 chars}. It is the MAXIMUM length that fits the mouth timing, because spoken Khmer is much slower than Chinese and the dubbed voice must end before the next line starts. Stay within the hint: choose short common words, drop filler, repeated or softening words and optional particles, merge phrases, but NEVER lose a fact, name, number or the main emotion, and keep a natural closing. Only if truly impossible, go over the hint by at most 20 percent. NEVER output the {about N chars} hint.", "EMOTION MARKER: after the number (and after the [n] tag when the line has one) write exactly ONE emotion code in curly braces that says how the speaker says THIS line: {angry} {sad} {sweet} {scared} {shocked} {mocking} {pleading} {cold} {joking} {happy} {calm}, for example '3. [1] {angry} text' or '4. {sad} text'. Decide it from the whole scene, the speaker's mood, the relationship and the story, then write the Khmer wording in that same emotion. The code is only a marker for the program: write it once, right after the number or tag, never inside the sentence."];var t=C.join("\n").split("{TL}").join(tl).split("{CTX}").join(ctx||"");return t+(lv>=2?"\n"+H.join("\n"):"")+"\n"+F.join("\n")};
+/* ===== PROMPT បកប្រែ (ស្អាត) — ដាក់ Prompt ថ្មីរបស់អ្នកក្នុង ZSF_PROMPT_NEW ខាងក្រោម។ អាចប្រើ {TL} = ភាសាគោលដៅ និង {CTX} = បរិបទ/សៀវភៅរឿង ===== */
+window.ZSF_PROMPT_NEW=[
+ "You are a professional subtitle translator (Subtitle Translator) and an expert movie story adapter.",
+ "Your task is to translate the provided subtitle text into natural, conversational, and highly engaging Khmer (\"ភាសាខ្មែរ\") following these extremely strict guidelines:",
+ "",
+ "១. ប្រើប្រាស់ភាសានិយាយប្រចាំថ្ងៃ (Natural & Conversational)៖",
+ "- Translate using conversational words that Khmer people naturally use in daily life.",
+ "- Avoid word-for-word translation that sounds rigid or violates natural Khmer grammar.",
+ "",
+ "២. កែសម្រួល និងសង្ខេបឱ្យទាក់ទាញ (Adaptation & Conciseness)៖",
+ "- If the original sentences are long, or use complex/difficult idioms, adapt and condense them into shorter, easy-to-read Khmer that remains synced to subtitle reading speeds while fully retaining the original intent and essence.",
+ "- Make the dialogue punchy, smooth, dramatic, and captivating to keep the audience hooked.",
+ "",
+ "៣. ប្រើប្រាស់សព្វនាមឱ្យស័ក្តិសម (Appropriate Pronouns)៖",
+ "- Based on the context of the dialogue, use Khmer pronouns that represent the character's status, age, power dynamics, and relationship (e.g., ខ្ញុំ/ឯង, បង/អូន, កូន/ម៉ែ, លោកម្ចាស់/ឯកឧត្ដម...).",
+ "- Reflect the character's exact emotions in the context (anger, pleading, teasing, respect, sarcasm, etc.).",
+ "",
+ "៤. ហាមប្រើប្រាស់សញ្ញា 'ៗ' (No Repetition Symbol)៖",
+ "- ABSOLUTE STRICT RULE: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the translation. Instead, you MUST spell out the repeated words directly. For example, write \"ទេទេ\" instead of \"ទេៗ\"; write \"លឿនលឿន\" instead of \"លឿនៗ\"; write \"ទេទេទេទេ\" instead of \"ទេៗៗៗ\"; write \"យឺតយឺត\" instead of \"យឺតៗ\". This is extremely critical because the Text-to-Speech (TTS) program cannot read or understand the 'ៗ' symbol and will fail to announce it.",
+ "",
+ "Atmosphere/Genre Context: {CTX}",
+ "",
+ "Rules:",
+ "1. Maintain the emotional tone and context of the conversation according to the specified atmosphere.",
+ "2. Keep the translation natural and fluent in Khmer.",
+ "3. Preserve the meaning of each block exactly.",
+ "4. STRICT RULE: Do not attempt to modify, suggest, or return any changes to timestamps or subtitle indices.",
+ "5. TAG PRESERVATION: If you see tags like [1], [2], [3], [M], [F], etc. (any letter, word, or number enclosed in square brackets) in the source text, you MUST preserve them exactly in the Khmer translation. Do not translate or modify these tags.",
+ "6. NAME TRANSLITERATION: All proper names (people, places, brands) MUST be translated or transliterated into Khmer script. DO NOT leave any names in English or Latin characters.",
+ "7. Return the translations as numbered lines mapped to their original numbers, exactly as described in OUTPUT FORMAT below (NOT JSON).",
+ "8. The output must be concise enough for subtitle reading speeds.",
+ "9. GENDER IDENTIFICATION: If a line contains the tag [1] or [M], it indicates a male voice. If it contains the tag [2] or [F], it indicates a female voice. Use this to understand the dialogue context and choose appropriate gender-based language in Khmer.",
+ "10. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write \"ទេទេ\" instead of \"ទេៗ\")."
+].join("\n");
+/* ផ្នែកបច្ចេកទេស (កុំលុប) — កូដអានលទ្ធផលពឹងលើទម្រង់នេះ: លេខបន្ទាត់, tag [1]-[4], emotion marker, length hint */
+window.zsfTrHead=function(tl,ctx,lv){var T=["OUTPUT FORMAT: keep the numbering and the order, one line per item, never skip or add an item. Output ONLY the numbered lines: no JSON, no explanations, no timestamps, no Markdown.","TAGS: if a source line starts with a tag [1], [2], [3] or [4] (or any tag in square brackets), keep that tag exactly at the start of the translated line; never translate, delete, rename or modify it."],H1=["LENGTH HINT: each input line ends with a hint like {about 40 chars}. It is the maximum length that fits the speaking time. Stay within the hint when possible, but never lose a fact, name, number or the main emotion. NEVER output the {about N chars} hint."],H2=["EMOTION MARKER: after the number (and after the [n] tag when the line has one) write exactly ONE emotion code in curly braces that says how the speaker says THIS line: {angry} {sad} {sweet} {scared} {shocked} {mocking} {pleading} {cold} {joking} {happy} {calm}, for example '3. [1] {angry} text' or '4. {sad} text'. The code is only a marker for the program: write it once, right after the number or tag, never inside the sentence."];var head=String(window.ZSF_PROMPT_NEW||"");var P=[head];if(ctx&&head.indexOf("{CTX}")===-1)P.push("","STORY CONTEXT: {CTX}");P.push("");P=P.concat(T);if(lv>=2)P=P.concat([""],H1);if(lv===2)P=P.concat([""],H2);return P.join("\n").split("{TL}").join(tl).split("{CTX}").join(ctx||"")};
 window.zsfAutoStory=function(){try{if($("#target").value!=="km")return "";return String(window.zsfStoryBlock()||"").replace(/\s+/g," ").trim().slice(0,5500)}catch(_){return ""}};
 window.zsfEnsureStory=async function(){try{var ks=zsfKF(K);if(!ks.length||!cues.length||$("#target").value!=="km")return;await Promise.race([Promise.resolve(window.__bibleP||null).then(function(){return gPrepareBible(ks,function(){})}),new Promise(function(r){setTimeout(function(){r(null)},window.zsfBibleWaitMs())})])}catch(_){}};
 function gWithTimeout(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error("timeout"))},ms)})])}
@@ -6954,7 +7008,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.13",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.18",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7390,7 +7444,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.13";
+  var EMB="26.0.18";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
