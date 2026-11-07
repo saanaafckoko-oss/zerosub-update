@@ -9,7 +9,52 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.20";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.26";})();
+(function(){var F0=window.fetch;if(!F0||window.__zsfHiFb)return;window.__zsfHiFb=1;
+var H="gemini-3.8-flash-high",L="gemini-3.8-flash";
+window.fetch=async function(u,o){
+ var url=(typeof u==="string")?u:"";
+ var hit=url.indexOf("generativelanguage.googleapis.com")>=0&&url.indexOf(":generateContent")>=0&&url.indexOf("key=")>=0&&url.indexOf(H)>=0;
+ if(hit&&window.__zsfHiBad)return F0.call(this,url.split(H).join(L),o);
+ var r=await F0.apply(this,arguments);
+ if(hit&&r&&!r.ok){
+  var bad=r.status===404;
+  if(!bad&&r.status===400){try{var t=await r.clone().text();bad=/model/i.test(t)&&/not found|not supported|unknown|does not exist/i.test(t)}catch(e){}}
+  if(bad){window.__zsfHiBad=1;try{if(typeof showToast==="function")showToast("3.8 Flash High មិនទាន់មានលើ Key នេះ — ប្រើ 3.8 Flash ជំនួស",false)}catch(e){}return F0.call(this,url.split(H).join(L),o)}
+ }
+ return r}
+})();
+/* ===== V26.0.26 : ចែកតួ ប្រុស/ស្រី/គិតក្នុងចិត្ត ប្រើ Gemini ជានិច្ច (Local AI មិនចាប់យកសំណើចែកតួទេ) · Local AI ប្តូរតែការបកប្រែ · សារព្រមានបើគ្មាន Gemini Key ===== */
+/* ===== V26.0.25 : បន្ថែម Gemini 3.8 Flash High ក្នុងបញ្ជី Gemini ធម្មតា · Auto សាកល្បង High មុនគេ · បើ ID មិនមាន ត្រឡប់ទៅ 3.8 Flash ស្វ័យប្រវត្តិ ===== */
+/* ===== V26.0.24 : ការបកប្រែខ្មែរបែបធម្មជាតិ (តាមគំរូ SRT មិត្ត) — ZSF_KM_FRIEND: ប្រវែងនិយាយធម្មតា ~៣-៤ តួខ្មែរ/អក្សរចិន · សំណួរនៅចុងប្រយោគ (មែនទេ/ហ្អេស/ហើយតើ) · ពាក្យខ្ចីប្រចាំថ្ងៃ · សព្វនាមតាមទំនាក់ទំនង · សញ្ញា ! ? ... ដើម្បីសំឡេង · មានឧទាហរណ៍ពិត ===== */
+window.ZSF_KM_FRIEND=[
+"REFERENCE QUALITY TARGET: write the Khmer exactly like a top Cambodian drama-dubbing translator whose lines are easy to hear and understand the first time. This block OVERRIDES any earlier wording or length guidance, but never the output format, numbering, tags or the rule against the repetition symbol.",
+"1. SAY IT, DO NOT TRANSLATE IT: understand what the speaker means and feels, then write what a real Cambodian would say out loud in that situation today. Never copy Chinese word order, idioms or metaphors.",
+"2. NATURAL LENGTH: about 3 to 4 Khmer characters per Chinese character is normal. Be short by choosing simple spoken words, NEVER by dropping a clause, name or emotion, and never as a telegram. Every line is a complete, natural, spoken sentence.",
+"3. QUESTIONS AND ENDINGS: put the question at the END of the sentence, the way people talk: «...មែនទេ?», «...ហ្អេស?», «...ទេអី?», «...ហើយតើ!», «...នោះអី». Use «តើ» only for formal speakers. Use spoken connectors and particles in the right places: ម៉េចក៏, ក្រែង, ចុះ, សិន, ទៅ (command), ផង, ណា៎, ហ្នឹង, ចឹង/អញ្ចឹង.",
+"4. EVERYDAY WORDS: use modern spoken words and common loanwords (ស៊ីញ៉េ, អាឡូ, តេទៅ, កក់ហាង, កាដូ) instead of formal or written ones. Formal vocabulary only for formal speakers (officials, bankers, lawyers, court characters). Avoid piles of ដែល, ការ, ភាព, នៅពេលដែល.",
+"5. EMOTION AND IDIOMS: turn Chinese idioms and exaggerations into real Khmer expressions with the same feeling, such as ក្រស្ទើរស្លាប់, ដាច់ខ្យល់, ឆ្អែតចិត្ត, ធ្លាក់ដល់ម្ល៉ឹង, កុំរេរ៉ា. Keep insults and rudeness at the same strength as the original.",
+"6. PRONOUNS BY RELATIONSHIP: couples បង/អូន; anger or contempt ឯង/អា; parents and child ប៉ា/ម៉ាក់/កូន; respect លោក/ពូ/មីង; boss លោកប្រធាន + name. Drop the pronoun when a Khmer speaker would. Keep the same terms for the same two people through the whole story.",
+"7. PUNCTUATION FOR THE VOICE: use ! for anger or shock, ?! for outrage, ? for questions and ... for a trailing or hesitating line, so the voice reads each line with the right feeling.",
+"8. SPLIT LINES: when one Chinese sentence is cut over several lines, give each line a natural fragment that flows into the next one. Never merge lines and never move content between lines.",
+"9. EXAMPLES (Chinese to Khmer), imitate this feel:",
+"我穷得很 → ខ្ញុំក្រស្ទើរស្លាប់ហើយ",
+"你骗别人去吧 → ទៅបោកអ្នកផ្សេងទៅ!",
+"你生日不是下个月吗 → ថ្ងៃកំណើតកូនខែក្រោយតើ មែនទេ?",
+"你们加了一宿的班 → ពួកអូនថែមម៉ោងមួយយប់ទល់ភ្លឺហ្អេស?",
+"这种日子我过够了 → ជីវិតបែបនេះ ខ្ញុំរស់នៅឆ្អែតចិត្តហើយ",
+"你自己穷不穷心里没数吗 → ខ្លួនឯងក្រប៉ុណ្ណា មិនដឹងខ្លួនទេអី?",
+"别在这做白日美梦了 → កុំមកយល់សប្តិទាំងថ្ងៃនៅទីនេះ!",
+"走吧别磨蹭了 → តោះ កុំរេរ៉ាច្រើនពេក!",
+"现在业绩这么差你还有脸请假 → ការងារធ្លាក់ដល់ម្ល៉ឹងហើយ នៅមានមុខមកសុំច្បាប់ទៀត?!",
+"我不是说了吗 → ខ្ញុំប្រាប់ហើយតើ!",
+"小辉你怎么了 → អាហួយ កើតអីហ្នឹង?",
+"在柜子里呢 → នៅក្នុងទូនោះអី",
+"你帮我打死他 → ជួយវាយវាឱ្យងាប់ផង!",
+"你放我们一条生路 → បងដោះលែងពួកយើងទៅ",
+"妈有口饭吃就行 → ម៉ាក់មានបាយហូបគឺគ្រប់គ្រាន់ហើយ",
+"10. Before answering, read every line aloud in your head. If it sounds like a book, a news reader or machine translation, rewrite it the way a real Cambodian would say it. Never change facts, names or emotion and never skip a line."
+].join("\n");
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -1002,7 +1047,7 @@ const voiceOfSlot=i=>(i%2===0)?"km-KH-PisethNeural":"km-KH-SreymomNeural";
 genView();slots();steps();
 
 /* gemini panel */
-const GM=[["3.1 Flash-Lite","gemini-3.1-flash-lite"],["3.1 Pro","gemini-3.1-pro"],["3.8 Flash","gemini-3.8-flash"],["3.7 Flash","gemini-3.7-flash"],["3.5 Flash-Lite","gemini-3.5-flash-lite"],["3.6 Flash","gemini-3.6-flash"],["3.5 Flash","gemini-3.5-flash"]];{const _g=S.get("gmid",null),_i=GM.findIndex(m=>m[1]===_g);if(_i>=0)gmodel=_i}
+const GM=[["3.1 Flash-Lite","gemini-3.1-flash-lite"],["3.1 Pro","gemini-3.1-pro"],["3.8 Flash High","gemini-3.8-flash-high"],["3.8 Flash","gemini-3.8-flash"],["3.7 Flash","gemini-3.7-flash"],["3.5 Flash-Lite","gemini-3.5-flash-lite"],["3.6 Flash","gemini-3.6-flash"],["3.5 Flash","gemini-3.5-flash"]];{const _g=S.get("gmid",null),_i=GM.findIndex(m=>m[1]===_g);if(_i>=0)gmodel=_i}
 const gmHtml=()=>GM.map((m,i)=>`button class="b pill ${i===gmodel?"on":""}">${i===gmodel?ICO.checkc+" ⚡ ":""}${/Pro/.test(m[0])?"💎 ":""}${m[0]}/button>`).join("");function gms(){$("#gm").innerHTML=gmHtml();S.set("gmid",GM[gmodel][1]);$$("#gm .b").forEach((b,i)=>b.onclick=()=>{gmodel=i;gms()})}gms();
 let K=S.get("gk",Array(10).fill(""));if(!Array.isArray(K))K=Array(10).fill("");while(K.length11)K.push("");
 $("#keys").innerHTML=K.map((x,i)=>`div class="slot" style="flex:0 0 46%">b>${i+1}/b>input type="password" data-i="${i}" value="${x}" placeholder="••••••••">button class="b" data-t="${i}">Test/button>button class="b" data-d="${i}" title="លុប" style="flex:0 0 auto;padding:0 9px;font-size:15px">🗑/button>/div>`).join("");
@@ -3509,7 +3554,7 @@ function zsfTrSummary(a){var b=zsfSnap(),d={req:b.req-a.req,ok:b.ok-a.ok,inTok:b
  var msg="Gemini: request "+d.ok+"/"+d.req+" ជោគជ័យ | token ចូល "+d.inTok+" ចេញ "+d.outTok+" | cache "+d.hit+"/"+(d.hit+d.miss)+" | retry "+d.retry;
  try{console.log("[ZSF translate] "+msg+" | models "+JSON.stringify(zsfUsage.models))}catch(e){}
  try{if(typeof showToast==="function")showToast(msg,true)}catch(e){}return d}
-var ZSF_TR_PV="v2",zsfTrDB=null,zsfTrMem=new Map();
+var ZSF_TR_PV="v3",zsfTrDB=null,zsfTrMem=new Map();
 function zsfHash(s){s=String(s||"");var h=5381;for(var i=0;is.length;i++)h=((h5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)+"."+s.length}
 function zsfTrKey(tl,ctx,text){return ZSF_TR_PV+"|"+selections.geminiModel+"|"+tl+((typeof zsfFunOn==="function"&&zsfFunOn())?"|"+zsfStyleMode():"")+"|"+zsfHash(ctx)+"|"+text}
 function zsfTrOk(tl,srcText,v){if(!v)return false;var hasL=/[A-Za-z\u00C0-\uFFFF]/.test(srcText);
@@ -3925,7 +3970,7 @@ function zsfFitDur(L,R,F,ks,ke,tk){
     "   PRE-VERIFIED TAGS: if an entry already starts with a tag [1]-[4], that tag was verified by a separate careful voice check. KEEP IT EXACTLY, never change it, and write the Khmer wording for that speaker ([1]/[3] male, [2]/[4] female; [3]/[4] are private inner thoughts).",
     "   VOICE RULES: gender is judged ONLY from the physical voice (pitch and timbre), never from names, pronouns, titles or the idea that speakers alternate. Build a small voice table in your head (A, B, C ...): one voice = one person = one gender. One speaker often says several lines in a row; lines with a tiny gap (under about 0.3 s) are usually the same speaker continuing. When two neighbouring lines switch between male and female, re-listen to confirm the voice really changed. If still unsure, keep the voice of the neighbouring line in the same scene.",
     "3) Translate the line into natural, spoken Khmer. The STORY CARD / genre block given below (if present) is MANDATORY: it decides vocabulary, register, rhythm and emotion of EVERY line (e.g. revenge or face-slap = cold, sharp, proud; sweet romance = soft and warm; ancient or palace = old-style and royal words by rank; comedy = light and playful; horror or suspense = tense and short). If the genre says AUTO, work out the genre from the story and sound, then follow it. Keep character names and forms of address consistent.",
-    "TRANSLATION STYLE (follows these extremely strict guidelines):\n\n១. ប្រើប្រាស់ភាសានិយាយប្រចាំថ្ងៃ (Natural & Conversational)៖\n- Translate using conversational words that Khmer people naturally use in daily life.\n- Avoid word-for-word translation that sounds rigid or violates natural Khmer grammar.\n\n២. កែសម្រួល និងសង្ខេបឱ្យទាក់ទាញ (Adaptation & Conciseness)៖\n- Make each Khmer line as SHORT as natural Khmer allows by choosing shorter, simpler words and structures and by dropping only filler words, empty particles and needless repetition. Example of the right kind of shortening: a line meaning «តើឯងចង់ទៅណា» may become «ឯងទៅណា» (same meaning, fewer characters). This is NOT summarizing: translate every clause, fact, name, number, emotion and implied meaning of the original line, and never merge lines or skip any part of a line.\n- Make the dialogue punchy, smooth, dramatic, and captivating to keep the audience hooked.\n\n៣. ប្រើប្រាស់សព្វនាមឱ្យស័ក្តិសម (Appropriate Pronouns)៖\n- Based on the context of the dialogue, use Khmer pronouns that represent the character's status, age, power dynamics, and relationship (e.g., ខ្ញុំ/ឯង, បង/អូន, កូន/ម៉ែ, លោកម្ចាស់/ឯកឧត្ដម...).\n- Reflect the character's exact emotions in the context (anger, pleading, teasing, respect, sarcasm, etc.).\n\n៤. ហាមប្រើប្រាស់សញ្ញា 'ៗ' (No Repetition Symbol)៖\n- ABSOLUTE STRICT RULE: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the translation. Instead, you MUST spell out the repeated words directly. For example, write \"ទេទេ\" instead of \"ទេៗ\"; write \"លឿនលឿន\" instead of \"លឿនៗ\"; write \"ទេទេទេទេ\" instead of \"ទេៗៗៗ\"; write \"យឺតយឺត\" instead of \"យឺតៗ\". This is extremely critical because the Text-to-Speech (TTS) program cannot read or understand the 'ៗ' symbol and will fail to announce it.\n\nRules for the Khmer wording:\n1. Maintain the emotional tone and context of the conversation according to the specified atmosphere.\n2. Keep the translation natural and fluent in Khmer.\n3. Preserve the FULL meaning of each line (shorter wording is allowed by guideline ២, but never summarize and never lose a clause, fact, name, number or emotion). When a choice is needed, keep the meaning and make the wording shorter, not the reverse.\n4. NAME TRANSLITERATION: All proper names (people, places, brands) MUST be translated or transliterated into Khmer script. DO NOT leave any names in English or Latin characters.\n5. Keep every line short enough to be spoken within the time of the original line (use the {about N chars} hint when given, as a soft target). If the full meaning cannot fit that hint, exceed the hint rather than lose meaning.\n6. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write \"ទេទេ\" instead of \"ទេៗ\").\n7. NUMBERS: write EVERY number, amount, year, date, time and percentage as Khmer WORDS, never as digits (the Khmer voice must read them correctly). NO LATIN LETTERS anywhere: translate English words or abbreviations into Khmer or write them phonetically in Khmer script.\n8. SOURCE TEXT MAY BE WRONG: the Chinese subtitles come from automatic speech recognition and may contain homophone mistakes; use the story context to translate the intended meaning.\n",
+    "TRANSLATION STYLE (follows these extremely strict guidelines):\n\n១. ប្រើប្រាស់ភាសានិយាយប្រចាំថ្ងៃ (Natural & Conversational)៖\n- Translate using conversational words that Khmer people naturally use in daily life.\n- Avoid word-for-word translation that sounds rigid or violates natural Khmer grammar.\n\n២. កែសម្រួល និងសង្ខេបឱ្យទាក់ទាញ (Adaptation & Conciseness)៖\n- Keep each Khmer line at the natural length of real speech (about 3 to 4 Khmer characters per Chinese character) by choosing simple spoken words, never by cutting words until it sounds like a telegram. Put question words at the end like people talk («...មែនទេ?», «...ហ្អេស?») instead of starting with «តើ». This is NOT summarizing: translate every clause, fact, name, number, emotion and implied meaning of the original line, and never merge lines or skip any part of a line.\n- Make the dialogue punchy, smooth, dramatic, and captivating to keep the audience hooked.\n\n៣. ប្រើប្រាស់សព្វនាមឱ្យស័ក្តិសម (Appropriate Pronouns)៖\n- Based on the context of the dialogue, use Khmer pronouns that represent the character's status, age, power dynamics, and relationship (e.g., ខ្ញុំ/ឯង, បង/អូន, កូន/ម៉ែ, លោកម្ចាស់/ឯកឧត្ដម...).\n- Reflect the character's exact emotions in the context (anger, pleading, teasing, respect, sarcasm, etc.).\n\n៤. ហាមប្រើប្រាស់សញ្ញា 'ៗ' (No Repetition Symbol)៖\n- ABSOLUTE STRICT RULE: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the translation. Instead, you MUST spell out the repeated words directly. For example, write \"ទេទេ\" instead of \"ទេៗ\"; write \"លឿនលឿន\" instead of \"លឿនៗ\"; write \"ទេទេទេទេ\" instead of \"ទេៗៗៗ\"; write \"យឺតយឺត\" instead of \"យឺតៗ\". This is extremely critical because the Text-to-Speech (TTS) program cannot read or understand the 'ៗ' symbol and will fail to announce it.\n\n"+(window.ZSF_KM_FRIEND||"")+"\n\nRules for the Khmer wording:\n1. Maintain the emotional tone and context of the conversation according to the specified atmosphere.\n2. Keep the translation natural and fluent in Khmer.\n3. Preserve the FULL meaning of each line (shorter wording is allowed by guideline ២, but never summarize and never lose a clause, fact, name, number or emotion). When a choice is needed, keep the meaning and make the wording shorter, not the reverse.\n4. NAME TRANSLITERATION: All proper names (people, places, brands) MUST be translated or transliterated into Khmer script. DO NOT leave any names in English or Latin characters.\n5. Keep every line short enough to be spoken within the time of the original line (use the {about N chars} hint when given, as a soft target). If the full meaning cannot fit that hint, exceed the hint rather than lose meaning.\n6. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write \"ទេទេ\" instead of \"ទេៗ\").\n7. NUMBERS: write EVERY number, amount, year, date, time and percentage as Khmer WORDS, never as digits (the Khmer voice must read them correctly). NO LATIN LETTERS anywhere: translate English words or abbreviations into Khmer or write them phonetically in Khmer script.\n8. SOURCE TEXT MAY BE WRONG: the Chinese subtitles come from automatic speech recognition and may contain homophone mistakes; use the story context to translate the intended meaning.\n",
     "NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). ",
     "4) The tag decides the Khmer wording: a male speaker ([1]/[3]) uses ខ្ញុំ / ខ្ញុំបាទ and the reply «បាទ»; a female speaker ([2]/[4]) uses ខ្ញុំ / នាងខ្ញុំ and the reply «ចាស». Never mix them. An inner thought ([3]/[4]) is a private first-person monologue: address nobody and add no polite reply particles.",
     "",
@@ -4706,7 +4751,7 @@ function zsfFitDur(L,R,F,ks,ke,tk){
     "   PRE-VERIFIED TAGS: if an entry already starts with a tag [1]-[4], that tag was verified by a separate careful voice check. KEEP IT EXACTLY, never change it, and write the Khmer wording for that speaker ([1]/[3] male, [2]/[4] female; [3]/[4] are private inner thoughts).",
     "   VOICE RULES: gender is judged ONLY from the physical voice (pitch and timbre), never from names, pronouns, titles or the idea that speakers alternate. Build a small voice table in your head (A, B, C ...): one voice = one person = one gender. One speaker often says several lines in a row; lines with a tiny gap (under about 0.3 s) are usually the same speaker continuing. When two neighbouring lines switch between male and female, re-listen to confirm the voice really changed. If still unsure, keep the voice of the neighbouring line in the same scene.",
     "3) Translate the line into natural, spoken Khmer. The STORY CARD / genre block given below (if present) is MANDATORY: it decides vocabulary, register, rhythm and emotion of EVERY line (e.g. revenge or face-slap = cold, sharp, proud; sweet romance = soft and warm; ancient or palace = old-style and royal words by rank; comedy = light and playful; horror or suspense = tense and short). If the genre says AUTO, work out the genre from the story and sound, then follow it. Keep character names and forms of address consistent.",
-    "TRANSLATION STYLE (follows these extremely strict guidelines):\n\n១. ប្រើប្រាស់ភាសានិយាយប្រចាំថ្ងៃ (Natural & Conversational)៖\n- Translate using conversational words that Khmer people naturally use in daily life.\n- Avoid word-for-word translation that sounds rigid or violates natural Khmer grammar.\n\n២. កែសម្រួល និងសង្ខេបឱ្យទាក់ទាញ (Adaptation & Conciseness)៖\n- Make each Khmer line as SHORT as natural Khmer allows by choosing shorter, simpler words and structures and by dropping only filler words, empty particles and needless repetition. Example of the right kind of shortening: a line meaning «តើឯងចង់ទៅណា» may become «ឯងទៅណា» (same meaning, fewer characters). This is NOT summarizing: translate every clause, fact, name, number, emotion and implied meaning of the original line, and never merge lines or skip any part of a line.\n- Make the dialogue punchy, smooth, dramatic, and captivating to keep the audience hooked.\n\n៣. ប្រើប្រាស់សព្វនាមឱ្យស័ក្តិសម (Appropriate Pronouns)៖\n- Based on the context of the dialogue, use Khmer pronouns that represent the character's status, age, power dynamics, and relationship (e.g., ខ្ញុំ/ឯង, បង/អូន, កូន/ម៉ែ, លោកម្ចាស់/ឯកឧត្ដម...).\n- Reflect the character's exact emotions in the context (anger, pleading, teasing, respect, sarcasm, etc.).\n\n៤. ហាមប្រើប្រាស់សញ្ញា 'ៗ' (No Repetition Symbol)៖\n- ABSOLUTE STRICT RULE: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the translation. Instead, you MUST spell out the repeated words directly. For example, write \"ទេទេ\" instead of \"ទេៗ\"; write \"លឿនលឿន\" instead of \"លឿនៗ\"; write \"ទេទេទេទេ\" instead of \"ទេៗៗៗ\"; write \"យឺតយឺត\" instead of \"យឺតៗ\". This is extremely critical because the Text-to-Speech (TTS) program cannot read or understand the 'ៗ' symbol and will fail to announce it.\n\nRules for the Khmer wording:\n1. Maintain the emotional tone and context of the conversation according to the specified atmosphere.\n2. Keep the translation natural and fluent in Khmer.\n3. Preserve the FULL meaning of each line (shorter wording is allowed by guideline ២, but never summarize and never lose a clause, fact, name, number or emotion). When a choice is needed, keep the meaning and make the wording shorter, not the reverse.\n4. NAME TRANSLITERATION: All proper names (people, places, brands) MUST be translated or transliterated into Khmer script. DO NOT leave any names in English or Latin characters.\n5. Keep every line short enough to be spoken within the time of the original line (use the {about N chars} hint when given, as a soft target). If the full meaning cannot fit that hint, exceed the hint rather than lose meaning.\n6. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write \"ទេទេ\" instead of \"ទេៗ\").\n7. NUMBERS: write EVERY number, amount, year, date, time and percentage as Khmer WORDS, never as digits (the Khmer voice must read them correctly). NO LATIN LETTERS anywhere: translate English words or abbreviations into Khmer or write them phonetically in Khmer script.\n8. SOURCE TEXT MAY BE WRONG: the Chinese subtitles come from automatic speech recognition and may contain homophone mistakes; use the story context to translate the intended meaning.\n",
+    "TRANSLATION STYLE (follows these extremely strict guidelines):\n\n១. ប្រើប្រាស់ភាសានិយាយប្រចាំថ្ងៃ (Natural & Conversational)៖\n- Translate using conversational words that Khmer people naturally use in daily life.\n- Avoid word-for-word translation that sounds rigid or violates natural Khmer grammar.\n\n២. កែសម្រួល និងសង្ខេបឱ្យទាក់ទាញ (Adaptation & Conciseness)៖\n- Keep each Khmer line at the natural length of real speech (about 3 to 4 Khmer characters per Chinese character) by choosing simple spoken words, never by cutting words until it sounds like a telegram. Put question words at the end like people talk («...មែនទេ?», «...ហ្អេស?») instead of starting with «តើ». This is NOT summarizing: translate every clause, fact, name, number, emotion and implied meaning of the original line, and never merge lines or skip any part of a line.\n- Make the dialogue punchy, smooth, dramatic, and captivating to keep the audience hooked.\n\n៣. ប្រើប្រាស់សព្វនាមឱ្យស័ក្តិសម (Appropriate Pronouns)៖\n- Based on the context of the dialogue, use Khmer pronouns that represent the character's status, age, power dynamics, and relationship (e.g., ខ្ញុំ/ឯង, បង/អូន, កូន/ម៉ែ, លោកម្ចាស់/ឯកឧត្ដម...).\n- Reflect the character's exact emotions in the context (anger, pleading, teasing, respect, sarcasm, etc.).\n\n៤. ហាមប្រើប្រាស់សញ្ញា 'ៗ' (No Repetition Symbol)៖\n- ABSOLUTE STRICT RULE: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the translation. Instead, you MUST spell out the repeated words directly. For example, write \"ទេទេ\" instead of \"ទេៗ\"; write \"លឿនលឿន\" instead of \"លឿនៗ\"; write \"ទេទេទេទេ\" instead of \"ទេៗៗៗ\"; write \"យឺតយឺត\" instead of \"យឺតៗ\". This is extremely critical because the Text-to-Speech (TTS) program cannot read or understand the 'ៗ' symbol and will fail to announce it.\n\n"+(window.ZSF_KM_FRIEND||"")+"\n\nRules for the Khmer wording:\n1. Maintain the emotional tone and context of the conversation according to the specified atmosphere.\n2. Keep the translation natural and fluent in Khmer.\n3. Preserve the FULL meaning of each line (shorter wording is allowed by guideline ២, but never summarize and never lose a clause, fact, name, number or emotion). When a choice is needed, keep the meaning and make the wording shorter, not the reverse.\n4. NAME TRANSLITERATION: All proper names (people, places, brands) MUST be translated or transliterated into Khmer script. DO NOT leave any names in English or Latin characters.\n5. Keep every line short enough to be spoken within the time of the original line (use the {about N chars} hint when given, as a soft target). If the full meaning cannot fit that hint, exceed the hint rather than lose meaning.\n6. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write \"ទេទេ\" instead of \"ទេៗ\").\n7. NUMBERS: write EVERY number, amount, year, date, time and percentage as Khmer WORDS, never as digits (the Khmer voice must read them correctly). NO LATIN LETTERS anywhere: translate English words or abbreviations into Khmer or write them phonetically in Khmer script.\n8. SOURCE TEXT MAY BE WRONG: the Chinese subtitles come from automatic speech recognition and may contain homophone mistakes; use the story context to translate the intended meaning.\n",
     "NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). ",
     "4) The tag decides the Khmer wording: a male speaker ([1]/[3]) uses ខ្ញុំ / ខ្ញុំបាទ and the reply «បាទ»; a female speaker ([2]/[4]) uses ខ្ញុំ / នាងខ្ញុំ and the reply «ចាស». Never mix them. An inner thought ([3]/[4]) is a private first-person monologue: address nobody and add no polite reply particles.",
     "",
@@ -5036,6 +5081,229 @@ var prep=function(g){return (async function(){try{
     if(done>0&&failed===0)lastKey=key;
     toastS(failed?("🎭 ចាប់សំឡេងបាន "+done+" បន្ទាត់ • មិនបាន "+failed):("🎭 AI ចាប់សំឡេង [1]-[4] រួច "+done+" បន្ទាត់"+(rechecked?(" • ពិនិត្យឡើងវិញ "+rechecked+" • កែ "+changed):"")),!failed);
   };
+
+  /* ===== V26.0.23 : ចាប់សំឡេង ប្រុស/ស្រី/គិតក្នុងចិត្ត ដំណើរការថ្មី =====
+     - ទាញតែ "សំឡេង" ពីវីដេអូ (គ្មានរូបភាព គ្មានការបើកវីដេអូ) ផ្ញើទៅ Gemini ជាផ្នែកៗក្នុងផ្ទៃខាងក្រោយ
+     - ផ្នែកតូច ~36 វិនាទី • ផ្ញើក្នុងពេលតែមួយតិច (3-6) • សាកម្តងទៀតពេលជាប់ quota (429/503)
+     - ក្នុងផ្នែកនីមួយៗ: (1) ចាប់ប្រុស/ស្រី [1]/[2]  (2) ចាប់សំឡេងគិតក្នុងចិត្ត [3]/[4]
+     - បង្ហាញមូលហេតុពិតក្នុងសារ បើមានបន្ទាត់ណាមិនបាន */
+  window.__zsfTagLegacy=window.zsfAutoClassifyTags;
+  window.zsfAutoClassifyTags=async function(){
+    if(!Array.isArray(srtBlocks)||!srtBlocks.length)return;
+    var f=(window.__zsfMedia&&window.__zsfMedia.file)||null;
+    if(!f){toastS("ℹ គ្មានវីដេអូ/សំឡេង — មិនអាចចាប់ប្រុស/ស្រីពីសំឡេងបានទេ",true);return;}
+    var key0=(f.name||"")+"|"+f.size+"|"+srtBlocks.length;
+    if(key0===lastKey&&!window.__zsfForceTag)return;window.__zsfForceTag=false;
+    var ks=[];try{ks=K.filter(Boolean)}catch(_){}
+    if(!ks.length)ks=keys();
+    ks=ks.filter(function(k,i,a){return k&&a.indexOf(k)===i});
+    var useW=true;try{if(localStorage.getItem("zsf_tag_worker")==="0")useW=false}catch(_){}
+    if(!ks.length&&!useW)return;
+    var T0=Date.now(),TOTAL=345000,errs={},lastErr="";
+    var sleep=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
+    var note=function(e){var m=((e&&e.status)?("HTTP "+e.status+" "):"")+String((e&&e.message)||e||"").replace(/\s+/g," ").slice(0,100);lastErr=m;errs[m]=(errs[m]||0)+1;try{console.warn("zsf tag",m)}catch(_){}};
+    var A=null,done=0,thoughtN=0,filled=0,failedG=[],profile=[],lowIds=[],got={},idxById={},ctx="",finished=0,noThought=false,viaWorker=false;
+    /* ===== ផ្លូវទី១ : Gemini Worker (ផ្ញើវីដេអូ + SRT ម្តង ទទួលបាន tag [1]-[4] ទាំងអស់) ===== */
+    var workerTag=async function(){
+      var WURL="";try{WURL=(typeof GEM_WORKER_URL!=="undefined"&&GEM_WORKER_URL)||""}catch(_){}
+      if(!WURL)WURL="https://sweet-firefly-faa0.saanaafckoko.workers.dev";
+      var N=srtBlocks.length;
+      prog("🎭 កំពុងផ្ញើទៅ Worker ដើម្បីចាប់ប្រុស/ស្រី (ដោយស្ងាត់)...",1);
+      var media=f;
+      if(f.size>90*1048576){
+        if(typeof gemWorkerMedia==="function"&&typeof file!=="undefined"&&file===f){media=await gemWorkerMedia(function(p,m){prog(m,p)});}
+        else throw new Error("វីដេអូធំពេកសម្រាប់ Worker");
+      }
+      var srtText=srtBlocks.map(function(b,i){return (i+1)+"\n"+String(b.time||"")+"\n"+String(b.text||"").replace(/\[[1-4]\]\s*/g,"").replace(/\n/g," ")}).join("\n\n")+"\n";
+      var fd=new FormData();
+      fd.append("video",media,media.name||"video.mp4");
+      fd.append("srt",srtText);
+      var tsel=null;try{tsel=$("#target")}catch(_){}
+      var tname="Khmer",tcode="km";try{if(tsel&&tsel.selectedOptions&&tsel.selectedOptions[0]){tname=tsel.selectedOptions[0].text;tcode=tsel.value}}catch(_){}
+      fd.append("target",tname);fd.append("targetCode",tcode);
+      var story="";try{story=window.zsfAutoStory?window.zsfAutoStory():""}catch(_){}
+      fd.append("context",story||"");
+      fd.append("model",(typeof selections!=="undefined"&&selections.geminiModel)||"");
+      fd.append("tagOnly","1");
+      var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},150000),r;
+      try{r=await fetch(WURL,{method:"POST",body:fd,signal:ctl.signal})}
+      catch(e){throw new Error(e&&e.name==="AbortError"?"Worker ឆ្លើយយូរពេក":"ភ្ជាប់ Worker មិនបាន")}
+      finally{clearTimeout(tm)}
+      prog("🎭 Worker កំពុងវិភាគសំឡេង...",8);
+      var raw=await r.text(),j=null,txt=raw,cuesW=null;
+      try{j=JSON.parse(raw)}catch(_){}
+      if(j){
+        if(j.error)throw new Error("Worker: "+String(j.error.message||j.error).slice(0,100));
+        txt=j.srt||j.text||j.result||"";
+        if(!txt&&Array.isArray(j.cues))cuesW=j.cues.map(function(c){return {s:+c.s,e:+c.e,t:String(c.t)}});
+      }
+      if(!r.ok)throw new Error("Worker HTTP "+r.status+": "+String(txt||raw).replace(/\s+/g," ").slice(0,80));
+      var res=cuesW;
+      if(!res){
+        res=[];String(txt).replace(/```[a-z]*/gi,"").replace(/\r/g,"").trim().split(/\n\s*\n/).forEach(function(blk){
+          var L=blk.split("\n"),ti=-1,k;for(k=0;kL.length&&k3;k++){if(/-->/.test(L[k])){ti=k;break}}
+          if(ti0)return;var mm=/(\d+:\d+:\d+[,.]\d+)\s*-->\s*(\d+:\d+:\d+[,.]\d+)/.exec(L[ti]);if(!mm)return;
+          res.push({s:srtToMs(mm[1]),e:srtToMs(mm[2]),t:L.slice(ti+1).join("\n")});});
+      }
+      if(!res.length)throw new Error("Worker ឆ្លើយមិនមាន SRT");
+      var tagAt=new Array(N).fill(0),cnt=0,th=0;
+      if(res.length===N){res.forEach(function(c,i){var m=/^\s*\[([1-4])\]/.exec(String(c.t||""));if(m){tagAt[i]=+m[1];}});}
+      else{
+        var ts=srtBlocks.map(function(b){return times(b).s});
+        res.forEach(function(c){var m=/^\s*\[([1-4])\]/.exec(String(c.t||""));if(!m)return;
+          var lo=0,hi=N-1;while(lohi){var mid=(lo+hi)>>1;if(ts[mid]c.s)lo=mid+1;else hi=mid;}
+          var bi=lo;if(bi>0&&Math.abs(ts[bi-1]-c.s)Math.abs(ts[bi]-c.s))bi=bi-1;
+          if(Math.abs(ts[bi]-c.s)=400&&!tagAt[bi])tagAt[bi]=+m[1];});
+      }
+      tagAt.forEach(function(v){if(v){cnt++;if(v>=3)th++}});
+      if(cnt0.85*N)throw new Error("Worker ឆ្លើយ tag បាន "+cnt+"/"+N+" បន្ទាត់");
+      tagAt.forEach(function(v,i){if(v){srtBlocks[i].text=applyTag(srtBlocks[i].text,v);got[i]=1;done++;}});
+      thoughtN=th;
+      return true;
+    };
+    if(useW){try{viaWorker=await workerTag()}catch(e){note(e);try{prog("🎭 Worker មិនបាន — ប្តូរទៅ Gemini ផ្ទាល់...",2)}catch(_){}}}
+    if(!viaWorker){
+    if(!ks.length){toastS("🎭 ចាប់ប្រុស/ស្រីមិនបាន • មូលហេតុ: "+(lastErr||"គ្មាន Gemini Key"),false);return;}
+    prog("🎭 កំពុងទាញសំឡេងពីវីដេអូ (ដោយស្ងាត់)...",1);
+    try{A=await getAudio(f)}catch(e){note(e)}
+    if(!A){toastS("🎭 ទាញសំឡេងពីវីដេអូមិនបាន • មូលហេតុ: "+lastErr,false);return;}
+    /* ---- ចែកជាក្រុមតាមពេល ---- */
+    var PAD=2,MAXS=36,MAXL=20,groups=[],cur=[];
+    srtBlocks.forEach(function(b,i){var t=times(b);
+      if(cur.length){var span=(t.e-times(srtBlocks[cur[0]]).s)/1000;if(span>MAXS||cur.length>=MAXL){groups.push(cur);cur=[];}}
+      cur.push(i);});
+    if(cur.length)groups.push(cur);
+    var models=[(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash","gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite","gemini-2.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
+    try{if(localStorage.getItem("zsf_thought_pass")==="0")noThought=true}catch(_){}
+    srtBlocks.forEach(function(b,i){idxById[String(b.id)]=i;});
+    var prep=function(g){
+      var idxs=groups[g],t0=times(srtBlocks[idxs[0]]).s,t1=0;
+      idxs.forEach(function(i){var e=times(srtBlocks[i]).e;if(e>t1)t1=e;});
+      var c0=Math.max(0,t0-PAD*1000);
+      var wav=b64(sliceWav(A.ab,A.info,Math.max(0,c0/1000-A.offset),(t1/1000+PAD)-A.offset));
+      var lines=idxs.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-c0)+" --> "+fmtT(t.e-c0),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,""),f0:f0Of(A,t.s,t.e)};});
+      return {idxs:idxs,wav:wav,lines:lines};
+    };
+    var parseArr=function(t){t=String(t).replace(/```json|```/g,"").trim();var o=null;
+      try{o=JSON.parse(t)}catch(e){var m=t.match(/\[[\s\S]*\]/);if(m){try{o=JSON.parse(m[0])}catch(_){}}}
+      if(o&&!Array.isArray(o)&&Array.isArray(o.lines))o=o.lines;return Array.isArray(o)?o:[];};
+    /* ហៅ Gemini ជាមួយសាកម្តងទៀត + ប្តូរ key/model */
+    var ask=async function(prompt,wav,startK,tries,accept){
+      var best=null,bestN=-1;
+      for(var att=0;atttries;att++){
+        if(window.__zsfTagAbort||Date.now()-T0>TOTAL||!models.length)break;
+        var mdl=models[att%models.length],kk=ks[(startK+att)%ks.length];
+        try{
+          var res=accept(await callGemini(prompt,wav,kk,mdl,[],false));
+          if(res.n>bestN){best=res.val;bestN=res.n}
+          if(res.full)return {val:best,n:bestN};
+          note(new Error("AI ឆ្លើយបាន "+res.n+"/"+res.total+" បន្ទាត់"));
+        }catch(e){
+          note(e);var st=e&&e.status;
+          if(st===404){var ix=models.indexOf(mdl);if(ix>=0&&models.length>1)models.splice(ix,1);}
+          else if(st===429||st===500||st===503||!st){await sleep(Math.min(12000,1500*Math.pow(2,att)));}
+        }
+      }
+      return best?{val:best,n:bestN}:null;
+    };
+    var runOne=async function(g,w){
+      try{
+        var P=prep(g),ids=new Set(P.lines.map(function(l){return l.id})),prompt=buildPrompt(P.lines,ctx,false);
+        var r=await ask(prompt,P.wav,g+w,7,function(txt){var pr=parseTags(txt,ids),c=Object.keys(pr.map).length;return {val:pr,n:c,total:ids.size,full:c>=0.9*ids.size};});
+        if(!r||r.n0.5*ids.size)throw new Error(lastErr||"AI ឆ្លើយមិនគ្រប់");
+        var rs=r.val;
+        profile=mergeProf(profile,rs.voices);
+        Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});
+        P.idxs.forEach(function(i){var b=srtBlocks[i],tg=rs.map[String(b.id)];if(typeof tg==="number"){b.text=applyTag(b.text,tg);got[i]=1;done++;}});
+        var tail=P.idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");
+        ctx=profText(profile)+(tail?((profile.length?". ":"")+"Tags of the last lines before this clip (id=tag): "+tail):"");
+        /* ជុំទី២ : សំឡេងគិតក្នុងចិត្ត (ស្តាប់សំឡេងតែប៉ុណ្ណោះ) — បរាជ័យមិនប៉ះពាល់ជុំទី១ */
+        if(!noThought&&!window.__zsfTagAbort&&Date.now()-T0TOTAL*0.6){
+          try{
+            var tl=P.lines.map(function(l){return {id:l.id,t:l.t,text:l.text}});
+            var tprompt="ROLE: Expert Chinese short-drama (短剧) sound editor.\nYou hear ONLY THE AUDIO of one clip (no picture) and the ORIGINAL subtitle lines spoken inside it (JSON; times are relative to the clip start).\n"+
+              "TASK: for EVERY entry decide HOW the line is presented: 'spoken' = the character says it aloud in the room; 'thought' = inner monologue / heart voice (心声, OS): the voice is heard but the character is NOT speaking it.\n"+
+              "Inner thoughts are VERY common in this genre (revenge, rebirth, secret plans, reactions to what another person just said). Do NOT under-detect them, but do not invent them either.\n"+
+              "SOUND CUES: the voice is treated differently from the room dialogue: echo, reverb, a soft close 'inside the head' tone, lower or muffled level, no room ambience, placed over silence or music. CONTEXT CUES: the line says things nobody would say aloud (secrets, plans, remarks about the person standing in front of them), or reacts to what was just said without being answered.\n"+
+              "Marker words OS, 心声, 内心, 心想 are supporting evidence only. Phone calls, shouting, whispering to someone, and a narrator addressing the audience are 'spoken'.\n"+
+              "conf: 'high' only when you are sure, otherwise 'low'.\n"+
+              "OUTPUT: a JSON array only, one object per entry in order: {\"id\":\"id>\",\"mode\":\"spoken\" or \"thought\",\"conf\":\"high\" or \"low\"}. No gender, no timestamps, no text.\n\nENTRIES (JSON):\n"+JSON.stringify(tl);
+            var tr=await ask(tprompt,P.wav,g+w+1,3,function(txt){var a=parseArr(txt);return {val:a,n:a.length,total:P.lines.length,full:a.length>=0.8*P.lines.length};});
+            if(tr)tr.val.forEach(function(it){
+              var i=idxById[String(it&&it.id)];if(i===undefined)return;
+              var m=TAG_RE.exec(srtBlocks[i].text||"");if(!m)return;
+              var cu=+m[1],base=cu>=3?cu-2:cu,md=String(it.mode||"").toLowerCase(),cf=String(it.conf||"").toLowerCase();
+              if(/^t/.test(md)&&!/^l/.test(cf)){if(cu=2){srtBlocks[i].text=applyTag(srtBlocks[i].text,base+2);thoughtN++;}}
+              else if(/^s/.test(md)&&/^h/.test(cf)&&cu>=3){srtBlocks[i].text=applyTag(srtBlocks[i].text,base);}
+            });
+          }catch(e){note(e)}
+        }
+        return true;
+      }catch(e){note(e);return false;}
+    };
+    var showProg=function(){prog("🎭 Gemini កំពុងស្តាប់សំឡេង ប្រុស/ស្រី/គិតក្នុងចិត្ត • ក្រុម "+finished+"/"+groups.length,2+10*finished/groups.length);};
+    /* ក្រុមទី១ ម្នាក់ឯងសិន ដើម្បីបង្កើតតារាងសំឡេង + ពិនិត្យថា key/model ដំណើរការ */
+    showProg();
+    var ok0=await runOne(0,0);finished++;showProg();if(!ok0)failedG.push(0);
+    var proceed=true;
+    if(!ok0&&groups.length>1){var ok1=await runOne(1,1);finished++;if(!ok1){failedG.push(1);proceed=false;}}
+    if(proceed){
+      var q=[],g0;for(g0=(ok0||groups.length2)?1:2;g0groups.length;g0++)q.push(g0);
+      var pos=0,conc=Math.max(3,Math.min(6,ks.length*2));
+      try{var tc=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tc>=1&&tc=8)conc=tc}catch(_){}
+      var wk=async function(w){
+        while(!window.__zsfTagAbort&&Date.now()-T0TOTAL){
+          var x=pos++;if(x>=q.length)return;
+          var ok=await runOne(q[x],w);finished++;showProg();if(!ok)failedG.push(q[x]);
+        }
+      };
+      var ws=[],w;for(w=0;wMath.min(conc,q.length);w++)ws.push(wk(w));
+      await Promise.all(ws);
+      /* សាកម្តងទៀតក្រុមដែលបរាជ័យ ម្តងមួយៗ (ចៀសវាង quota) */
+      if(failedG.length&&!window.__zsfTagAbort&&Date.now()-T0TOTAL*0.85){
+        await sleep(4000);var again=failedG.slice();failedG=[];
+        for(var a2=0;a2again.length;a2++){
+          if(window.__zsfTagAbort||Date.now()-T0>TOTAL)break;
+          prog("🎭 សាកម្តងទៀតក្រុមដែលមិនទាន់បាន "+(a2+1)+"/"+again.length,12);
+          if(!(await runOne(again[a2],a2)))failedG.push(again[a2]);
+        }
+      }
+    }
+    }
+    /* ---- បំពេញបន្ទាត់ដែលនៅខ្វះ តាមសំឡេងជិតខាង (កំណត់ជាសំឡេងនិយាយធម្មតា) ---- */
+    var hasTag=function(i){return !!TAG_RE.exec(srtBlocks[i].text||"")};
+    var spokenOf=function(t){return ((t-1)%2)+1};
+    var lastT=0,i2;
+    for(i2=0;i2srtBlocks.length;i2++){
+      var mm=TAG_RE.exec(srtBlocks[i2].text||"");
+      if(mm){lastT=+mm[1];continue;}
+      if(lastT){srtBlocks[i2].text=applyTag(srtBlocks[i2].text,spokenOf(lastT));filled++;}
+    }
+    var nextT=0;
+    for(i2=srtBlocks.length-1;i2>=0;i2--){
+      var m3=TAG_RE.exec(srtBlocks[i2].text||"");
+      if(m3){nextT=+m3[1];continue;}
+      if(nextT){srtBlocks[i2].text=applyTag(srtBlocks[i2].text,spokenOf(nextT));filled++;}
+    }
+    var miss=0;srtBlocks.forEach(function(b,i){if(!hasTag(i))miss++;});
+    /* ---- ដោះស្រាយតាម pitch សម្រាប់បន្ទាត់ដែល AI មិនច្បាស់ ---- */
+    var flipped=0;
+    try{var PS=null;try{PS=zsfPitchSplit(A)}catch(_){}
+      if(PS){srtBlocks.forEach(function(b,i){
+        var tx=String(b.text||""),ms=tx.match(/\[[1-4]\]/g);if(!ms||ms.length!==1)return;
+        var m=TAG_RE.exec(tx);if(!m)return;var tt=times(b),h=f0Of(A,tt.s,tt.e);if(!h)return;
+        var tg=+m[1],male=tg%2===1,bid=String(b.id);
+        if(((male&&h>=PS.hi*1.1)||(!male&&h=PS.lo*0.9))&&lowIds.indexOf(bid)>=0){b.text=applyTag(tx,male?tg+1:tg-1);flipped++;}
+      });}
+    }catch(e){console.warn("pitch arbitration",e)}
+    try{window.__zsfTagReport="ZSF "+(window.__ZSF_VER||"")+" tag report (audio-only) | line = id | tag | pitchHz\n"+srtBlocks.map(function(b,i){var m=TAG_RE.exec(b.text||""),tt=times(b),h=0;try{h=f0Of(A,tt.s,tt.e)}catch(_){}return "#"+b.id+"|"+(m?m[1]:"-")+"|"+h}).join("\n")+"\nERRORS:\n"+Object.keys(errs).map(function(k){return errs[k]+"x "+k}).join("\n")}catch(_){}
+    try{closeVideo()}catch(_){}
+    try{renderEditor();saveData();}catch(_){}
+    var okAll=(miss===0&&filled===0&&!failedG.length);
+    if(done>0&&okAll)lastKey=key0;
+    var top="",tn=0;Object.keys(errs).forEach(function(k){if(errs[k]>tn){tn=errs[k];top=k}});
+    toastS(okAll?("🎭 AI ចាប់សំឡេង [1]-[4] រួច "+done+" បន្ទាត់"+(thoughtN?(" • សំឡេងគិតក្នុងចិត្ត "+thoughtN):"")+(viaWorker?" • តាម Worker":"")):("🎭 ចាប់បាន "+done+" • បំពេញតាមបរិបទ "+filled+" • មិនបាន "+miss+(top?(" • មូលហេតុ: "+top):"")),okAll&&done>0);
+  };
 })();
 
 /* ######## E. UI wiring ######## */
@@ -5087,7 +5355,7 @@ $("#asrGem").onclick=zsfTranscribeGeminiMain;
 
 /* ===== V11.3 : Auto Model — ស្វែងរក Gemini model ដែលដំណើរការភ្លាមៗដោយស្វ័យប្រវត្តិ ===== */
 window.__zsfAutoSt=window.__zsfAutoSt||{on:S.get("gmauto",true)!==false,busy:false,p:null};
-var ZSF_AUTO_PRI=["gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite"];
+var ZSF_AUTO_PRI=["gemini-3.8-flash-high","gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite"];
 function zsfAutoBtn(){
   var st=window.__zsfAutoSt||{},cur="";
   try{var i=GM.findIndex(function(m){return m[1]===selections.geminiModel});if(i>=0)cur=GM[i][0]}catch(_){}
@@ -5110,7 +5378,7 @@ async function zsfAutoRun(force){
   if(st.busy)return st.p;
   var ks=K.filter(Boolean);if(!ks.length)return;
   var kh=ks.length+":"+ks[0].slice(-6)+ks[ks.length-1].slice(-6),c=null;
-  try{c=JSON.parse(localStorage.getItem("zsf_auto_model")||"null")}catch(_){}
+  try{c=JSON.parse(localStorage.getItem("zsf_auto_model2")||"null")}catch(_){}
   if(!force&&c&&c.id&&c.kh===kh&&Date.now()-c.t3600000){zsfAutoApply(c.id,true);return}
   st.busy=true;gms();
   st.p=(async function(){
@@ -5135,7 +5403,7 @@ async function zsfAutoRun(force){
           }catch(_){}
         }
       }
-      if(pick){try{localStorage.setItem("zsf_auto_model",JSON.stringify({id:pick,t:Date.now(),kh:kh}))}catch(_){}zsfAutoApply(pick)}
+      if(pick){try{localStorage.setItem("zsf_auto_model2",JSON.stringify({id:pick,t:Date.now(),kh:kh}))}catch(_){}zsfAutoApply(pick)}
       else{try{showToast("🤖 Auto: ពិនិត្យម៉ូដែលមិនបាន (បណ្តាញ ឬ Key) — ប្រើម៉ូដែលបច្ចុប្បន្ន",false)}catch(_){}}
     }catch(_){}
     st.busy=false;gms();
@@ -5948,6 +6216,7 @@ $("#exp").onclick=async function(){
   /* Step 2a (v10): ស្តាប់សំឡេងចាប់ប្រុស/ស្រី/គិតក្នុងចិត្ត មុនបកប្រែ */
   window.__preTag=false;window.__preTried=false;window.__bibleP=null;
   try{if(on(1)&&cues.length&&K.filter(Boolean).length&&$("#target").value==="km"){window.__bibleP=gPrepareBible(K.filter(Boolean),function(){}).catch(function(){return null})}}catch(e){window.__bibleP=null}
+  try{if(on(2)&&cues.length&&!K.filter(Boolean).length){zsfDone("⚠ ចែកតួ (ប្រុស/ស្រី) ត្រូវការ Gemini Key — Local AI ស្តាប់សំឡេងមិនបានទេ",false)}}catch(e){}
   if(on(2)&&cues.length&&K.filter(Boolean).length){
    window.__preTried=true;phase(2,20,35);setProgress(0,"🎭 កំពុងស្តាប់សំឡេង ចាប់ប្រុស/ស្រី/គិតក្នុងចិត្ត...");
    try{await tagSpeakers()}catch(e){console.warn("pretag",e)}
@@ -6339,7 +6608,7 @@ window.ZSF_PROMPT_NEW=[
  "- Avoid word-for-word translation that sounds rigid or violates natural Khmer grammar.",
  "",
  "២. កែសម្រួល និងសង្ខេបឱ្យទាក់ទាញ (Adaptation & Conciseness)៖",
- "- If the original sentences are long, or use complex/difficult idioms, adapt and condense them into shorter, easy-to-read Khmer that remains synced to subtitle reading speeds while fully retaining the original intent and essence.",
+ "- If the original sentence is long or uses difficult idioms, express it with simpler everyday Khmer words and an easier sentence structure, but NEVER by dropping any part of the meaning (every clause, fact, name, number and emotion must stay).",
  "- Make the dialogue punchy, smooth, dramatic, and captivating to keep the audience hooked.",
  "",
  "៣. ប្រើប្រាស់សព្វនាមឱ្យស័ក្តិសម (Appropriate Pronouns)៖",
@@ -6359,9 +6628,24 @@ window.ZSF_PROMPT_NEW=[
  "5. TAG PRESERVATION: If you see tags like [1], [2], [3], [M], [F], etc. (any letter, word, or number enclosed in square brackets) in the source text, you MUST preserve them exactly in the Khmer translation. Do not translate or modify these tags.",
  "6. NAME TRANSLITERATION: All proper names (people, places, brands) MUST be translated or transliterated into Khmer script. DO NOT leave any names in English or Latin characters.",
  "7. Return the translations as numbered lines mapped to their original numbers, exactly as described in OUTPUT FORMAT below (NOT JSON).",
- "8. The output must be concise enough for subtitle reading speeds.",
+ "8. Keep each line as short as natural spoken Khmer allows by choosing simple words, but COMPLETENESS has priority over shortness: never omit, merge or summarize any part of the meaning.",
  "9. GENDER IDENTIFICATION: If a line contains the tag [1] or [M], it indicates a male voice. If it contains the tag [2] or [F], it indicates a female voice. Use this to understand the dialogue context and choose appropriate gender-based language in Khmer.",
- "10. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write \"ទេទេ\" instead of \"ទេៗ\")."
+ "10. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write \"ទេទេ\" instead of \"ទេៗ\").",
+ "",
+ "KHMER SPOKEN-LANGUAGE STYLE (MOST IMPORTANT): the Khmer lines are READ ALOUD by a voice and heard by ordinary Cambodian viewers today, so they must sound like real people talking, not like a book, a news report or a textbook.",
+ "A. REAL SPEECH TEST: for every line ask 'would a normal Cambodian say exactly this to a friend, a family member, a boss or an enemy in this situation today?' If it sounds stiff, bookish, translated, or hard to understand when heard only once, rewrite it until it sounds natural.",
+ "B. EVERYDAY WORDS: choose short, common words that everybody understands the first time they hear them. Avoid formal, written-style, Pali-Sanskrit or royal vocabulary unless the character really is royalty or the story is ancient/palace. Never use rare or bookish words that a listener would have to think about.",
+ "C. SPOKEN FORMS: use the natural spoken forms and sentence endings that people really use, such as ហ្នឹង, អញ្ចឹង/ចឹង, ម៉េច, ស្អី, អត់, ហើយ, ណា៎, ទេ, ចុះ, អើ, អូយ, ហា៎, in the right places and at the right strength for the situation (casual among friends, polite with elders and bosses using បាទ/ចាស). Do not force them into every line, and do not use them where the character would speak formally.",
+ "D. NO TRANSLATIONESE: do not copy Chinese word order or structure. Avoid chains of ដែល / ការ / ភាព, overuse of បាន, and stiff connectors such as ដូច្នេះហើយ, ជាមួយនឹងនេះ, ដូចនេះ. Build the sentence the way a Khmer speaker would say it from scratch.",
+ "E. IDIOMS, SLANG AND SET PHRASES: never translate Chinese idioms (成语), proverbs, internet slang or cultural jokes word by word. Find what the speaker MEANS and say it with a natural, modern Khmer expression that gives the same feeling (anger, sarcasm, flirting, bragging, threat, pity). If Khmer has no equivalent, use a short plain phrase that carries the same meaning.",
+ "F. EMOTION AND ATTITUDE: keep the exact attitude and strength of each line (cold, furious, teasing, begging, arrogant, tender, afraid). Use natural spoken reactions and short exclamations when the original has them. Keep insults and rudeness at the same level as the original: do not soften them and do not make them worse.",
+ "G. PRONOUNS AND ADDRESS: choose ខ្ញុំ / ឯង / អ្នក / បង / អូន / ប្អូន / ពូ / មីង / ម៉ាក់ / ប៉ា / លោក / កូន / គាត់ / នាង / វា from the age, gender, relationship, status and mood of the two people, exactly as real Cambodians do. Drop the pronoun when a Cambodian speaker would drop it. Keep the same terms for the same pair of people through the whole story. Do not use អ្នក and ខ្ញុំ everywhere.",
+ "H. MODERN CAMBODIAN LIFE: for modern stories use the words people use now (ទូរស័ព្ទ, ផ្ញើសារ, ហៅទូរស័ព្ទ, ប្រាក់ខែ, ក្រុមហ៊ុន, ម្ចាស់ហាង, ទិញ, លក់ ...) and the way young and old Cambodians really talk at home, at work, in shops and in arguments. Use a polite, dignified, old-style register only for ancient or palace stories.",
+ "I. COMPLETENESS (HIGHEST PRIORITY): translate EVERY clause and every fact, name, number, question and emotion of every numbered line. Never skip, summarize, merge or leave a word untranslated, and never add anything that is not in the source. Make a line short ONLY by using simpler words and a simpler structure, never by dropping meaning. A line that is cut short or misses part of the meaning is wrong.",
+ "J. SPLIT SENTENCES: one spoken sentence is often cut across several lines. Use the previous lines for context so every line connects smoothly with its neighbours, keeps the same pronouns and the same speaker, but translate only the numbered lines and give exactly one output line per numbered input line.",
+ "K. FINAL SELF-CHECK before answering: read every Khmer line as if you were speaking it aloud. If any word sounds odd, unclear, too formal, mistranslated or is missing part of the meaning, fix it. Output only the final numbered lines.",
+ "",
+ (window.ZSF_KM_FRIEND||"")
 ].join("\n");
 /* ផ្នែកបច្ចេកទេស (កុំលុប) — កូដអានលទ្ធផលពឹងលើទម្រង់នេះ: លេខបន្ទាត់, tag [1]-[4], emotion marker, length hint */
 window.zsfTrHead=function(tl,ctx,lv){var T=["OUTPUT FORMAT: keep the numbering and the order, one line per item, never skip or add an item. Output ONLY the numbered lines: no JSON, no explanations, no timestamps, no Markdown.","TAGS: if a source line starts with a tag [1], [2], [3] or [4] (or any tag in square brackets), keep that tag exactly at the start of the translated line; never translate, delete, rename or modify it."],H1=["LENGTH HINT: each input line ends with a hint like {about 40 chars}. It is the maximum length that fits the speaking time. Stay within the hint when possible, but never lose a fact, name, number or the main emotion. NEVER output the {about N chars} hint."],H2=["EMOTION MARKER: after the number (and after the [n] tag when the line has one) write exactly ONE emotion code in curly braces that says how the speaker says THIS line: {angry} {sad} {sweet} {scared} {shocked} {mocking} {pleading} {cold} {joking} {happy} {calm}, for example '3. [1] {angry} text' or '4. {sad} text'. The code is only a marker for the program: write it once, right after the number or tag, never inside the sentence."];var head=String(window.ZSF_PROMPT_NEW||"");var P=[head];if(ctx&&head.indexOf("{CTX}")===-1)P.push("","STORY CONTEXT: {CTX}");P.push("");P=P.concat(T);if(lv>=2)P=P.concat([""],H1);if(lv===2)P=P.concat([""],H2);return P.join("\n").split("{TL}").join(tl).split("{CTX}").join(ctx||"")};
@@ -6543,7 +6827,7 @@ async function gemDirectRunV36(prog){
  var tagRules=wantTag?("\nVOICE TAGS: tag each entry with exactly one of: 1 = male voice spoken aloud, 2 = female voice spoken aloud, 3 = male inner thought, 4 = female inner thought. Judge gender ONLY from the physical voice you hear at that timestamp (pitch and timbre), never from names, pronouns or the idea that speakers alternate. Use inner thought (3/4) only with clear audio evidence (echo, filtered or detached voice); whispering, shouting, phone calls, off-screen voices and narrators are spoken (1/2). If one entry contains two different speakers, write the tag before each part inside \"t\" like \"[1] ... [2] ...\" and set \"tag\" to the first part's tag."):"";
  async function runBatch(a,b){
   var lines=[];for(var i=a;ib;i++)lines.push((i+1)+" | "+s2t(cues[i].s)+" --> "+s2t(cues[i].e)+" | "+String(cues[i].t).replace(/^\s*\[[1-4]\]\s*/,"").replace(/\n/g," "));
-  var prompt="ROLE: expert Chinese short-drama translator (Chinese to "+target+"), strict SRT editor and voice analyst.\nYou are given the full ATTACHED VIDEO (picture and sound) and part of its ORIGINAL SRT (speech-recognition output, may contain mistakes; times are positions in the video). Use the video to understand who speaks, to whom, and the story. For EVERY listed entry write the "+target+" translation.\nTRANSLATION STYLE: translate into natural, conversational, engaging "+target+" (for dubbing) following these strict guidelines:\n១. ប្រើប្រាស់ភាសានិយាយប្រចាំថ្ងៃ (Natural & Conversational)៖\n- Translate using conversational words that Khmer people naturally use in daily life.\n- Avoid word-for-word translation that sounds rigid or violates natural Khmer grammar.\n\n២. កែសម្រួល និងសង្ខេបឱ្យទាក់ទាញ (Adaptation & Conciseness)៖\n- Make each Khmer line as SHORT as natural Khmer allows by choosing shorter, simpler words and structures and by dropping only filler words, empty particles and needless repetition. Example of the right kind of shortening: a line meaning «តើឯងចង់ទៅណា» may become «ឯងទៅណា» (same meaning, fewer characters). This is NOT summarizing: translate every clause, fact, name, number, emotion and implied meaning of the original line, and never merge lines or skip any part of a line.\n- Make the dialogue punchy, smooth, dramatic, and captivating to keep the audience hooked.\n\n៣. ប្រើប្រាស់សព្វនាមឱ្យស័ក្តិសម (Appropriate Pronouns)៖\n- Based on the context of the dialogue, use Khmer pronouns that represent the character's status, age, power dynamics, and relationship (e.g., ខ្ញុំ/ឯង, បង/អូន, កូន/ម៉ែ, លោកម្ចាស់/ឯកឧត្ដម...).\n- Reflect the character's exact emotions in the context (anger, pleading, teasing, respect, sarcasm, etc.).\n\n៤. ហាមប្រើប្រាស់សញ្ញា 'ៗ' (No Repetition Symbol)៖\n- ABSOLUTE STRICT RULE: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the translation. Instead, you MUST spell out the repeated words directly. For example, write \"ទេទេ\" instead of \"ទេៗ\"; write \"លឿនលឿន\" instead of \"លឿនៗ\"; write \"ទេទេទេទេ\" instead of \"ទេៗៗៗ\"; write \"យឺតយឺត\" instead of \"យឺតៗ\". This is extremely critical because the Text-to-Speech (TTS) program cannot read or understand the 'ៗ' symbol and will fail to announce it.\n\nRules:\n1. Maintain the emotional tone and context of the conversation according to the specified atmosphere.\n2. Keep the translation natural and fluent in Khmer.\n3. Preserve the FULL meaning of each line (shorter wording is allowed by guideline ២, but never summarize and never lose a clause, fact, name, number or emotion). When a choice is needed, keep the meaning and make the wording shorter, not the reverse.\n4. NAME TRANSLITERATION: All proper names (people, places, brands) MUST be translated or transliterated into Khmer script. DO NOT leave any names in English or Latin characters.\n5. Keep every line short enough to be spoken within the time of the original line (use the {about N chars} hint when given, as a soft target). If the full meaning cannot fit that hint, exceed the hint rather than lose meaning.\n6. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write \"ទេទេ\" instead of \"ទេៗ\").\n7. NUMBERS: write EVERY number, amount, year, date, time and percentage as Khmer WORDS, never as digits (the Khmer voice must read them correctly). NO LATIN LETTERS anywhere: translate English words or abbreviations into Khmer or write them phonetically in Khmer script.\n8. SOURCE TEXT MAY BE WRONG: the Chinese subtitles come from automatic speech recognition and may contain homophone mistakes; use the story context to translate the intended meaning.\nKeep every entry separate (never merge or split); no explanations. Story context: "+(ctxT||"-")+"."+tagRules+"\nOUTPUT: ONE JSON array only, no markdown: "+(wantTag?'[{"n":entry number>,"tag":1-4>,"t":"translation>"}]':'[{"n":entry number>,"t":"translation>"}]')+". Include EVERY entry number listed, in order.\nENTRIES (number | time | original text):\n"+lines.join("\n");
+  var prompt="ROLE: expert Chinese short-drama translator (Chinese to "+target+"), strict SRT editor and voice analyst.\nYou are given the full ATTACHED VIDEO (picture and sound) and part of its ORIGINAL SRT (speech-recognition output, may contain mistakes; times are positions in the video). Use the video to understand who speaks, to whom, and the story. For EVERY listed entry write the "+target+" translation.\nTRANSLATION STYLE: translate into natural, conversational, engaging "+target+" (for dubbing) following these strict guidelines:\n១. ប្រើប្រាស់ភាសានិយាយប្រចាំថ្ងៃ (Natural & Conversational)៖\n- Translate using conversational words that Khmer people naturally use in daily life.\n- Avoid word-for-word translation that sounds rigid or violates natural Khmer grammar.\n\n២. កែសម្រួល និងសង្ខេបឱ្យទាក់ទាញ (Adaptation & Conciseness)៖\n- Keep each Khmer line at the natural length of real speech (about 3 to 4 Khmer characters per Chinese character) by choosing simple spoken words, never by cutting words until it sounds like a telegram. Put question words at the end like people talk («...មែនទេ?», «...ហ្អេស?») instead of starting with «តើ». This is NOT summarizing: translate every clause, fact, name, number, emotion and implied meaning of the original line, and never merge lines or skip any part of a line.\n- Make the dialogue punchy, smooth, dramatic, and captivating to keep the audience hooked.\n\n៣. ប្រើប្រាស់សព្វនាមឱ្យស័ក្តិសម (Appropriate Pronouns)៖\n- Based on the context of the dialogue, use Khmer pronouns that represent the character's status, age, power dynamics, and relationship (e.g., ខ្ញុំ/ឯង, បង/អូន, កូន/ម៉ែ, លោកម្ចាស់/ឯកឧត្ដម...).\n- Reflect the character's exact emotions in the context (anger, pleading, teasing, respect, sarcasm, etc.).\n\n៤. ហាមប្រើប្រាស់សញ្ញា 'ៗ' (No Repetition Symbol)៖\n- ABSOLUTE STRICT RULE: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the translation. Instead, you MUST spell out the repeated words directly. For example, write \"ទេទេ\" instead of \"ទេៗ\"; write \"លឿនលឿន\" instead of \"លឿនៗ\"; write \"ទេទេទេទេ\" instead of \"ទេៗៗៗ\"; write \"យឺតយឺត\" instead of \"យឺតៗ\". This is extremely critical because the Text-to-Speech (TTS) program cannot read or understand the 'ៗ' symbol and will fail to announce it.\n\n"+(window.ZSF_KM_FRIEND||"")+"\n\nRules:\n1. Maintain the emotional tone and context of the conversation according to the specified atmosphere.\n2. Keep the translation natural and fluent in Khmer.\n3. Preserve the FULL meaning of each line (shorter wording is allowed by guideline ២, but never summarize and never lose a clause, fact, name, number or emotion). When a choice is needed, keep the meaning and make the wording shorter, not the reverse.\n4. NAME TRANSLITERATION: All proper names (people, places, brands) MUST be translated or transliterated into Khmer script. DO NOT leave any names in English or Latin characters.\n5. Keep every line short enough to be spoken within the time of the original line (use the {about N chars} hint when given, as a soft target). If the full meaning cannot fit that hint, exceed the hint rather than lose meaning.\n6. NO REPETITION SYMBOL: NEVER use the Khmer repetition symbol 'ៗ' (Lek To) in the Khmer translations. You must expand and repeat the words (e.g. write \"ទេទេ\" instead of \"ទេៗ\").\n7. NUMBERS: write EVERY number, amount, year, date, time and percentage as Khmer WORDS, never as digits (the Khmer voice must read them correctly). NO LATIN LETTERS anywhere: translate English words or abbreviations into Khmer or write them phonetically in Khmer script.\n8. SOURCE TEXT MAY BE WRONG: the Chinese subtitles come from automatic speech recognition and may contain homophone mistakes; use the story context to translate the intended meaning.\nKeep every entry separate (never merge or split); no explanations. Story context: "+(ctxT||"-")+"."+tagRules+"\nOUTPUT: ONE JSON array only, no markdown: "+(wantTag?'[{"n":entry number>,"tag":1-4>,"t":"translation>"}]':'[{"n":entry number>,"t":"translation>"}]')+". Include EVERY entry number listed, in order.\nENTRIES (number | time | original text):\n"+lines.join("\n");
   var last=null;
   for(var mi=0;mimodels.length;mi++){
    try{
@@ -6989,7 +7273,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.20",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.26",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7385,7 +7669,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    if(typeof u==="string"&&u.indexOf("generativelanguage.googleapis.com")>=0&&u.indexOf(":generateContent")>=0&&o&&typeof o.body==="string"){
     var hk="";try{hk=(o.headers&&o.headers["x-goog-api-key"])||""}catch(e){}
     var j=JSON.parse(o.body),media=hasMedia(j);
-    if(on()&&!media){var lf=function(u2,o2){return call(JSON.parse(o2.body),o2.signal)};if(typeof zsfEnforce==="function"&&typeof zsfFunOn==="function"&&zsfFunOn()&&o.body.indexOf("NO LATIN LETTERS")>=0)return zsfEnforce(lf,this,u,o,true);return call(j,o.signal)}
+    if(on()&&!media&&!/physical voice|voice table|PRE-VERIFIED TAGS/.test(o.body)){var lf=function(u2,o2){return call(JSON.parse(o2.body),o2.signal)};if(typeof zsfEnforce==="function"&&typeof zsfFunOn==="function"&&zsfFunOn()&&o.body.indexOf("NO LATIN LETTERS")>=0)return zsfEnforce(lf,this,u,o,true);return call(j,o.signal)}
     if(media&&hk==="LOCAL_AI")return Promise.resolve(err(400,"Local AI មិនគាំទ្រសំឡេង/វីដេអូ — ត្រូវការ Gemini Key"));
    }
   }catch(e){}
@@ -7425,7 +7709,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.20";
+  var EMB="26.0.26";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
