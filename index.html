@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.26";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.28";})();
 (function(){var F0=window.fetch;if(!F0||window.__zsfHiFb)return;window.__zsfHiFb=1;
 var H="gemini-3.8-flash-high",L="gemini-3.8-flash";
 window.fetch=async function(u,o){
@@ -5156,34 +5156,38 @@ var prep=function(g){return (async function(){try{
           if(Math.abs(ts[bi]-c.s)=400&&!tagAt[bi])tagAt[bi]=+m[1];});
       }
       tagAt.forEach(function(v){if(v){cnt++;if(v>=3)th++}});
-      if(cnt0.85*N)throw new Error("Worker ឆ្លើយ tag បាន "+cnt+"/"+N+" បន្ទាត់");
+      if(cnt0.5*N)throw new Error("Worker ឆ្លើយ tag បាន "+cnt+"/"+N+" បន្ទាត់");
       tagAt.forEach(function(v,i){if(v){srtBlocks[i].text=applyTag(srtBlocks[i].text,v);got[i]=1;done++;}});
       thoughtN=th;
       return true;
     };
     if(useW){try{viaWorker=await workerTag()}catch(e){note(e);try{prog("🎭 Worker មិនបាន — ប្តូរទៅ Gemini ផ្ទាល់...",2)}catch(_){}}}
-    if(!viaWorker){
+    var wkMiss=0;if(viaWorker){srtBlocks.forEach(function(b,i){if(!got[i])wkMiss++;});}
+    if(!viaWorker||(wkMiss>0&&ks.length)){
     if(!ks.length){toastS("🎭 ចាប់ប្រុស/ស្រីមិនបាន • មូលហេតុ: "+(lastErr||"គ្មាន Gemini Key"),false);return;}
     prog("🎭 កំពុងទាញសំឡេងពីវីដេអូ (ដោយស្ងាត់)...",1);
     try{A=await getAudio(f)}catch(e){note(e)}
-    if(!A){toastS("🎭 ទាញសំឡេងពីវីដេអូមិនបាន • មូលហេតុ: "+lastErr,false);return;}
+    if(!A&&!viaWorker){toastS("🎭 ទាញសំឡេងពីវីដេអូមិនបាន • មូលហេតុ: "+lastErr,false);return;}
+    if(A){
     /* ---- ចែកជាក្រុមតាមពេល ---- */
     var PAD=2,MAXS=36,MAXL=20,groups=[],cur=[];
-    srtBlocks.forEach(function(b,i){var t=times(b);
+    srtBlocks.forEach(function(b,i){if(viaWorker&&got[i])return;var t=times(b);
       if(cur.length){var span=(t.e-times(srtBlocks[cur[0]]).s)/1000;if(span>MAXS||cur.length>=MAXL){groups.push(cur);cur=[];}}
       cur.push(i);});
     if(cur.length)groups.push(cur);
+    T0=Date.now();TOTAL=Math.max(TOTAL,Math.min(2700000,groups.length*70000));
     var models=[(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash","gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite","gemini-2.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
     try{if(localStorage.getItem("zsf_thought_pass")==="0")noThought=true}catch(_){}
     srtBlocks.forEach(function(b,i){idxById[String(b.id)]=i;});
-    var prep=function(g){
-      var idxs=groups[g],t0=times(srtBlocks[idxs[0]]).s,t1=0;
+    var prepIdx=function(idxs){
+      var t0=times(srtBlocks[idxs[0]]).s,t1=0;
       idxs.forEach(function(i){var e=times(srtBlocks[i]).e;if(e>t1)t1=e;});
       var c0=Math.max(0,t0-PAD*1000);
       var wav=b64(sliceWav(A.ab,A.info,Math.max(0,c0/1000-A.offset),(t1/1000+PAD)-A.offset));
       var lines=idxs.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-c0)+" --> "+fmtT(t.e-c0),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,""),f0:f0Of(A,t.s,t.e)};});
       return {idxs:idxs,wav:wav,lines:lines};
     };
+    var prep=function(g){return prepIdx(groups[g])};
     var parseArr=function(t){t=String(t).replace(/```json|```/g,"").trim();var o=null;
       try{o=JSON.parse(t)}catch(e){var m=t.match(/\[[\s\S]*\]/);if(m){try{o=JSON.parse(m[0])}catch(_){}}}
       if(o&&!Array.isArray(o)&&Array.isArray(o.lines))o=o.lines;return Array.isArray(o)?o:[];};
@@ -5209,17 +5213,9 @@ var prep=function(g){return (async function(){try{
     var runOne=async function(g,w){
       try{
         var P=prep(g),ids=new Set(P.lines.map(function(l){return l.id})),prompt=buildPrompt(P.lines,ctx,false);
-        var r=await ask(prompt,P.wav,g+w,7,function(txt){var pr=parseTags(txt,ids),c=Object.keys(pr.map).length;return {val:pr,n:c,total:ids.size,full:c>=0.9*ids.size};});
-        if(!r||r.n0.5*ids.size)throw new Error(lastErr||"AI ឆ្លើយមិនគ្រប់");
-        var rs=r.val;
-        profile=mergeProf(profile,rs.voices);
-        Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});
-        P.idxs.forEach(function(i){var b=srtBlocks[i],tg=rs.map[String(b.id)];if(typeof tg==="number"){b.text=applyTag(b.text,tg);got[i]=1;done++;}});
-        var tail=P.idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");
-        ctx=profText(profile)+(tail?((profile.length?". ":"")+"Tags of the last lines before this clip (id=tag): "+tail):"");
-        /* ជុំទី២ : សំឡេងគិតក្នុងចិត្ត (ស្តាប់សំឡេងតែប៉ុណ្ណោះ) — បរាជ័យមិនប៉ះពាល់ជុំទី១ */
+var thP=null;
         if(!noThought&&!window.__zsfTagAbort&&Date.now()-T0TOTAL*0.6){
-          try{
+          thP=(async function(){try{
             var tl=P.lines.map(function(l){return {id:l.id,t:l.t,text:l.text}});
             var tprompt="ROLE: Expert Chinese short-drama (短剧) sound editor.\nYou hear ONLY THE AUDIO of one clip (no picture) and the ORIGINAL subtitle lines spoken inside it (JSON; times are relative to the clip start).\n"+
               "TASK: for EVERY entry decide HOW the line is presented: 'spoken' = the character says it aloud in the room; 'thought' = inner monologue / heart voice (心声, OS): the voice is heard but the character is NOT speaking it.\n"+
@@ -5228,7 +5224,35 @@ var prep=function(g){return (async function(){try{
               "Marker words OS, 心声, 内心, 心想 are supporting evidence only. Phone calls, shouting, whispering to someone, and a narrator addressing the audience are 'spoken'.\n"+
               "conf: 'high' only when you are sure, otherwise 'low'.\n"+
               "OUTPUT: a JSON array only, one object per entry in order: {\"id\":\"id>\",\"mode\":\"spoken\" or \"thought\",\"conf\":\"high\" or \"low\"}. No gender, no timestamps, no text.\n\nENTRIES (JSON):\n"+JSON.stringify(tl);
-            var tr=await ask(tprompt,P.wav,g+w+1,3,function(txt){var a=parseArr(txt);return {val:a,n:a.length,total:P.lines.length,full:a.length>=0.8*P.lines.length};});
+            return await ask(tprompt,P.wav,g+w+1,3,function(txt){var a=parseArr(txt);return {val:a,n:a.length,total:P.lines.length,full:a.length>=P.lines.length};});
+          }catch(e){note(e);return null}})();
+        }
+                var r=await ask(prompt,P.wav,g+w,7,function(txt){var pr=parseTags(txt,ids),c=Object.keys(pr.map).length;return {val:pr,n:c,total:ids.size,full:c>=0.75*ids.size};});
+        if(!r||r.n0.5*ids.size)throw new Error(lastErr||"AI ឆ្លើយមិនគ្រប់");
+        var rs=r.val;
+        profile=mergeProf(profile,rs.voices);
+        Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});
+        P.idxs.forEach(function(i){var b=srtBlocks[i],tg=rs.map[String(b.id)];if(typeof tg==="number"){b.text=applyTag(b.text,tg);got[i]=1;done++;}});
+        var tail=P.idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");
+        ctx=profText(profile)+(tail?((profile.length?". ":"")+"Tags of the last lines before this clip (id=tag): "+tail):"");
+        /* ជុំបំពេញ : បន្ទាត់ដែល AI រំលង → សួរម្តងទៀតតែបន្ទាត់ទាំងនោះ រហូតគ្រប់ 100% */
+        var mpI=P.idxs.filter(function(i){return !got[i]});
+        for(var mr=0;mr5&&mpI.length&&!window.__zsfTagAbort&&Date.now()-T0TOTAL;mr++){
+          try{
+            var P2=prepIdx(mpI),ids2=new Set(P2.lines.map(function(l){return l.id})),pr2=buildPrompt(P2.lines,ctx,false);
+            var r2=await ask(pr2,P2.wav,g+w+mr+1,4,function(txt){var pp=parseTags(txt,ids2),cc=Object.keys(pp.map).length;return {val:pp,n:cc,total:ids2.size,full:cc>=ids2.size};});
+            if(r2){
+              profile=mergeProf(profile,r2.val.voices);
+              Object.keys(r2.val.low||{}).forEach(function(id){lowIds.push(id);});
+              P2.idxs.forEach(function(i){var b2=srtBlocks[i],tg2=r2.val.map[String(b2.id)];if(typeof tg2==="number"){b2.text=applyTag(b2.text,tg2);got[i]=1;done++;}});
+            }
+          }catch(e){note(e)}
+          mpI=P.idxs.filter(function(i){return !got[i]});
+        }
+        /* ជុំទី២ : សំឡេងគិតក្នុងចិត្ត (ស្តាប់សំឡេងតែប៉ុណ្ណោះ) — បរាជ័យមិនប៉ះពាល់ជុំទី១ */
+        if(thP){
+          try{
+            var tr=thP?await thP:null;
             if(tr)tr.val.forEach(function(it){
               var i=idxById[String(it&&it.id)];if(i===undefined)return;
               var m=TAG_RE.exec(srtBlocks[i].text||"");if(!m)return;
@@ -5268,6 +5292,7 @@ var prep=function(g){return (async function(){try{
           if(!(await runOne(again[a2],a2)))failedG.push(again[a2]);
         }
       }
+    }
     }
     }
     /* ---- បំពេញបន្ទាត់ដែលនៅខ្វះ តាមសំឡេងជិតខាង (កំណត់ជាសំឡេងនិយាយធម្មតា) ---- */
@@ -6131,7 +6156,7 @@ function zsfEmoPreset(p,emo){var e=emo&&ZSF_EMO[emo];try{if(localStorage.getItem
 async function tagSpeakers(){
  if(!K.filter(Boolean).length||typeof window.zsfAutoClassifyTags!=="function")return;
  window.__zsfTagAbort=false;
- try{cuesToBlocks();window.__zsfForceTag=true;var __tp=window.zsfAutoClassifyTags(),__tid;await Promise.race([__tp,new Promise(function(r){__tid=setTimeout(function(){window.__zsfTagAbort=true;try{showToast("⏱ ចែកតូយូរពេក — បន្តជំហានបន្ទាប់",false)}catch(e){}r()},360000)})]);clearTimeout(__tid);renderEditor()}catch(e){try{renderEditor()}catch(_){}}
+ try{cuesToBlocks();window.__zsfForceTag=true;var __tp=window.zsfAutoClassifyTags(),__tid;await Promise.race([__tp,new Promise(function(r){__tid=setTimeout(function(){window.__zsfTagAbort=true;try{showToast("⏱ ចែកតូយូរពេក — បន្តជំហានបន្ទាប់",false)}catch(e){}r()},1800000)})]);clearTimeout(__tid);renderEditor()}catch(e){try{renderEditor()}catch(_){}}
 }
 
 /* ---------- ផ្ទាំងរើស Gemini / Groq ---------- */
@@ -7273,7 +7298,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.26",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.28",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7709,7 +7734,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.26";
+  var EMB="26.0.28";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
