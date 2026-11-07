@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.18";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.19";})();
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -4927,7 +4927,7 @@ function zsfFitDur(L,R,F,ks,ke,tk){
       }
     };
     var next=0,wk=async function(){while(true){var x=next++;if(x>=nb)return;await runB(x)}},ws=[],w;
-    for(w=0;w!==Math.min(3,nb);w++)ws.push(wk());
+    for(w=0;w!==Math.min(6,nb);w++)ws.push(wk());
     await Promise.all(ws);
     try{toastS("🧠 សំឡេងគិតក្នុងចិត្ត [3]/[4]: រកឃើញ "+seen+" ឃ្លា • កែ "+changed+" ឃ្លា"+(audioOnly?" (ស្តាប់សំឡេងតែប៉ុណ្ណោះ)":""),true)}catch(_){}
     return lock;
@@ -4947,9 +4947,9 @@ function zsfFitDur(L,R,F,ks,ke,tk){
     var pool=V?[V].concat(VP):[],pq=pool.map(function(){return Promise.resolve()}),pickN=0;
     var nextEl=function(){for(var t=0;tpool.length;t++){var e=(pickN++)%pool.length;if(pool[e])return e}return -1};
     var grabPooled=function(e,idxs,clipMs,maxPer){var r=pq[e].then(function(){return grabFramesFor(pool[e],idxs,clipMs,maxPer)});pq[e]=r.catch(function(){});return r};
-    var maxLines=V?14:16;
+    var maxLines=V?18:24;
     var __chm=0;try{__chm=parseInt(localStorage.getItem("zsf_gem_chunks"),10)||0}catch(_){}
-    var maxSec=Math.max(20,Math.min(30,Math.floor(11*1024*1024/bps))),PAD=3,groups=[],cur=[];
+    var maxSec=Math.max(20,Math.min(44,Math.floor(11*1024*1024/bps))),PAD=3,groups=[],cur=[];
     if(__chm!==0)maxSec=Math.min(maxSec,__chm0?Math.min(180,-__chm)+2*PAD:66);
     srtBlocks.forEach(function(b,i){var t=times(b);
       if(cur.length){var span=(t.e-times(srtBlocks[cur[0]]).s)/1000;if(span>maxSec-2*PAD||cur.length>=maxLines){groups.push(cur);cur=[];}}
@@ -4967,10 +4967,10 @@ var prep=function(g){return (async function(){try{
         return {idxs:idxs,wav:wav,lines:lines,fr:fr};
       }catch(e){console.warn("prep failed",e);return null;}})();};
     var __mt=false;try{if(localStorage.getItem("zsf_tag_master")==="1")__mt=await masterTagRun(f)}catch(e){console.warn("masterTag",e)}
-    var PW=Math.max(2,pool.length+1),preps=[];
+    var PW=Math.max(4,pool.length+3),preps=[];
     var schedPrep=function(g){if(ggroups.length&&!preps[g])preps[g]=prep(g)};
     if(!__mt){for(var s0=0;s0PW;s0++)schedPrep(s0)}
-    var tagConc=Math.min(12,Math.max(6,K.filter(Boolean).length*3));if(__chm!==0)tagConc=Math.min(16,Math.max(8,K.filter(Boolean).length*4));try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=16)tagConc=tcv}catch(_){}
+    var tagConc=Math.min(16,Math.max(8,K.filter(Boolean).length*4));if(__chm!==0)tagConc=Math.min(16,Math.max(8,K.filter(Boolean).length*4));try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=16)tagConc=tcv}catch(_){}
     var inflight=[];
     var runGroup=async function(g,P0,ctx0){
       var idxs=groups[g];
@@ -5012,10 +5012,10 @@ var prep=function(g){return (async function(){try{
       for(var q2=1;q2srtBlocks.length;q2++){var g1=gOf(q2-1),g2=gOf(q2);if(g1>=0&&g2>=0&&g1!==g2){var ta=times(srtBlocks[q2-1]),tb=times(srtBlocks[q2]);if(tb.s-ta.e=250&&!/[。！？!?…”"」』.]\s*$/.test(String(srtBlocks[q2-1].text||"").replace(/\[[1-4]\]\s*/g,"")))mark(q2,3,"C")}}
       srtBlocks.forEach(function(b,i){var m=TAG_RE.exec(b.text||"");if(m&&+m[1]>=3)mark(i,4,"T");});
       var PS=null;try{PS=zsfPitchSplit(A)}catch(_){}try{srtBlocks.forEach(function(b,i){var m=TAG_RE.exec(b.text||"");if(!m)return;var tt=times(b),h=f0Of(A,tt.s,tt.e);if(!h)return;var male=(+m[1])%2===1;if(PS?((male&&h>=PS.hi)||(!male&&h=PS.lo)):((male&&h>195)||(!male&&h125)))mark(i,5,"P");});}catch(_){}
-      var sl=Object.keys(sus).map(Number).sort(function(a,b){return (sus[b]-sus[a])||(a-b)}).slice(0,80).sort(function(a,b){return a-b}),wins=[];
+      var sl=Object.keys(sus).map(Number).sort(function(a,b){return (sus[b]-sus[a])||(a-b)}).slice(0,50).sort(function(a,b){return a-b}),wins=[];
       sl.forEach(function(i){var a0=Math.max(0,i-2),b0=Math.min(srtBlocks.length-1,i+2),L=wins[wins.length-1];
         if(L&&a0=L.b+1){L.b=Math.max(L.b,b0);L.t.push(i);}else wins.push({a:a0,b:b0,t:[i]});});
-      var rcIn=[],RC=Math.min(8,tagConc);
+      var rcIn=[],RC=Math.min(12,tagConc);
       for(var w=0;wwins.length;w++){
         var W=wins[w],widx=[];for(var z=W.a;z=W.b;z++)widx.push(z);
         if(widx.length>40)continue;
@@ -7008,7 +7008,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.18",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.19",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7444,7 +7444,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.18";
+  var EMB="26.0.19";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
