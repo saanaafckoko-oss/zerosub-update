@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.5";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.6";})();
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
 meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -3634,7 +3634,7 @@ function zsfOnsetFix(L,R,F,ks,ke){
   var V=W[Math.floor(W.length*0.9)];
   var sa=Math.floor(s/F),m0=0,cn=0;for(j=sa;jsa+8&&jN;j++){m0+=D[j];cn++}m0=cn?m0/cn:0;
   var inSpeech=m0>=V-12;
-  var lo=Math.max(0,s-0.6,prevEnd+0.02),hi=Math.min(e-0.25,s+(inSpeech?0.0:3.0));
+  var lo=Math.max(0,s,prevEnd+0.02),hi=Math.min(e-0.25,s+(inSpeech?0.0:3.0));
   prevEnd=e;
   if(!(hi>lo+0.06))continue;
   var f0=Math.max(0,Math.floor(lo/F)),f1=Math.min(N-7,Math.floor(hi/F)),found=-1,Bf=0;
@@ -5475,9 +5475,9 @@ function zsfSnapCues(pcm,cues0){
    var fa=Math.max(0,Math.floor(s/FT)),fb=Math.min(nf-1,Math.ceil(e/FT)),sp=0,i;
    for(i=fa;i=fb;i++)sp+=m[i];
    if((fb-fa+1)>=4&&sp/(fb-fa+1)0.12)return;
-   var sa=Math.max(0,Math.floor((s-0.5)/FT)),sb=Math.min(nf-2,Math.floor((e-0.1)/FT)),ns=-1;
+   var sa=Math.max(0,Math.floor(s/FT)),sb=Math.min(nf-2,Math.floor((e-0.1)/FT)),ns=-1;
    for(i=sa;i=sb;i++){if(m[i]&&m[i+1]){ns=i;break}}
-   if(ns>=0){var s2=ns*FT;if(s2>s-0.5&&s2e-0.15)s=s2}
+   if(ns>=0){var s2=ns*FT;if(s2>=s&&s2e-0.15)s=s2}
    var ea=Math.min(nf-1,Math.floor((e+0.5)/FT)),eb=Math.max(0,Math.floor((s+0.1)/FT)),ne=-1;
    for(i=ea;i>=eb;i--){if(m[i]&&m[i-1>=0?i-1:0]){ne=i;break}}
    if(ne>=0){var e2=(ne+1)*FT+0.08;if(e2>s+0.2)e=Math.max(e2,e-0.25)}
@@ -6933,7 +6933,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.5",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.6",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7369,7 +7369,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.5";
+  var EMB="26.0.6";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
