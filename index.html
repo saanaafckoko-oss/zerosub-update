@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.44";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.45";})();
 (function(){var F0=window.fetch;if(!F0||window.__zsfHiFb)return;window.__zsfHiFb=1;
 var H="gemini-3.8-flash-high",L="gemini-3.8-flash";
 window.fetch=async function(u,o){
@@ -24,7 +24,7 @@ window.fetch=async function(u,o){
  }
  return r}
 })();
-/* ===== V26.0.44 : ចែកតួ ប្រុស/ស្រី/គិតក្នុងចិត្ត លឿនជាងមុន — thinking ទាប + retry 429/503 + ១ ហៅធំ + master/thought ស្របគ្នា + ផ្ញើ pitch f0 + មិនបើករូបភាពមាត់ជាលំនាំដើម ===== */
+/* ===== V26.0.45 : ចែកតួ ប្រុស/ស្រី/គិតក្នុងចិត្ត លឿនជាងមុន — thinking ទាប + retry 429/503 + ១ ហៅធំ + master/thought ស្របគ្នា + ផ្ញើ pitch f0 + មិនបើករូបភាពមាត់ជាលំនាំដើម ===== */
 /* ===== V26.0.39 : ចែកតួ ប្រុស/ស្រី/គិតក្នុងចិត្ត ត្រឡប់ទៅដំណើរការលឿន (Gemini ស្តាប់វីដេអូទាំងមូល + មើលមាត់ + ពិនិត្យឡើងវិញ) · ប្រើ 3.8 Flash ធម្មតាសម្រាប់ចែកតួ (មិនប្រើ High ដែលយឺត) ===== */
 /* ===== V26.0.26 : ចែកតួ ប្រុស/ស្រី/គិតក្នុងចិត្ត ប្រើ Gemini ជានិច្ច (Local AI មិនចាប់យកសំណើចែកតួទេ) · Local AI ប្តូរតែការបកប្រែ · សារព្រមានបើគ្មាន Gemini Key ===== */
 /* ===== V26.0.25 : បន្ថែម Gemini 3.8 Flash High ក្នុងបញ្ជី Gemini ធម្មតា · Auto សាកល្បង High មុនគេ · បើ ID មិនមាន ត្រឡប់ទៅ 3.8 Flash ស្វ័យប្រវត្តិ ===== */
@@ -7361,7 +7361,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.44",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.45",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7798,18 +7798,8 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
  return r}})();
 /script>
 script>
-/* ===== V26.0.44 : ចាប់ប្រុស/ស្រី ប្រើកូដចាស់ (កាត់សំឡេងជាកង់ៗ + មើលមាត់ + ពិនិត្យឡើងវិញ) ជាលំនាំដើម ===== */
+/* ===== V26.0.45 : ចាប់ប្រុស/ស្រី ប្រើកូដកំណែ 24.2 (ស្តាប់វីដេអូទាំងមូល + ជុំគិតក្នុងចិត្ត + ពិនិត្យឡើងវិញ) ជាលំនាំដើម ===== */
 (function(){var __kd=window.__zsfDirectAnalyze;
-/* =====================================================================
-   កូដ "ចាប់ប្រុស/ស្រី" (ដាក់ tag [1]=ប្រុសនិយាយ [2]=ស្រីនិយាយ [3]=ប្រុសគិតក្នុងចិត្ត [4]=ស្រីគិតក្នុងចិត្ត)
-   ចម្លងពី index.html (ZERO SUB FLASH) — បន្ទាត់ 10805–11113 និង 11354–11443 (បន្ទាត់ក្នុងកំណែដែលបានបំប្លែង "")
-   - buildPrompt / classifyChunk / parseTags : ប្រើ Gemini ស្តាប់សំឡេង (+ frame វីដេអូ) ដើម្បីកំណត់ភេទ
-   - window.__zsfDirectAnalyze : វិភាគទាំងអស់ក្នុងមួយដង
-   - window.zsfAutoClassifyTags : ប៊ូតុងចាប់ប្រុសស្រីដោយស្វ័យប្រវត្តិ
-   ពឹងផ្អែកលើមុខងារក្នុងកម្មវិធីដើម: showToast, srtToMs, extractVideoAudioV32Prototype,
-   audioBufferToWav, srtBlocks, userApiKeys, selections ។ល។ ហើយ API Key ក្នុង localStorage "zero_user_api_keys"
-   ===================================================================== */
-
 (function(){
   var TAG_RE=/^\s*\[([1-4])\]\s*/, cache=new WeakMap(), lastKey="";
   function toastS(m,ok){try{showToast(m,ok!==false)}catch(_){}}
@@ -7853,6 +7843,33 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
     return new Uint8Array(out);
   }
   function b64(u8){var s="",st=0x8000;for(var i=0;iu8.length;i+=st)s+=String.fromCharCode.apply(null,u8.subarray(i,i+st));return btoa(s);}
+  /* v11.7: វាស់កម្រិតសំឡេង (pitch, Hz) ក្នុងកម្មវិធី — ជាភស្តុតាងជំនួយប្រុស/ស្រី (0 = វាស់មិនបាន) */
+  function f0Of(A,t0ms,t1ms){
+    try{
+      var f=A.info.fmt,d=A.info.data;if(!f||f.bits!==16||!(f.sr>=8000))return 0;
+      var ch=f.ch||1,ba=f.ba||2*ch,dv=new DataView(A.ab),total=Math.floor(d.len/ba);
+      var dec=Math.max(1,Math.round(f.sr/8000)),sr=f.sr/dec,N=Math.round(sr*0.04),LMIN=Math.floor(sr/400),LMAX=Math.ceil(sr/65);
+      var a=Math.max(0,Math.floor(((t0ms/1000)-(A.offset||0)+0.08)*f.sr)),b=Math.min(total,Math.floor(((t1ms/1000)-(A.offset||0)-0.08)*f.sr));
+      var span=b-a,frameLen=N*dec+LMAX*dec;if(spanframeLen)return 0;
+      var nF=Math.min(36,Math.floor((span-frameLen)/(dec*N/2))+1),fr=[],i,j,k;
+      for(i=0;inF;i++){
+        var st=a+(nF>1?Math.floor(i*(span-frameLen)/(nF-1)):0),x=new Float32Array(N+LMAX),m=0;
+        for(j=0;jN+LMAX;j++){var s=0;for(k=0;kdec;k++)s+=dv.getInt16(d.off+(st+j*dec+k)*ba,true);x[j]=s/dec;m+=x[j]}
+        m/=x.length;var e=0;for(j=0;jx.length;j++){x[j]-=m;if(jN)e+=x[j]*x[j]}
+        fr.push({x:x,e:Math.sqrt(e/N)});
+      }
+      var es=fr.map(function(q){return q.e}).sort(function(p,q){return q-p}),thr=Math.max(120,es[Math.floor(es.length*0.5)]||0),out=[];
+      fr.forEach(function(q){
+        if(q.ethr)return;var x=q.x,e0=0,best=0,bl=0,r=new Float32Array(LMAX+2);
+        for(j=0;jN;j++)e0+=x[j]*x[j];if(e0=0)return;
+        for(var l=LMIN;l=LMAX;l++){var c=0,e1=0;for(j=0;jN;j++){c+=x[j]*x[j+l];e1+=x[j+l]*x[j+l]}r[l]=c/Math.sqrt(e0*e1+1e-9);if(r[l]>best)best=r[l]}
+        if(best0.6)return;
+        for(l=LMIN+1;lLMAX;l++){if(r[l]>=0.9*best&&r[l]>=r[l-1]&&r[l]>=r[l+1]){bl=l;break}}
+        if(bl)out.push(sr/bl);
+      });
+      if(out.length4)return 0;out.sort(function(p,q){return p-q});return Math.round(out[Math.floor(out.length/2)]);
+    }catch(e){return 0}
+  }
 
    
   var fvVid=null,fvUrl=null,fvFile=null;
@@ -7878,10 +7895,10 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
       var c=document.createElement("canvas");c.width=cw;c.height=ch;c.getContext("2d").drawImage(v,0,0,cw,ch);
       var d=c.toDataURL("image/jpeg",0.6),i=d.indexOf(",");return i>0?d.slice(i+1):null;}catch(e){return null}
   }
-  async function grabFramesFor(v,idxs,clipMs){
-    var per=Math.max(1,Math.min(3,Math.floor(90/Math.max(1,idxs.length)))),out=[],bad=0;
+  async function grabFramesFor(v,idxs,clipMs,maxPer){
+    var per=Math.max(1,Math.min(maxPer||2,Math.floor(48/Math.max(1,idxs.length)))),out=[],bad=0;
     for(var q=0;qidxs.length;q++){
-      var b=srtBlocks[idxs[q]],t=times(b),d=Math.max(0,t.e-t.s),n=d500?1:per,jp=[],lb=[];
+      var b=srtBlocks[idxs[q]],t=times(b),d=Math.max(0,t.e-t.s),n=d(maxPer?900:1500)?1:per,jp=[],lb=[];
       for(var k=0;kn;k++){
         var tt=(t.s+d*((k+1)/(n+1)))/1000,jpg=await grabFrame(v,tt,640);
         if(jpg){jp.push(jpg);lb.push(fmtT(tt*1000-clipMs));bad=0;}else if(++bad>=4)return out;
@@ -7909,9 +7926,11 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
       "Evidence priority (highest to lowest): (1) the actual audio at the timestamp - voice pitch and timbre, plus "+(hasFrames?"lip movement and scene context from the attached video frames":"scene context only - no video frames are attached in this request, so rely on the sound")+"; (2) speaker voice continuity - compare with nearby established voices; (3) subtitle wording - USE ONLY as a last resort; audio evidence always overrides text.",
       "Crucial rules:",
       "- Whispering / shouting / off-screen / phone calls = SPOKEN DIALOGUE (mode 'spoken').",
-      "- Internal Thought threshold: do NOT guess. Use mode 'thought' ONLY with clear audio evidence of inner monologue (echo/reverb, filtered, dreamy or detached voice treatment, a voice clearly not coming from a mouth in the scene). If ambiguous, default to 'spoken'. Never choose 'thought' just because the words sound like thinking.",
+      "- Internal Thought (VERY common in Chinese short dramas, do not under-detect): use mode 'thought' when TWO OR MORE cues agree, or one cue is very clear. Cues: (a) PICTURE: the speaker's face is visible but the lips are closed/not moving while the voice plays, or the camera shows a silent character reacting, looking, walking or alone; (b) SOUND: the voice is treated differently from the room dialogue - echo, reverb, soft close-up 'inside the head' tone, muffled or lower level, no room ambience; (c) CONTEXT: another person is present and does not react, or the line says things nobody would say aloud (secrets, plans, comments about the person in front of them); (d) TEXT markers such as OS, 心声, 内心, 心想 are supporting evidence only. Choose 'spoken' when the lips move in step with the line and the sound has the same room acoustics as the other dialogue. Never choose 'thought' just because the words sound like thinking.",
       "- Multiple voices: if several voices overlap near a timestamp, identify the primary voice matching the text and use ONLY ONE voice for that entry. Never give one entry more than one classification.",
+      "- SPLIT SENTENCES: one spoken sentence is often cut into several consecutive subtitle lines. When a line has no sentence-ending punctuation and the next line starts after a tiny gap (under about 0.3 s), they are fragments of ONE sentence by ONE speaker: give all fragments the SAME voice id and gender. A single speaker NEVER becomes both male and female inside one sentence or one line.",
       "- Narrator / voice-over: a narrator who speaks aloud to the audience (not a character's own inner voice) = SPOKEN DIALOGUE, classified by the narrator's gender. Use mode 'thought' ONLY for a character's own inner monologue.",
+      "- PITCH MEASUREMENT: each subtitle line has f0 = the median voiced pitch in Hz that the program measured on that line's audio (0 = could not be measured). Adult male is usually below about 160 Hz and adult female above about 170 Hz. Background music or overlapping voices can corrupt f0, so treat it as supporting evidence only: clear listening and lip-sync evidence win, but if you pick the opposite gender to a clean f0 (below 125 or above 200), re-listen and set conf to low unless you are sure.",
       "- Gender is judged from the physical voice: pitch (male roughly 85-180 Hz with deep chest resonance; female roughly 165-255 Hz with a lighter, brighter timbre), formants and overall timbre. Boyish voices and deep female voices exist, so judge the whole timbre, not one high or low word. Do not decide gender from names, pronouns, titles or the idea that speakers must alternate.",
       "",
       (hasFrames?"### 2B. LIP-SYNC VERIFICATION (VIDEO FRAMES) - DO THIS FOR EVERY LINE BEFORE DECIDING GENDER AND MODE\nVIDEO FRAMES are attached after the audio. Each image group is labelled with the subtitle id and the clip time of every frame; the frames are spread across that line's duration so you can see whether a mouth moves.\nSTEP V1 - LOOK: read the line's text, then look at THAT line's frames and find the person who says or thinks these words. Record lip = 'moving' (a visible character's lips open/close in step with the line), 'still' (the speaker's face is clearly visible and the lips are closed/motionless while a voice plays), 'none' (no readable mouth: back turned, face covered, far shot, camera on another person, speaker off-screen, phone call, voice-over) or 'unknown' (cannot tell).\nSTEP V2 - LISTEN AGAIN: re-listen to the exact timestamps of that line and check the voice against what you saw. Gender is decided by the SOUND; a person's appearance never decides gender by itself (dubbing, off-screen speakers and voice-overs exist). If the picture and the voice disagree, listen once more and trust the voice for gender.\nSTEP V3 - MODE: lip 'moving' = spoken. lip 'none' or 'unknown' = spoken (off-screen or unclear is spoken). lip 'still' = thought ONLY when it is the speaking character's own closed lips AND the line is not an answer to someone and no other visible or off-screen person could be the speaker, ideally with detached/echo voice treatment; otherwise spoken. A closed mouth in a listener's shot while another person talks off-screen is NOT a thought.\nSTEP V4 - never conclude from the subtitle wording alone; if frames and audio stay unclear, follow the neighbouring line's voice in the same scene.":""),
@@ -7934,16 +7953,22 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
     (frames||[]).forEach(function(g){p.push({text:g.label});g.jpg.forEach(function(d){p.push({inline_data:{mime_type:"image/jpeg",data:d}})})});
     p.push({text:prompt});return p;
   }
-  async function callGemini(prompt,wavB64,key,model,frames){
-    var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},150000);
+  async function callGemini1(prompt,wavB64,key,model,frames,noThink){
+    var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},110000);
     try{
       var res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},
-        body:JSON.stringify({contents:[{role:"user",parts:buildParts(prompt,wavB64,frames)}],generationConfig:{temperature:0,responseMimeType:"application/json"}}),signal:ctl.signal});
+        body:JSON.stringify({contents:[{role:"user",parts:buildParts(prompt,wavB64,frames)}],generationConfig:(noThink?{temperature:0,responseMimeType:"application/json",thinkingConfig:{thinkingBudget:0}}:{temperature:0,responseMimeType:"application/json"})}),signal:ctl.signal});
       var raw=await res.text(),d;try{d=JSON.parse(raw)}catch(e){throw new Error("Gemini ឆ្លើយមិនត្រឹមត្រូវ (HTTP "+res.status+")")}
       if(!res.ok||d.error){var er=new Error((d.error&&d.error.message)||("HTTP "+res.status));er.status=res.status;throw er;}
       var txt="";(((d.candidates||[])[0]||{}).content||{parts:[]}).parts.forEach(function(p){if(typeof p.text==="string")txt+=p.text});
       if(!txt.trim())throw new Error("Gemini ឆ្លើយទទេ");return txt;
     }catch(e){if(e&&e.name==="AbortError")throw new Error("Gemini យឺតពេក");throw e;}finally{clearTimeout(tm);}
+  }
+  /* V6.0: ជុំទី១ បិទ "thinking" ឱ្យលឿន (ជុំពិនិត្យឡើងវិញនៅតែគិតពេញ); បើ model មិនទទួល → ត្រឡប់ទៅធម្មតាស្វ័យប្រវត្តិ */
+  var TFAST=false;
+  async function callGemini(prompt,wavB64,key,model,frames,fast){
+    try{return await callGemini1(prompt,wavB64,key,model,frames,!!(fast&&TFAST))}
+    catch(e){if(fast&&TFAST&&e&&e.status===400&&/think/i.test(String(e.message))){TFAST=false;return await callGemini1(prompt,wavB64,key,model,frames,false)}throw e}
   }
   function parseTags(txt,ids){
     var t=String(txt).replace(/```json|```/g,"").trim(),obj=null;
@@ -7957,29 +7982,30 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
       if(g)return (g==="f"?2:1)+(th?2:0);
       var tg=parseInt(o.tag,10);return (tg>=1&&tg=4)?tg:0;
     }
-    var map={},low={};
+    var map={},low={},inc={};
     arr.forEach(function(o){if(!o)return;var id=String(o.id);if(!ids.has(id))return;if(/^l/i.test(String(o.conf||"")))low[id]=1;
       if(Array.isArray(o.parts)&&o.parts.length>=1){
         var ps=o.parts.map(function(p){p=p||{};return {tag:tagOf(p),text:String(p.text||"")}}).filter(function(p){return p.tag>=1&&p.tag=4&&p.text.trim()});
-        if(ps.length>=2){map[id]={parts:ps};return}
+        if(ps.length>=2){var bp=ps.reduce(function(a,p){return p.text.length>a.text.length?p:a},ps[0]);map[id]=bp.tag;low[id]=1;return}
         if(ps.length===1){map[id]=ps[0].tag;return}
       }
-      var tg=tagOf(o);if(tg>=1&&tg=4)map[id]=tg;
+      var tg=tagOf(o);if(tg>=1&&tg=4){map[id]=tg;var lp=String(o.lip||"").toLowerCase();if(tg>=3&&lp==="moving")inc[id]=2;else if(tg=2&&lp==="still")inc[id]=1;}
     });
-    return {map:map,voices:voices,low:low};
+    return {map:map,voices:voices,low:low,inc:inc};
   }
-  async function classifyChunk(lines,ctx,wavB64,frames){
+  async function classifyChunk(lines,ctx,wavB64,frames,fast){
     var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
     var model=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
-    var ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx,!!(frames&&frames.length)),last=null,best={map:{},voices:[]};
+    var __t0=Date.now(),ids=new Set(lines.map(function(l){return l.id})),prompt=buildPrompt(lines,ctx,!!(frames&&frames.length)),last=null,best={map:{},voices:[]};
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0);
     var TMODELS=[model,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
     for(var round=0;round2;round++){
       for(var tm2=0;tm2TMODELS.length;tm2++){
         var wall=0;
         for(var n=0;nks.length;n++){
+          if(Date.now()-__t0>150000||window.__zsfTagAbort){round=9;tm2=99;break}
           try{
-            var pr=parseTags(await callGemini(prompt,wavB64,ks[(start+n)%ks.length],TMODELS[tm2],frames),ids),c=Object.keys(pr.map).length;
+            var pr=parseTags(await callGemini(prompt,wavB64,ks[(start+n)%ks.length],TMODELS[tm2],frames,fast),ids),c=Object.keys(pr.map).length;
             if(c>=Object.keys(best.map).length)best=pr;
             if(c===ids.size||c>0.8*ids.size)return pr;
             last=new Error("AI ឆ្លើយមិនគ្រប់បន្ទាត់");
@@ -8014,8 +8040,11 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
     "   [3] male inner thought (clear audio evidence of inner monologue: echo, filtered or detached voice)",
     "   [4] female inner thought (same evidence)",
     "   Whisper, shout, off-screen voice, narrator and phone calls are SPOKEN ([1] or [2]). Inner thoughts are common in this genre: if the voice sounds echoed, reverberant, filtered or detached from the room, tag it as a thought ([3]/[4]); choose spoken only when the voice sounds natural and present in the room. If voices overlap, use the main voice only.",
+    "   PRE-VERIFIED TAGS: if an entry already starts with a tag [1]-[4], that tag was verified by a separate careful voice check. KEEP IT EXACTLY, never change it, and write the Khmer wording for that speaker ([1]/[3] male, [2]/[4] female; [3]/[4] are private inner thoughts).",
     "   VOICE RULES: gender is judged ONLY from the physical voice (pitch and timbre), never from names, pronouns, titles or the idea that speakers alternate. Build a small voice table in your head (A, B, C ...): one voice = one person = one gender. One speaker often says several lines in a row; lines with a tiny gap (under about 0.3 s) are usually the same speaker continuing. When two neighbouring lines switch between male and female, re-listen to confirm the voice really changed. If still unsure, keep the voice of the neighbouring line in the same scene.",
     "3) Translate the line into natural, spoken Khmer. The STORY CARD / genre block given below (if present) is MANDATORY: it decides vocabulary, register, rhythm and emotion of EVERY line (e.g. revenge or face-slap = cold, sharp, proud; sweet romance = soft and warm; ancient or palace = old-style and royal words by rank; comedy = light and playful; horror or suspense = tense and short). If the genre says AUTO, work out the genre from the story and sound, then follow it. Keep character names and forms of address consistent.",
+    "COMPLETE MEANING: translate every sentence fully and faithfully. COMPACT BUT COMPLETE: translate the FULL meaning of every sentence, including how it ends; never cut a sentence short, never leave it unfinished and never drop any fact, name, number, emotion or intention. Each input line ends with a hint like {about 40 chars}: it is only the target length that fits the mouth timing, so choose the most natural short everyday spoken Khmer (fewer filler words, no polite padding, no repetition) and aim near that length; if the full meaning needs more, exceed it rather than lose meaning. NEVER output the {about N chars} hint. NO LATIN LETTERS: the Khmer voice cannot read English, so never leave English words, abbreviations or brand/technical terms in the output. Translate them into Khmer, or write them phonetically in Khmer script (e.g. OK = អូខេ, WiFi = វ៉ាយហ្វាយ, VIP = វីអាយភី, app = កម្មវិធី, phone = ទូរស័ព្ទ, video = វីដេអូ). ADDRESS TERMS: choose Khmer pronouns and kinship/address terms from each character's age, status and relationship in the story context, and keep them consistent for the same pair of characters through the whole story: to an elder use respectful terms (grandfather = ជីតា/លោកតា, grandmother = ជីដូន/លោកយាយ, older man = ពូ/អ៊ំប្រុស/លោកពូ, older woman = មីង/អ៊ំស្រី/អ្នកមីង, parents = ប៉ា/ម៉ាក់ or ឪពុក/ម្តាយ by the family's style); to a younger person or child use ប្អូន/កូន/ចៅ; older siblings = បង (ប្រុស/ស្រី) and younger = ប្អូន; lovers/spouses = បង and អូន (husband = ស្វាមី/បង, wife = ភរិយា/អូន) in a warm tone; boss/teacher/master = លោក/អ្នកគ្រូ/លោកគ្រូ/ចៅហ្វាយ; for strangers or equals use បងប្អូន/លោក/អ្នកស្រី/នាង by age and politeness; enemies or angry speech may use ឯង/អ្នក. ",
+    "NUMBERS: write EVERY number, amount, year, date, time, percentage and quantity as Khmer WORDS, never as digits (the Khmer voice must read them correctly), following the story context. Examples: 10000 = មួយម៉ឺន, 100000 = មួយសែន, 1000000 = មួយលាន, 2500 = ពីរពាន់ប្រាំរយ, 50% = ហាសិបភាគរយ, 3 = បី. Convert Chinese/Arabic numerals and number words too (e.g. 一万 = មួយម៉ឺន). ",
     "4) The tag decides the Khmer wording: a male speaker ([1]/[3]) uses ខ្ញុំ / ខ្ញុំបាទ and the reply «បាទ»; a female speaker ([2]/[4]) uses ខ្ញុំ / នាងខ្ញុំ and the reply «ចាស». Never mix them. An inner thought ([3]/[4]) is a private first-person monologue: address nobody and add no polite reply particles.",
     "",
     "STRICT RULES:",
@@ -8054,19 +8083,19 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
     var f=(window.__zsfMedia&&window.__zsfMedia.file)||null;
     if(!f)throw new Error("គ្មានវីដេអូ/សំឡេង");
     var ks=keys();if(!ks.length)throw new Error("គ្មាន Gemini API Key");
-    var A=await audioOnce(f);window.__zsfGemBeat=Date.now();var PAD=2,t0=times(lines[0]).s,t1=times(lines[lines.length-1]).e;
+    var TO=!!window.__zsfTextOnly;var A=TO?null:await audioOnce(f);window.__zsfGemBeat=Date.now();var PAD=2,t0=times(lines[0]).s,t1=times(lines[lines.length-1]).e;
     lines.forEach(function(l){var e=times(l).e;if(e>t1)t1=e;});
-    var clipMs=Math.max(0,t0-PAD*1000),bps=A.info.fmt.sr*(A.info.fmt.ba||2);
-    if(((t1+PAD*1000-clipMs)/1000)*bps>14*1024*1024)throw new Error("សំឡេងវែងពេកសម្រាប់ផ្នែកនេះ");
-    var wav=b64(sliceWav(A.ab,A.info,Math.max(0,clipMs/1000-A.offset),(t1/1000+PAD)-A.offset));
+    var clipMs=Math.max(0,t0-PAD*1000),bps=TO?1:A.info.fmt.sr*(A.info.fmt.ba||2);
+    if(!TO&&((t1+PAD*1000-clipMs)/1000)*bps>14*1024*1024)throw new Error("សំឡេងវែងពេកសម្រាប់ផ្នែកនេះ");
+    var wav=TO?"":b64(sliceWav(A.ab,A.info,Math.max(0,clipMs/1000-A.offset),(t1/1000+PAD)-A.offset));
     var srt=lines.map(function(l,i){var ti=times(l);return (i+1)+"\n"+fmtS(ti.s-clipMs)+" --> "+fmtS(ti.e-clipMs)+"\n"+l.text+"\n"}).join("\n");
     var story="";try{if(typeof zsfStoryBlock==="function")story=String(zsfStoryBlock()||"").slice(0,6000);}catch(_){story="";}
-    var prompt=DIRECT_PROMPT+(story?("\n\nSTORY CARD / GENRE (Khmer notes - MANDATORY for the translation of every line):"+story):"")+(gl?("\n\nGLOSSARY (Chinese names/terms - always use one consistent Khmer rendering):\n"+String(gl).slice(0,3000)):"")+"\n\n=== ORIGINAL SRT ===\n"+srt;
+    var prompt=(TO?(function(){var d=String(DIRECT_PROMPT),i=d.indexOf("3) Translate"),tr=i>=0?d.slice(i):d;return ["ROLE: You are a strict SRT preservation editor and a master Chinese-to-Khmer translator.","TASK: Below is the ORIGINAL SRT of a Chinese short drama. There is NO audio. Translate EVERY entry into natural, spoken Khmer. Keep the entry count, numbering and timestamps EXACTLY as given.","TAGS: if an entry already starts with a tag [1]-[4], that tag was verified by a separate voice check. KEEP IT EXACTLY at the start of the line and never change it ([1]/[3] male, [2]/[4] female; [3]/[4] are private inner thoughts, so write the Khmer wording for that speaker). If an entry has NO tag, do NOT add one.","The numbered entries are one continuous story: use the neighbouring lines for context, pronouns and address terms.","3) "+tr].join("\n")})():DIRECT_PROMPT)+(story?("\n\nSTORY CARD / GENRE (Khmer notes - MANDATORY for the translation of every line):"+story):"")+(gl?("\n\nGLOSSARY (Chinese names/terms - always use one consistent Khmer rendering):\n"+String(gl).slice(0,3000)):"")+"\n\n=== ORIGINAL SRT ===\n"+srt;
     var model=(typeof selections!=="undefined"&&selections&&selections.geminiModel)||"gemini-flash-latest";
     var start=(typeof currentApiIndex==="number"?currentApiIndex:0)+(rr||0),txt=null,last=null;
      
     var MODELS=[model,"gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-2.5-flash"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
-    var gparts=[{inline_data:{mime_type:"audio/wav",data:wav}},{text:prompt}];
+    var gparts=TO?[{text:prompt}]:[{inline_data:{mime_type:"audio/wav",data:wav}},{text:prompt}];
     var DEAD=window.__zsfDeadModels=window.__zsfDeadModels||{},COOL=window.__zsfCoolModels=window.__zsfCoolModels||{};
     var lastQuota=false,usedFb="";var kcn=function(m,k){return m+"|"+k};
     for(var round=0;3>round&&txt===null;round++){
@@ -8103,7 +8132,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
       if(lastQuota){var qe=new Error("Gemini អស់ quota (Key និង Model បម្រុងទាំងអស់) — សូមរង់ចាំ ១ នាទី ឬថែម API Key ថ្មី ហើយចុចម្តងទៀត");qe.zsfQuota=true;throw qe;}
       throw last||new Error("Gemini មិនបានឆ្លើយ");
     }
-    if(usedFb)toastS("ℹ️ Model "+model+" អស់ quota — បានប្រើ "+usedFb+" ជំនួស",true);
+    if(usedFb)toastS("ℹ Model "+model+" អស់ quota — បានប្រើ "+usedFb+" ជំនួស",true);
     var fm=txt.match(/```(?:srt)?\s*([\s\S]*?)```/);if(fm)txt=fm[1];
     txt=txt.trim().replace(/\r\n?/g,"\n");
     var out=[],seen={};
@@ -8119,10 +8148,121 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
     out.sort(function(a,b){return a.li-b.li});
     return {srt:out.map(function(o,i){return (i+1)+"\n"+lines[o.li].time+"\n"+o.text+"\n"}).join("\n")};
   };
+  function zsfPitchSplit(A){
+    var vals=[];
+    srtBlocks.forEach(function(b){var t=times(b),h=f0Of(A,t.s,t.e);if(h>=70&&h=450)vals.push(Math.log(h));});
+    if(vals.length8)return null;
+    var c1=Math.log(120),c2=Math.log(220),n1=0,n2=0;
+    for(var it=0;it30;it++){
+      var s1=0,s2=0;n1=0;n2=0;
+      vals.forEach(function(v){if(Math.abs(v-c1)=Math.abs(v-c2)){s1+=v;n1++}else{s2+=v;n2++}});
+      if(!n1||!n2)return null;
+      c1=s1/n1;c2=s2/n2;
+    }
+    if(n13||n23||(c2-c1)Math.log(1.3))return null;
+    var th=(c1+c2)/2;
+    return {lo:Math.exp(th-0.14),hi:Math.exp(th+0.14)};
+  }
+  /* V20.5 MASTER TAG : ផ្ញើវីដេអូទាំងមូលទៅ Gemini ម្តង (ដូចក្នុង Gemini App) រួចឱ្យវាត្រឡប់តែ "លេខឃ្លា + tag" ។ ម៉ោង SRT មិនត្រូវបានប៉ះពាល់ទេ (app មិនយកម៉ោងពី Gemini) */
+  async function masterTagRun(f){
+    var ks=keys().filter(Boolean);
+    if(!ks.length||!f)return false;
+    if(typeof gdVideoPart!=="function"||typeof gdGenerate!=="function"||typeof gdParse!=="function")return false;
+    var N=srtBlocks.length,media=f,shim=function(p,m){prog(m,p)};
+    if(f.size>150*1048576&&typeof gemWorkerMedia==="function"&&typeof file!=="undefined"&&file===f){try{media=await gemWorkerMedia(shim)}catch(e){media=f}}
+    if(media.size>400*1048576)return false;
+    var part=null,key=null;
+    for(var ki=0;ki!==ks.length&&!part;ki++){try{part=await gdVideoPart(ks[ki],media,shim);key=ks[ki]}catch(e){console.warn("master upload",e)}}
+    if(!part)return false;
+    var model0=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
+    var models=[model0,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
+    var B=150,nb=Math.ceil(N/B),tags=new Array(N).fill(0),doneB=0,t0=Date.now();
+    var runB=async function(bi){
+      var a=bi*B,b=Math.min(N,a+B),lines=[],i;
+      for(i=a;i!==b;i++)lines.push((i+1)+" | "+String(srtBlocks[i].time||"")+" | "+String(srtBlocks[i].text||"").replace(/\[[1-4]\]\s*/g,"").replace(/\n/g," "));
+      var prompt="ROLE: Expert Audio/Video Scene Analyst. You are given the FULL attached video (picture and sound) and part of its ORIGINAL SRT (format: n | time | text; the time is the position inside the video).\n"+
+      "TASK: classify ONLY the entries numbered "+(a+1)+" to "+b+". Give EXACTLY ONE tag per entry:\n1 = Male spoken dialogue (male voice, physically spoken aloud)\n2 = Female spoken dialogue (female voice, physically spoken aloud)\n3 = Male internal thought (male voice, clearly NOT spoken, lips not moving)\n4 = Female internal thought (female voice, clearly NOT spoken, lips not moving)\n"+
+      "EVIDENCE PRIORITY: (1) the real audio and picture at that time: voice pitch and timbre, lip movement, scene; (2) voice continuity with nearby established voices; (3) the subtitle wording only as a last resort. Never judge gender from names, pronouns or from the idea that speakers alternate.\n"+
+      "ABSOLUTE RULE (ZERO TIMESTAMP MODIFICATION): you never output, edit, shift, merge, split or re-time any timestamp, and never rewrite any subtitle text. The original SRT stays 100% unchanged; you only return the entry number and its tag. Judge each entry strictly inside its OWN time range, listening to the real audio there.\n"+
+      "RULES: whispering, shouting, off-screen voices, phone calls and narrators are SPOKEN (1 or 2). Use 3 or 4 ONLY with clear evidence of inner monologue (voice-over, echo or filtered voice, lips closed); if unsure use 1 or 2. If several voices overlap, choose the primary voice that matches the text. Keep the same voice in the same scene on the same gender.\n"+
+      "OUTPUT: a JSON array only, one object per entry in order: {\"n\":ENTRY_NUMBER,\"tag\":TAG_1_TO_4}. Do NOT output text or timestamps. Output exactly "+(b-a)+" objects, numbers exactly as given, no entry skipped or added.\n\nENTRIES:\n"+lines.join("\n");
+      for(var mi=0;mi!==models.length;mi++){
+        try{
+          var js=gdParse(await gdGenerate([part,{text:prompt}],key,models[mi])),got=0;
+          js.forEach(function(it){var n=(+it.n)-1,tg=+it.tag;if(n>=a&&b>n&&tg>=1&&4>=tg&&!tags[n]){tags[n]=tg;got++}});
+          if(got*10>=(b-a)*9){doneB++;prog("🎭 Gemini ស្តាប់វីដេអូទាំងមូល ប្រុស/ស្រី "+doneB+"/"+nb,10+70*doneB/nb);return}
+        }catch(e){console.warn("master batch",models[mi],e)}
+      }
+    };
+    var next=0,wk=async function(){while(true){var x=next++;if(x>=nb)return;await runB(x)}},ws=[];
+    for(var w=0;w!==Math.min(3,nb);w++)ws.push(wk());
+    await Promise.all(ws);
+    var have=tags.filter(Boolean).length;
+    if(N*7>have*10)return false; /* ទទួលបានតិចពេក → ប្រើវិធីចាស់ជាផ្នែកៗ */
+    var filled=0,last=0,q;
+    for(q=0;q!==N;q++){if(tags[q])last=tags[q];else if(last){tags[q]=last;filled++}}
+    for(q=N-1;q>=0;q--){if(!tags[q]){var nx=0,z;for(z=q+1;z!==N&&!nx;z++)nx=tags[z];tags[q]=nx||1;filled++}}
+    for(q=0;q!==N;q++)srtBlocks[q].text=applyTag(srtBlocks[q].text,tags[q]); /* ប៉ះតែ tag — ម៉ោង/លេខ/អត្ថបទមិនប្តូរ */
+    try{toastS("🎭 Gemini ស្តាប់វីដេអូទាំងមូលរួច • "+(N-filled)+"/"+N+" ឃ្លា"+(filled?(" • បំពេញខ្វះ "+filled):"")+" • "+Math.round((Date.now()-t0)/1000)+" វិនាទី",true)}catch(_){}
+    return true;
+  }
+
+  /* V22.1 : ជុំពិសេសចាប់ "សំឡេងគិតក្នុងចិត្ត" [3]/[4] */
+  async function masterThoughtRun(f){
+    var lock={},ks=keys().filter(Boolean);
+    if(!ks.length||!f)return lock;
+    if(typeof gdVideoPart!=="function"||typeof gdGenerate!=="function"||typeof gdParse!=="function")return lock;
+    var N=srtBlocks.length,media=f,shim=function(p,m){prog(m,p)};
+    if(f.size>150*1048576&&typeof gemWorkerMedia==="function"&&typeof file!=="undefined"&&file===f){try{media=await gemWorkerMedia(shim)}catch(e){media=f}}
+    if(media.size>400*1048576)return lock;
+    var part=null,key=null,ki;
+    for(ki=0;ki!==ks.length&&!part;ki++){try{part=await gdVideoPart(ks[ki],media,shim);key=ks[ki]}catch(e){console.warn("thought upload",e)}}
+    if(!part)return lock;
+    var audioOnly=!!(part&&part.__zsfWav);
+    var model0=(typeof selections!=="undefined"&&selections.geminiModel)||"gemini-3.8-flash";
+    var models=[model0,"gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"].filter(function(m,i,a){return m&&a.indexOf(m)===i});
+    var B=100,nb=Math.ceil(N/B),doneB=0,changed=0,seen=0;
+    var runB=async function(bi){
+      var a=bi*B,b=Math.min(N,a+B),lines=[],i;
+      for(i=a;i!==b;i++)lines.push((i+1)+" | "+String(srtBlocks[i].time||"")+" | "+String(srtBlocks[i].text||"").replace(/\[[1-4]\]\s*/g,"").replace(/\n/g," "));
+      var prompt="ROLE: Expert Chinese short-drama (短剧) sound and scene editor.\n"+
+      (audioOnly?"You are given ONLY THE AUDIO of the video (no picture), covering the time range of the entries below, and part of the ORIGINAL SRT (format: n | time | text; the time is the position inside the video).\n":"You are given the FULL attached video (picture and sound) and part of its ORIGINAL SRT (format: n | time | text; the time is the position inside the video).\n")+
+      "TASK: for ONLY the entries numbered "+(a+1)+" to "+b+", decide HOW each line is presented: 'spoken' = the character really says it aloud in the scene; 'thought' = inner monologue / heart voice (心声, OS): the voice is heard but the character is NOT speaking it.\n"+
+      "IMPORTANT: inner thoughts are VERY common in this genre (revenge, rebirth, secret plans, reactions to what another person just said). Do NOT under-detect them, but do not invent them either.\n"+
+      "CUES (use all of them):\n"+
+      (audioOnly?"1. NO PICTURE is available: rely on sound and context.\n":"1. PICTURE: the speaker's face is visible and the lips are closed or not moving while the voice plays; or the camera shows a silent character who is reacting, looking, walking, driving or alone.\n")+
+      "2. SOUND: the voice is treated differently from the room dialogue: echo, reverb, a soft close-up 'inside the head' tone, lower or muffled level, no room ambience, often placed over silence or music.\n"+
+      "3. CONTEXT: another person is present and does not react to the line, or the line says things nobody would say aloud (secrets, plans, remarks about the person standing in front of them).\n"+
+      "4. TEXT: markers such as OS, 心声, 内心, 心想 are supporting evidence only.\n"+
+      "Choose 'thought' when two or more cues agree, or one of cue 1 or 2 is very clear. Choose 'spoken' when the lips move in step with the line and the sound has the same room acoustics as the other dialogue; phone calls, shouting, whispering to someone, and a narrator who addresses the audience are 'spoken'.\n"+
+      "conf: 'high' only when you are sure, otherwise 'low'.\n"+
+      "ABSOLUTE RULE (ZERO MODIFICATION): never output, edit, shift, merge, split or re-time any timestamp, and never rewrite any subtitle text; you only return the entry number and its mode. Do not judge gender.\n"+
+      "OUTPUT: a JSON array only, one object per entry in order: {\"n\":ENTRY_NUMBER,\"mode\":\"spoken\" or \"thought\",\"conf\":\"high\" or \"low\"}. Exactly "+(b-a)+" objects, numbers exactly as given.\n\nENTRIES:\n"+lines.join("\n");
+      for(var mi=0;mi!==models.length;mi++){
+        try{
+          var js=gdParse(await gdGenerate([part,{text:prompt}],key,models[mi])),got=0;
+          js.forEach(function(it){
+            var n=(+it.n)-1;if(!(n>=a&&nb))return;
+            var md=String(it.mode||"").toLowerCase(),cf=String(it.conf||"").toLowerCase(),m=TAG_RE.exec(srtBlocks[n].text||"");
+            if(!m||!md)return;got++;
+            var cur=+m[1],base=cur=2?cur:cur-2;
+            if(/^t/.test(md)&&!/^l/.test(cf)){lock[String(srtBlocks[n].id)]=1;seen++;if(cur=2){srtBlocks[n].text=applyTag(srtBlocks[n].text,base+2);changed++}}
+            else if(/^s/.test(md)&&/^h/.test(cf)&&cur>=3){srtBlocks[n].text=applyTag(srtBlocks[n].text,base);changed++}
+          });
+          if(got*10>=(b-a)*8){doneB++;prog("🧠 ចាប់សំឡេងគិតក្នុងចិត្ត "+doneB+"/"+nb,10+3*doneB/nb);return}
+        }catch(e){console.warn("thought batch",models[mi],e)}
+      }
+    };
+    var next=0,wk=async function(){while(true){var x=next++;if(x>=nb)return;await runB(x)}},ws=[],w;
+    for(w=0;w!==Math.min(3,nb);w++)ws.push(wk());
+    await Promise.all(ws);
+    try{toastS("🧠 សំឡេងគិតក្នុងចិត្ត [3]/[4]: រកឃើញ "+seen+" ឃ្លា • កែ "+changed+" ឃ្លា"+(audioOnly?" (ស្តាប់សំឡេងតែប៉ុណ្ណោះ)":""),true)}catch(_){}
+    return lock;
+  }
   window.zsfAutoClassifyTags=async function(){
     if(!Array.isArray(srtBlocks)||!srtBlocks.length)return;
     var f=(window.__zsfMedia&&window.__zsfMedia.file)||null;
-    if(!f){toastS("ℹ️ គ្មានវីដេអូ/សំឡេង — AI នឹងកំណត់ [1]-[4] ពីអត្ថបទ និងបរិបទ (មិនច្បាស់ស្មើការស្តាប់សំឡេង)",true);return;}
+    if(!f){toastS("ℹ គ្មានវីដេអូ/សំឡេង — AI នឹងកំណត់ [1]-[4] ពីអត្ថបទ និងបរិបទ (មិនច្បាស់ស្មើការស្តាប់សំឡេង)",true);return;}
     var key=(f.name||"")+"|"+f.size+"|"+srtBlocks.length;
     if(key===lastKey&&!window.__zsfForceTag)return;window.__zsfForceTag=false;  
     if(!keys().length)return;
@@ -8130,36 +8270,40 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
     prog("🎭 កំពុងរៀបចំសំឡេង សម្រាប់ចាប់ប្រុស/ស្រី...",1);
     var A=await getAudio(f),bps=A.info.fmt.sr*(A.info.fmt.ba||2);
     var V=null;try{V=await openVideo(f);}catch(_){V=null;}
-    var maxLines=V?16:24;
+    var maxLines=V?20:24;
+    var __chm=0;try{__chm=parseInt(localStorage.getItem("zsf_gem_chunks"),10)||0}catch(_){}
     var maxSec=Math.max(20,Math.min(60,Math.floor(11*1024*1024/bps))),PAD=3,groups=[],cur=[];
+    if(__chm!==0)maxSec=Math.min(maxSec,__chm0?Math.min(180,-__chm)+2*PAD:66);
     srtBlocks.forEach(function(b,i){var t=times(b);
       if(cur.length){var span=(t.e-times(srtBlocks[cur[0]]).s)/1000;if(span>maxSec-2*PAD||cur.length>=maxLines){groups.push(cur);cur=[];}}
       cur.push(i);});
     if(cur.length)groups.push(cur);
-    var ctx="",done=0,failed=0,profile=[],lowIds=[],idxById={};
+    var ctx="",done=0,failed=0,profile=[],lowIds=[],incMap={},idxById={};
     srtBlocks.forEach(function(b,i){idxById[String(b.id)]=i;});
 var prep=function(g){return (async function(){try{
         var idxs=groups[g],t0s=times(srtBlocks[idxs[0]]).s,t1e=times(srtBlocks[idxs[idxs.length-1]]).e,clipMs=Math.max(0,t0s-PAD*1000);
         var wav=b64(sliceWav(A.ab,A.info,Math.max(0,clipMs/1000-A.offset),(t1e/1000+PAD)-A.offset));
-        var lines=idxs.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-clipMs)+" --> "+fmtT(t.e-clipMs),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,"")};});
+        var lines=idxs.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-clipMs)+" --> "+fmtT(t.e-clipMs),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,""),f0:f0Of(A,t.s,t.e)};});
         var fr=[];
         if(V){try{fr=await grabFramesFor(V,idxs,clipMs);}catch(_){fr=[];}if(!fr.length){V=null;closeVideo();}}
         return {idxs:idxs,wav:wav,lines:lines,fr:fr};
       }catch(e){console.warn("prep failed",e);return null;}})();};
-    var prepP=groups.length?prep(0):null;
-    var tagConc=5;try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=6)tagConc=tcv}catch(_){}
+    var __mt=false;try{__mt=await masterTagRun(f)}catch(e){console.warn("masterTag",e)}
+    var prepP=(groups.length&&!__mt)?prep(0):null;
+    var tagConc=Math.min(8,Math.max(4,K.filter(Boolean).length*2));if(__chm!==0)tagConc=Math.min(12,Math.max(6,K.filter(Boolean).length*3));try{var tcv=parseInt(localStorage.getItem("zsf_tag_conc"),10);if(tcv>=1&&tcv=6)tagConc=tcv}catch(_){}
     var inflight=[];
     var runGroup=async function(g,P0,ctx0){
       var idxs=groups[g];
       prog("🎭 AI កំពុងស្តាប់សំឡេង ប្រុស/ស្រី • ក្រុម "+(g+1)+"/"+groups.length,2+8*g/groups.length);
       try{
         if(!P0)throw new Error("prep");
-        var rs=await classifyChunk(P0.lines,ctx0,P0.wav,P0.fr),map=rs.map;profile=mergeProf(profile,rs.voices);Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});
+        var rs=await classifyChunk(P0.lines,ctx0,P0.wav,P0.fr,true),map=rs.map;profile=mergeProf(profile,rs.voices);Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});Object.keys(rs.inc||{}).forEach(function(id){incMap[id]=rs.inc[id];});
         idxs.forEach(function(i){var b=srtBlocks[i],tg=map[String(b.id)];if(tg){b.text=applyTag(b.text,tg);done++;}else failed++;});
       }catch(e){console.warn("tag chunk failed",e);failed+=idxs.length;}
       var tail=idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");ctx=profText(profile)+(tail?((profile.length?". ":"")+"Tags of the last lines before this clip (id=tag): "+tail):"");
     };
-    for(var g=0;ggroups.length;g++){
+    for(var g=0;!__mt&&ggroups.length;g++){
+      if(window.__zsfTagAbort)break;
       var P0=await prepP;
       prepP=(g+1groups.length)?prep(g+1):null;
       var rec={done:false,p:null};
@@ -8173,43 +8317,63 @@ var prep=function(g){return (async function(){try{
     await Promise.all(inflight.map(function(r){return r.p}));
     try{toastS("⏱ ចាប់សំឡេង [1]-[4] ចំណាយ "+Math.round((Date.now()-__tTag0)/1000)+" វិនាទី",true)}catch(_){}
 
-    var rechecked=0,changed=0;
+    var thoughtLock={};try{if(!window.__zsfTagAbort)thoughtLock=await masterThoughtRun(f)||{}}catch(e){console.warn("thoughtPass",e)}
+    var rechecked=0,changed=0,confirmed={};
     try{
-      var sus={};lowIds.forEach(function(id){if(idxById[id]!==undefined)sus[idxById[id]]=1;});
+      var sus={},why={};var mark=function(i,w,l){if(!(sus[i]>=w))sus[i]=w;why[i]=(why[i]||"")+l};lowIds.forEach(function(id){if(idxById[id]!==undefined)mark(idxById[id],3,"L")});Object.keys(incMap).forEach(function(id){if(idxById[id]!==undefined)mark(idxById[id],incMap[id]===2?4:1,incMap[id]===2?"M":"S")});
       var gOf=function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?(+m[1])%2:-1;};
       for(var q=1;qsrtBlocks.length-1;q++){
         var gp=gOf(q-1),gc=gOf(q),gn=gOf(q+1);
         if(gp>=0&&gc>=0&&gn>=0&&gp===gn&&gc!==gp){
           var tq=times(srtBlocks[q]),tp=times(srtBlocks[q-1]),tn=times(srtBlocks[q+1]);
-          if(tq.s-tp.e3000&&tn.s-tq.e3000)sus[q]=1;
+          if(tq.s-tp.e3000&&tn.s-tq.e3000)mark(q,2,"F");
         }
       }
-      srtBlocks.forEach(function(b,i){var m=TAG_RE.exec(b.text||"");if(m&&+m[1]>=3)sus[i]=1;});
-      var sl=Object.keys(sus).map(Number).sort(function(a,b){return a-b}).slice(0,40),wins=[];
+      for(var q2=1;q2srtBlocks.length;q2++){var g1=gOf(q2-1),g2=gOf(q2);if(g1>=0&&g2>=0&&g1!==g2){var ta=times(srtBlocks[q2-1]),tb=times(srtBlocks[q2]);if(tb.s-ta.e=250&&!/[。！？!?…”"」』.]\s*$/.test(String(srtBlocks[q2-1].text||"").replace(/\[[1-4]\]\s*/g,"")))mark(q2,3,"C")}}
+      srtBlocks.forEach(function(b,i){var m=TAG_RE.exec(b.text||"");if(m&&+m[1]>=3)mark(i,4,"T");});
+      var PS=null;try{PS=zsfPitchSplit(A)}catch(_){}try{srtBlocks.forEach(function(b,i){var m=TAG_RE.exec(b.text||"");if(!m)return;var tt=times(b),h=f0Of(A,tt.s,tt.e);if(!h)return;var male=(+m[1])%2===1;if(PS?((male&&h>=PS.hi)||(!male&&h=PS.lo)):((male&&h>195)||(!male&&h125)))mark(i,5,"P");});}catch(_){}
+      var sl=Object.keys(sus).map(Number).sort(function(a,b){return (sus[b]-sus[a])||(a-b)}).slice(0,40).sort(function(a,b){return a-b}),wins=[];
       sl.forEach(function(i){var a0=Math.max(0,i-2),b0=Math.min(srtBlocks.length-1,i+2),L=wins[wins.length-1];
         if(L&&a0=L.b+1){L.b=Math.max(L.b,b0);L.t.push(i);}else wins.push({a:a0,b:b0,t:[i]});});
+      var rcIn=[],RC=5;
       for(var w=0;wwins.length;w++){
         var W=wins[w],widx=[];for(var z=W.a;z=W.b;z++)widx.push(z);
         if(widx.length>40)continue;
-        prog("🎭 ពិនិត្យឡើងវិញបន្ទាត់មិនច្បាស់ "+(w+1)+"/"+wins.length,10);
+        if(window.__zsfTagAbort||Date.now()-__tTag0>300000){prog("🎭 រំលងការពិនិត្យឡើងវិញ (យូរពេក)",9);break}prog("🎭 ពិនិត្យឡើងវិញបន្ទាត់មិនច្បាស់ "+(w+1)+"/"+wins.length,10);
         var c0=Math.max(0,times(srtBlocks[widx[0]]).s-PAD*1000),c1=times(srtBlocks[widx[widx.length-1]]).e;
         var wv=b64(sliceWav(A.ab,A.info,Math.max(0,c0/1000-A.offset),(c1/1000+PAD)-A.offset));
-        var wl=widx.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-c0)+" --> "+fmtT(t.e-c0),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,"")};});
-        var wf=[];if(V){try{wf=await grabFramesFor(V,widx,c0);}catch(_){wf=[];}}
-        try{
-          var r2=await classifyChunk(wl,"RE-CHECK PASS: some lines in this clip were unclear in a first pass. Listen very carefully to every line. Known voices: "+profText(profile),wv,wf);
-          W.t.forEach(function(i){var id=String(srtBlocks[i].id),tg=r2.map[id];rechecked++;
-            if(typeof tg==="number"&&!(r2.low&&r2.low[id])){var old=TAG_RE.exec(srtBlocks[i].text||"");if(!old||+old[1]!==tg){srtBlocks[i].text=applyTag(srtBlocks[i].text,tg);changed++;}}});
-        }catch(e){console.warn("recheck failed",e);}
+        var wl=widx.map(function(i){var b=srtBlocks[i],t=times(b);return {id:String(b.id),t:fmtT(t.s-c0)+" --> "+fmtT(t.e-c0),text:String(b.text||"").replace(/\[[1-4]\]\s*/g,""),f0:f0Of(A,t.s,t.e)};});
+        var wf=[];if(V){try{wf=await grabFramesFor(V,widx,c0,2);}catch(_){wf=[];}}
+        (function(W,wl,wv,wf){
+          var rec={done:false,p:null};
+          rec.p=(async function(){
+            try{
+              var r2=await classifyChunk(wl,"RE-CHECK PASS: some lines in this clip were unclear in a first pass. Listen very carefully to every line. Lines separated by a tiny gap whose first line has no sentence-ending punctuation are usually fragments of ONE sentence spoken by ONE voice (never both male and female). Known voices: "+profText(profile),wv,wf);
+              W.t.forEach(function(i){var id=String(srtBlocks[i].id),tg=r2.map[id];rechecked++;
+                if(typeof tg==="number"&&!(r2.low&&r2.low[id])&&!(thoughtLock[id]&&tg<=2)){confirmed[id]=1;var old=TAG_RE.exec(srtBlocks[i].text||"");if(!old||+old[1]!==tg){srtBlocks[i].text=applyTag(srtBlocks[i].text,tg);changed++;why[i]=(why[i]||"")+">"+tg;}}});
+            }catch(e){console.warn("recheck failed",e);}
+            rec.done=true;
+          })();
+          rcIn.push(rec);
+        })(W,wl,wv,wf);
+        while(rcIn.filter(function(r){return !r.done}).length>=RC){await Promise.race(rcIn.filter(function(r){return !r.done}).map(function(r){return r.p}));}
       }
+      await Promise.all(rcIn.map(function(r){return r.p}));
     }catch(e){console.warn("recheck pass",e);}
+    var flipped=0;
+    try{if(PS){srtBlocks.forEach(function(b,i){
+      var tx=String(b.text||""),ms=tx.match(/\[[1-4]\]/g);if(!ms||ms.length!==1)return;
+      var m=TAG_RE.exec(tx);if(!m)return;var tt=times(b),h=f0Of(A,tt.s,tt.e);if(!h)return;
+      var tg=+m[1],male=tg%2===1;
+      var bid=String(b.id);if(((male&&h>=PS.hi*1.1)||(!male&&h=PS.lo*0.9))&&lowIds.indexOf(bid)>=0&&!confirmed[bid]){b.text=applyTag(tx,male?tg+1:tg-1);flipped++;try{why[i]=(why[i]||"")+"A"}catch(_){}}
+    });}}catch(e){console.warn("pitch arbitration",e)}
+    try{window.__zsfTagReport="ZSF "+(window.__ZSF_VER||"")+" tag report | line = id | tag | pitchHz | flags (A=fixed by pitch P=pitch conflict T=thought L=low conf M=lip moves in thought S=still lips in speech F=isolated flip >x=changed by recheck to x)\n"+srtBlocks.map(function(b,i){var m=TAG_RE.exec(b.text||""),tt=times(b),h=0;try{h=f0Of(A,tt.s,tt.e)}catch(_){}return "#"+b.id+"|"+(m?m[1]:"-")+"|"+h+"|"+((typeof why!=="undefined"&&why[i])||"")}).join("\n")}catch(_){}
     closeVideo();
     try{renderEditor();saveData();}catch(_){}
     if(done>0&&failed===0)lastKey=key;
     toastS(failed?("🎭 ចាប់សំឡេងបាន "+done+" បន្ទាត់ • មិនបាន "+failed):("🎭 AI ចាប់សំឡេង [1]-[4] រួច "+done+" បន្ទាត់"+(rechecked?(" • ពិនិត្យឡើងវិញ "+rechecked+" • កែ "+changed):"")),!failed);
   };
 })();
-
 if(__kd)window.__zsfDirectAnalyze=__kd;})();
 /script>
 /body>/html>
@@ -8220,7 +8384,7 @@ if(__kd)window.__zsfDirectAnalyze=__kd;})();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.44";
+  var EMB="26.0.45";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
