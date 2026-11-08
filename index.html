@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.41";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.43";})();
 (function(){var F0=window.fetch;if(!F0||window.__zsfHiFb)return;window.__zsfHiFb=1;
 var H="gemini-3.8-flash-high",L="gemini-3.8-flash";
 window.fetch=async function(u,o){
@@ -24,7 +24,7 @@ window.fetch=async function(u,o){
  }
  return r}
 })();
-/* ===== V26.0.41 : ចែកតួ ប្រុស/ស្រី/គិតក្នុងចិត្ត លឿនជាងមុន — thinking ទាប + retry 429/503 + ១ ហៅធំ + master/thought ស្របគ្នា + ផ្ញើ pitch f0 + មិនបើករូបភាពមាត់ជាលំនាំដើម ===== */
+/* ===== V26.0.43 : ចែកតួ ប្រុស/ស្រី/គិតក្នុងចិត្ត លឿនជាងមុន — thinking ទាប + retry 429/503 + ១ ហៅធំ + master/thought ស្របគ្នា + ផ្ញើ pitch f0 + មិនបើករូបភាពមាត់ជាលំនាំដើម ===== */
 /* ===== V26.0.39 : ចែកតួ ប្រុស/ស្រី/គិតក្នុងចិត្ត ត្រឡប់ទៅដំណើរការលឿន (Gemini ស្តាប់វីដេអូទាំងមូល + មើលមាត់ + ពិនិត្យឡើងវិញ) · ប្រើ 3.8 Flash ធម្មតាសម្រាប់ចែកតួ (មិនប្រើ High ដែលយឺត) ===== */
 /* ===== V26.0.26 : ចែកតួ ប្រុស/ស្រី/គិតក្នុងចិត្ត ប្រើ Gemini ជានិច្ច (Local AI មិនចាប់យកសំណើចែកតួទេ) · Local AI ប្តូរតែការបកប្រែ · សារព្រមានបើគ្មាន Gemini Key ===== */
 /* ===== V26.0.25 : បន្ថែម Gemini 3.8 Flash High ក្នុងបញ្ជី Gemini ធម្មតា · Auto សាកល្បង High មុនគេ · បើ ID មិនមាន ត្រឡប់ទៅ 3.8 Flash ស្វ័យប្រវត្តិ ===== */
@@ -5129,8 +5129,8 @@ if(__thGo)__thGo(!!__mt);
     var A=null,done=0,thoughtN=0,filled=0,failedG=[],profile=[],lowIds=[],got={},idxById={},ctx="",finished=0,noThought=false,viaWorker=false;
     /* ===== ផ្លូវទី១ : Gemini Worker (ផ្ញើវីដេអូ + SRT ម្តង ទទួលបាន tag [1]-[4] ទាំងអស់) ===== */
     var workerTag=async function(){
-      var WURL="";try{WURL=(typeof GEM_WORKER_URL!=="undefined"&&GEM_WORKER_URL)||""}catch(_){}
-      if(!WURL)WURL="https://sweet-firefly-faa0.saanaafckoko.workers.dev";
+      var WURL="https://muddy-lake-a14e.saanaafckoko.workers.dev";
+      if(!ks.length)throw new Error("គ្មាន Gemini Key");
       var N=srtBlocks.length;
       prog("🎭 កំពុងផ្ញើទៅ Worker ដើម្បីចាប់ប្រុស/ស្រី (ដោយស្ងាត់)...",1);
       var media=f;
@@ -5148,7 +5148,7 @@ if(__thGo)__thGo(!!__mt);
       var story="";try{story=window.zsfAutoStory?window.zsfAutoStory():""}catch(_){}
       fd.append("context",story||"");
       fd.append("model",(typeof selections!=="undefined"&&selections.geminiModel)||"");
-      fd.append("tagOnly","1");
+      fd.append("tagOnly","1");fd.append("keys",ks.join(","));
       var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},150000),r;
       try{r=await fetch(WURL,{method:"POST",body:fd,signal:ctl.signal})}
       catch(e){throw new Error(e&&e.name==="AbortError"?"Worker ឆ្លើយយូរពេក":"ភ្ជាប់ Worker មិនបាន")}
@@ -5354,7 +5354,7 @@ var thP=null;
     toastS(okAll?("🎭 AI ចាប់សំឡេង [1]-[4] រួច "+done+" បន្ទាត់"+(thoughtN?(" • សំឡេងគិតក្នុងចិត្ត "+thoughtN):"")+(viaWorker?" • តាម Worker":"")):("🎭 ចាប់បាន "+done+" • បំពេញតាមបរិបទ "+filled+" • មិនបាន "+miss+(top?(" • មូលហេតុ: "+top):"")),okAll&&done>0);
   };
   /* V26.0.39: ប្រើដំណើរការចាស់ (វីដេអូទាំងមូល + រូបភាព/មាត់ + ពិនិត្យឡើងវិញ) ជាលំនាំដើមវិញ — លឿន និងច្បាស់ជាង។ ចង់សាកវិធីថ្មី (សំឡេងតែប៉ុណ្ណោះ): localStorage zsf_tag_v2=1 */
-  window.zsfAutoClassifyTags=async function(){var self=this,args=arguments,v2=false;try{v2=localStorage.getItem("zsf_tag_v2")==="1"}catch(_){}if(v2||typeof window.__zsfTagLegacy!=="function")return window.__zsfTagV2.apply(self,args);window.__zsfTagErrN=0;window.__zsfTagLastErr="";var r;try{r=await window.__zsfTagLegacy.apply(self,args)}catch(e){console.warn("legacy tag",e);window.__zsfTagLastErr=String((e&&e.message)||e).slice(0,90)}var N=0,T=0;try{N=srtBlocks.length;srtBlocks.forEach(function(b){if(/^\s*\[[1-4]\]/.test(String(b.text||"")))T++})}catch(_){}if(N>0&&0.8*N>T&&!window.__zsfTagAbort){try{toastS("⚠ វិធីមើលវីដេអូចាប់បាន "+T+"/"+N+(window.__zsfTagLastErr?(" • "+window.__zsfTagLastErr):"")+" — ប្តូរទៅវិធីបម្រុង (សំឡេង)",false)}catch(_){}window.__zsfForceTag=true;return await window.__zsfTagV2.apply(self,args)}return r};
+  window.zsfAutoClassifyTags=async function(){var self=this,args=arguments,v2=false;v2=true;try{if(localStorage.getItem("zsf_tag_v2")==="0")v2=false}catch(_){}if(v2||typeof window.__zsfTagLegacy!=="function")return window.__zsfTagV2.apply(self,args);window.__zsfTagErrN=0;window.__zsfTagLastErr="";var r;try{r=await window.__zsfTagLegacy.apply(self,args)}catch(e){console.warn("legacy tag",e);window.__zsfTagLastErr=String((e&&e.message)||e).slice(0,90)}var N=0,T=0;try{N=srtBlocks.length;srtBlocks.forEach(function(b){if(/^\s*\[[1-4]\]/.test(String(b.text||"")))T++})}catch(_){}if(N>0&&0.8*N>T&&!window.__zsfTagAbort){try{toastS("⚠ វិធីមើលវីដេអូចាប់បាន "+T+"/"+N+(window.__zsfTagLastErr?(" • "+window.__zsfTagLastErr):"")+" — ប្តូរទៅវិធីបម្រុង (សំឡេង)",false)}catch(_){}window.__zsfForceTag=true;return await window.__zsfTagV2.apply(self,args)}return r};
 })();
 
 /* ######## E. UI wiring ######## */
@@ -7361,7 +7361,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.41",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.43",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7805,7 +7805,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.41";
+  var EMB="26.0.43";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
