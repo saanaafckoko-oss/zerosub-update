@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.47";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.48";})();
 (function(){var F0=window.fetch;if(!F0||window.__zsfHiFb)return;window.__zsfHiFb=1;
 var H="gemini-3.8-flash-high",L="gemini-3.8-flash";
 window.fetch=async function(u,o){
@@ -808,7 +808,18 @@ html[data-mode=light] #zfAuth .zf-top button{color:#0369a1}#zfAuth .zf-top{z-ind
 #zfAuth .b.acc{background:linear-gradient(180deg,#7ff0ff,#0ea5e9 55%,#2563eb);color:#02121f;border-color:#8be9ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -4px 0 rgba(0,0,0,.2),0 6px 18px rgba(34,211,238,.5)}
 #zfAuth .b.blue{background:linear-gradient(180deg,#8b7bff,#4338ca);border-color:#a5b4fc;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -4px 0 rgba(0,0,0,.25),0 6px 18px rgba(99,102,241,.55)}
 @media (prefers-reduced-motion:reduce){#zfAuth::after,#zfAuth .zfa-film,#zfAuth .zfa-eq i,#zfAuth .zf-hero::after,#zfAuth .zf-panel{animation:none!important}#zfAuth .zfa-eq i{height:60%}}
-/style>/head>body class="zf-locked">
+/style>style id="zs-lite">
+/* v26.0.48 lite: បិទចលនាដែលស៊ីថ្ម/ឡើងកម្ដៅ */
+.zf-logo,.zf-logo::before,.zf-logo::after,.zf-hero .zf-logo,.zf-hero h2,.zf-panel,.zf-dot,
+#zfAuth,#zfAuth::before,#zfAuth::after,#zfAuth *,#zfAuth *::before,#zfAuth *::after{animation:none!important}
+.zf-logo,.zf-hero .zf-logo,#zfAuth .zf-logo{filter:none!important;box-shadow:0 0 8px rgba(255,190,40,.55)!important;transform:none!important}
+.zf-logo::after{display:none!important}
+#zfAuth .zf-hero::before,#zfAuth .zf-hero::after,#zfAuth::before,#zfAuth::after,#zfAuth .zfa-film,#zfAuth .zfa-eq{display:none!important}
+#zfAuth *{filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#zsfUpdBtn,#zsfUpdBtn *{animation:none!important}
+header,.card,.sheet>div,#pbot,#toast{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+/style>
+/head>body class="zf-locked">
 div id="zfAuth" role="dialog" aria-label="ZERO FLASH Login">
 div class="zfa-film l" aria-hidden="true">/div>div class="zfa-film r" aria-hidden="true">/div>
 div class="zf-top">button id="zfLg" type="button" aria-label="Language">svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">circle cx="12" cy="12" r="9"/>path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>/svg>/button>button id="zfDn" type="button" aria-label="ភ្លឺ / ងងឹត">/button>/div>
@@ -1266,7 +1277,7 @@ $("#tryV").onclick=async()=>{const b=$("#tryV"),old=b.innerHTML;
 let RP=S.get("rp",[]);const rpc=()=>$("#rpn").textContent=RP.length;rpc();
 $("#rpIn").onclick=()=>{const i=document.createElement("input");i.type="file";i.accept=".txt,.csv";i.onchange=async()=>{const t=await i.files[0].text();RP=t.split(/\r?\n/).map(l=>l.split(/=>|=|,|\t/)).filter(a=>a.length>=2&&a[0].trim()).map(a=>[a[0].trim(),a.slice(1).join("=").trim()]);S.set("rp",RP);rpc()};i.click()};
 $("#rpOut").onclick=()=>save("replace-words.txt",RP.map(a=>a.join("=")).join("\n"));
-setInterval(()=>{if($("#srtText").value.trim())$("#srtArea").classList.remove("hide")},500);
+setInterval(()=>{if(document.hidden)return;if($("#srtText").value.trim())$("#srtArea").classList.remove("hide")},1500);
 /script>script>
 /* ===== Real features ===== */
 /* V5.8: រក្សាទុកវីដេអូលឿន — អានជាដុំ 6MB ដោយ FileReader (base64 ក្នុងម៉ាស៊ីន មិនប្រើ loop JS) អានដុំបន្ទាប់ពេលកំពុងសរសេរដុំមុន ហើយបង្ហាញភាគរយ/ល្បឿនពិត */
@@ -5602,7 +5613,7 @@ q("#cuAlign").onclick=async function(){
  }catch(e){showToast("❌ តម្រឹមម៉ោងបរាជ័យ: "+String((e&&e.message)||e).slice(0,160),false)}
  b.disabled=false;b.innerHTML=old};
 q("#aiGen").onclick=()=>{if(!cues.length)return alert("សូមនាំចូល SRT ជាមុន");if(!V.src)return alert("សូមរើសវីដេអូជាមុន");doExport().catch(function(x){alert("Export: "+x.message)})};
-setInterval(()=>{const a=document.activeElement;if(a&&a.dataset&&a.dataset.a=="txt")return;const k=cues.length+"|"+toSrt(cues);if(k!==last+"|"&&k!==cues.length+"|"+last){last=toSrt(cues);if(cues.length)q("#srtArea").classList.remove("hide");render()}},600);
+setInterval(()=>{if(document.hidden)return;const a=document.activeElement;if(a&&a.dataset&&a.dataset.a=="txt")return;const __t=toSrt(cues),k=cues.length+"|"+__t;if(k!==last+"|"&&k!==cues.length+"|"+last){last=__t;if(cues.length)q("#srtArea").classList.remove("hide");render()}},1500);
 q("#vidFile").addEventListener("change",()=>{if(q("#vidFile").files[0])q("#browse").textContent="📂 ប្តូរឯកសារ Media"});
 let pc=0;
 const NMS=["ទាញអក្សរ","ចែកតួ","បកប្រែ","អានសំឡេង","ភ្លេងអម","Export"],LBL=["ទាញយក Subtitle","ចែកតួ ប្រុស/ស្រី","បកប្រែ Subtitle","អានសំឡេងខ្មែរ","បង្កើតភ្លេងអម","Export វីដេអូ"];
@@ -5620,7 +5631,7 @@ if(window.__pipe){const eb=q("#exp");if(eb)eb.innerHTML=ICO.playstack+" ⚡ ក�
 clearTimeout(pt);if(fin||bad)pt=setTimeout(()=>{b.style.display="none";document.body.classList.remove("pb");if(pi)pi.style.display="none"},4000)};
 new MutationObserver(()=>{if(window.__pipe)return;const t=q("#log").textContent||"",m=/(\d+)\/(\d+)/.exec(t);if(!t)return;setProgress(/^រួចរាល់|^✅/.test(t)?100:m?Math.round(m[1]/m[2]*100):pc,t)}).observe(q("#log"),{childList:true,characterData:true,subtree:true});
 })();
-/script>script>(function(){var m=document.querySelector("#models"),r=m&&m.previousElementSibling;if(r){r.appendChild(m);var t=r.querySelector(".t");if(t)t.style.flex="none"}})()/script>script>(function(){var t=document.querySelector("#tot"),d=t&&t.previousElementSibling;if(!d)return;var f=document.createElement("span");f.id="cutFn";d.appendChild(f);setInterval(function(){var n=(typeof file!=="undefined"&&file&&file.name)?"("+file.name+")":"";if(f.textContent!==n)f.textContent=n},700)})()/script>script>(function(){
+/script>script>(function(){var m=document.querySelector("#models"),r=m&&m.previousElementSibling;if(r){r.appendChild(m);var t=r.querySelector(".t");if(t)t.style.flex="none"}})()/script>script>(function(){var t=document.querySelector("#tot"),d=t&&t.previousElementSibling;if(!d)return;var f=document.createElement("span");f.id="cutFn";d.appendChild(f);setInterval(function(){if(document.hidden)return;var n=(typeof file!=="undefined"&&file&&file.name)?"("+file.name+")":"";if(f.textContent!==n)f.textContent=n},1500)})()/script>script>(function(){
 function mk(id,N,cls){var r=document.getElementById(id);if(!r)return;var w=document.createElement("div");w.className="rgw";r.parentNode.insertBefore(w,r);w.appendChild(r);r.style.flex="none";r.classList.add("rg2",cls);
 var d=[];for(var i=0;i=N;i++)d.push("radial-gradient(circle at calc(var(--T)/2 + (100% - var(--T))*"+(i/N).toFixed(4)+") 50%,rgba(255,255,255,.4) 0 1.2px,transparent 1.6px)");r.style.setProperty("--dots",d.join(","));
 var up=function(){r.style.setProperty("--pf",(r.value-r.min)/(r.max-r.min))};r.addEventListener("input",up);up()}
@@ -6679,7 +6690,7 @@ window.zsfStoryBlock=function(){
   try{var m=zsfStyleMode(),g=m.slice(0,2)==="g:"?gGenreByCode(m.slice(2)):null;
    showToast(g?("📌 ប្រភេទសាច់រឿង៖ "+g[1]):(m==="fun"?"😄 ស្ទីលកំប្លែង ទាក់ទាញ បើកហើយ":(m==="auto"?"🎭 វិភាគ SRT ស្វ័យប្រវត្តិ បើកហើយ":"ស្ទីលធម្មតា")),true)}catch(e){}
  };
- label();setInterval(label,1500);
+ label();setInterval(function(){if(!document.hidden)label()},3000);
 })();
 
 /* V12.9: សៀវភៅរឿងស្វ័យប្រវត្តិ (បង្កប់ក្នុងកូដ — គ្មានប្រអប់បរិបទ/ប៊ូតុងប្រភេទទៀត) */
@@ -7362,7 +7373,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.47",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.48",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -8351,7 +8362,7 @@ var prep=function(g){return (async function(){try{
             try{
               var r2=await classifyChunk(wl,"RE-CHECK PASS: some lines in this clip were unclear in a first pass. Listen very carefully to every line. Lines separated by a tiny gap whose first line has no sentence-ending punctuation are usually fragments of ONE sentence spoken by ONE voice (never both male and female). Known voices: "+profText(profile),wv,wf);
               W.t.forEach(function(i){var id=String(srtBlocks[i].id),tg=r2.map[id];rechecked++;
-                if(typeof tg==="number"&&!(r2.low&&r2.low[id])&&!(thoughtLock[id]&&tg<=2)){confirmed[id]=1;var old=TAG_RE.exec(srtBlocks[i].text||"");if(!old||+old[1]!==tg){srtBlocks[i].text=applyTag(srtBlocks[i].text,tg);changed++;why[i]=(why[i]||"")+">"+tg;}}});
+                if(typeof tg==="number"&&!(r2.low&&r2.low[id])&&!(thoughtLock[id]&&tg=2)){confirmed[id]=1;var old=TAG_RE.exec(srtBlocks[i].text||"");if(!old||+old[1]!==tg){srtBlocks[i].text=applyTag(srtBlocks[i].text,tg);changed++;why[i]=(why[i]||"")+">"+tg;}}});
             }catch(e){console.warn("recheck failed",e);}
             rec.done=true;
           })();
@@ -8385,7 +8396,7 @@ if(__kd)window.__zsfDirectAnalyze=__kd;})();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.47";
+  var EMB="26.0.48";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
