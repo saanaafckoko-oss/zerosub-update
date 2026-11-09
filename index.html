@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.53";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.55";})();
 (function(){var F0=window.fetch;if(!F0||window.__zsfHiFb)return;window.__zsfHiFb=1;
 var H="gemini-3.8-flash-high",L="gemini-3.8-flash";
 window.fetch=async function(u,o){
@@ -24,6 +24,8 @@ window.fetch=async function(u,o){
  }
  return r}
 })();
+/* ===== V26.0.55 : កាតកូតា Local AI ស្អាតជាងមុន (សល់/សរុប + % + bar + ថ្ងៃផុត + RPM + Active) · ផ្ទាំងវឌ្ឍនភាពបកប្រែ (ពេលចំណាយ · នៅសល់ · ល្បឿន) ===== */
+/* ===== V26.0.55 : ចន្លោះដកដង្ហើមវែងជាងមុន (ឃ្លា 0.30s, ប្តូរតួ +0.25s) · ល្បឿនអតិបរមាទាបជាងមុន · រុញឃ្លាក្នុងខ្សែបានដល់ 1.2s · prompt បកប្រែតាមស្ទីល SRT គំរូ ===== */
 /* ===== V26.0.47 : ចែកតួ ប្រុស/ស្រី/គិតក្នុងចិត្ត លឿនជាងមុន — thinking ទាប + retry 429/503 + ១ ហៅធំ + master/thought ស្របគ្នា + ផ្ញើ pitch f0 + មិនបើករូបភាពមាត់ជាលំនាំដើម ===== */
 /* ===== V26.0.39 : ចែកតួ ប្រុស/ស្រី/គិតក្នុងចិត្ត ត្រឡប់ទៅដំណើរការលឿន (Gemini ស្តាប់វីដេអូទាំងមូល + មើលមាត់ + ពិនិត្យឡើងវិញ) · ប្រើ 3.8 Flash ធម្មតាសម្រាប់ចែកតួ (មិនប្រើ High ដែលយឺត) ===== */
 /* ===== V26.0.26 : ចែកតួ ប្រុស/ស្រី/គិតក្នុងចិត្ត ប្រើ Gemini ជានិច្ច (Local AI មិនចាប់យកសំណើចែកតួទេ) · Local AI ប្តូរតែការបកប្រែ · សារព្រមានបើគ្មាន Gemini Key ===== */
@@ -55,7 +57,20 @@ window.ZSF_KM_FRIEND=[
 "你帮我打死他 → ជួយវាយវាឱ្យងាប់ផង!",
 "你放我们一条生路 → បងដោះលែងពួកយើងទៅ",
 "妈有口饭吃就行 → ម៉ាក់មានបាយហូបគឺគ្រប់គ្រាន់ហើយ",
-"10. Before answering, read every line aloud in your head. If it sounds like a book, a news reader or machine translation, rewrite it the way a real Cambodian would say it. Never change facts, names or emotion and never skip a line."
+"10. MORE EXAMPLES from the reference translation (same feel: short spoken sentences, particles at the end, ! for emotion):",
+"你们不是一路来的 → ពួកឯងមិនបានមកជាមួយគ្នាទេអ្ហែស?",
+"才6点半 → ទើបម៉ោង ៦ កន្លះទេតើ!",
+"这顿饭恐怕还有的熬 → បាយមួយពេលនេះ ប្រហែលត្រូវទ្រាំយូរហើយមើលទៅ!",
+"看你瘦的 → មើលចុះ ស្គមដល់ហើយ!",
+"差不多的 → ដូចតែគ្នាហ្នឹង!",
+"妈您这话我就不爱听了 → ម៉ាក់ និយាយបែបហ្នឹង ខ្ញុំមិនចូលចិត្តស្តាប់ទេ!",
+"你疯了吧 → ឯងឆ្កួតហើយមែនទេ?!",
+"烂泥扶不上墙 → មនុស្សអត់បានការមែន!",
+"麻烦少油少盐 → ជួយដាក់ប្រេង និងអំបិលតិចតិចផង",
+"要是他能出头太阳都打西边出来了 → បើគេអាចមានបាន ទាល់តែថ្ងៃរះពីលិចហើយ",
+"11. FIT THE SLOT FOR DUBBING: the Khmer voice must be readable at a calm pace with a short breath between lines. Aim for about 3 Khmer characters per Chinese character and never above 3.3. When a line is long, drop filler such as ទាំងអស់, ដែរ, ទៀត, បន្ថែមទៀត and polite padding instead of dropping meaning. Never write one phrase twice inside a line.",
+"12. ONE SPELLING PER NAME: write each character name the same way in every line (decide once, for example លីនលីន, ស៊ាវហ៊ុយ, ស៊ាវលី, លោកប្រធានអ៊ូ) and never mix spellings.",
+"13. Before answering, read every line aloud in your head. If it sounds like a book, a news reader or machine translation, rewrite it the way a real Cambodian would say it. Never change facts, names or emotion and never skip a line."
 ].join("\n");
 /script>
 meta charset="utf-8">script>try{document.documentElement.setAttribute("data-mode",localStorage.getItem("zf_mode")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-mode","dark")}/script>
@@ -2166,7 +2181,7 @@ function zsfFitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch
 function zsfRhythmOn(){try{return localStorage.getItem("zsf_rhythm")!=="0"}catch(e){return true}}
 function zsfKhSyl(t){let c=0;for(const ch of String(t||"")){const k=ch.codePointAt(0);if((k>=0x1780&&k=0x17B3))c++;else if(k===0x17D2)c--}return Math.max(0,c)}
 function zsfAvail(q,dur,nx){
- const tail=zsfFit("tail",.15),mg=zsfFit("margin",.20),sp=nx?zsfFit("spill",0):0,gap=nx?(nx.s-q.e):1.0,room=gap-.10;
+ const tail=zsfFit("tail",.30),mg=zsfFit("margin",.20),sp=nx?zsfFit("spill",0):0,gap=nx?(nx.s-q.e):1.0,room=gap-.10;
  if(room>0){const tl=tail;return dur+Math.min(room,tl)+sp}
  return Math.max(dur*.6,.3,dur-mg)+sp}
 /* ពិនិត្យម្តងថា TTS Worker គាំទ្រ rate ពិតឬអត់ (បើមិនគាំទ្រ → ប្រើវិធី stretch ចាស់) */
@@ -2184,13 +2199,13 @@ async function dubAudioLocal(text,slot,p,slotD){
  return{buf,boost:pl.boost,tt:pl.tempo}}
 async function dubAudio(text,slot,p,slotD,slotG){
  if(window.__zsfRateOK===false)return dubAudioLocal(text,slot,p,slotD);
- const pitch=Math.round(p.pitch),auto=+p.auto||0,base=clampTempo(Math.max(1+p.speed/100,auto>0?zsfFit("mintempo",1.25):0));
+ const pitch=Math.round(p.pitch),auto=+p.auto||0,base=clampTempo(Math.max(1+p.speed/100,auto>0?zsfFit("mintempo",1.10):0));
  let cur=base,buf;
  try{buf=await ttsBuf(text,slot,pitch,Math.round((base-1)*100))}catch(e){return dubAudioLocal(text,slot,p,slotD)}
- buf=zsfTightPauses(buf,.22);
+ buf=zsfTightPauses(buf,.30);
  if(!(slotD>0))return{buf,boost:false,tt:cur};
  if(auto>0){/* V26.0.7 order: 1.15x -> up to 1.35x -> use silence gap -> up to 1.5x (push is in zsfPlaceItems) */
-  const C1=Math.max(base,zsfFit("cap1",1.6)),C2=Math.max(C1,Math.min(zsfFit("cap2",1.85),1.9)),G=Math.max(slotD,Math.min(slotG>0?slotG:slotD,slotD+zsfFit("over",.5)));
+  const C1=Math.max(base,zsfFit("cap1",1.4)),C2=Math.max(C1,Math.min(zsfFit("cap2",1.6),1.9)),G=Math.max(slotD,Math.min(slotG>0?slotG:slotD,slotD+zsfFit("over",.5)));
   if(buf.duration>slotD*1.02)buf=zsfTightPauses(buf,.12);
   for(let it=0;it2;it++){
    const d=buf.duration;if(d=slotD*1.02)break;if(it>0&&d=G*1.02)break;
@@ -2205,7 +2220,7 @@ async function dubAudio(text,slot,p,slotD,slotG){
     if(nb&&nb.duration=slotD*1.02){buf=nb;cur=tot}}}}
  let forced=1;
  if(zsfFitOn()&&buf.duration>slotD){buf=zsfTightPauses(buf,.08);
-  const FM=zsfFit("fmax",1.85);let allow=Math.max(1,FM/Math.max(cur,1)),need=Math.min(buf.duration/(slotD*.97),allow);
+  const FM=zsfFit("fmax",1.6);let allow=Math.max(1,FM/Math.max(cur,1)),need=Math.min(buf.duration/(slotD*.97),allow);
   for(let f=0;f2&&need>1.01;f++){
    try{buf=wsolaStretch(buf,need)}catch(e){break}
    forced*=need;const nl=buf.duration;if(nl=slotD)break;
@@ -2255,19 +2270,19 @@ function zsfClipFade(buf,maxDur){
   for(let i=0;if;i++)d[n-1-i]*=i/f}
  return nb}
 function zsfPlaceItems(items){
- const ON=zsfFitOn(),DLY=zsfFit("delay",0),GAPL=zsfFit("gap2",.30),GAP=Math.min(GAPL,zsfFit("gapc",.14)),PUSH=zsfFit("push",.35),HARD=(function(){try{return localStorage.getItem("zsf_tts_hard")==="1"}catch(e){return false}})();
+ const ON=zsfFitOn(),DLY=zsfFit("delay",0),GAPL=zsfFit("gap2",.18),GAP=zsfFit("gapc",.30),PUSH=zsfFit("push",1.2),HARD=(function(){try{return localStorage.getItem("zsf_tts_hard")==="1"}catch(e){return false}})();
  let cursor=0,delayed=0,late=0,maxLate=0;const st=[];
  items.forEach((it,i)=>{
   const b0=it.buf0||(it.buf0=it.buf);let buf=b0,o0=Math.max(0,fxOn(it.q)+DLY);
   if(cursor>o0+.02){o0=Math.min(cursor,o0+PUSH);delayed++}
   const nx=items[i+1];
   if(ON){
-   const nxs=nx?fxOn(nx.q)+DLY:1e9,ce=it.q.e+DLY+zsfFit("etail",.15),lim=Math.max(.3,Math.min(nxs-GAPL,ce)-o0),dl=b0.duration;
+   const nxs=nx?fxOn(nx.q)+DLY:1e9,ce=it.q.e+DLY+zsfFit("etail",.30),lim=Math.max(.3,Math.min(nxs-GAPL,ce)-o0),dl=b0.duration;
    if(dl>lim*1.02){
-    const tt=it.tt||1,CAT=zsfFit("catch",1.85),cap=(dl1.2?Math.min(CAT,1.5):CAT),al=Math.max(1,cap/Math.max(tt,1)),nd=Math.min(dl/lim,al);
+    const tt=it.tt||1,CAT=zsfFit("catch",1.6),cap=(dl1.2?Math.min(CAT,1.5):CAT),al=Math.max(1,cap/Math.max(tt,1)),nd=Math.min(dl/lim,al);
     if(nd>1.01){try{buf=wsolaStretch(b0,nd)}catch(e){buf=b0}}}
    if(HARD&&nx){const room=nxs-GAP-o0;if(room>.25&&buf.duration>room+.02){try{buf=zsfClipFade(buf,room)}catch(e){}}}}
-  it.buf=buf;st.push(o0);{const ld=o0-(fxOn(it.q)+DLY);if(ld>.25){late++;if(ld>maxLate)maxLate=ld}}cursor=o0+buf.duration+GAP+(nx&&nx.slot!==it.slot?.10:0)});
+  it.buf=buf;st.push(o0);{const ld=o0-(fxOn(it.q)+DLY);if(ld>.25){late++;if(ld>maxLate)maxLate=ld}}cursor=o0+buf.duration+GAP+(nx&&nx.slot!==it.slot?zsfFit("spkgap",.25):0)});
  window.__zsLate={n:late,max:maxLate,all:items.length};
  return{st,delayed}}
 function scheduleDub(items,t0,bus,bgG,base){
@@ -3454,7 +3469,42 @@ function __zsWorkNote(p,msg){
     window.__zsWorkT=setTimeout(function(){if(window.__zsWork){window.__zsWork=0;try{N.workStop()}catch(_){}}},180000);
   }catch(e){}
 }
-function setProgress(p,msg){__zsWorkNote(p,msg);var g=$("#gprog");g.style.display="block";$("#gprogTxt").textContent=msg||"";$("#gprogBar").style.width=Math.max(0,Math.min(100,p))+"%";try{$("#log").textContent=msg||""}catch(e){}clearTimeout(__pt);if(p>=100||/^❌/.test(msg||""))__pt=setTimeout(function(){g.style.display="none"},4000)}
+function setProgress(p,msg){try{zsfPG(p,msg)}catch(_e){}__zsWorkNote(p,msg);var g=$("#gprog");g.style.display="block";$("#gprogTxt").textContent=msg||"";$("#gprogBar").style.width=Math.max(0,Math.min(100,p))+"%";try{$("#log").textContent=msg||""}catch(e){}clearTimeout(__pt);if(p>=100||/^❌/.test(msg||""))__pt=setTimeout(function(){g.style.display="none"},4000)}
+var __pg={t0:0,d0:0,tot:0,done:0,last:0,tm:null,msg:"",hide:null};
+function zsfPGel(){var e=document.getElementById("zsfPG");if(e)return e;
+ var a=document.getElementById("gprog");if(!a||!a.parentNode)return null;
+ e=document.createElement("section");e.id="zsfPG";
+ e.style.cssText="display:none;margin:0 0 14px;padding:12px;border-radius:18px;border:1.5px solid #1e90ff;background:#0b1024;box-shadow:0 0 18px rgba(30,144,255,.25)";
+ e.innerHTML=`div id="pgMsg" style="padding:10px 12px;border-radius:12px;background:#070b1c;border:1px solid #1c2a4d;font-weight:800;font-size:14px;line-height:21px;color:#e2e8f0">/div>
+ div style="margin-top:8px;padding:10px 12px;border-radius:12px;background:#10183a;border:1px solid #1c2a4d;font-size:13.5px;color:#cbd5e1">
+  div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">span>⏱ ពេលចំណាយ: b id="pgEl" style="color:#38bdf8;font-family:monospace;font-size:15px">00:00/b>/span>span>⏳ នៅសល់ប្រហែល: b id="pgEta" style="color:#fbbf24">--/b>/span>/div>
+  div style="margin-top:7px">⚡ ល្បឿន: b id="pgSp" style="color:#34d399;font-family:monospace;font-size:15px">--/b> span style="color:#7c8db5">បន្ទាត់/វិនាទី/span>/div>
+ /div>
+ div style="margin-top:10px;height:9px;border-radius:7px;background:#141b36;overflow:hidden">div id="pgBar" style="height:100%;width:0;background:linear-gradient(90deg,#3b82f6,#a78bfa);transition:width .35s">/div>/div>`;
+ a.parentNode.insertBefore(e,a);return e}
+function zsfPGdraw(){
+ var e=document.getElementById("zsfPG");if(!e)return;
+ var now=Date.now(),el=(now-__pg.t0)/1000,dn=__pg.done-__pg.d0,sp=(el>1&&dn>0)?dn/el:0,left=__pg.tot-__pg.done;
+ function f(s){s=Math.max(0,Math.round(s));var h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60,z=function(n){return String(n).padStart(2,"0")};return (h?h+":":"")+z(m)+":"+z(x)}
+ document.getElementById("pgMsg").textContent="⚡ "+__pg.msg;
+ document.getElementById("pgEl").textContent=f(el);
+ document.getElementById("pgEta").textContent=sp?"~"+f(left/sp):"--";
+ document.getElementById("pgSp").textContent=sp?sp.toFixed(1):"--";
+ document.getElementById("pgBar").style.width=Math.max(0,Math.min(100,__pg.done/__pg.tot*100))+"%";
+ if(now-__pg.last>25000)zsfPGhide()}
+function zsfPGhide(){clearInterval(__pg.tm);__pg.tm=null;__pg.t0=0;var e=document.getElementById("zsfPG");if(e)e.style.display="none"}
+function zsfPG(p,msg){
+ msg=String(msg||"");
+ if(/^❌/.test(msg)||p>=100){clearTimeout(__pg.hide);__pg.hide=setTimeout(zsfPGhide,4000);return}
+ var m=/(\d+)\s*\/\s*(\d+)/.exec(msg);if(!m)return;
+ var dn=+m[1],tt=+m[2];if(tt2||dn>tt)return;
+ var now=Date.now();
+ if(!__pg.t0||tt!==__pg.tot||dn__pg.done||now-__pg.last>60000){__pg.t0=now;__pg.d0=dn}
+ __pg.tot=tt;__pg.done=dn;__pg.last=now;__pg.msg=msg.split("\n")[0];
+ clearTimeout(__pg.hide);
+ var e=zsfPGel();if(!e)return;e.style.display="block";
+ if(!__pg.tm)__pg.tm=setInterval(zsfPGdraw,1000);
+ zsfPGdraw()}
 function hideProgress(){clearTimeout(__pt);$("#gprog").style.display="none"}
 function toggleProgressBar(show,t,p){if(!show)return hideProgress();var m=/(\d+)\/(\d+)/.exec(t||"");setProgress(m?Math.round(m[1]/m[2]*100):Math.min(100,(p||0)*10),t)}
 function stopProgressTimers(){}
@@ -7383,7 +7433,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.53",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.55",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -7670,13 +7720,27 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
    badge("● User_Apk","#34d399");return
   }
   function mm(n){n=Number(n);return n>=1e6?(n/1e6).toFixed(2)+"M":num(n)}
-  var bx="flex:1;min-width:0;padding:5px 6px;border-radius:6px;",lb="font-size:12.5px;line-height:17px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis",vb="font-size:14.6px;line-height:20px;font-weight:700;margin-top:1px;white-space:nowrap";
-  var h="div style='display:flex;align-items:center;justify-content:space-between;height:20px'>span style='color:#fcd34d;font-size:13px;font-weight:500;line-height:20px'>⏳ នៅសល់: "+(days!=null?days:"-")+" ថ្ងៃ/span>"+(rpm?"span style='display:inline-flex;align-items:center;gap:3px;height:20px;padding:0 6px;border-radius:5px;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.12);color:#38bdf8;font-size:11.5px;font-weight:700'>⚡ "+rpm+" RPM/span>":"")+"/div>";
-  h+="div style='display:flex;align-items:center;gap:4px;margin-top:8px'>";
-  h+="div style='"+bx+"border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.08)'>div style='"+lb+"'>📊 កូតាសរុប/div>div style='"+vb+";color:#38bdf8'>"+(tot!=null?num(tot):"-")+"/div>/div>";
-  h+="div style='"+bx+"border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.08)'>div style='"+lb+"'>🔻 បានប្រើ/div>div style='"+vb+";color:#f87171'>"+(used!=null?num(used):"-")+"/div>/div>";
-  h+="div style='"+bx+"border:1px solid rgba(52,211,153,.35);background:rgba(52,211,153,.1)'>div style='"+lb+"'>🟢 នៅសល់/div>div style='"+vb+";color:#34d399'>"+(rem!=null?"~"+mm(rem):"-")+"/div>"+(rem!=null?"div style='font-size:11.4px;line-height:14px;color:#34d399;opacity:.85;white-space:nowrap'>(~"+num(Math.floor(rem/33))+" ជួរ)/div>":"")+"/div>";
-  h+="/div>";
+  function p2(n){return String(n).padStart(2,"0")}
+  var pct=(tot!=null&&tot>0&&rem!=null)?Math.max(0,Math.min(100,rem/tot*100)):null,dt=null;
+  if(ex!=null){var tt=(typeof ex==="number"||/^\d+$/.test(String(ex)))?Number(ex)*(Number(ex)1e12?1000:1):Date.parse(ex);if(tt)dt=new Date(tt)}
+  if(!dt&&days!=null)dt=new Date(Date.now()+days*864e5);
+  var ds=dt?dt.getFullYear()+"-"+p2(dt.getMonth()+1)+"-"+p2(dt.getDate()):"-",
+      alive=(days==null||days>0)&&(rem==null||rem>0),
+      col=pct==null?"#34d399":pct10?"#f87171":pct30?"#fbbf24":"#34d399",
+      grad=pct==null||pct>=30?"linear-gradient(90deg,#10b981,#06b6d4)":pct>=10?"linear-gradient(90deg,#f59e0b,#fbbf24)":"linear-gradient(90deg,#ef4444,#f87171)";
+  var h=`div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+   div style="min-width:0;font-weight:800;font-size:15px;line-height:22px;color:${col}">● សល់: span style="font-size:16px">${rem!=null?num(rem):"-"}/span> span style="color:#9fb0cf;font-weight:600">/ ${tot!=null?num(tot):"-"}/span>${pct!=null?` span style="white-space:nowrap">( ${pct.toFixed(1)}% )/span>`:""}/div>
+   button type="button" onclick="var b=document.getElementById('laiRef');if(b)b.click()" style="flex:none;width:34px;height:30px;border-radius:8px;border:1px solid #3b4a72;background:#1b2745;color:#7dd3fc;font-size:15px;line-height:1">🔄/button>
+  /div>
+  div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+   div style="flex:1;height:8px;border-radius:6px;background:#1b2338;overflow:hidden">div style="height:100%;width:${pct!=null?pct:0}%;background:${grad};transition:width .4s">/div>/div>
+   div style="flex:none;font-size:13px;color:#9fb0cf;white-space:nowrap">ប្រើ: b style="color:#f87171">${used!=null?num(used):"-"}/b>/div>
+  /div>
+  div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 10px;margin-top:10px;padding-top:9px;border-top:1px solid #243153;font-size:12.8px;color:#cbd5e1">
+   span style="white-space:nowrap">⏳ ${ds}${days!=null?` span style="color:#fcd34d">(${days} ថ្ងៃ)/span>`:""}/span>
+   ${rpm?`span style="white-space:nowrap">⚡ ល្បឿន: b style="color:#38bdf8">${rpm} RPM/b>/span>`:""}
+   span style="display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:6px;font-weight:800;font-size:12px;white-space:nowrap;${alive?"color:#34d399;border:1px solid rgba(52,211,153,.5);background:rgba(52,211,153,.12)":"color:#f87171;border:1px solid rgba(248,113,113,.5);background:rgba(248,113,113,.12)"}">${alive?"✅ Active":"⛔ ផុតកំណត់"}/span>
+  /div>`;
   $i("laiInfo").innerHTML=h;
   badge("● User_Apk","#34d399");
  }
@@ -8444,7 +8508,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.53";
+  var EMB="26.0.55";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
