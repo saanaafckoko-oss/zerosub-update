@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.65";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.66";})();
 (function(){var F0=window.fetch;if(!F0||window.__zsfHiFb)return;window.__zsfHiFb=1;
 var H="gemini-3.8-flash-high",L="gemini-3.8-flash";
 window.fetch=async function(u,o){
@@ -6240,7 +6240,7 @@ function zsfEmoPreset(p,emo){var e=emo&&ZSF_EMO[emo];try{if(localStorage.getItem
 async function tagSpeakers(){
  if(!K.filter(Boolean).length||typeof window.zsfAutoClassifyTags!=="function")return;
  window.__zsfTagAbort=false;
- try{cuesToBlocks();window.__zsfForceTag=true;var __tp=window.zsfAutoClassifyTags(),__tid;await Promise.race([__tp,new Promise(function(r){__tid=setTimeout(function(){window.__zsfTagAbort=true;try{showToast("⏱ ចែកតូយូរពេក — បន្តជំហានបន្ទាប់",false)}catch(e){}r()},1800000)})]);clearTimeout(__tid);renderEditor()}catch(e){try{renderEditor()}catch(_){}}
+ try{cuesToBlocks();window.__zsfForceTag=true;var __tp=window.zsfAutoClassifyTags(),__tid;await Promise.race([__tp,new Promise(function(r){__tid=setTimeout(function(){window.__zsfTagAbort=true;try{showToast("⏱ ចែកតូយូរពេក — បន្តជំហានបន្ទាប់",false)}catch(e){}r()},360000)})]);clearTimeout(__tid);renderEditor()}catch(e){try{renderEditor()}catch(_){}}
 }
 
 /* ---------- ផ្ទាំងរើស Gemini / Groq ---------- */
@@ -7457,7 +7457,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.65",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.66",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -8409,7 +8409,7 @@ var prep=function(g){return (async function(){try{
         if(!P0)throw new Error("prep");
         var rs=await classifyChunk(P0.lines,ctx0,P0.wav,P0.fr,true),map=rs.map;profile=mergeProf(profile,rs.voices);Object.keys(rs.low||{}).forEach(function(id){lowIds.push(id);});Object.keys(rs.inc||{}).forEach(function(id){incMap[id]=rs.inc[id];});
         idxs.forEach(function(i){var b=srtBlocks[i],tg=map[String(b.id)];if(tg){b.text=applyTag(b.text,tg);done++;}else failed++;});
-      }catch(e){console.warn("tag chunk failed",e);failed+=idxs.length;}
+      }catch(e){console.warn("tag chunk failed",e);failed+=idxs.length;window.__zsfTagLastErr="AI: "+String((e&&e.message)||e).slice(0,90);}
       var tail=idxs.slice(-3).map(function(i){var m=TAG_RE.exec(srtBlocks[i].text||"");return m?("#"+srtBlocks[i].id+"="+m[1]):""}).filter(Boolean).join(", ");ctx=profText(profile)+(tail?((profile.length?". ":"")+"Tags of the last lines before this clip (id=tag): "+tail):"");
     };
     for(var g=0;!__mt&&ggroups.length;g++){
@@ -8481,7 +8481,7 @@ var prep=function(g){return (async function(){try{
     closeVideo();
     try{renderEditor();saveData();}catch(_){}
     if(done>0&&failed===0)lastKey=key;
-    toastS(failed?("🎭 ចាប់សំឡេងបាន "+done+" បន្ទាត់ • មិនបាន "+failed):("🎭 AI ចាប់សំឡេង [1]-[4] រួច "+done+" បន្ទាត់"+(rechecked?(" • ពិនិត្យឡើងវិញ "+rechecked+" • កែ "+changed):"")),!failed);
+    toastS(failed?("🎭 ចាប់សំឡេងបាន "+done+" បន្ទាត់ • មិនបាន "+failed+(window.__zsfTagLastErr?(" • មូលហេតុ: "+window.__zsfTagLastErr):"")):("🎭 AI ចាប់សំឡេង [1]-[4] រួច "+done+" បន្ទាត់"+(rechecked?(" • ពិនិត្យឡើងវិញ "+rechecked+" • កែ "+changed):"")),!failed);
   };
 })();
 if(__kd)window.__zsfDirectAnalyze=__kd;})();
@@ -8532,7 +8532,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.65";
+  var EMB="26.0.66";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
