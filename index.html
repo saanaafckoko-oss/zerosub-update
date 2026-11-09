@@ -9,7 +9,7 @@
 <body>
 <script type="text/plain" id="zsfApp">!DOCTYPE html>
 html lang="km">head>
-script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.48";})();
+script id="zsf-boot">(function(){window.__ZSF_VER=window.__ZSF_VER||"26.0.52";})();
 (function(){var F0=window.fetch;if(!F0||window.__zsfHiFb)return;window.__zsfHiFb=1;
 var H="gemini-3.8-flash-high",L="gemini-3.8-flash";
 window.fetch=async function(u,o){
@@ -809,6 +809,7 @@ html[data-mode=light] #zfAuth .zf-top button{color:#0369a1}#zfAuth .zf-top{z-ind
 #zfAuth .b.blue{background:linear-gradient(180deg,#8b7bff,#4338ca);border-color:#a5b4fc;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -4px 0 rgba(0,0,0,.25),0 6px 18px rgba(99,102,241,.55)}
 @media (prefers-reduced-motion:reduce){#zfAuth::after,#zfAuth .zfa-film,#zfAuth .zfa-eq i,#zfAuth .zf-hero::after,#zfAuth .zf-panel{animation:none!important}#zfAuth .zfa-eq i{height:60%}}
 /style>style id="zs-lite">
+.sheet>div{max-height:82vh;overflow-y:auto;-webkit-overflow-scrolling:touch}.sw button{font-size:14px}
 /* v26.0.48 lite: បិទចលនាដែលស៊ីថ្ម/ឡើងកម្ដៅ */
 .zf-logo,.zf-logo::before,.zf-logo::after,.zf-hero .zf-logo,.zf-hero h2,.zf-panel,.zf-dot,
 #zfAuth,#zfAuth::before,#zfAuth::after,#zfAuth *,#zfAuth *::before,#zfAuth *::after{animation:none!important}
@@ -985,7 +986,7 @@ const S={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.pars
 let cues=[],file=null,lang="auto",model="whisper-large-v3",gmodel=0;
 
 /* themes */
-const TH=[["មាស","#2b1c0a","#3a2916","#c98a0a","#ffb300","255,170,0","#2a1b0a"],["ទឹកសមុទ្រ","#0b1b30","#12294a","#2a6fc9","#38bdf8","56,189,248","#04202e"],["ស្វាយ","#1d0f33","#2a1650","#7c3aed","#c084fc","192,132,252","#2a0b4a"],["បៃតង","#0a2418","#103522","#16a34a","#34d399","52,211,153","#032016"],["ផ្កាឈូក","#2e0f1f","#45172e","#db2777","#f472b6","244,114,182","#3a0a22"],["ក្រហម","#2a0d0d","#401414","#dc2626","#fb7185","251,113,133","#3a0808"]];
+const TH=[["មាស","#2b1c0a","#3a2916","#c98a0a","#ffb300","255,170,0","#2a1b0a"],["ទឹកសមុទ្រ","#0b1b30","#12294a","#2a6fc9","#38bdf8","56,189,248","#04202e"],["ស្វាយ","#1d0f33","#2a1650","#7c3aed","#c084fc","192,132,252","#2a0b4a"],["បៃតង","#0a2418","#103522","#16a34a","#34d399","52,211,153","#032016"],["ផ្កាឈូក","#2e0f1f","#45172e","#db2777","#f472b6","244,114,182","#3a0a22"],["ក្រហម","#2a0d0d","#401414","#dc2626","#fb7185","251,113,133","#3a0808"],["ក្រូច","#1e0f05","#341a09","#cb580b","#ff8b3d","255,139,61","#231206"],["ទឹកក្រូច","#1e1405","#342109","#cb780b","#ffab3d","255,171,61","#231606"],["លឿង","#1e1a05","#342d09","#cbab0b","#ffdf3d","255,223,61","#231e06"],["ក្រូចឃ្មុំ","#1e1705","#342709","#c69010","#fac342","250,195,66","#231a06"],["បៃតងខ្ចី","#141e05","#223409","#78b620","#abec51","171,236,81","#172306"],["ស្លឹកឈើ","#0b1d07","#12310c","#40ab2b","#71e25a","113,226,90","#0c2108"],["បៃតងមរកត","#051e12","#09341f","#20b66b","#51ec9e","81,236,158","#062314"],["ទឹកសមុទ្រខ្ចី","#051e1b","#09342e","#1bbba6","#4cf0db","76,240,219","#06231f"],["ស៊ីយ៉ាន","#051b1e","#092e34","#10aec6","#42e2fa","66,226,250","#061f23"],["ផ្ទៃមេឃ","#05161e","#092634","#1089c6","#42bdfa","66,189,250","#061923"],["ខៀវ","#050f1e","#091934","#1053c6","#4286fa","66,134,250","#061123"],["ខៀវងងឹត","#050a1e","#091034","#2039b6","#516aec","81,106,236","#060b23"],["ឥន្ទនីល","#07051e","#0d0934","#281bbb","#594cf0","89,76,240","#080623"],["ស្វាយខ្ចី","#10051e","#1b0934","#5d15c1","#9047f5","144,71,245","#120623"],["ស្វាយចាស់","#16061d","#250b32","#8225b1","#b655e7","182,85,231","#190722"],["ម្លិះ","#1b071d","#2e0c31","#a12bab","#d75ae2","215,90,226","#1f0821"],["ម្ជុលក្រហម","#1e0518","#340929","#c11596","#f547ca","245,71,202","#23061c"],["ផ្កាឈូកខ្ចី","#1e0510","#34091b","#c6105c","#fa428f","250,66,143","#230612"],["ក្រហមចាស់","#1e0507","#34090d","#bb1b28","#f04c59","240,76,89","#230608"],["ឈាម","#1e0505","#340909","#c11515","#f54747","245,71,71","#230606"],["ស្វាយប៉ឺស","#1b091b","#2e0f2e","#a136a1","#d864d8","216,100,216","#1f0a1f"],["ទឹកផ្ទៃ","#09161b","#0f262e","#3686a1","#64bbd8","100,187,216","#0a1a1f"],["ពណ៌ប្រាក់","#101418","#1d232b","#627084","#b3bdcc","179,189,204","#121417"],["ពណ៌ទង់ដែង","#1d0e07","#31170c","#ab512b","#e2835a","226,131,90","#211008"]];
 function applyTh(i){const t=TH[i],r=document.documentElement.style;["--bg","--hdr","--line","--acc","--glow","--accT"].forEach((k,j)=>r.setProperty(k,t[[1,2,3,4,5,6][j]]));S.set("th",i)}
 applyTh(S.get("th",0));
 $("#sw").innerHTML=TH.map((t,i)=>`button data-i="${i}" style="background:linear-gradient(135deg,${t[1]},${t[4]})">${t[0]}/button>`).join("");
@@ -1321,6 +1322,7 @@ async function zsFastSave(name,b){
    if(!r||!r.ok)throw new Error((r&&r.error)||"saveToDownloads");
   }
   try{setProgress(100,"✅ រក្សាទុករួច")}catch(e){}
+  try{navigator.vibrate&&navigator.vibrate([250,120,250,120,400])}catch(e){}
   try{showToast("✅ រក្សាទុករួចក្នុង Downloads: "+name+" ("+mb(total)+" MB)",true)}catch(e){}
   return true;
  }catch(err){
@@ -6236,6 +6238,7 @@ new MutationObserver(function(){if(!window.__expRunning)return;var eb=$("#exp"),
 
 function zsfDone(msg,big){
  try{if(big)msg=zsfTimes(msg)}catch(_){}
+ try{if(big&&String(msg).indexOf("✅")>=0&&window.zsSayDone)window.zsSayDone()}catch(_){}
  /* V21.1: មិនបង្ហាញប្រអប់បៃតងលើអេក្រង់ទៀតទេ — ជូនដំណឹងតាម Notification របស់ទូរសព្ទ (ដូចគេ) + ញ័រ */
  var shown=false;
  try{var N=window.ZSNative;if(N&&typeof N.workStart==="function"){
@@ -7249,6 +7252,11 @@ async function clearLogin(){
 }
 
 /* ---------- Auth UI ---------- */
+function zsWelcome(){try{var L="km";try{L=localStorage.getItem("zf_lang")||"km"}catch(e){}
+var M={km:["សូមស្វាគមន៍មកកាន់គ្រួសារ ហ្សេរ៉ូ ហ្វ្លាស","km-KH"],en:["Welcome to the Zero Flash family","en-US"],lo:["ຍິນດີຕ້ອນຮັບສູ່ຄອບຄົວ Zero Flash","lo-LA"],th:["ยินดีต้อนรับสู่ครอบครัว Zero Flash","th-TH"],vi:["Chào mừng bạn đến với gia đình Zero Flash","vi-VN"],zh:["欢迎来到 Zero Flash 大家庭","zh-CN"],ko:["Zero Flash 가족이 되신 것을 환영합니다","ko-KR"]};
+var m=M[L]||M.km;if(!window.speechSynthesis)return;var u=new SpeechSynthesisUtterance(m[0]);u.lang=m[1];u.rate=.95;u.volume=1;
+try{var vs=speechSynthesis.getVoices(),p=m[1].slice(0,2),v=vs.filter(function(x){return String(x.lang).replace("_","-").toLowerCase().indexOf(p)===0})[0];if(v)u.voice=v}catch(e){}
+setTimeout(function(){try{speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}},700)}catch(e){}}
 var busy=false,expTimer=null,curExp=0;
 function err(msg){
  var b=$("zfErr");b.innerHTML=msg;b.style.display="block";
@@ -7303,7 +7311,7 @@ async function verify(){
    else{var rr=await remoteDays(raw);if(rr.err)netErr=true;else if(rr.days>0){days=rr.days;k=normalize(raw)}}
   }
   var wait=700-(Date.now()-t0);if(wait>0)await new Promise(function(r){setTimeout(r,wait)});
-  if(isAdmin){setKA({});await persist({key:"ADMIN",activatedAt:Date.now(),expiresAt:0,admin:true,tok:tok});unlock("ADMIN");return}
+  if(isAdmin){setKA({});await persist({key:"ADMIN",activatedAt:Date.now(),expiresAt:0,admin:true,tok:tok});unlock("ADMIN");zsWelcome();return}
   if(wState==="blocked"){err("🚫 IP របស់អ្នកត្រូវបានបិទ (ដាក់កូនសោខុសច្រើនដង)br>span style=\"font-weight:500;font-size:12.5px;opacity:.9\">សូមទាក់ទងអ្នកលក់តាម Telegram ដើម្បីដោះ/span>");return}
   if(wState==="device"){err(devMsg());return}
   if(wState==="expired"){err("⌛ កូនសោនេះផុតកំណត់ហើយbr>span style=\"font-weight:500;font-size:12.5px;opacity:.9\">សូមទាក់ទងអ្នកលក់តាម Telegram ដើម្បីបន្ថែមថ្ងៃ/span>");return}
@@ -7313,7 +7321,7 @@ async function verify(){
    if(!saved){err(FAIL);return}
    setKA({});markUsed(k,now,exp);lset("zsf_last_chk",String(Date.now()));
    if(wipeAdminKeys()){toast("🔒 បានលុប API Key ចាស់ចេញពីឧបករណ៍នេះ — សូមដាក់ Key ផ្ទាល់ខ្លួនរបស់អ្នក",true);setTimeout(function(){location.reload()},900);return}
-   unlock(exp);if(/^ZS-/.test(String(k)))startRecheck();return;
+   unlock(exp);zsWelcome();if(/^ZS-/.test(String(k)))startRecheck();return;
   }
   if(netErr){err("⚠️ មិនអាចផ្ទៀងផ្ទាត់កូនសោបានទេ — សូមភ្ជាប់អ៊ីនធឺណិត ហើយសាកល្បងម្តងទៀត");return}
   var n=(Number(ka.n)||0)+1,o={n:n};if(n>=5)o.until=Date.now()+Math.min(3600,30*Math.pow(2,n-5))*1000;setKA(o);
@@ -7373,7 +7381,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 script id="zsf-v725-updbtn">
  
 (function(){
-  var ZSF_VER=window.__ZSF_VER||"26.0.48",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
+  var ZSF_VER=window.__ZSF_VER||"26.0.52",REMV="",IURL="",VURL="https://raw.githubusercontent.com/saanaafckoko-oss/zerosub-update/main/version.txt",st="off";
   IURL=VURL.replace(/version\.txt$/,"index.html");
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;iMath.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function isLocal(){return false}
@@ -8388,6 +8396,25 @@ var prep=function(g){return (async function(){try{
 })();
 if(__kd)window.__zsfDirectAnalyze=__kd;})();
 /script>
+script id="zs-voice">
+(function(){
+var KM=["មួយ","ពីរ","បី","បួន","ប្រាំ","ប្រាំមួយ"];
+var C={km:["មិនអីទេ កំពុងតែដំណើរការ សូមរង់ចាំបន្តិច","ចិត្តត្រជាក់ៗ ជិតរួចហើយ សូមអត់ធ្មត់បន្តិច","កុំបារម្ភ ការងារកំពុងដើរយ៉ាងល្អ","សូមរង់ចាំបន្តិចទៀត ទូរសព្ទកំពុងខំធ្វើឱ្យអ្នក","ជិតបានហើយ សូមកុំបិទកម្មវិធី"],en:["Don't worry, it's working. Please wait a moment.","Stay calm, almost there. Thank you for your patience.","No worries, everything is going well.","Please wait a little more, your phone is working hard.","Almost done. Please keep the app open."]};
+function lang(){var L="km";try{L=localStorage.getItem("zf_lang")||"km"}catch(e){}return L==="km"?"km":"en"}
+function say(t,l){try{if(!window.speechSynthesis||document.hidden)return;var u=new SpeechSynthesisUtterance(t),code=l==="km"?"km-KH":"en-US";u.lang=code;u.rate=.95;u.volume=1;
+try{var p=code.slice(0,2),v=speechSynthesis.getVoices().filter(function(x){return String(x.lang).replace("_","-").toLowerCase().indexOf(p)===0})[0];if(v)u.voice=v}catch(e){}
+speechSynthesis.cancel();speechSynthesis.speak(u);last=Date.now()}catch(e){}}
+var last=0,prev=0,ci=0;
+window.zsSayDone=function(){var l=lang();say(l==="km"?"រួចរាល់ទាំងអស់ហើយ វីដេអូរបស់អ្នកបានចូលទូរសព្ទហើយ":"All done! Your video is saved.",l)};
+setInterval(function(){
+ if(!window.__pipe){prev=0;return}
+ var f=window.__fstep||0,l=lang();
+ if(f&&prev&&f>prev&&prev=6){say(l==="km"?"រួចរាល់ដំណាក់កាលទី"+KM[prev-1]:"Step "+prev+" complete",l)}
+ else if(Date.now()-last>45000&&!document.hidden){say(C[l][ci++%C[l].length],l)}
+ if(f)prev=f;else if(!prev)last=last||Date.now();
+},3000);
+})();
+/script>
 /body>/html>
 </script>
 <script id="zsf-wrap">
@@ -8396,7 +8423,7 @@ if(__kd)window.__zsfDirectAnalyze=__kd;})();
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="26.0.48";
+  var EMB="26.0.52";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
