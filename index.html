@@ -6178,7 +6178,7 @@ async function translateAll(){
  var plain=function(i){return src[i].t.replace(TAG,"").replace(/\n/g," ").trim()};
  var out=new Array(N).fill(null),doneN=0,lastErr="",inflight=0,abort=null,dead={},t00=Date.now();
  var show=function(){try{setProgress(Math.round(doneN/N*100),"🧠 កំពុងបកប្រែ "+doneN+"/"+N+(isLocal?" (Local AI)":" (Gemini)")+"..."+(doneN===0&&lastErr?" ["+lastErr+"]":""))}catch(_){}};
- var live=function(j){doneN++;try{var c=cues[j],m=src[j].t.match(TAG);if(c)c.t=(m?m[0].trim()+" ":"")+out[j]}catch(_){}show()};
+ var cnt={};var live=function(j){if(!cnt[j]){cnt[j]=1;doneN++}try{var c=cues[j],m=src[j].t.match(TAG);if(c)c.t=(m?m[0].trim()+" ":"")+out[j]}catch(_){}show()};
  /* ១. ចាប់ប្រភេទសាច់រឿង (រង់ចាំអតិបរមា ២៥ វិនាទី) */
  if(tv==="km"&&!isLocal){
   try{
@@ -6256,13 +6256,19 @@ async function translateAll(){
  var hb=setInterval(show,3000);
  try{await Promise.all(Array.from({length:W},function(_,wi){return worker(wi)}))}finally{clearInterval(hb)}
 
+ /* V27.2.1: ឃ្លាដែលនៅមិនទាន់បកប្រែ → Google Translate ជាវិធីបម្រុង */
+ try{if(!abort&&!isLocal){var __miss=[];for(var mk=0;mk<N;mk++){if(out[mk]===null)__miss.push(mk)}
+  if(__miss.length){try{setProgress(Math.round(doneN/N*100),"🌐 កំពុងបកឃ្លាដែលនៅសល់ "+__miss.length+" ដោយ Google...")}catch(_){}
+   var __gt=await googleTr(__miss.map(plain),tv,null),__pg=[];
+   __gt.forEach(function(v,x){var j=__miss[x];if(v&&out[j]===null){v=String(v).replace(/\[[1-4]\]\s*/g,"").trim();if(v&&zsfTrOk(tv,plain(j),v)){out[j]=v;__pg.push([zk(j),v]);live(j)}}});
+   if(__pg.length){try{zsfTrPutMany(__pg)}catch(_){}}}}}catch(eg){console.warn("google fallback",eg)}
  /* V27.2: ជំហានខ្លី — ឃ្លាណាអានមិនទាន់ក្នុងពេល SRT (>~6 ព្យាង្គ/វិ) → ឱ្យ Gemini កាត់ពាក្យបំពេញ រក្សាអត្ថន័យ + ពាក្យបញ្ចប់ + សញ្ញា */
  try{if(!abort&&!isLocal){for(var rd=0;rd<2;rd++){
   var lng=[];for(var k=0;k<N;k++){if(out[k]){var dd=Math.max(.3,src[k].e-src[k].s),mx=Math.max(3,Math.round(dd*zsfFit("sylps",6)));if(zsfKhSyl(out[k])>mx*1.08)lng.push(k)}}
   if(!lng.length)break;
   for(var q2=0;q2<lng.length;q2+=30){var grp=lng.slice(q2,q2+30),ky=keys[Math.floor(q2/30)%keys.length];
    try{var pr2=HEAD+"\n\nSHORTEN TASK: each line below has the Chinese source, the current Khmer, and a limit {about N chars}. Rewrite ONLY the Khmer so it is at or below N chars (about 6 syllables per second, the line is spoken in sync with lips). Cut filler and decoration, NEVER cut meaning: keep who/what, names, numbers, negations, the final point. Keep spoken Khmer, a natural ending word and the right punctuation (? ! ។ ...) for the emotion. Output only the numbered Khmer lines.\n"+grp.map(function(j,x){return (x+1)+". "+src[j].t.replace(/\n/g," ")+" || "+out[j]+" {about "+Math.max(5,Math.round((src[j].e-src[j].s)*zsfFit("hint",13)))+" chars}"}).join("\n");
-    var tx2=await requestGeminiOnce(pr2,ky,zsfTrModels()[0],false),ar2=zsfParseNumbered(tx2,grp.length),pu2=[];
+    try{setProgress(100,"✂️ កំពុងកាត់ឃ្លាឱ្យខ្លី... ("+Math.min(q2+30,lng.length)+"/"+lng.length+")")}catch(_){}var tx2=await Promise.race([requestGeminiOnce(pr2,ky,zsfTrModels()[0],false),new Promise(function(_,rj){setTimeout(function(){rj(new Error("timeout"))},40000)})]),ar2=zsfParseNumbered(tx2,grp.length),pu2=[];
     ar2.forEach(function(v,x){if(v===null)return;var j=grp[x],t=v.replace(/\[[1-4]\]\s*/g,"").replace(/\{[a-z]+\}\s*/g,"").trim();
      if(t&&zsfKhSyl(t)<zsfKhSyl(out[j])&&zsfTrOk(tv,plain(j),t)){out[j]=t;pu2.push([zk(j),t]);live(j)}});
     if(pu2.length){try{zsfTrPutMany(pu2)}catch(_){}}
