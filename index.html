@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- V27.9.14 : អានសំឡេង (TTS) លឿនជាងមុនប៉ុន្តែប្រុងប្រយ័ត្ន — ចំនួនអានស្របគ្នាចាប់ផ្តើមដូចមុន (Server×៣) បង្កើនបន្តិចម្តងៗរហូត Server×៤ (អតិបរមា ២៤) ហើយបន្ថយភ្លាមពេលឃើញ 429/ហួសម៉ោង/កំហុស · គ្មានការបន្ថែមក្នុង UI -->
+<!-- V27.9.33 : ផ្គុំវីដេអូ (Merger) — Re-encode ជាលំនាំដើម + កំណត់ timestamp ឡើងវិញ + តម្រឹមសំឡេង (async) ដោះស្រាយសំឡេងតាក់ស្គប់ត្រង់ចំណុចតភ្ជាប់ភាគ --> <!-- V27.9.14 : អានសំឡេង (TTS) លឿនជាងមុនប៉ុន្តែប្រុងប្រយ័ត្ន — ចំនួនអានស្របគ្នាចាប់ផ្តើមដូចមុន (Server×៣) បង្កើនបន្តិចម្តងៗរហូត Server×៤ (អតិបរមា ២៤) ហើយបន្ថយភ្លាមពេលឃើញ 429/ហួសម៉ោង/កំហុស · គ្មានការបន្ថែមក្នុង UI -->
 <!-- V27.9.12 : Prompt បកប្រែថ្មី (ZSF_PROMPT_NEW ច្បាប់ ១-១១) + រក្សាច្បាប់ឋានៈ/ទំនាក់ទំនង/ពាក្យហៅតួអង្គដដែល (ច្បាប់ទី ១២) + ផ្នែកបច្ចេកទេសដដែល · ប្តូរ cache បកប្រែ v10→v11 -->
 <!-- V27.9.4 : CNN ប្រុស/ស្រី (ONNX) ជាមតិបន្ថែមក្នុង hybrid tagger -->
 <!-- V27.9.2 : ផ្ទៀងផ្ទាត់ប្រុស/ស្រីតាម "តារាងសំឡេង" នៃវីដេអូតែមួយ (kNN) — ឃ្លាដែលកុំព្យូទ័រសម្រេចតែឯង តែសំឡេងដូចភេទផ្ទុយក្នុងវីដេអូដដែល → ផ្ញើ Gemini ផ្ទៀងផ្ទាត់ · ឃ្លាបំរុងចុងក្រោយប្រើ kNN ជំនួសកម្រិតតែមួយ -->
@@ -1617,6 +1617,8 @@ async function zsfEnforce(F0,self,u,o,ENF){
   return zsfEnforce(F0,this,u,o,ENF)};
 })();
 /* V15.4: ផ្គុំវីដេអូដោយ FFmpeg native ក្នុង APK (ដូចការកាត់ភាគ) — មិនពឹង ffmpeg.wasm ទៀត */
+/* V27.9.33: ផ្គុំដោយ Re-encode ជាលំនាំដើម (copy ធ្វើឲ្យ timestamp ភាគៗរញ៉េរញ៉ៃ → តាក់ស្គប់) */
+const ZS_MERGE_COPY=false;
 async function zsNativeMerge(fl,info){
  const N=window.ZSNative;
  if(!(N&&typeof N.runFfmpeg==="function"&&typeof N.putFile==="function"&&typeof N.deleteFile==="function"&&typeof N.saveToDownloads==="function"&&typeof N.prepareLastPicked==="function"))throw new Error("APK នេះគ្មាន native merge (putFile/runFfmpeg)");
@@ -1641,13 +1643,13 @@ async function zsNativeMerge(fl,info){
   const exts=fl.map(ext),oe=exts.every(x=>x===exts[0])?exts[0]:"mp4",mp=/^(mp4|mov|m4v)$/.test(oe);
   const run=async(a,lb)=>{say(lb+" ...");const r=await nCall("zsMg",cb=>N.runFfmpeg(JSON.stringify(a),cb),60*60*1000,ms=>say(lb+" "+Math.floor(ms/1000)+" វិនាទី"));return r};
   let out=tg+"_out."+oe;
-  let r=await run(["-y","-f","concat","-safe","0","-i",dir+list,"-c","copy"].concat(mp?["-movflags","+faststart"]:[],[dir+out]),"🔗 កំពុងផ្គុំ (Native • លឿន)");
+  let r=ZS_MERGE_COPY?await run(["-y","-f","concat","-safe","0","-i",dir+list,"-c","copy"].concat(mp?["-movflags","+faststart"]:[],[dir+out]),"🔗 កំពុងផ្គុំ (Native • លឿន)"):{ok:false};
   if(!(r&&r.ok)){
    try{N.deleteFile(out)}catch(_){}
    out=out0;
    const v0=(info||[]).find(Boolean)||{w:1280,h:720},W=(v0.w||1280)&~1,H=(v0.h||720)&~1;
    const inp=names.flatMap(n=>["-i",dir+n]);
-   const fc=names.map((_,i)=>`[${i}:v]scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,format=yuv420p[v${i}];[${i}:a]aresample=44100,aformat=channel_layouts=stereo[a${i}]`).join(";")+";"+names.map((_,i)=>`[v${i}][a${i}]`).join("")+`concat=n=${names.length}:v=1:a=1[v][a]`;
+   const fc=names.map((_,i)=>`[${i}:v]setpts=PTS-STARTPTS,scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,format=yuv420p[v${i}];[${i}:a]asetpts=PTS-STARTPTS,aresample=44100:async=1,aformat=channel_layouts=stereo[a${i}]`).join(";")+";"+names.map((_,i)=>`[v${i}][a${i}]`).join("")+`concat=n=${names.length}:v=1:a=1[v][a]`;
    r=await run(["-y"].concat(inp,["-filter_complex",fc,"-map","[v]","-map","[a]","-c:v","libx264","-preset","ultrafast","-crf","23","-c:a","aac","-b:a","128k","-movflags","+faststart",dir+out]),"🔗 កំពុងផ្គុំ (Native • Re-encode)");
   }
   if(!(r&&r.ok))throw new Error("native ffmpeg ផ្គុំបរាជ័យ: "+errTxt(r&&r.error));
@@ -1683,7 +1685,7 @@ async function doMerge(){
   mounted=await mountFiles(f,"/mg",files);
   let oe=exts.every(x=>x===exts[0])?exts[0]:"mp4",code=-1;
   const ok=info.every(Boolean),same=!ok||info.every(x=>x.w===info[0].w&&x.h===info[0].h);
-  if(same){
+  if(same&&ZS_MERGE_COPY){
    window.__ffTag="🔗 កំពុងផ្គុំ (Fast Sync)";say(window.__ffTag+" ...");
    await f.writeFile("list.txt",files.map(x=>"file '/mg/"+x.name+"'").join("\n")+"\n");
    const a=["-f","concat","-safe","0","-i","list.txt","-c","copy"];
@@ -1691,12 +1693,12 @@ async function doMerge(){
    a.push("-y","out."+oe);
    code=await f.exec(a);
    if(code!==0){try{await f.deleteFile("out."+oe)}catch(e){}}
-  }else say("⚠ ទំហំវីដេអូមិនដូចគ្នា — ប្តូរទៅវិធី Re-encode (យឺតជាង)...");
+  }else if(!same)say("⚠ ទំហំវីដេអូមិនដូចគ្នា — ប្តូរទៅវិធី Re-encode (យឺតជាង)...");
   if(code!==0){
    oe="mp4";const v0=info.find(Boolean)||{w:1280,h:720},W=(v0.w||1280)&~1,H=(v0.h||720)&~1;
    window.__ffTag="🔗 កំពុងផ្គុំ (Re-encode)";say(window.__ffTag+" ...");
    const inp=files.flatMap(x=>["-i","/mg/"+x.name]);
-   const fc=files.map((_,i)=>`[${i}:v]scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,format=yuv420p[v${i}];[${i}:a]aresample=44100,aformat=channel_layouts=stereo[a${i}]`).join(";")+";"+files.map((_,i)=>`[v${i}][a${i}]`).join("")+`concat=n=${files.length}:v=1:a=1[v][a]`;
+   const fc=files.map((_,i)=>`[${i}:v]setpts=PTS-STARTPTS,scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,format=yuv420p[v${i}];[${i}:a]asetpts=PTS-STARTPTS,aresample=44100:async=1,aformat=channel_layouts=stereo[a${i}]`).join(";")+";"+files.map((_,i)=>`[v${i}][a${i}]`).join("")+`concat=n=${files.length}:v=1:a=1[v][a]`;
    await runFF(f,[...inp,"-filter_complex",fc,"-map","[v]","-map","[a]","-c:v","libx264","-preset","ultrafast","-crf","23","-c:a","aac","-b:a","128k","-movflags","+faststart","-y","out.mp4"]);
   }
   const d=await f.readFile("out."+oe),nm=baseName(mergeFiles[0])+"_merged."+oe;
