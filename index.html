@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- V27.9.40 : ជួសជុលការវិភាគ SRT ចាប់ប្រភេទរឿងស្វ័យប្រវត្តិ — (១) ប្រភេទពី SRT ទាំងមូលមិនត្រូវបានជំនួសដោយប្រភេទពីឃ្លាដំបូងៗទៀតទេ (២) កាត STORY មិនកាត់ត្រឹម ១២០០ តួអក្សរទៀត (៣) សាកល្បងម្តងទៀត + សំណើរកប្រភេទតូច បើវិភាគពេញបរាជ័យ (៤) Timeout វែងជាងមុន -->
 <!-- V27.9.38 : ផ្គុំវីដេអូ (Merger) — Re-encode ជាលំនាំដើម + កំណត់ timestamp ឡើងវិញ + តម្រឹមសំឡេង (async) ដោះស្រាយសំឡេងតាក់ស្គប់ត្រង់ចំណុចតភ្ជាប់ភាគ --> <!-- V27.9.14 : អានសំឡេង (TTS) លឿនជាងមុនប៉ុន្តែប្រុងប្រយ័ត្ន — ចំនួនអានស្របគ្នាចាប់ផ្តើមដូចមុន (Server×៣) បង្កើនបន្តិចម្តងៗរហូត Server×៤ (អតិបរមា ២៤) ហើយបន្ថយភ្លាមពេលឃើញ 429/ហួសម៉ោង/កំហុស · គ្មានការបន្ថែមក្នុង UI -->
 <!-- V27.9.12 : Prompt បកប្រែថ្មី (ZSF_PROMPT_NEW ច្បាប់ ១-១១) + រក្សាច្បាប់ឋានៈ/ទំនាក់ទំនង/ពាក្យហៅតួអង្គដដែល (ច្បាប់ទី ១២) + ផ្នែកបច្ចេកទេសដដែល · ប្តូរ cache បកប្រែ v10→v11 -->
 <!-- V27.9.4 : CNN ប្រុស/ស្រី (ONNX) ជាមតិបន្ថែមក្នុង hybrid tagger -->
@@ -3531,6 +3532,42 @@ async function doExport(){
  try{const r=await doExport0();try{zsxEnd(true)}catch(e){}return r}
  catch(e){try{zsxLog("❌ "+String((e&&e.message)||e));zsxEnd(false)}catch(_){}throw e}
 }
+
+/* ===== V27.9.39 : សំឡេងខ្មែរតែមួយ (គ្មានវីដេអូ) — ប៊ូតុងក្រហម «ចាប់ផ្ដើម បង្កើតសំឡេង AI» ===== */
+async function zsfVoiceOnly(){
+ const btn=$("#aiGen"),old=btn.innerHTML,opt=$$("#opts .b")[2];
+ let restoreOff=false;
+ try{
+  if(!cues.length)throw new Error("សូមនាំចូល SRT ជាមុន");
+  if(!cues.some(function(c){return String(c.t||"").trim()}))throw new Error("SRT គ្មានអក្សរសម្រាប់អានទេ");
+  btn.disabled=true;AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  /* SRT គ្មានស្លាក [1]-[4] → អានដោយសំឡេងតែមួយ (Preset ដែលបានជ្រើស) ដោយបិទ «ចែកតួ» បណ្តោះអាសន្ន */
+  const tagged=cues.some(function(c){return /^\s*\[[1-4]\]/.test(String(c.t||""))});
+  if(!tagged&&opt&&!opt.classList.contains("off")){opt.classList.add("off");restoreOff=true}
+  window.__preDub=null;
+  btn.textContent="🎙 កំពុងបង្កើតសំឡេងខ្មែរ...";
+  const dub=await buildDub(btn);
+  if(!dub||!dub.out.length)throw new Error("បង្កើតសំឡេងមិនបាន — ពិនិត្យអ៊ីនធឺណិត ឬ TTS Worker");
+  const SR=24000,pl=fxPlan(dub.out).plan;
+  let endT=0;pl.forEach(function(x){if(x.en>endT)endT=x.en});
+  const total=Math.max(SR,Math.round((endT+1.2)*SR)),B=fxBounds(total,SR,pl,60),NW=B.length-1,parts=[];
+  for(let k=0;k<NW;k++){
+   btn.textContent="🔊 កំពុងផ្គុំសំឡេង "+Math.round((k+1)/NW*100)+"%...";
+   const buf=await fxRenderWin(B[k],B[k+1],SR,null,0,pl,0,false,[]),n=buf.length,a=buf.getChannelData(0),b=buf.numberOfChannels>1?buf.getChannelData(1):a,o=new Int16Array(n);
+   for(let i=0;i<n;i++){let v=(a[i]+b[i])*.5;v=v>1?1:(v<-1?-1:v);o[i]=v<0?v*32768:v*32767}
+   parts.push(o);await new Promise(function(r){setTimeout(r,0)})}
+  let len=0;parts.forEach(function(x){len+=x.length});
+  const hd=new ArrayBuffer(44),dv=new DataView(hd),w=function(o,t){for(let i=0;i<t.length;i++)dv.setUint8(o+i,t.charCodeAt(i))};
+  w(0,"RIFF");dv.setUint32(4,36+len*2,true);w(8,"WAVE");w(12,"fmt ");dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,SR,true);dv.setUint32(28,SR*2,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);w(36,"data");dv.setUint32(40,len*2,true);
+  const blob=new Blob([hd].concat(parts),{type:"audio/wav"});
+  let nm="khmer_voice";try{if(file)nm=(baseName(file)||nm)+"_khmer_voice"}catch(e){}
+  dlBlob(nm+".wav",blob);
+  window.__preDub=null;
+  showToast("✅ បង្កើតសំឡេងខ្មែររួច "+dub.out.length+"/"+dub.total+" ឃ្លា • "+(blob.size/1048576).toFixed(1)+" MB • ឯកសារ "+nm+".wav ក្នុងថត Download"+(dub.fail?" • បរាជ័យ "+dub.fail+" ឃ្លា":""),!dub.fail);
+ }finally{
+  if(restoreOff&&opt)opt.classList.remove("off");
+  btn.disabled=false;btn.innerHTML=old}
+}
 async function doExport0(){
  const T0x=performance.now(),tag=m=>{},done=m=>{window.__zsExpPath=m};window.__zsExpTm="";window.__zsExpPath="";
  if(!file||!V.videoWidth)return alert("សូមជ្រើសវីដេអូជាមុន");
@@ -6132,7 +6169,7 @@ q("#cuAlign").onclick=async function(){
   else{setC(r.cues);try{render()}catch(e){}showToast("✅ បានតម្រឹមម៉ោង Subtitle ទាំងអស់ ("+r.cues.length+" ឃ្លា • កែម៉ោងចាប់ផ្តើម "+r.st.s+" • កែម៉ោងបញ្ចប់ "+r.st.e+")",true)}
  }catch(e){showToast("❌ តម្រឹមម៉ោងបរាជ័យ: "+String((e&&e.message)||e).slice(0,160),false)}
  b.disabled=false;b.innerHTML=old};
-q("#aiGen").onclick=()=>{if(!cues.length)return alert("សូមនាំចូល SRT ជាមុន");if(!V.src)return alert("សូមរើសវីដេអូជាមុន");doExport().catch(function(x){alert("Export: "+x.message)})};
+q("#aiGen").onclick=()=>{if(!cues.length)return showToast("សូមនាំចូល SRT ជាមុន",false);if(!file||!V.src){zsfVoiceOnly().catch(function(x){showToast("❌ "+String((x&&x.message)||x).slice(0,200),false)});return}doExport().catch(function(x){showToast("❌ Export: "+String((x&&x.message)||x).slice(0,200),false)})};
 setInterval(()=>{if(document.hidden)return;const a=document.activeElement;if(a&&a.dataset&&a.dataset.a=="txt")return;const __t=toSrt(cues),k=cues.length+"|"+__t;if(k!==last+"|"&&k!==cues.length+"|"+last){last=__t;if(cues.length)q("#srtArea").classList.remove("hide");render()}},1500);
 q("#vidFile").addEventListener("change",()=>{if(q("#vidFile").files[0])q("#browse").textContent="📂 ប្តូរឯកសារ Media"});
 let pc=0;
@@ -7628,12 +7665,12 @@ window.zsfStoryBlock=function(){
 })();
 
 /* V12.9: សៀវភៅរឿងស្វ័យប្រវត្តិ (បង្កប់ក្នុងកូដ — គ្មានប្រអប់បរិបទ/ប៊ូតុងប្រភេទទៀត) */
-window.zsfBibleWaitMs=function(){var mb=0;try{mb=file?file.size/1048576:0}catch(_){}return 60000};
+window.zsfBibleWaitMs=function(){var mb=0;try{mb=file?file.size/1048576:0}catch(_){}return 90000};
 /* ===== PROMPT បកប្រែ (ស្អាត) — ដាក់ Prompt ថ្មីរបស់អ្នកក្នុង ZSF_PROMPT_NEW ខាងក្រោម។ អាចប្រើ {TL} = ភាសាគោលដៅ និង {CTX} = បរិបទ/សៀវភៅរឿង ===== */
 window.ZSF_PROMPT_NEW="អ្នកគឺជាអ្នកបកប្រែភាសាខ្មែរដែលមានជំនាញខ្ពស់ក្នុងការបកប្រែភាពយន្ត វីដេអូ និងអត្ថបទសន្ទនា។\n\nសូមបកប្រែអត្ថបទខាងក្រោមទៅជាភាសាខ្មែរ ដោយអនុវត្តតាមច្បាប់ទាំងនេះ៖\n\n1. បកប្រែឱ្យមានលក្ខណៈធម្មជាតិ ដូចមនុស្សខ្មែរនិយាយពិតៗ មិនត្រូវបកប្រែតាមពាក្យមួយៗរហូតធ្វើឱ្យឃ្លារឹង ឬមិនស្រួលស្ដាប់ឡើយ។\n\n2. រក្សាអត្ថន័យដើម ឱ្យបានត្រឹមត្រូវ និងពេញលេញ។ មិនត្រូវបន្ថែម ឬកាត់ចេញព័ត៌មានសំខាន់ៗឡើយ។\n\n3. ប្រើឃ្លាខ្មែរឱ្យខ្លី ប៉ុន្តែមានខ្លឹមសារ និងមិនបាត់បង់អត្ថន័យដើម។\n\n4. ប្រើពាក្យសមស្របទៅតាមបរិបទ អារម្មណ៍ និងទំនាក់ទំនងរបស់តួអង្គ ដូចជា៖\n - ការនិយាយធម្មតា\n - ការនិយាយគួរឱ្យគោរព\n - ការនិយាយជិតស្និទ្ធ\n - ការខឹង\n - ការភ័យខ្លាច\n - ការសោកសៅ\n - ការភ្ញាក់ផ្អើល\n - ការលេងសើច\n\n5. បញ្ចប់ឃ្លានីមួយៗឱ្យសមស្រប ដោយប្រើពាក្យខ្មែរដែលស្ដាប់ទៅធម្មជាតិ។ អាចប្រើពាក្យបែបសន្ទនា ដូចជា៖\n - ណា\n - ហើយ\n - ទេ\n - មែនទេ?\n - វើយ\n - អី?\n - សោះ\n - ហ្នឹងហើយ\n - អីចឹង\n - ណ៎\n\n ប៉ុន្តែត្រូវប្រើតែពេលសមស្របនឹងបរិបទ មិនត្រូវដាក់គ្រប់ឃ្លាដោយបង្ខំឡើយ។\n\n6. អាចបន្ថែមភាពកំប្លែង ឬពាក្យលេងសើចបន្តិច ដើម្បីឱ្យការបកប្រែមានជីវិត និងទាក់ទាញជាងមុន ប៉ុន្តែត្រូវរក្សាអត្ថន័យដើម និងមិនត្រូវបំផ្លើសឡើយ។\n\n7. ឧទាហរណ៍នៃស្ទីលសន្ទនា៖\n - “That was amazing!” → “អស្ចារ្យណាស់វើយ!”\n - “Are you serious?” → “និយាយមែនហ្នឹង?”\n - “I can’t believe this!” → “ខ្ញុំមិនជឿទេ!”\n - “What are you doing?” → “កំពុងធ្វើអីហ្នឹង?”\n - “Come on, let’s go!” → “ទៅ ទៅ កុំយូរ!”\n\n8. ប្រើសញ្ញាវណ្ណយុត្តិឱ្យត្រឹមត្រូវ និងសមស្របទៅតាមអារម្មណ៍របស់ឃ្លា ដូចជា៖\n - សញ្ញាឧទាន (!)\n - សញ្ញាសួរ (?)\n - សញ្ញាចំណុចបី (...)\n - សញ្ញាក្បៀស (,)\n - សញ្ញាចំណុច (។)\n\n9. ទម្រង់បន្ទាត់ (កម្មវិធីផ្ញើជាបន្ទាត់មានលេខ មិនមែនឯកសារ SRT ពេញ)៖\n - រក្សាលេខរៀងដដែល\n - បកប្រែតែអត្ថបទសន្ទនា\n - មួយបន្ទាត់ចូល ត្រូវចេញមួយបន្ទាត់ ហើយរក្សាលំដាប់ដដែល\n\n10. កុំបន្ថែមការពន្យល់ កំណត់សម្គាល់ ឬអត្ថបទក្រៅពីលទ្ធផលបកប្រែ។ សូមបង្ហាញតែលទ្ធផលបកប្រែប៉ុណ្ណោះ។\n\n11. មុននឹងបញ្ចប់ សូមពិនិត្យឡើងវិញក្នុងចិត្ត (មិនបង្ហាញក្នុងលទ្ធផលទេ) ថា៖\n - ភាសាខ្មែរមានភាពធម្មជាតិ\n - ឃ្លាមិនវែងពេក\n - អត្ថន័យដើមមិនបានបាត់\n - ពាក្យបញ្ចប់ឃ្លាសមស្រប\n - សញ្ញាអារម្មណ៍ត្រូវបានប្រើត្រឹមត្រូវ\n - ភាពកំប្លែងមិនលើសកម្រិត\n - មិនមានការបកប្រែតាមពាក្យដែលធ្វើឱ្យស្ដាប់ទៅរឹង\n\n12. ឋានៈ ទំនាក់ទំនង និងពាក្យហៅរបស់តួអង្គ (សំខាន់ណាស់ — ត្រូវអនុវត្តគ្រប់បន្ទាត់)\nអ្នកគឺជាអ្នកបកប្រែជំនាញផ្នែកភាពយន្ត និងរឿងភាគ។ ត្រូវផ្តោតសំខាន់លើការសម្គាល់ឋានៈ ទំនាក់ទំនង និងតួនាទីរបស់តួអង្គឱ្យបានត្រឹមត្រូវ។ ការវិភាគតួអង្គ (ឈ្មោះ ភេទ អាយុ ឬជំនាន់ ទំនាក់ទំនង ឋានៈ របៀបដែលអ្នកដទៃហៅគេ) ត្រូវធ្វើក្នុងគំនិតរបស់អ្នកប៉ុណ្ណោះ ហើយត្រូវប្រើបញ្ជីតួអង្គ និងតារាងហៅគ្នាក្នុងសៀវភៅរឿង (STORY) ជាប្រភពតែមួយគត់ និងជាកត្តាចម្បង។ មិនត្រូវសរសេរតារាងវិភាគ ឬផ្នែកទី១ ទី២ ក្នុងលទ្ធផលទេ ព្រោះកម្មវិធីអានតែបន្ទាត់ដែលមានលេខប៉ុណ្ណោះ។\n- សម្គាល់ថាតួអង្គណាជា៖ បងប្រុស ប្អូនប្រុស បងស្រី ប្អូនស្រី ឪពុក ម្ដាយ ជីតា ជីដូន ពូ មីង មា បងប្អូនជីដូនមួយ ស្វាមី ភរិយា មិត្តភក្តិ គ្រូ សិស្ស មេ កូនចៅ អ្នកដឹកនាំ អ្នកបម្រើ សត្រូវ ឬតួនាទីផ្សេងទៀតតាមបរិបទរឿង។\n- ជ្រើសរើសពាក្យហៅឱ្យសមស្របតាម៖ អាយុ ភេទ ឋានៈ ភាពជិតស្និទ្ធ ទំនាក់ទំនងគ្រួសារ ស្ថានភាពផ្លូវការ ឬមិនផ្លូវការ និងបរិបទប្រវត្តិសាស្ត្រ ឬវប្បធម៌ក្នុងរឿង។\n- ប្រសិនបើតួអង្គម្នាក់ហៅអ្នកដទៃថា “បង” “ប្អូន” “ពូ” “មីង” “ឪពុក” ឬ “ម្ដាយ” ត្រូវរក្សាទំនាក់ទំនងនេះឱ្យដូចគ្នាពេញមួយរឿង។\n- កុំបកប្រែពាក្យហៅតាមព្យញ្ជនៈ ប្រសិនបើវាធ្វើឱ្យអត្ថន័យខុសពីទំនាក់ទំនងពិត។ ត្រូវប្រើពាក្យខ្មែរដែលសមស្របបំផុតតាមបរិបទ។\n- ប្រសិនបើមិនអាចបញ្ជាក់ឋានៈ ឬទំនាក់ទំនងបានច្បាស់៖ កុំស្មានដោយគ្មានមូលហេតុ ប្រើពាក្យហៅអព្យាក្រឹត និងរក្សាឈ្មោះតួអង្គដើម។\n- រក្សាលក្ខណៈនៃការនិយាយរបស់តួអង្គ៖ មនុស្សចាស់និយាយតាមរបៀបមនុស្សចាស់ · កូននិយាយទៅឪពុកម្ដាយដោយគោរព · អ្នកក្រោមបង្គាប់និយាយទៅអ្នកមានឋានៈខ្ពស់ដោយសមរម្យ · មិត្តជិតស្និទ្ធអាចប្រើពាក្យធម្មតា · សត្រូវ ឬមនុស្សមិនស្និទ្ធអាចប្រើពាក្យរឹងមាំ ឬផ្លូវការ។\n- រក្សាឈ្មោះតួអង្គឱ្យដូចគ្នាគ្រប់កន្លែង កុំប្តូររបៀបសរសេរឈ្មោះនៅពេលក្រោយ។\n- បកប្រែឱ្យមានលក្ខណៈធម្មជាតិ ងាយយល់ និងសមស្របសម្រាប់អានជាចំណងជើងភាពយន្ត។\n\n=== TECHNICAL RULES FOR THE APP (the app reads the answer by these rules, never break them) ===\nYou are a professional Khmer subtitle translator. Translate each numbered line to {TL}. Story context: {CTX}.\nOUTPUT FORMAT: keep the numbering and the order, one output line per input line, ONE INPUT = ONE OUTPUT: never skip, merge or split a numbered line, even if it is very short or meaningless. Output only numbered lines, nothing else.\nTAGS: if a line starts with a tag like [1], [2], [3] or [4], keep that tag unchanged at the start of the translated line. A tag [1] means a male voice (use male-fitting words such as បាទ, បង) and [2] means a female voice (use female-fitting words such as ចាស, អូន); still choose each pronoun from age, status and closeness.\nTIME HINT: every input line may end with the time available for it, like (1.6s). Use it only to size the line and NEVER copy it into the output. The Khmer voice reads about 18 Khmer letters per second (1.0s = 18 letters, 2.0s = 36, 3.0s = 54; spaces and punctuation do not count). Keep each Khmer line near its budget by deleting empty filler words, never by dropping a name, number, negation, key fact or emotion; a line already inside its budget stays as it is.\nNUMBERS: write every number, amount, year, date, time and percentage as Khmer WORDS, never as digits (e.g. 10000 = មួយម៉ឺន, 50% = ហាសិបភាគរយ, 3 = បី) because the Khmer voice must read them.\nNO LATIN LETTERS: never leave English words, abbreviations or Pinyin in the output; translate them into Khmer or write them by sound in Khmer script (OK = អូខេ, WiFi = វ៉ាយហ្វាយ). Every person, place and brand name must be written in Khmer script by sound.\nONLY KHMER SCRIPT: never output Thai, Chinese, Japanese or Korean letters.\nNO REPEAT SIGN: never use the Khmer repetition sign ៗ (the voice cannot read it); write the repeated word in full (ស្រីស្រី, not ស្រីៗ).\nEND MARK: end every line with the ONE mark that truly fits it: ! for anger, shouting or orders; ? for a real question; ?! for a shocked question; ... when the sentence trails off or continues in the next line; ។ for a calm finished statement. Never put ! on every line.\nIf a source line looks wrong (often a speech-recognition mistake such as a wrong homophone), use the neighbouring lines and the story context to find the most likely meaning and translate that.";
 /* ផ្នែកបច្ចេកទេស (កុំលុប) — កូដអានលទ្ធផលពឹងលើទម្រង់នេះ: លេខបន្ទាត់, tag [1]-[4], emotion marker, length hint */
 window.zsfTrHead=function(tl,ctx,lv){return String(window.ZSF_PROMPT_NEW||"").split("{TL}").join(tl).split("{CTX}").join(ctx||"")};
-window.zsfAutoStory=function(){try{if($("#target").value!=="km")return "";return String(window.zsfStoryBlock()||"").replace(/\s+/g," ").trim().slice(0,1200)}catch(_){return ""}};
+window.zsfAutoStory=function(){try{if($("#target").value!=="km")return "";return String(window.zsfStoryBlock()||"").replace(/\s+/g," ").trim().slice(0,6000)}catch(_){return ""}};
 window.zsfEnsureStory=async function(){try{var ks=zsfKF(K);if(!ks.length||!cues.length||$("#target").value!=="km")return;await Promise.race([Promise.resolve(window.__bibleP||null).then(function(){return gPrepareBible(ks,function(){})}),new Promise(function(r){setTimeout(function(){r(null)},window.zsfBibleWaitMs())})])}catch(_){}};
 function gWithTimeout(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error("timeout"))},ms)})])}
 /* AI មើលវីដេអូ (បើតូច) + អាន SRT ទាំងមូល → ចាប់ប្រភេទរឿង តួអង្គ (ភេទ សម័យ តួនាទី) ពាក្យហៅគ្នា ពាក្យពិសេស។ មិនដែល throw — បរាជ័យ = null (បកប្រែបន្តតាមបរិបទដោយ AI) */
@@ -7682,12 +7719,13 @@ async function gPrepareBible(keys,prog,ovr){
    try{
     var raw=null;
     if(vpart){try{raw=await gdGenerate([vpart,{text:mk(true)}],key,models[mi])}catch(ve){console.warn("story video analysis → text only",ve);vpart=null;raw=null}}
-    if(raw===null)raw=await gWithTimeout(gdGenerate([{text:mk(false)}],key,models[mi]),45000);
+    if(raw===null)raw=await gWithTimeout(gdGenerate([{text:mk(false)}],key,models[mi]),70000);
     var b=gCleanBible(gParseJson(raw));
     if(b.genres.length||b.characters.length||b.terms.length||b.address.length){
-     var EB=window.__zsfEarlyBible;
+     if(!b.genres.length){try{var hb0=zsfHeurBible(all);if(hb0&&hb0.genres.length)b.genres=hb0.genres}catch(_){}}
+      var EB=window.__zsfEarlyBible;
      if(typeof ovr==="string")window.__zsfEarlyBible=b;
-     else if(EB){try{if(EB.genres&&EB.genres.length)b.genres=EB.genres.slice(0,1);
+     else if(EB){try{if((!b.genres||!b.genres.length)&&EB.genres&&EB.genres.length)b.genres=EB.genres.slice(0,1);
        ["characters","places","terms","address"].forEach(function(k){var ek=EB[k]||[],seen={};ek.forEach(function(x){seen[x.zh]=1});b[k]=ek.concat((b[k]||[]).filter(function(x){return !seen[x.zh]}));if(k==="characters")b[k]=b[k].slice(0,16)});
        if(!b.synopsis)b.synopsis=EB.synopsis;if(!b.tone)b.tone=EB.tone}catch(e){}}
      gBible=b;gBibleSig=sig;return b}
@@ -7696,6 +7734,9 @@ async function gPrepareBible(keys,prog,ovr){
  }
  if(typeof ovr!=="string"&&window.__zsfEarlyBible){gBible=window.__zsfEarlyBible;gBibleSig=sig;return gBible}
  gBibleFail[sig]=(gBibleFail[sig]||0)+1;
+ /* V27.9.40: សំណើតូចតែរកប្រភេទ (genre only) មុនប៉ាន់ស្មានពីពាក្យគន្លឹះ */
+ try{var qp="Read this Chinese short-drama subtitle text. Return ONE JSON object only: {\"genre_codes\":[1 or 2 codes]}. FIRST code = dominant premise (ancient<->modern travel = cross_a2m/cross_m2a, reborn = rebirth, game system = system, else main plot driver). Choose ONLY from this list:\n"+list+"\n\nSUBTITLE TEXT:\n"+sample;
+  for(var qm=0;qm<Math.min(3,models.length);qm++){try{var qr=await gWithTimeout(gdGenerate([{text:qp}],keys[qm%keys.length],models[qm]),30000);var qb=gCleanBible(gParseJson(qr));if(qb.genres.length){qb._quick=true;gBible=qb;gBibleSig=sig;return qb}}catch(qe){console.warn("genre-only",models[qm],qe)}}}catch(_){}
  {var hb=zsfHeurBible(all);if(hb){gBible=hb;return hb}}
  return null}
 /* V7.8: សៀវភៅរឿងដំបូង ពីឃ្លាដំបូងៗ មុន Gemini ស្តាប់+បកប្រែដំណាលគ្នា */
@@ -7737,7 +7778,7 @@ async function gemDirectRun(prog){
  var known=window.__preTag?cues.map(function(c){var m=/^\s*\[([1-4])\]/.exec(String(c.t||""));return m?+m[1]:0}):cues.map(function(){return 0});
  /* ១) សៀវភៅរឿង (លាក់) */
  prog(3,"📖 កំពុងអានរឿងទាំងមូល...");
- var bible=null;try{bible=await Promise.race([(window.__bibleP||gPrepareBible(keys,prog)),new Promise(function(r){setTimeout(function(){r(null)},window.zsfBibleWaitMs())})])}catch(e){bible=null}if(!bible){try{showToast("⚠ សៀវភៅរឿងបង្កើតមិនបាន (Gemini quota ឬបណ្តាញ) — បកប្រែតាមបរិបទធម្មតា",false)}catch(e){}}
+ var bible=null;try{bible=await Promise.race([(window.__bibleP||gPrepareBible(keys,prog)),new Promise(function(r){setTimeout(function(){r(null)},window.zsfBibleWaitMs())})])}catch(e){bible=null}if(!bible){try{gBibleFail={};bible=await Promise.race([gPrepareBible(keys,prog),new Promise(function(r){setTimeout(function(){r(null)},window.zsfBibleWaitMs())})])}catch(e){bible=null}}if(!bible){try{showToast("⚠ សៀវភៅរឿងបង្កើតមិនបាន (Gemini quota ឬបណ្តាញ) — បកប្រែតាមបរិបទធម្មតា",false)}catch(e){}}
  if(bible)showToast("🎭 ប្រភេទរឿង៖ "+((bible.genres||[]).map(function(c){var g=gGenreByCode(c);return g?g[1]:c}).join(" + ")||"មិនច្បាស់")+(bible._heur?" (ប៉ាន់ស្មាន)":"")+" — បកប្រែតាមប្រភេទនេះ",true);
  /* ២) បកប្រែជាផ្នែកៗ (ស្តាប់សំឡេង + អាន SRT) ដូចកូដចាស់ */
  var out=new Array(N).fill(null),doneLines=0,rr=0,stop=false,hit=0;
