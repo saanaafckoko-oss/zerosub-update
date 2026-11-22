@@ -2153,7 +2153,7 @@ function stretchRaw(raw,tempo){
  __stLock=job.catch(()=>{});return job}
 /* ===== v21 : TTS លឿន + ច្បាស់ ៖ retry, cache (មិនបង្កើតឃ្លាដដែលពីរដង), កាត់ស្ងាត់ដើម/ចុង, WSOLA ក្នុង JS (មិនរង់ចាំ FFmpeg) ===== */
 const TTS_CONC=6,TTS_TRIES=3,__ttsCache=new Map(),__sleep=ms=>new Promise(r=>setTimeout(r,ms));
-function __zsfC(k,ms){if(k==="r429")window.__zsfParCap=1; /* V27.9.52: 429 → ត្រឡប់ទៅម្តងមួយឃ្លា */
+function __zsfC(k,ms){if(k==="r429"){window.__zsfLast429=Date.now();window.__zsfParCap=Math.max(1,Math.ceil((window.__zsfParCap||1)/2))}else if(k==="ok"&&window.__zsfParTgt&&(window.__zsfParCap||1)<window.__zsfParTgt&&Date.now()-(window.__zsfLast429||0)>20000)window.__zsfParCap++; /* PERF: 429 → បន្ថយពាក់កណ្តាល ហើយស្តារវិញ (មិនជាប់ ១ រហូត) */
  const R=window.__zsfReq=window.__zsfReq||{ok:0,r429:0,to:0,err:0,ms:0};R[k]=(R[k]||0)+1;if(ms)R.ms+=ms}
 async function ttsRaw(text,slot,speed,pitch){
  const voice=voiceOfSlot(slot);let lastErr,gw=0;
@@ -2382,7 +2382,7 @@ async function buildDub(btn){
  }
  async function wk(k){
   while(next<J2.length){
-   if(k>0&&k>=(window.__zsfParCap||1))return;
+   if(k>0&&k>=(window.__zsfParCap||1)){await __sleep(400);continue}
    const ji=next++;
    if(!(await one(ji)))FLD.push(ji);
    done++;{let eta="";if(done>=6){const sc=(Date.now()-T0d)/done*(J2.length-done)/1000;eta=" • នៅសល់ ~"+(sc>=90?Math.round(sc/60)+" នាទី":Math.max(1,Math.round(sc))+" វិនាទី")}btn.textContent=`🎙 កំពុងបង្កើតសំឡេងខ្មែរ ${done}/${J2.length}`+eta}
@@ -2390,7 +2390,7 @@ async function buildDub(btn){
  }
  {let PAR=4;try{const v=parseInt(localStorage.getItem("zsf_tts_par"));if(v>=1&&v<=6)PAR=v}catch(_){}
   const healthy=ttsList().filter(u=>!(__ttsH[u]&&__ttsH[u].until>Date.now())).length;
-  window.__zsfParCap=Math.max(1,Math.min(PAR,healthy,J2.length));
+  window.__zsfParCap=Math.max(1,Math.min(PAR,Math.max(1,healthy*2),J2.length));window.__zsfParTgt=window.__zsfParCap;window.__zsfLast429=0;
   await Promise.all(Array.from({length:window.__zsfParCap},(_,k)=>wk(k)))}const __m2=Date.now();
  /* V27.8.19: ឃ្លាណាបរាជ័យ → ព្យាយាមម្តងទៀតរហូតដល់ ៥ ជុំ (តិចៗម្តង រង់ចាំរវាងជុំ) មិនរំលងចោលទេ */
  /* V27.8.19: ឃ្លាក្នុង SRT ដែលមិនបានចូលជាការងារអាន (អត្ថបទទទេបន្ទាប់ពីសម្អាត) → អានពីអត្ថបទដើម (ដកតែ tag) */
@@ -8935,7 +8935,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="27.9.57";
+  var EMB="27.9.58";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
