@@ -7140,11 +7140,11 @@ async function translateAll(){
  if(!N)return;
  var sleep=function(ms){return new Promise(function(z){setTimeout(z,ms)})};
  var plain=function(i){return src[i].t.replace(TAG,"").replace(/\n/g," ").trim()};
- var out=new Array(N).fill(null),doneN=0,lastErr="",inflight=0,abort=null,dead={},t00=Date.now();
- var show=function(){try{setProgress(Math.round(doneN/N*100),"🧠 កំពុងបកប្រែ "+doneN+"/"+N+(isLocal?" (Local AI)":" (Gemini)")+"..."+(doneN===0&&lastErr?" ["+lastErr+"]":""))}catch(_){}};
+ var out=new Array(N).fill(null),doneN=0,lastErr="",inflight=0,abort=null,dead={},t00=Date.now(),stopSoft=false,t90=0,softRes=null,softP=new Promise(function(z){softRes=z});
+ var show=function(){try{setProgress(Math.floor(doneN/N*100),"🧠 កំពុងបកប្រែ "+doneN+"/"+N+(isLocal?" (Local AI)":" (Gemini)")+"..."+(doneN===0&&lastErr?" ["+lastErr+"]":""))}catch(_){}};
  var cnt={};var live=function(j){if(!cnt[j]){cnt[j]=1;doneN++}try{var c=cues[j],m=src[j].t.match(TAG);if(c)c.t=(m?m[0].trim()+" ":"")+out[j]}catch(_){}show()};
  /* ១. ចាប់ប្រភេទសាច់រឿង (រង់ចាំអតិបរមា ២៥ វិនាទី) */
- if(tv==="km"&&!isLocal){
+ if(tv==="km"){
   try{
    setProgress(2,"📖 កំពុងអាន SRT ដើម្បីចាប់ប្រភេទសាច់រឿង...");
    var bible=null,to=function(){return new Promise(function(r){setTimeout(function(){r(null)},60000)})};
@@ -7152,7 +7152,8 @@ async function translateAll(){
    if(!bible){try{gBibleFail={}}catch(_){}bible=await Promise.race([gPrepareBible(keys,function(){}),to()])}
   }catch(e){}
  }
- var ctx=window.zsfAutoStory?window.zsfAutoStory():"";
+ try{if(typeof bible!=="undefined"&&bible)showToast("🎭 ប្រភេទរឿង៖ "+((bible.genres||[]).map(function(c){var g=gGenreByCode(c);return g?g[1]:c}).join(" + ")||"មិនច្បាស់")+(bible._heur?" (ប៉ាន់ស្មាន)":"")+" — បកប្រែតាមប្រភេទនេះ",true)}catch(_){}
+  var ctx=window.zsfAutoStory?window.zsfAutoStory():"";
  var HEAD=window.zsfTrHead(tl,ctx,2);
  var hint=function(j){return Math.max(5,Math.round((src[j].e-src[j].s)*(typeof zsfFit==="function"?zsfFit("hint",18):18)))};
  var zk=function(j){return zsfTrKey(tv,ctx+"#one1",plain(j))};
@@ -7168,7 +7169,7 @@ async function translateAll(){
   var f=idxs[0],l9=idxs[idxs.length-1],prev=f>0?[f-4,f-3,f-2,f-1].filter(function(k){return k>=0}).map(plain).join(" / "):"",nxt=[l9+1,l9+2].filter(function(k){return k<N}).map(plain).join(" / ");
   var prompt=HEAD+(tv==="km"?"\nThe (N.Ns) at the end of each numbered line is only a duration hint. NEVER copy it, or any number of seconds, into your translation.":"")+(prev?"\nPrevious lines for context only, do NOT translate them: "+prev:"")+(nxt?"\nNext lines for context only, do NOT translate them: "+nxt:"")+"\n"+idxs.map(function(j,x){return (x+1)+". "+src[j].t.replace(/\n/g," ")+(tv==="km"?" ("+Math.max(0.3,(+src[j].e-+src[j].s)||0.3).toFixed(1)+"s)":"")}).join("\n");
   var t0=Date.now();
-  while(Date.now()-t0<150000&&!abort){
+  while(Date.now()-t0<150000&&!abort&&!stopSoft){
    if(dead[key])return;
    var models=zsfTrModels();if(isLocal)models=models.slice(0,1);
    var tried=false;
@@ -7199,7 +7200,7 @@ async function translateAll(){
  async function worker(wi){
   var key=keys[wi%keys.length];
   if(wi>0)await sleep(wi*250);
-  while(!abort){
+  while(!abort&&!stopSoft){
    if(dead[key])break;
    var idxs=queue.shift();
    if(!idxs){if(inflight===0)break;await sleep(500);continue}
@@ -7218,11 +7219,11 @@ async function translateAll(){
  var nb=queue.length,W=isLocal?(function(){try{return window.zsfLaiCfg(nb).workers}catch(_){return 2}})():Math.min(keys.length,Math.max(1,nb));
  W=Math.max(1,Math.min(W,Math.max(1,nb)));
  show();
- var hb=setInterval(show,3000);
- try{await Promise.all(Array.from({length:W},function(_,wi){return worker(wi)}))}finally{clearInterval(hb)}
+ var hb=setInterval(function(){show();try{if(doneN>=Math.ceil(N*0.9)&&doneN<N){if(!t90)t90=Date.now();else if(Date.now()-t90>90000){stopSoft=true;softRes()}}}catch(_){}},3000);
+ try{await Promise.race([Promise.all(Array.from({length:W},function(_,wi){return worker(wi)})),softP])}finally{clearInterval(hb)}
 
  /* V27.2.6: ឃ្លាដែលនៅមិនទាន់បកប្រែ → Google Translate ជាវិធីបម្រុង */
- try{if(!abort&&!isLocal){var __miss=[];for(var mk=0;mk<N;mk++){if(out[mk]===null)__miss.push(mk)}
+ try{if(!abort){var __miss=[];for(var mk=0;mk<N;mk++){if(out[mk]===null)__miss.push(mk)}
   if(__miss.length){try{setProgress(Math.round(doneN/N*100),"🌐 កំពុងបកឃ្លាដែលនៅសល់ "+__miss.length+" ដោយ Google...")}catch(_){}
    var __gt=await googleTr(__miss.map(plain),tv,null),__pg=[];
    __gt.forEach(function(v,x){var j=__miss[x];if(v&&out[j]===null){v=String(v).replace(ZSF_TAGANY,"").trim();if(/^km/i.test(tv))v=zsfKhClean(v);if(v&&zsfTrOk(tv,plain(j),v)){out[j]=v;__pg.push([zk(j),v]);live(j)}}});
@@ -9259,7 +9260,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="28.1.6";
+  var EMB="28.1.7";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
