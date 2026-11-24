@@ -7186,7 +7186,7 @@ async function translateAll(){
      zsfTrCool[key+"|"+m]=Date.now()+15000;
     }catch(e){
      var msg=String((e&&e.message)||e);lastErr=msg.slice(0,80);var kd=zsfErrKind(e);
-     if(kd==="auth"){zsfTrCool[key+"|*"]=Date.now()+600000;lastErr="Key មិនត្រឹមត្រូវ ឬអស់សិទ្ធិ: "+lastErr;if(isLocal){abort=new Error("Local AI Key មិនត្រឹមត្រូវ — "+msg.slice(0,80));return}dead[key]=1;return}
+     if(kd==="auth"){zsfTrCool[key+"|*"]=Date.now()+600000;lastErr="Key មិនត្រឹមត្រូវ ឬអស់សិទ្ធិ: "+lastErr;if(isLocal){var __dis=/disabled|violation|terms of service|suspend|banned|blocked/i.test(msg);abort=new Error(__dis?"Local AI Key ត្រូវបានបិទដោយម្ចាស់សេវា (បំពានលក្ខខណ្ឌ) — មិនមែនកំហុសកូដទេ។ សូមដោះ ✓ Local AI រួចដាក់ ✓ Gemini ហើយប្រើ Gemini API Key ផ្ទាល់ខ្លួន ឬជំនួស Local AI Key ថ្មី":"Local AI Key មិនត្រឹមត្រូវ — "+msg.slice(0,80));return}dead[key]=1;return}
      if(kd==="rate"){if(e&&(e.daily||e.retrySec>180)){zsfTrCool[key+"|"+m]=Date.now()+21600000;zsfTrDay[key+"|"+m]=Date.now()+21600000}else zsfTrCool[key+"|"+m]=Date.now()+Math.max(8000,Math.min(90000,((e&&e.retrySec)||45)*1000+1500))}
      else if(kd==="model")zsfTrCool[key+"|"+m]=Date.now()+1800000;
      else zsfTrCool[key+"|"+m]=Date.now()+(/timeout|abort/i.test(msg)?60000:20000);
@@ -9074,8 +9074,8 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
       if(!String(t0||"").trim()&&mi<order.length-1){var u0=d0.usage||{};consume(u0.total_tokens||((u0.prompt_tokens||0)+(u0.completion_tokens||0)));mi++;ovRetry=0;continue}}catch(_){}}
     var __ov=mbad&&(r.status>=500||/high demand|overloaded|unavailable/i.test(String(raw).slice(0,500)));
      if(__ov&&sel!=="auto"&&ovRetry<2){ovRetry++;await new Promise(function(z){setTimeout(z,3000*ovRetry)});continue}
-     var __rs=String(raw).slice(0,700),__mErr=mbad&&(r.status===404||r.status===429||r.status===400||/model_not_found|unknown provider|cooldown|cooling down|quota|not found|not supported/i.test(__rs));
-     if(mbad&&(sel==="auto"||__ov||__mErr)&&mi<order.length-1){if(r.status===404||/model_not_found|unknown provider|not found|not supported/i.test(__rs))(window.__laiBad=window.__laiBad||{})[order[mi]]=1;else if(r.status===429||/cooldown|cooling down|quota/i.test(__rs))(window.__laiCool=window.__laiCool||{})[order[mi]]=Date.now()+300000;mi++;ovRetry=0;continue}
+     var __rs=String(raw).slice(0,700),__dis=mbad&&(r.status===403||r.status===401||/disabled in this account|violation of terms|terms of service|suspended|has been disabled/i.test(__rs)),__mErr=mbad&&(__dis||r.status===404||r.status===429||r.status===400||/model_not_found|unknown provider|cooldown|cooling down|quota|not found|not supported/i.test(__rs));
+     if(mbad&&(sel==="auto"||__ov||__mErr)&&mi<order.length-1){if(r.status===404||/model_not_found|unknown provider|not found|not supported/i.test(__rs))(window.__laiBad=window.__laiBad||{})[order[mi]]=1;else if(__dis){(window.__laiCool=window.__laiCool||{})[order[mi]]=Date.now()+900000;try{showToast("⚠ Local AI ម៉ូដែល "+order[mi]+" ត្រូវបានបិទ — ប្តូរទៅម៉ូដែលផ្សេងដោយស្វ័យប្រវត្តិ",false)}catch(_){}}else if(r.status===429||/cooldown|cooling down|quota/i.test(__rs))(window.__laiCool=window.__laiCool||{})[order[mi]]=Date.now()+300000;mi++;ovRetry=0;continue}
     break}
    window.__laiModel=order[mi];
    window.__laiLast="HTTP "+r.status+": "+String(raw).replace(/\s+/g," ").slice(0,180);try{d=JSON.parse(raw)}catch(e){return err(r.status||502,"Local AI ឆ្លើយមិនត្រឹមត្រូវ (HTTP "+r.status+")")}
@@ -9259,7 +9259,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="28.1.4";
+  var EMB="28.1.6";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
