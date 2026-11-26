@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<!-- V28.2.5 : Local AI ហៅ VPS ផ្ទាល់ (khmerapi.duckdns.org/v1) ជាមុន · fallback ទៅ Worker ស្វ័យប្រវត្តិ -->
+<!-- V28.2.4 : លឿនជាងមុន ~២ដង (គុណភាពដដែល) — អានសំឡេងស្របគ្នាដល់ ១០ (តាមចំនួន Server ដែលមាន ×២ · ជួប 429 ថយពាក់កណ្តាលដោយស្វ័យប្រវត្តិ) · បកប្រែ Gemini ២ ការងារក្នុង ១ Key (អតិបរមា ៨) -->
 <!-- V28.1.7 : Prompt បកប្រែ — បន្ថែម ORDER OF WORK (អានឃ្លា → យល់អត្ថន័យ → ជ្រើសពាក្យបញ្ចប់ឃ្លា → បានបង្រួម ហើយរក្សាពាក្យបញ្ចប់) · ប្តូរ cache v17→v18 -->
 <!-- V28.1.6 : Prompt បកប្រែ — បន្ថែម COMPLETE-THOUGHT TEST (ឃ្លាខ្លីត្រូវបញ្ចប់សេចក្តី ស្តាប់យល់ដោយខ្លួនឯង) + ចំណុចត្រួតពិនិត្យទី ១១ · ប្តូរ cache v16→v17 -->
 <!-- V28.1.5 : Prompt បកប្រែ — បន្ថែមច្បាប់ SHORT BUT COMPLETE (បកប្រែឱ្យខ្លីតាមថវិកាអក្សរ ដោយរក្សាអត្ថន័យ ឈ្មោះ លេខ ពាក្យបដិសេធ) · ប្តូរ cache បកប្រែ v15→v16 -->
@@ -2473,9 +2475,9 @@ async function buildDub(btn){
    done++;{let eta="";if(done>=6){const sc=(Date.now()-T0d)/done*(J2.length-done)/1000;eta=" • នៅសល់ ~"+(sc>=90?Math.round(sc/60)+" នាទី":Math.max(1,Math.round(sc))+" វិនាទី")}btn.textContent=`🎙 កំពុងបង្កើតសំឡេងខ្មែរ ${done}/${J2.length}`+eta}
   }
  }
- {let PAR=5;try{const v=parseInt(localStorage.getItem("zsf_tts_par"));if(v>=1&&v<=5)PAR=v}catch(_){}
+ {let PAR=10;try{const v=parseInt(localStorage.getItem("zsf_tts_par"));if(v>=1&&v<=12)PAR=v}catch(_){}
   const healthy=ttsList().filter(u=>!(__ttsH[u]&&__ttsH[u].until>Date.now())).length;
-  window.__zsfParCap=Math.max(1,Math.min(PAR,Math.max(1,healthy*3),J2.length));window.__zsfParTgt=window.__zsfParCap;window.__zsfLast429=0;
+  window.__zsfParCap=Math.max(1,Math.min(PAR,Math.max(1,healthy*2),J2.length));window.__zsfParTgt=window.__zsfParCap;window.__zsfLast429=0;
   await Promise.all(Array.from({length:window.__zsfParCap},(_,k)=>wk(k)))}const __m2=Date.now();
  /* V27.8.19: ឃ្លាណាបរាជ័យ → ព្យាយាមម្តងទៀតរហូតដល់ ៥ ជុំ (តិចៗម្តង រង់ចាំរវាងជុំ) មិនរំលងចោលទេ */
  /* V27.8.19: ឃ្លាក្នុង SRT ដែលមិនបានចូលជាការងារអាន (អត្ថបទទទេបន្ទាប់ពីសម្អាត) → អានពីអត្ថបទដើម (ដកតែ tag) */
@@ -7219,7 +7221,7 @@ async function translateAll(){
    if(doneN===0&&Date.now()-t00>600000){abort=new Error("បកប្រែមិនបានក្នុងរយៈពេល ១០ នាទី — "+(lastErr||"ពិនិត្យ API Key / Quota"))}
   }
  }
- var nb=queue.length,W=isLocal?(function(){try{return window.zsfLaiCfg(nb).workers}catch(_){return 2}})():Math.min(keys.length,Math.max(1,nb));
+ var nb=queue.length,W=isLocal?(function(){try{return window.zsfLaiCfg(nb).workers}catch(_){return 2}})():Math.min(Math.min(8,keys.length*2),Math.max(1,nb));
  W=Math.max(1,Math.min(W,Math.max(1,nb)));
  show();
  var hb=setInterval(show,3000);
@@ -8914,6 +8916,15 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
 (function(){
  if(window.__zsfLai)return;window.__zsfLai=1;
  var HOST="https://fragrant-water-4800.saanaafckoko.workers.dev",DASH="https://khmerapi.duckdns.org",F0=window.fetch;
+  /* V28.2.5 : ហៅ VPS ផ្ទាល់ដូច APK (លឿនជាង Worker) — បើ CORS/បណ្តាញបរាជ័យ ឬ 404 ប្តូរទៅ Worker ស្វ័យប្រវត្តិ ហើយសាកផ្ទាល់ម្តងទៀតក្រោយ ៣០ នាទី */
+  async function LF(url,opt){
+   var bad=Number(g("zsf_lai_direct_fail","0"))||0;
+   if(typeof url==="string"&&url.indexOf(HOST)===0&&Date.now()-bad>1800000){
+    try{var r=await F0(DASH+url.slice(HOST.length),opt);if(r.status!==404){window.__laiDirect=1;return r}}
+    catch(e){if(e&&e.name==="AbortError")throw e}
+    window.__laiDirect=0;s("zsf_lai_direct_fail",String(Date.now()));
+   }
+   return F0(url,opt)}
  function g(k,d){try{var v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}}
  function s(k,v){try{localStorage.setItem(k,v)}catch(e){}}
  function key(){return String(g("zsf_lai_key","")).trim()}
@@ -8987,7 +8998,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   var ac=new AbortController(),tm=setTimeout(function(){ac.abort()},12000);
   try{
    opt=opt||{};opt.signal=ac.signal;
-   var r=await F0(url,opt),raw=await r.text(),d=null;
+   var r=await LF(url,opt),raw=await r.text(),d=null;
    try{d=JSON.parse(raw)}catch(e){}
    return{ok:r.ok,status:r.status,d:d,raw:raw}
   }finally{clearTimeout(tm)}
@@ -8997,7 +9008,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   line.style.cssText="margin-top:8px;font-size:12.5px;color:#fcd34d;word-break:break-all";line.textContent="🧪 សាកម៉ូដែល "+mdl+" ...";box.appendChild(line);
   var ac=new AbortController(),tm=setTimeout(function(){ac.abort()},40000),t0=Date.now();
   try{
-   var r=await F0(HOST+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify({model:mdl,messages:[{role:"user",content:"Say hi in one word."}],max_tokens:20,stream:false}),signal:ac.signal});
+   var r=await LF(HOST+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify({model:mdl,messages:[{role:"user",content:"Say hi in one word."}],max_tokens:20,stream:false}),signal:ac.signal});
    var raw=await r.text(),sec=((Date.now()-t0)/1000).toFixed(1);
    if(r.ok){var tx="";try{tx=JSON.parse(raw).choices[0].message.content}catch(e){}line.style.color="#34d399";line.textContent="🧪 "+mdl+": ដំណើរការ ✓ ("+sec+" វិនាទី) ចម្លើយ៖ "+String(tx).slice(0,40)}
    else{line.style.color="#f87171";line.textContent="🧪 "+mdl+": HTTP "+r.status+" ("+sec+" វិនាទី) "+String(raw).replace(/\s+/g," ").slice(0,200)}
@@ -9052,7 +9063,7 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
  window.zsfLaiCfg=function(maxW){var r=Number(window.__laiRpm)||0,w=2,d=600;
   if(r>=300){w=10;d=0}else if(r>=180){w=8;d=50}else if(r>=120){w=6;d=100}else if(r>=60){w=4;d=300}else if(r>=45){w=3;d=450}
   if(maxW&&maxW>0)w=Math.min(w,maxW);return{rpm:r,workers:w,delayMs:d}};
- function consume(n){if(!(n>0))return;try{F0(HOST+"/v1/key/consume",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify({tokens:n})}).then(function(){setTimeout(check,500)}).catch(function(){})}catch(e){}}
+ function consume(n){if(!(n>0))return;try{LF(HOST+"/v1/key/consume",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify({tokens:n})}).then(function(){setTimeout(check,500)}).catch(function(){})}catch(e){}}
  async function call(j,sig){
   var msgs=[],si=j.systemInstruction||j.system_instruction,gc=j.generationConfig||{};
   if(si&&si.parts)msgs.push({role:"system",content:si.parts.map(function(p){return p.text||""}).join("")});
@@ -9068,10 +9079,10 @@ ensureDev().catch(function(){}).then(function(){var e=$("zfDev");if(e)e.textCont
   try{
    var r,raw,d,mi=0,ovRetry=0;
    for(;;){body.model=order[mi];
-    try{r=await F0(HOST+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify(body),signal:sig})}
+    try{r=await LF(HOST+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key()},body:JSON.stringify(body),signal:sig})}
     catch(ne){if(ne&&ne.name==="AbortError")throw ne;
      /* v26.0.34: បើ preflight/CORS បរាជ័យ សាកម្តងទៀតដោយគ្មាន header ពិសេស (simple request) */
-     r=await F0(HOST+"/v1/chat/completions?api_key="+encodeURIComponent(key()),{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(body),signal:sig})}
+     r=await LF(HOST+"/v1/chat/completions?api_key="+encodeURIComponent(key()),{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(body),signal:sig})}
     raw=await r.text();
     var mbad=!r.ok;
      if(!mbad){try{var d0=JSON.parse(raw),c0=d0.choices&&d0.choices[0],t0=c0&&c0.message&&c0.message.content;if(Array.isArray(t0))t0=t0.map(function(p){return p&&p.text||""}).join("");if(!t0&&c0&&typeof c0.text==="string")t0=c0.text;
@@ -9263,7 +9274,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="28.2.3";
+  var EMB="28.2.4";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
