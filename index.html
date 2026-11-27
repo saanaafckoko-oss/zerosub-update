@@ -2389,13 +2389,11 @@ async function zsfProbeRate(slot){
  return window.__zsfRateOK}
 /* ===== V28.4.9 : ល្បឿនអានធម្មជាតិ — ល្បឿន "សរុប" តែមួយ (មិនគុណគ្នា) · រក្សា Pitch · បន្ថែម silence · ព្រមានឃ្លាវែង ===== */
 const ZSF_SPD_MODES={slow:.85,natural:.95,normal:1,fast:1.1},ZSF_LONG_MSG="Subtitle នេះវែងពេកសម្រាប់រយៈពេលដែលបានកំណត់";
-function zsfSpdCfg(){
- const g=(k,d)=>{try{const v=localStorage.getItem("zsf_spd_"+k);return v==null?d:v}catch(e){return d}};
- let mode=g("mode","natural");if(!ZSF_SPD_MODES[mode])mode="natural";
- const adv=g("adv","0")==="1",safe=g("max","1.2")==="1.15"?1.15:1.2;
- let am=parseFloat(g("advmax","1.3"));if(!isFinite(am))am=1.3;am=Math.max(1.2,Math.min(1.5,am));
- const cap=adv?am:safe;
- return{mode,base:Math.min(ZSF_SPD_MODES[mode],cap),cap,adv,safe,advmax:am,gap:g("gap","1")!=="0",onlong:g("onlong","ask")==="go"?"go":"ask"}}
+/* V28.4.11 : ការកំណត់ល្អបំផុត បង្កប់ក្នុងកូដ (គ្មាន UI) */
+const ZSF_AUTO=Object.freeze({base:ZSF_SPD_MODES.natural,cap:1.2,gap:true});
+function zsfSpdCfg(){return ZSF_AUTO}
+/* អត្ថបទសម្រាប់អាន (ខ្លីជាង) — មិនប្តូរ Subtitle ដែលបង្ហាញ · បោះបង់ស្វ័យប្រវត្តិ បើ Subtitle ត្រូវបានកែ */
+function zsfReadText(q){return q.rt&&q.rtFor===q.t?q.rt:q.t}
 function calc_subtitle_duration(q){return Math.max(0,(+q.e)-(+q.s))}
 /* dur = ប្រវែងសំឡេងនៅល្បឿន base · target = ពេលដែលមាន · លទ្ធផល total = ល្បឿនសរុបធៀបនឹងសំឡេងធម្មតា 1.00 */
 function zsfSpeedPlan(dur,target,base,cap){
@@ -2429,7 +2427,7 @@ function zsfVoicedSec(q){const SP=window.__spEn;if(!SP||SP.file!==file||!SP.e.le
  const i0=Math.max(0,Math.floor((q.s-.1)/fs)),i1=Math.min(e.length-1,Math.ceil((q.e+.1)/fs));let n=0;
  for(let i=i0;i<=i1;i++)if(10*Math.log10(e[i]+1e-10)>SP.__fl+8)n++;return n*fs}
 function zsfIsGhostCue(q){try{if(localStorage.getItem("zsf_ghost")!=="1")return false}catch(_){return false}const v=zsfVoicedSec(q);return v>=0&&v<Math.min(.25,Math.max(.1,(q.e-q.s)*.2))}
-function zsfCueSig(){let h=0,n=0;for(const q of cues){const t=String(q.t||"")+"|"+(+q.s).toFixed(2)+"|"+(+q.e).toFixed(2);for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0;n++}return n+":"+h}
+function zsfCueSig(){let h=0,n=0;for(const q of cues){const t=String(q.t||"")+"|"+String(q.rt||"")+"|"+(+q.s).toFixed(2)+"|"+(+q.e).toFixed(2);for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0;n++}return n+":"+h}
 (function(){let pd=null;try{Object.defineProperty(window,"__preDub",{configurable:true,get(){if(pd&&pd.sig&&pd.sig!==zsfCueSig())pd=null;return pd},set(v){pd=v}})}catch(_){}})();
 /* V28.0.1: text sent to TTS = Khmer letters only (zsfCleanTTS was defined but never used -> stray symbols/Chinese/emoji were spoken as phantom sounds) */
 function zsfTtsText(t){var r=(/[\u1780-\u17FF]/.test(t)?zsfLatinToKhmer:function(x){return x})(zsfNumToKhmer(zsfTtsClean(t)));
@@ -2444,9 +2442,9 @@ async function buildDub(btn){
  /* V28.3.3: a cue with a broken time (end<=start / negative / not a number) is REPAIRED, never dropped from the dub */
  try{let __rp=0;cues.forEach((q,k)=>{let s=+q.s,e=+q.e,ch=false;if(!isFinite(s)){const p=cues[k-1];s=p&&isFinite(+p.e)?+p.e:0;ch=true}if(s<0){s=0;ch=true}if(!isFinite(e)||e<=s){const n=(String(q.t||"").match(/[\u1780-\u17B3]/g)||[]).length;e=s+Math.max(.8,n*.08);ch=true}if(ch){q.s=s;q.e=e;__rp++}});window.__zsfRepairedCues=__rp;if(__rp)showToast("🛠 ជួសជុលម៉ោងខុស "+__rp+" ឃ្លា ដើម្បីកុំរំលងការអាន",true)}catch(_){}
  const __VAL=validate_timestamps(cues);window.__zsfValidation=__VAL;
- const jobs=cues.filter(q=>!__VAL.bad.has(q)).map(q=>({q,slot:slotOfText(q.t),text:zsfTtsText(q.t)})).filter(j=>j.text).filter(j=>{try{if(zsfIsGhostCue(j.q)){window.__zsfGhostSk=(window.__zsfGhostSk||0)+1;return false}}catch(e){}return true});
+ const jobs=cues.filter(q=>!__VAL.bad.has(q)).map(q=>({q,slot:slotOfText(q.t),text:zsfTtsText(zsfReadText(q))})).filter(j=>j.text).filter(j=>{try{if(zsfIsGhostCue(j.q)){window.__zsfGhostSk=(window.__zsfGhostSk||0)+1;return false}}catch(e){}return true});
  /* V28.3.4: audit - the text sent to TTS must keep every Khmer letter of the SRT line (lines with digits/Latin are converted to Khmer words on purpose, so they are not compared) */
- try{const __td=[];jobs.forEach(j=>{const src=String(j.q.t||"").replace(ZSF_TAGANY," ");if(/[0-9A-Za-z\u17E0-\u17E9]/.test(src))return;const a=(src.match(/[\u1780-\u17B3]/g)||[]).length,b=(j.text.match(/[\u1780-\u17B3]/g)||[]).length;if(a!==b)__td.push(cues.indexOf(j.q)+1)});window.__zsfTextDiff=__td;if(__td.length)showToast("⚠ អត្ថបទអានខុសពី SRT "+__td.length+" ឃ្លា (បន្ទាត់៖ "+__td.slice(0,12).join(", ")+")",false)}catch(_){}
+ try{const __td=[];jobs.forEach(j=>{const src=String(zsfReadText(j.q)||"").replace(ZSF_TAGANY," ");if(/[0-9A-Za-z\u17E0-\u17E9]/.test(src))return;const a=(src.match(/[\u1780-\u17B3]/g)||[]).length,b=(j.text.match(/[\u1780-\u17B3]/g)||[]).length;if(a!==b)__td.push(cues.indexOf(j.q)+1)});window.__zsfTextDiff=__td;if(__td.length)showToast("⚠ អត្ថបទអានខុសពី SRT "+__td.length+" ឃ្លា (បន្ទាត់៖ "+__td.slice(0,12).join(", ")+")",false)}catch(_){}
  const __cs=cues.slice().sort((a,b)=>a.s-b.s),__ix=new Map(__cs.map((c,i)=>[c,i]));
  try{const __tb=[];cues.forEach((q,k)=>{const ch=(String(q.t||"").match(/[\u1780-\u17B3]/g)||[]).length,d=q.e-q.s;if(ch>=4&&d>0&&(ch/d>20||d<.5))__tb.push(k+1)});window.__zsfTightCues=__tb;if(__tb.length)showToast("\u26a0 \u1798\u17b6\u1793 "+__tb.length+" \u1783\u17d2\u179b\u17b6\u178a\u17c2\u179b\u1796\u17c1\u179b SRT \u1781\u17d2\u179b\u17b8\u1796\u17c1\u1780 \u17ac\u17a2\u1780\u17d2\u179f\u179a\u179c\u17c2\u1784\u1796\u17c1\u1780 (\u1794\u1793\u17d2\u1791\u17b6\u178f\u17cb\u17d6 "+__tb.slice(0,12).join(", ")+(__tb.length>12?" ...":"")+")",false)}catch(_){}
  
@@ -2516,6 +2514,7 @@ async function buildDub(btn){
  }
  /* V28.3.3: last safety net - lines still failing after 12 rounds are tried one by one with the local-stretch path (no server rate parameter) */
  if(left.length){const q3=left.slice();left=[];for(let x=0;x<q3.length;x++){const ji=q3[x];btn.textContent=`🔁 ព្យាយាមចុងក្រោយ (វិធីផ្សេង) • នៅសល់ ${q3.length-x} ឃ្លា`;if(!(await one(ji)))left.push(ji)}}
+ await zsfAutoShorten(J2,out,one,btn);
  fail=left.length;
  try{const cov=new Set(Array.from(okJ).map(ji=>J2[ji].q)),ms=[];
   cues.forEach((q,k)=>{if(!/[\u1780-\u17FF0-9A-Za-z]/.test(String(q.t||"").replace(ZSF_TAGANY," ")))return;if(!cov.has(q))ms.push(k+1)});
@@ -2524,7 +2523,7 @@ async function buildDub(btn){
  try{const L=ttsList(),nw=Date.now(),okN=L.filter(u=>!(__ttsH[u]&&__ttsH[u].until>nw)).length;const __R=window.__zsfReq||{};window.__zsfDubStatTxt=" • ⏱ "+Math.round((Date.now()-__t0all)/1000)+"វិ [រៀបចំ "+Math.round((__m1-__t0all)/1000)+" • អាន "+Math.round((__m2-__m1)/1000)+" • ព្យាយាមឡើងវិញ "+Math.round((Date.now()-__m2)/1000)+"] • សំណើ "+(__R.ok||0)+"/"+J2.length+"ឃ្លា (avg "+(__R.ok?Math.round(__R.ms/__R.ok):0)+"ms, 429×"+(__R.r429||0)+", timeout×"+(__R.to||0)+", err×"+(__R.err||0)+") • Server ល្អ "+okN+"/"+L.length}catch(_){}
  out.sort((a,b)=>a.q.s-b.q.s);
  let __sig="";try{__sig=zsfCueSig()}catch(_){}
- window.__zsfLastOut=out;window.zsfLongGate&&window.zsfLongGate();return{out,fail,sped,total:J2.length,sig:__sig};
+ window.__zsfLastOut=out;return{out,fail,sped,total:J2.length,sig:__sig};
 }
 /* កំណត់ពេលចាក់ ៖ ចាប់ផ្តើមត្រង់ពេល SRT; បើឃ្លាមុនមិនទាន់ចប់ រង់ចាំវាចប់សិន (មិនឱ្យជាន់គ្នា) ។ ពេលនិយាយ BGM/សំឡេងដើម = 0% ក្រៅពីនោះតាម slider */
 
@@ -2613,7 +2612,7 @@ function zsfDubTag(){
   let __q="";try{const Q=zsfSyncQC();if(Q.review){__q=" • 🔍 ត្រូវពិនិត្យ "+Q.review+" ឃ្លា (#"+Q.lines.slice(0,10).join(",")+(Q.lines.length>10?"…":"")+")";try{console.info(Q.text)}catch(_){}}}catch(_){}
   return (a.length?" • ⚠ "+a.join(" • "):" • ✓ គ្មានឃ្លាយឺត/ជាន់")+__q}catch(e){return ""}}
 function zsfPlaceItems(items){
- /* V28.4.9: ចាប់ផ្តើមត្រង់ម៉ោង SRT · មិនបង្កើនល្បឿនម្តងទៀតពេលដាក់ timeline · បើឃ្លាមុននៅមិនទាន់និយាយចប់ រង់ចាំ (មិនជាន់ មិនកាត់ពាក្យ) */
+ /* V28.4.11: ចាប់ផ្តើមត្រង់ម៉ោង SRT · បើឃ្លាមុននៅមិនទាន់ចប់ (ករណីវែងពេក) រង់ចាំ — មិនជាន់ មិនកាត់ពាក្យ មិនបង្ខំលឿន · មិនកែ timestamp */
  const DLY=zsfFit("delay",0);
  let cursor=0,delayed=0;const st=[],PL=[];
  items.forEach((it,i)=>{
@@ -2624,92 +2623,8 @@ function zsfPlaceItems(items){
   cursor=o0+voice});
  window.__zsfPlaceLog=PL;
  return{st,delayed}}
-/* ===== V28.4.9 : UI ល្បឿនអាន + ព្រមាន Subtitle វែង + Debug ===== */
-(function(){
- const el=(tag,css,txt)=>{const e=document.createElement(tag);if(css)e.style.cssText=css;if(txt!=null)e.textContent=txt;return e};
- const set=(k,v)=>{try{localStorage.setItem("zsf_spd_"+k,v)}catch(e){}window.__preDub=null};
- const BTN="padding:10px;font-size:13px;flex:1 1 100%;white-space:normal;height:auto;line-height:1.6",SEL="width:100%;margin:4px 0 10px";
- const hidden=new Set();let box,list,dbg;
- const stamp=s=>{s=Math.max(0,+s||0);const m=Math.floor(s/60);return String(m).padStart(2,"0")+":"+(s-m*60).toFixed(3).padStart(6,"0")};
- function debugText(d){
-  if(d.fail)return "#"+(d.cn||d.n)+" បរាជ័យ: "+d.err;
-  return "Subtitle #"+d.cn+(d.part?" (ផ្នែក "+d.part+")":"")+" | Start "+stamp(d.start)+" | End "+stamp(d.end)+" | Duration "+(d.end-d.start).toFixed(2)+"s | ពេលដែលប្រើបាន "+d.target.toFixed(2)+"s | Original audio "+d.orig.toFixed(2)+"s | Speed ×"+d.tempo.toFixed(2)+" | ត្រូវការ ×"+d.need.toFixed(2)+" | Final audio "+d.audio.toFixed(2)+"s | Final+silence "+d.padded.toFixed(2)+"s"+(d.need>1.205?" | ⚠ WARNING: ត្រូវការល្បឿនលើស 1.20":"")+(d.tooLong?" | ⚠ "+ZSF_LONG_MSG:"")}
- function nextStart(q){let n=Infinity;cues.forEach(c=>{if(c!==q&&c.s>=q.s&&c.s<n)n=c.s});return n}
- function changed(msg){window.__preDub=null;try{$("#srtText").value=toSrt(cues)}catch(e){}try{render()}catch(e){}showToast(msg+" — ចុច «ពិនិត្យ» ម្តងទៀត",true)}
- function extend(d){
-  const q=d.q;if(cues.indexOf(q)<0)return showToast("SRT ត្រូវបានប្តូរ — សូមពិនិត្យម្តងទៀត",false);
-  const want=q.s+d.audio+.02,lim=nextStart(q)-.02,ne=Math.min(want,lim);
-  if(!(ne>q.e+.03))return showToast("គ្មានចន្លោះទំនេរមុនឃ្លាបន្ទាប់ — ពង្រីកមិនបាន",false);
-  if(!confirm("ពង្រីក end time ឃ្លា #"+d.cn+" ពី "+stamp(q.e)+" ទៅ "+stamp(ne)+" ?\n(មិនប៉ះឃ្លាផ្សេង)"+(ne<want-.03?"\nចំណាំ៖ ចន្លោះនេះនៅមិនទាន់គ្រប់ទាំងស្រុង":"")))return;
-  q.e=ne;hidden.add(d.n);changed("✅ បានពង្រីក end time ឃ្លា #"+d.cn)}
- async function shorten(d,row,b){
-  const q=d.q;if(cues.indexOf(q)<0)return showToast("SRT ត្រូវបានប្តូរ — សូមពិនិត្យម្តងទៀត",false);
-  let keys=typeof window.zsfKF==="function"?window.zsfKF(K):K.filter(Boolean),loc=false;try{loc=!!(window.__zsfLaiActive&&window.__zsfLaiActive())}catch(e){}
-  if(loc)keys=["LOCAL_AI"];
-  if(!keys.length)return showToast("សូមបញ្ចូល Gemini Key ជាមុន",false);
-  const old=b.textContent;b.disabled=true;b.textContent="⏳ AI កំពុងបង្រួម...";
-  try{
-   const m=/^\s*\[[1-4]\]\s*/.exec(q.t),tag=m?m[0].trim()+" ":"",km=String(q.t).replace(/^\s*\[[1-4]\]\s*/,"").replace(/\n/g," ").trim();
-   const zh=(window.__zsZhSrc||[]).find(c=>Math.abs(c.s-q.s)<.2);
-   const out=await window.zsfShortenOne(zh?String(zh.t||""):"",km,zsfSpdCfg().cap,d.need,keys,loc);
-   const v=String(out||"").replace(/^\s*\[[1-4]\]\s*/,"").trim();
-   if(!v)throw new Error("AI មិនបានផ្ញើលទ្ធផល");
-   const ta=el("textarea","width:100%;margin-top:8px");ta.value=v;ta.rows=3;
-   const ok=el("button",BTN,"✅ យកអត្ថបទនេះ"),no=el("button",BTN,"✖ បោះបង់"),r=el("div","display:flex;gap:6px;margin-top:6px");
-   ok.className=no.className="b";r.append(ok,no);
-   const w=el("div");w.append(el("div","font-size:12px;opacity:.8;margin-top:8px","សូមពិនិត្យន័យមុនយក (អាចកែបាន)៖"),ta,r);row.append(w);
-   no.onclick=()=>{w.remove();b.disabled=false};
-   ok.onclick=()=>{const t=ta.value.trim();if(!t)return;if(cues.indexOf(q)<0)return;q.t=tag+t;hidden.add(d.n);changed("✅ បានប្តូរអត្ថបទឃ្លា #"+d.cn)};
-  }catch(e){showToast("❌ បង្រួមមិនបាន៖ "+String(e&&e.message||e).slice(0,120),false);b.disabled=false}
-  b.textContent=old}
- function show(){
-  if(!list)return;list.textContent="";
-  const D=(window.__zsfDubLog||[]).slice().sort((a,b)=>a.n-b.n),L=detect_long_subtitles(D).filter(d=>!hidden.has(d.n));
-  if(D.length)list.append(el("div","margin:8px 0;font-weight:700",L.length?"⚠ ឃ្លាវែងពេក "+L.length+" ឃ្លា":"✓ គ្មានឃ្លាត្រូវដោះស្រាយ"));
-  L.slice(0,60).forEach(d=>{
-   const row=el("div","border:1px solid #f59e0b;border-radius:12px;padding:10px;margin-bottom:8px");
-   row.append(el("div","font-weight:700;color:#fbbf24","#"+d.cn+" ⚠ "+ZSF_LONG_MSG),
-    el("div","font-size:12px;margin:4px 0","ពេល "+d.target.toFixed(2)+"s • សំឡេង "+d.audio.toFixed(2)+"s • លើស "+Math.max(0,d.audio-d.target).toFixed(2)+"s • ត្រូវការ ×"+d.need.toFixed(2)),
-    el("div","font-size:13px;margin-bottom:6px",String(d.q.t||"")));
-   const bs=el("div","display:flex;gap:6px;flex-wrap:wrap"),mk=(t,f)=>{const b=el("button",BTN,t);b.className="b";b.onclick=()=>f(b);bs.append(b)};
-   if(!d.part){mk("✂️ Shorten Text",b=>shorten(d,row,b));mk("⏩ ពង្រីក end time",()=>extend(d))}
-   mk("👌 អនុញ្ញាតឱ្យលើស",()=>{hidden.add(d.n);show()});
-   row.append(bs);list.append(row)});
-  dbg.value=D.map(debugText).join("\n")}
- async function check(b){
-  if(!cues.length)return showToast("សូមនាំចូល SRT ជាមុន",false);
-  const old=b.textContent;b.disabled=true;window.__zsfChecking=true;
-  try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();hidden.clear();const d=await buildDub(b);window.__preDub=d.fail?null:d}
-  catch(e){showToast("❌ "+String(e&&e.message||e).slice(0,160),false)}
-  window.__zsfChecking=false;b.disabled=false;b.textContent=old;show()}
- /* ហៅនៅចុង buildDub ៖ បើមានឃ្លាវែង ហើយកំណត់ «សួរខ្ញុំ» → ឱ្យអ្នកប្រើសម្រេច */
- window.zsfLongGate=function(){
-  hidden.clear();try{show()}catch(e){}
-  const n=detect_long_subtitles().length;
-  if(!n||window.__zsfChecking||window.__batchCap||window.__batchHold||zsfSpdCfg().onlong!=="ask")return;
-  if(!confirm("⚠ "+ZSF_LONG_MSG+"៖ "+n+" ឃ្លា\n\nOK = បន្ត ដោយឱ្យសំឡេងលើសពេលបន្តិច (មិនកាត់ពាក្យ មិនបង្ខំឱ្យលឿន)\nCancel = ឈប់ ដើម្បី Shorten Text ឬពង្រីកពេល")){
-   const e=new Error("⏸ បានឈប់ ដើម្បីដោះស្រាយឃ្លាវែង — មើលប្រអប់ «ល្បឿនអាន»");e.fatal=true;throw e}};
- function build(){
-  const g=document.getElementById("aiGen");if(!g||document.getElementById("zsfSpdBox"))return;
-  const css=el("style",null,'.step[data-k="speed"],.step[data-k="auto"]{display:none!important}');document.head.append(css);
-  const C=zsfSpdCfg();
-  box=el("div","border:1px solid #3b73f0;border-radius:16px;padding:12px;margin:14px 0");box.id="zsfSpdBox";
-  const sel=(label,opts,val,fn)=>{const s=el("select",SEL);s.className="sel2";opts.forEach(o=>{const x=el("option",null,o[1]);x.value=o[0];s.append(x)});s.value=val;s.onchange=()=>fn(s.value);box.append(el("div","font-size:13px",label),s);return s};
-  const tick=(label,val,fn)=>{const l=el("label","display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0"),c=el("input");c.type="checkbox";c.checked=val;c.onchange=()=>fn(c.checked);l.append(c,el("span",null,label));box.append(l)};
-  box.append(el("div","font-weight:800;margin-bottom:8px","🗣 ល្បឿនអាន (ជំនួស Speed / Auto Speed ចាស់)"));
-  sel("ល្បឿនធម្មតា",[["slow","Slow 0.85"],["natural","Natural 0.95 (លំនាំដើម)"],["normal","Normal 1.00"],["fast","Fast 1.10"]],C.mode,v=>set("mode",v));
-  const safe=sel("ល្បឿនសរុបអតិបរមា",[["1.15","×1.15"],["1.2","×1.20 (លំនាំដើម)"]],String(C.safe),v=>set("max",v));
-  tick("Advanced៖ អនុញ្ញាតល្បឿនលើស 1.20",C.adv,v=>{set("adv",v?"1":"0");am.disabled=!v;safe.disabled=v});
-  const am=sel("អតិបរមា Advanced",[["1.25","×1.25"],["1.3","×1.30"],["1.4","×1.40"],["1.5","×1.50"]],String(C.advmax),v=>set("advmax",v));
-  am.disabled=!C.adv;safe.disabled=C.adv;
-  tick("ប្រើចន្លោះស្ងាត់មុនឃ្លាបន្ទាប់ (អតិបរមា 0.5s) មុនបង្កើនល្បឿន",C.gap,v=>set("gap",v?"1":"0"));
-  sel("ពេលមានឃ្លាវែងពេក",[["ask","សួរខ្ញុំមុន"],["go","បន្ត ហើយឱ្យសំឡេងលើសពេល"]],C.onlong,v=>set("onlong",v));
-  const ck=el("button","width:100%;padding:12px;white-space:normal;height:auto;line-height:1.6","🔍 ពិនិត្យ Subtitle វែងពេក (បង្កើតសំឡេងសាកល្បង)");ck.className="b";ck.onclick=()=>check(ck);
-  list=el("div");
-  const det=el("details","margin-top:8px"),sm=el("summary",null,"🛠 Debug ព័ត៌មានឃ្លានីមួយៗ");dbg=el("textarea","width:100%;margin-top:6px;font-size:11px");dbg.rows=10;dbg.readOnly=true;det.append(sm,dbg);
-  box.append(ck,list,det);g.parentNode.insertBefore(box,g);show()}
- setTimeout(build,600);
-})();
+/* V28.4.11 : ល្បឿនស្វ័យប្រវត្តិ — លាក់ប៊ូតុង Speed / Auto Speed ចាស់ (លែងប្រើ ដើម្បីកុំឱ្យល្បឿនគុណគ្នា) */
+(function(){const c=document.createElement("style");c.textContent='.step[data-k="speed"],.step[data-k="auto"]{display:none!important}';document.head.append(c)})();
 function scheduleDub(items,t0,bus,bgG,base){
  let prevEnd=0,delayed=0;try{fxSpeechZones()}catch(e){}
  const __P=zsfPlaceItems(items);delayed=__P.delayed;
@@ -7456,7 +7371,32 @@ function zsfLenGuard(old,nw){
  for(var i=0;i<NEG.length;i++){if(a.indexOf(NEG[i])!==-1&&b.indexOf(NEG[i])===-1)return false}
  return true}
 /* V28.4.9: ស្ពានសម្រាប់ប៊ូតុង Shorten Text */
-window.zsfShortenOne=function(cn,km,cap,need,keys,isLocal){var models=zsfTrModels();if(isLocal)models=models.slice(0,1);var max=Math.max(4,Math.floor(zsfKmCount(km)*cap/Math.max(need,1.01)*.97));return zsfLenAsk([{cn:cn,km:km,max:max}],keys,models,isLocal).then(function(a){return a[0]})};
+/* V28.4.11 : ឃ្លាដែលនៅវែងពេកក្រោយល្បឿន ×1.20 → AI បង្រួមអត្ថបទ «សម្រាប់អាន» ដោយស្វ័យប្រវត្តិ (Subtitle និងម៉ោងនៅដដែល) · បរាជ័យ = ប្រើអត្ថបទដើម */
+window.zsfAutoShorten=async function(J2,out,one,btn){
+ try{
+  const bad=(window.__zsfDubLog||[]).filter(d=>!d.fail&&d.tooLong&&!d.part&&J2[d.n-1]&&zsfReadText(d.q)===d.q.t);
+  if(!bad.length||window.__zsfStop)return 0;
+  let keys=typeof window.zsfKF==="function"?window.zsfKF(K):K.filter(Boolean),loc=false;try{loc=!!(window.__zsfLaiActive&&window.__zsfLaiActive())}catch(_){}
+  if(loc)keys=["LOCAL_AI"];
+  if(!keys.length)return 0;
+  let models=zsfTrModels();if(loc)models=models.slice(0,1);
+  const TG=/^\s*\[[1-4]\]\s*/,T0=Date.now();let done=0;
+  for(let p=0;p<bad.length&&Date.now()-T0<120000&&!window.__zsfStop;p+=20){
+   try{btn.textContent="✂️ កំពុងសម្រួលឃ្លាវែង "+Math.min(p+20,bad.length)+"/"+bad.length}catch(_){}
+   const part=bad.slice(p,p+20).map(d=>{const km=String(d.q.t).replace(TG,"").replace(/\n/g," ").trim(),n=zsfKmCount(km),zh=(window.__zsZhSrc||[]).find(c=>Math.abs(c.s-d.q.s)<.2);
+    return{d,km,n,cn:zh?String(zh.t||""):"",max:Math.max(6,Math.floor(n*.6),Math.floor(n*d.target/d.audio*.97))}});
+   let ans;try{ans=await zsfLenAsk(part,keys,models,loc)}catch(e){console.warn("auto shorten",e);break}
+   for(let i=0;i<part.length&&!window.__zsfStop;i++){
+    const x=part[i],v=String(ans[i]||"").replace(TG,"").trim(),n=zsfKmCount(v);
+    if(!v||!/[\u1780-\u17B3]/.test(v)||n>=x.n||n<x.n*.5||!zsfTrOk("km",x.cn||x.km,v)||!zsfLenGuard(x.km,v))continue;
+    const ji=x.d.n-1,j=J2[ji],at=out.findIndex(o=>o.n===x.d.n);if(at<0)continue;
+    const oldItem=out[at],oldText=j.text;j.text=zsfTtsText(v)||oldText;out.splice(at,1);
+    if(await one(ji)&&out[out.length-1].voice<oldItem.voice){const m=TG.exec(x.d.q.t);x.d.q.rt=(m?m[0].trim()+" ":"")+v;x.d.q.rtFor=x.d.q.t;done++}
+    else{const k=out.findIndex(o=>o.n===x.d.n);if(k>=0)out.splice(k,1);out.push(oldItem);j.text=oldText;window.__zsfDubLog=window.__zsfDubLog.filter(l=>l.n!==x.d.n);window.__zsfDubLog.push(x.d)}
+   }
+  }
+  window.__zsfAutoShortened=done;return done
+ }catch(e){console.warn("auto shorten",e);return 0}};
 async function zsfLenAsk(items,keys,models,isLocal){
  var prompt=ZSF_LEN_PROMPT+"\n\n"+items.map(function(x,i){return (i+1)+". CN: "+x.cn+"\n   KM: "+x.km+"\n   TARGET: "+x.max+" Khmer letters"}).join("\n");
  var last=null;
@@ -9454,7 +9394,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="28.4.9";
+  var EMB="28.4.11";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
