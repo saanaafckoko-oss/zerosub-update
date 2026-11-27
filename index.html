@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<!-- V28.4.9 : សារ Export ចប់ (បង្ហាញពេល prep/voice/render/ffmpeg/save) នៅជាប់ ៣ នាទី — ចុចលើសារដើម្បីបិទ · គ្មានអ្វីផ្សេងប្តូរ -->
+><!DOCTYPE html>
+<!-- V28.4.10 : សាក KEEP មុន Native (តេស្តល្បឿន) · V28.4.9 : សារ Export ចប់ (បង្ហាញពេល prep/voice/render/ffmpeg/save) នៅជាប់ ៣ នាទី — ចុចលើសារដើម្បីបិទ · គ្មានអ្វីផ្សេងប្តូរ -->
 <!-- V28.4.3 : Prompt បកប្រែ — ឃ្លាវែងត្រូវបង្រួមខ្លីដោយរក្សាអត្ថន័យ (ច្បាប់ឃ្លាវែង) + កន្ទុយពាក្យអារម្មណ៍ត្រូវតែមានក្នុងឈុតទំនើប/ជិតស្និទ្ធ (ណា ណ៎ ហ្មង តើ អញ្ចឹង វ៉ាយ ហាស ចា៎ ចុះ) · ប្តូរ cache v20→v21 -->
 <!-- V28.4.2 : សំឡេងអាន — ឃ្លាមិនត្រូវបានកាត់/ជាន់ដោយឃ្លាបន្ទាប់ទៀត: (១) រុញឃ្លាបន្ទាប់បានដល់ 1.2s ដើម្បីរង់ចាំឃ្លាមុនអានចប់ (ពីមុន 0.15s) (២) កាត់ឃ្លាតាមការផ្អាកតួអង្គ ត្រឹមសញ្ញាវណ្ណយុត្តិ/ពាក្យតភ្ជាប់ មិនកាត់ត្រង់ចន្លោះដកឃ្លាធម្មតាទៀត -->
 <!-- V28.4.1 : Prompt បកប្រែ — សរសេរឡើងវិញតាមច្បាប់ ៣ (ភាសានិយាយធម្មជាតិ · ត្រូវសំឡេងតួអង្គ · មនោសញ្ចេតនា) + ឧទាហរណ៍ ខុស/ត្រូវ + កន្ទុយពាក្យតាមមុខងារ + «ធម្មជាតិមុន ទើបខ្លី» · ផ្នែកបច្ចេកទេសរក្សាដដែល · ប្តូរ cache បកប្រែ v19→v20 -->
@@ -3746,11 +3746,17 @@ async function doExport0(){
   const why=[];
   /* V18.2 : សាក Native FFmpeg មុនគេ (លឿនបំផុត ហើយមិនពឹង AAC របស់ WebView) */
   let __noAac=false;const __apk=!!(window.ZSNative&&typeof window.ZSNative.runFfmpeg==="function"&&typeof window.ZSNative.putFile==="function");
+   /* V28.4.10 (តេស្ត) : សាក KEEP (AAC ក្នុងម៉ាស៊ីនទូរសព្ទ) មុន — បើមិនបាន ត្រឡប់ទៅ Native FFmpeg ដូចមុន។ បិទវិញដោយ window.__zsKeepFirst=false */
+   let __keepTried=false;
+   if(window.__zsKeepFirst!==false&&window.ZSNative&&typeof window.ZSNative.runFfmpeg==="function"){__keepTried=true;
+    try{tag("KEEP-first");if(await doExportKeep()){done("KEEP");return}}
+    catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("keep-first:",e);why.push("keep: "+String((e&&e.message)||e));showToast("⚠ KEEP មិនបាន ("+why[why.length-1].slice(0,80)+") — សាក Native FFmpeg",false)}
+   }
   if(window.__zsNoNativeExp!==true&&window.ZSNative&&typeof window.ZSNative.runFfmpeg==="function"){
    try{tag("N v18.4: Native FFmpeg — រក្សាវីដេអូដើម + សំឡេងថ្មី (លឿនបំផុត)");if(await doExportNative()){done("N");return}}
    catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("native export:",e);why.push("native: "+String((e&&e.message)||e));showToast("⚠ Native Export មិនបាន ("+why[0].slice(0,90)+") — សាកវិធីបន្ទាប់",false)}
   }
-  try{tag("KEEP: រក្សាវីដេអូដើម + សំឡេងថ្មី (គ្មាន Subtitle)");if(await doExportKeep()){done("KEEP");return}}
+  try{if(__keepTried)throw new Error("KEEP បានសាករួចហើយ");tag("KEEP: រក្សាវីដេអូដើម + សំឡេងថ្មី (គ្មាន Subtitle)");if(await doExportKeep()){done("KEEP");return}}
   catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("keep export:",e);why.push(String((e&&e.message)||e));__noAac=/AAC/.test(why[why.length-1]);
    showToast("⚠ Export រក្សាវីដេអូដើមមិនបាន ("+why[0].slice(0,90)+") — ប្រើវិធី encode វីដេអូឡើងវិញ (គ្មាន Subtitle)",false)}
   /* V18.4 : ក្នុង APK បើវិធីលឿន (N/KEEP) មិនបាន → ឈប់ប្រាប់មូលហេតុពិត មិនធ្លាក់ទៅ B/C ដោយស្ងាត់ៗ (B/C អាចអស់ពេលជាង ៣០ នាទី ឬគាំងត្រង់ 4%) */
@@ -9373,7 +9379,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="28.5.1";
+  var EMB="28.5.2";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
