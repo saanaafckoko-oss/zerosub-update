@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- V28.4.9 : សារ Export ចប់ (បង្ហាញពេល prep/voice/render/ffmpeg/save) នៅជាប់ ៣ នាទី — ចុចលើសារដើម្បីបិទ · គ្មានអ្វីផ្សេងប្តូរ -->
 <!-- V28.4.3 : Prompt បកប្រែ — ឃ្លាវែងត្រូវបង្រួមខ្លីដោយរក្សាអត្ថន័យ (ច្បាប់ឃ្លាវែង) + កន្ទុយពាក្យអារម្មណ៍ត្រូវតែមានក្នុងឈុតទំនើប/ជិតស្និទ្ធ (ណា ណ៎ ហ្មង តើ អញ្ចឹង វ៉ាយ ហាស ចា៎ ចុះ) · ប្តូរ cache v20→v21 -->
 <!-- V28.4.2 : សំឡេងអាន — ឃ្លាមិនត្រូវបានកាត់/ជាន់ដោយឃ្លាបន្ទាប់ទៀត: (១) រុញឃ្លាបន្ទាប់បានដល់ 1.2s ដើម្បីរង់ចាំឃ្លាមុនអានចប់ (ពីមុន 0.15s) (២) កាត់ឃ្លាតាមការផ្អាកតួអង្គ ត្រឹមសញ្ញាវណ្ណយុត្តិ/ពាក្យតភ្ជាប់ មិនកាត់ត្រង់ចន្លោះដកឃ្លាធម្មតាទៀត -->
 <!-- V28.4.1 : Prompt បកប្រែ — សរសេរឡើងវិញតាមច្បាប់ ៣ (ភាសានិយាយធម្មជាតិ · ត្រូវសំឡេងតួអង្គ · មនោសញ្ចេតនា) + ឧទាហរណ៍ ខុស/ត្រូវ + កន្ទុយពាក្យតាមមុខងារ + «ធម្មជាតិមុន ទើបខ្លី» · ផ្នែកបច្ចេកទេសរក្សាដដែល · ប្តូរ cache បកប្រែ v19→v20 -->
@@ -3847,7 +3848,7 @@ function srtToMs(s){return Math.round(t2s(String(s))*1000)}
 
 /* A4. Toast + Progress */
 var __tt=null,__pt=null;
-function showToast(m,ok){var t=$("#toast");t.textContent=m;t.className=ok===false?"bad":"";t.style.display="block";clearTimeout(__tt);__tt=setTimeout(function(){t.style.display="none"},4500)}
+function showToast(m,ok){var t=$("#toast"),keep=/^[\u26A1\u2705]\s*Export/.test(String(m));t.textContent=keep?m+"\n\n👆 ចុចលើប្រអប់នេះដើម្បីបិទ":m;t.style.whiteSpace=keep?"pre-wrap":"";t.style.pointerEvents="auto";t.onclick=function(){t.style.display="none"};t.className=ok===false?"bad":"";t.style.display="block";clearTimeout(__tt);__tt=setTimeout(function(){t.style.display="none"},keep?180000:4500)}
 function toast(m,ok){showToast(m,ok)}
 function __zsWorkNote(p,msg){
   try{var N=window.ZSNative;if(!(N&&typeof N.workStart==="function"))return;
@@ -9372,7 +9373,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="28.5.0";
+  var EMB="28.5.1";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
