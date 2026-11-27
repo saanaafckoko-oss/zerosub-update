@@ -2967,7 +2967,8 @@ async function doExportFast(){if(window.__zsfStop)throw window.__zsfStopErr();
    if(nOut%12===0){vp=Math.min(1,t/dur);upd()}
   }catch(e){err=err||e}finally{fr.close()}},error:e=>{err=err||e}});
  dec.configure(dcfg);
- let vp=0,ap=0;const upd=()=>{const el=(performance.now()-T0)/1000,eta=vp>.03?Math.round(el/vp*(1-vp)):0;btn.textContent="កំពុង Export "+Math.min(99,Math.round(92*vp+7*ap))+"%..."+(eta>0?" • នៅសល់ ~"+(eta>=90?Math.round(eta/60)+" នាទី":eta+" វិនាទី"):"")};
+ let vp=0,ap=0;const upd=()=>{const el=(performance.now()-T0)/1000,eta=vp>.03?Math.round(el/vp*(1-vp)):0;btn.textContent="កំពុង Export "+__sp()+"%..."+(eta>0?" • នៅសល់ ~"+(eta>=90?Math.round(eta/60)+" នាទី":eta+" វិនាទី"):"")};
+ let __sh=0;const __sp=()=>Math.min(99,Math.floor(__sh));const __pgT=setInterval(()=>{const tg=Math.min(99,92*vp+7*ap);if(__sh<tg)__sh=Math.min(tg,__sh+Math.max(.3,(tg-__sh)*.3));else if(__sh<Math.min(99,tg+3))__sh+=.06;if(!err)upd()},400);
  let mc=0;for(const z of dm.samples)if(z.cts>mc)mc=z.cts;
  const durS=Math.max(dur,(mc-dm.start)/dm.ts+fdur/1e6),SR=ae.sr,total=Math.round(durS*SR);
  const {plan,delayed}=voiceOn?fxPlan(dub.out):{plan:[],delayed:0};
@@ -3002,7 +3003,7 @@ async function doExportFast(){if(window.__zsfStop)throw window.__zsfStopErr();
  if(!as.length)throw new Error("Encode សំឡេងមិនបាន");ap=1;upd()};
  let wdT;const wd=new Promise((_,rj)=>{wdT=setInterval(()=>{if(performance.now()-window.__zsAct>400000){err=err||new Error("Export គាំង — គ្មានវឌ្ឍនភាព ៩០ វិនាទី");rj(err)}},3000)});
  const allP=Promise.all([vidTask().catch(e=>{err=err||e;throw e}),audTask().catch(e=>{err=err||e;throw e})]);allP.catch(()=>{});
- try{await Promise.race([allP,wd])}finally{clearInterval(wdT);if(err){try{dec.close()}catch(e){}try{enc.close()}catch(e){}}}
+ try{await Promise.race([allP,wd])}finally{clearInterval(wdT);try{clearInterval(__pgT)}catch(e){}if(err){try{dec.close()}catch(e){}try{enc.close()}catch(e){}}}
  if(err)throw err;
  /* ---- Mux ---- */
  const blob=SPMP4.mux({w,h,vdesc,v:vs,fpsHint:dm.fps,a:{kind:ae.kind,sr:SR,ch:2,desc:adesc,fs:ae.fs,s:as},durUs:Math.round(durS*1e6)});
@@ -9380,7 +9381,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="28.5.3";
+  var EMB="28.5.4";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
