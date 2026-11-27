@@ -2356,6 +2356,7 @@ function tempoPlan(p,dur,slotD){
    Auto Speed  = បើវែងជាងពេលដែលមាន → បង្កើត TTS ម្តងទៀតលឿនជាងមុន (រហូត ៣ដង) ត្រឹម cap = min(base×(1+Auto%), 2.0)
    បន្ទាប់មក force-fit (WSOLA) រហូតដល់ ×1.8 សរុប ។ ពេលដាក់ចូលវីដេអូ ៖ រុញបានអតិបរមា 0.5s ហើយបន្តឹងមិនឱ្យជាន់ឃ្លាបន្ទាប់ */
 function zsfFit(k,d){try{const v=parseFloat(localStorage.getItem("zsf_tts_"+k));if(isFinite(v))return v}catch(e){}return d}
+function zsfApk(){try{return localStorage.getItem("zsf_tts_apk")!=="0"}catch(e){return true}} /* V28.5.3: APK-style fit = generate once at base rate, measure, stretch only as needed (max zsf_tts_maxspeed), steal the silent gap */
 function zsfFitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch(e){return true}}
 /* V27.8.9: pause-aware dubbing. Finds the real pauses of the ORIGINAL actor inside a cue (from the video's own speech energy) and makes the Khmer voice pause and resume at the same moments, so it never runs ahead of the mouth. */
 function zsfPauseOn(){try{return localStorage.getItem("zsf_tts_pausesplit")!=="0"}catch(e){return true}}
@@ -2385,7 +2386,7 @@ function zsfPauseSplit(text,segs,q){
  return parts.every(x=>x.text)?parts:null}
 function zsfAvail(q,dur,nx){
  /* V27.8.8: breath = the silent gap of the SRT itself. Audio may run slightly past the SRT end only if the gap is big enough; a breath is always kept before the next cue. */
- const BR=zsfFit("breath",.22),tail=zsfFit("tail",.5),gap=nx?(nx.s-q.e):1.0;
+ const BR=zsfFit("breath",.22),tail=zsfFit("tail",1.8),gap=nx?(nx.s-q.e):1.0;
  if(gap>=BR)return dur+Math.min(gap-BR,tail);
  return Math.max(dur*.85,dur-(BR-gap))}
 /* ពិនិត្យម្តងថា TTS Worker គាំទ្រ rate ពិតឬអត់ (បើមិនគាំទ្រ → ប្រើវិធី stretch ចាស់) */
@@ -2407,13 +2408,13 @@ async function dubAudio(text,slot,p,slotD){
  let cur=base,buf;
  const __ch=(text.match(/[\u1780-\u17FF]/g)||[]).length,__vk=voiceOfSlot(slot),__SP=(window.__zsfSpc=window.__zsfSpc||{}),__st=(__SP[__vk]=__SP[__vk]||{n:0,u:0});
  /* V27.8.21: ទាយប្រវែងសំឡេងពីចំនួនអក្សរ → បើវែងជាងពេល សុំល្បឿនត្រឹមត្រូវតែម្តងដំបូង (មិនសុំ TTS ២-៣ដងទៀត) */
- if(slotD>0&&auto>0&&__ch>=4&&__st.n>=8){const pd=__ch*__st.u/base;if(pd>slotD*1.1){const t0=Math.min(base*(pd/slotD),Math.min(base*(1+auto/100),1.8));if(t0>base*1.02)cur=t0}}
+ if(!zsfApk()&&slotD>0&&auto>0&&__ch>=4&&__st.n>=8){const pd=__ch*__st.u/base;if(pd>slotD*1.1){const t0=Math.min(base*(pd/slotD),Math.min(base*(1+auto/100),zsfFit("maxspeed",1.4)));if(t0>base*1.02)cur=t0}}
  try{buf=await ttsBuf(text,slot,pitch,Math.round((cur-1)*100))}catch(e){return dubAudioLocal(text,slot,p,slotD)}
  /* V28.0.1: audio length wildly different from what the text needs = wrong/garbled server reply -> ask again once, keep the more plausible one */
  try{if(__ch>=6&&__st.n>=8&&__st.u>0){const rt=Math.round((cur-1)*100),eu=buf.duration*cur/__ch;if(eu>__st.u*2.8||eu<__st.u*.35){__ttsCache.delete(voiceOfSlot(slot)+"|"+pitch+"|"+rt+"|"+text);const nb=await ttsBuf(text,slot,pitch,rt),e2=nb.duration*cur/__ch;if(Math.abs(Math.log(e2/__st.u))<Math.abs(Math.log(eu/__st.u)))buf=nb}}}catch(_){}
  try{if(cur===base&&__ch>=4&&buf.duration>.2){const u=buf.duration*cur/__ch;__st.u=__st.n<8?(__st.u*__st.n+u)/(__st.n+1):__st.u*.85+u*.15;__st.n++}}catch(_){}
  if(!(slotD>0))return{buf,boost:false,tt:cur};
- if(auto>0){const cap=Math.min(base*(1+auto/100),1.8);
+ if(auto>0&&!zsfApk()){const cap=Math.min(base*(1+auto/100),zsfFit("maxspeed",1.4));
   for(let it=0;it<3;it++){
    const d=buf.duration;if(d<=slotD*1.02)break;
    const tot=Math.min(cur*(d/slotD)*1.02,cap);if(tot<=cur*1.015)break;
@@ -2423,7 +2424,7 @@ async function dubAudio(text,slot,p,slotD){
   if(cur>base*1.03&&buf.duration<slotD*.88){const t2=Math.max(base,cur*(buf.duration/slotD)*1.02);if(t2<cur*.97){try{const nb=await ttsBuf(text,slot,pitch,Math.round((t2-1)*100));if(nb.duration<=slotD*1.02){buf=nb;cur=t2}}catch(e){}}}}
  let forced=1;const pre0=buf;
  if(zsfFitOn()&&buf.duration>slotD){
-  const FM=zsfFit("fmax",2);let allow=Math.max(1,FM/Math.max(cur,1)),need=Math.min(buf.duration/(slotD*.97),allow);
+  const FM=zsfApk()?zsfFit("maxspeed",1.4):zsfFit("fmax",1.5);let allow=Math.max(1,FM/Math.max(cur,1)),need=Math.min(buf.duration/(slotD*.97),allow);
   for(let f=0;f<2&&need>1.01;f++){
    try{buf=wsolaStretch(buf,need)}catch(e){break}
    forced*=need;const nl=buf.duration;if(nl<=slotD)break;
@@ -2563,7 +2564,7 @@ function zsfDubSummary(D){
 /* ស្រោមឈ្មោះតាមបញ្ជីដែលបានស្នើ */
 function parse_segments(){return cues.map((q,i)=>({n:i+1,start_time:q.s,end_time:q.e,target_duration:q.e-q.s,text:q.t}))}
 function generate_segment_audio(text,slot,p,slotD){return dubAudio(text,slot,p||presetOf(slot),slotD)}
-function fit_audio_to_duration(buf,targetSec){const t=buf.duration/Math.max(.05,targetSec);return t>1.01?wsolaStretch(buf,Math.min(t,zsfFit("fmax",2))):buf}
+function fit_audio_to_duration(buf,targetSec){const t=buf.duration/Math.max(.05,targetSec);return t>1.01?wsolaStretch(buf,Math.min(t,zsfFit("fmax",1.5))):buf}
 function place_audio_on_timeline(items){return zsfPlaceItems(items)}
 function write_segment_logs(){const r=zsfDubReport();try{console.info(r.text)}catch(_){}return r.text}
 function export_result(){return doExport()}
@@ -2617,7 +2618,7 @@ function zsfDubTag(){
   return (a.length?" • ⚠ "+a.join(" • "):" • ✓ គ្មានឃ្លាយឺត/ជាន់")+__q}catch(e){return ""}}
 function zsfPlaceItems(items){
  /* V27.8.8: each Khmer line starts on its SRT time; the silence before the next SRT line is the breath (kept >= breath). No long drift: push at most 0.6s. */
- const FM=zsfFit("fmax",2),ON=zsfFitOn(),DLY=zsfFit("delay",0),GAP=zsfFit("breath",.22),PUSH=zsfFit("push",1.2);
+ const FM=zsfFit("fmax",1.5),ON=zsfFitOn(),DLY=zsfFit("delay",0),GAP=zsfFit("breath",.22),PUSH=zsfFit("push",1.2);
  let cursor=0,delayed=0;const st=[],PL=[];
  items.forEach((it,i)=>{
   const b0=it.buf0||(it.buf0=it.buf);let buf=b0,o0=Math.max(0,fxOn(it.q)+DLY);const want=o0,prevEnd=i?cursor-GAP:0;
@@ -9379,7 +9380,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="28.5.2";
+  var EMB="28.5.3";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
