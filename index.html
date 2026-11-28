@@ -3566,7 +3566,7 @@ async function doExportNative(){if(window.__zsfStop)throw window.__zsfStopErr();
  const dur=V.duration||0;if(!(dur>0.5))throw new Error("អានរយៈពេលវីដេអូមិនបាន");
  const lg=m=>{try{zsxLog(m)}catch(e){}};
  const note=(p,m)=>{try{if(typeof __zsWorkNote==="function")__zsWorkNote(p,"Export "+Math.round(p)+"% "+(m||""))}catch(e){}};
- const prog=(p,m)=>{p=Math.max(0,Math.min(99,p));btn.textContent="កំពុង Export "+Math.round(p)+"%..."+(m?" • "+m:"");note(p,m)};
+ let __ps=0,__pt=0,__pm="",__pl=Date.now();const __draw=()=>{btn.textContent="កំពុង Export "+Math.min(99,Math.round(__ps))+"%..."+(__pm?" • "+__pm:"")};const __pid=setInterval(()=>{if(Date.now()-__pl>300000||(__pt>=94&&Date.now()-__pl>60000)){clearInterval(__pid);return}if(__ps<__pt)__ps=Math.min(__pt,__ps+Math.max(.3,(__pt-__ps)*.3));else if(__ps<Math.min(98,__pt+2.5))__ps+=.05;if(String(btn.textContent).indexOf("កំពុង Export ")===0)__draw()},400);const prog=(p,m)=>{p=Math.max(0,Math.min(99,p));__pt=Math.max(__pt,p);__ps=Math.max(__ps,Math.min(p,__ps+Math.max(.3,(p-__ps)*.3)));__pm=m||"";__pl=Date.now();__draw();note(Math.round(__ps),m)};
  const b64of=bl=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const t=String(fr.result);res(t.slice(t.indexOf(",")+1))};fr.onerror=()=>rej(fr.error||new Error("read"));fr.readAsDataURL(bl)});
  const tg="ex"+Date.now(),pcm=tg+".pcm",out=tg+"_out.mp4";let own=null,prep=null,wl=null,keep=false;const M={};M.t0=performance.now();
  try{
@@ -3750,7 +3750,7 @@ async function doExport0(){
   let __noAac=false;const __apk=!!(window.ZSNative&&typeof window.ZSNative.runFfmpeg==="function"&&typeof window.ZSNative.putFile==="function");
    /* V28.4.10 (តេស្ត) : សាក KEEP (AAC ក្នុងម៉ាស៊ីនទូរសព្ទ) មុន — បើមិនបាន ត្រឡប់ទៅ Native FFmpeg ដូចមុន។ បិទវិញដោយ window.__zsKeepFirst=false */
    let __keepTried=false;
-   if(window.__zsKeepFirst!==false&&window.ZSNative&&typeof window.ZSNative.runFfmpeg==="function"){__keepTried=true;
+   if((window.__zsKeepFirst===true||localStorage.getItem("zsf_keep_first")==="1")&&window.ZSNative&&typeof window.ZSNative.runFfmpeg==="function"){__keepTried=true;
     try{tag("KEEP-first");if(await doExportKeep()){done("KEEP");return}}
     catch(e){btn.innerHTML=old;if(e&&e.fatal)throw e;console.warn("keep-first:",e);why.push("keep: "+String((e&&e.message)||e));showToast("⚠ KEEP មិនបាន ("+why[why.length-1].slice(0,80)+") — សាក Native FFmpeg",false)}
    }
@@ -9381,7 +9381,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="28.5.5";
+  var EMB="28.5.6";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
