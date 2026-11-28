@@ -2357,6 +2357,13 @@ function tempoPlan(p,dur,slotD){
    បន្ទាប់មក force-fit (WSOLA) រហូតដល់ ×1.8 សរុប ។ ពេលដាក់ចូលវីដេអូ ៖ រុញបានអតិបរមា 0.5s ហើយបន្តឹងមិនឱ្យជាន់ឃ្លាបន្ទាប់ */
 function zsfFit(k,d){try{const v=parseFloat(localStorage.getItem("zsf_tts_"+k));if(isFinite(v))return v}catch(e){}return d}
 function zsfApk(){try{return localStorage.getItem("zsf_tts_apk")!=="0"}catch(e){return true}} /* V28.5.3: APK-style fit = generate once at base rate, measure, stretch only as needed (max zsf_tts_maxspeed), steal the silent gap */
+function zsfTdSet(btn,lab,done,total,eta){var s=window.__zsfTD;if(!s||s.total!==total||s.real>=s.total){if(s&&s.id)clearInterval(s.id);s=window.__zsfTD={shown:0,real:0,creep:0,total:total,id:0}}
+ s.real=done;s.eta=eta||"";s.lab=lab;s.btn=btn;s.t=Date.now();if(!s.id)s.id=setInterval(zsfTdTick,150);zsfTdTick()}
+function zsfTdPct(s,full){var r=window.__zsfTdRange;if(!r)return "";var f=full?1:Math.min(.999,(s.shown+s.creep)/s.total),p=Math.max(r[0]+f*(r[1]-r[0]),window.__zsfOV||0);if(full)p=Math.max(p,r[1]);window.__zsfOV=Math.max(window.__zsfOV||0,p);return " \u2022 "+Math.min(99,p).toFixed(1)+"%"}
+function zsfTdTick(){var s=window.__zsfTD;if(!s)return;
+ if(Date.now()-s.t>300000||(s.shown>=s.total&&s.real>=s.total)){clearInterval(s.id);s.id=0;if(s.real>=s.total&&s.total>0)s.btn.textContent=s.lab+s.total+"/"+s.total+zsfTdPct(s,1);return}
+ if(s.shown<s.real){s.shown+=Math.max(1,Math.ceil((s.real-s.shown)/5));if(s.shown>s.real)s.shown=s.real;s.creep=0}else if(s.creep<.92)s.creep+=.04;
+ s.btn.textContent=s.lab+s.shown+"/"+s.total+zsfTdPct(s,0)+s.eta}
 function zsfFitOn(){try{return localStorage.getItem("zsf_tts_force")!=="0"}catch(e){return true}}
 /* V27.8.9: pause-aware dubbing. Finds the real pauses of the ORIGINAL actor inside a cue (from the video's own speech energy) and makes the Khmer voice pause and resume at the same moments, so it never runs ahead of the mouth. */
 function zsfPauseOn(){try{return localStorage.getItem("zsf_tts_pausesplit")!=="0"}catch(e){return true}}
@@ -2496,10 +2503,10 @@ async function buildDub(btn){
    if(k>0&&k>=(window.__zsfParCap||1)){await __sleep(400);continue}
    const ji=next++;
    if(!(await one(ji)))FLD.push(ji);
-   done++;{let eta="";if(done>=6){const sc=(Date.now()-T0d)/done*(J2.length-done)/1000;eta=" • នៅសល់ ~"+(sc>=90?Math.round(sc/60)+" នាទី":Math.max(1,Math.round(sc))+" វិនាទី")}btn.textContent=`🎙 កំពុងបង្កើតសំឡេងខ្មែរ ${done}/${J2.length}`+eta}
+   done++;{let eta="";if(done>=6){const sc=(Date.now()-T0d)/done*(J2.length-done)/1000;eta=" • នៅសល់ ~"+(sc>=90?Math.round(sc/60)+" នាទី":Math.max(1,Math.round(sc))+" វិនាទី")}zsfTdSet(btn,`🎙 កំពុងបង្កើតសំឡេងខ្មែរ `,done,J2.length,eta)}
   }
  }
- {let PAR=10;try{const v=parseInt(localStorage.getItem("zsf_tts_par"));if(v>=1&&v<=12)PAR=v}catch(_){}
+ {let PAR=12;try{const v=parseInt(localStorage.getItem("zsf_tts_par"));if(v>=1&&v<=12)PAR=v}catch(_){}
   const healthy=ttsList().filter(u=>!(__ttsH[u]&&__ttsH[u].until>Date.now())).length;
   window.__zsfParCap=Math.max(1,Math.min(PAR,Math.max(1,healthy*2),J2.length));window.__zsfParTgt=window.__zsfParCap;window.__zsfLast429=0;
   await Promise.all(Array.from({length:window.__zsfParCap},(_,k)=>wk(k)))}const __m2=Date.now();
@@ -3566,7 +3573,7 @@ async function doExportNative(){if(window.__zsfStop)throw window.__zsfStopErr();
  const dur=V.duration||0;if(!(dur>0.5))throw new Error("អានរយៈពេលវីដេអូមិនបាន");
  const lg=m=>{try{zsxLog(m)}catch(e){}};
  const note=(p,m)=>{try{if(typeof __zsWorkNote==="function")__zsWorkNote(p,"Export "+Math.round(p)+"% "+(m||""))}catch(e){}};
- let __ps=0,__pt=0,__pm="",__pl=Date.now();const __draw=()=>{btn.textContent="កំពុង Export "+Math.min(99,Math.round(__ps))+"%..."+(__pm?" • "+__pm:"")};const __pid=setInterval(()=>{if(Date.now()-__pl>300000||(__pt>=94&&Date.now()-__pl>60000)){clearInterval(__pid);return}if(__ps<__pt)__ps=Math.min(__pt,__ps+Math.max(.3,(__pt-__ps)*.3));else if(__ps<Math.min(98,__pt+2.5))__ps+=.05;if(String(btn.textContent).indexOf("កំពុង Export ")===0)__draw()},400);const prog=(p,m)=>{p=Math.max(0,Math.min(99,p));__pt=Math.max(__pt,p);__ps=Math.max(__ps,Math.min(p,__ps+Math.max(.3,(p-__ps)*.3)));__pm=m||"";__pl=Date.now();__draw();note(Math.round(__ps),m)};
+ let __ps=0,__pt=0,__pm="",__pl=Date.now();const __draw=()=>{btn.textContent="កំពុង Export "+Math.min(99,Math.round(__ps))+"%..."+(__pm?" • "+__pm:"")};const __pid=setInterval(()=>{if(Date.now()-__pl>300000||(__pt>=96&&Date.now()-__pl>60000)){clearInterval(__pid);return}if(__ps<__pt)__ps=Math.min(__pt,__ps+Math.max(.3,(__pt-__ps)*.3));else if(__ps<Math.min(98,__pt+2.5))__ps+=.05;if(String(btn.textContent).indexOf("កំពុង Export ")===0)__draw()},400);const __qm=p=>p<8?p*.5:p<10?40+(p-8):p<=60?42+(p-10)*.4:p<62?63:p<=92?64+(p-62)*31/30:95+(p-92);window.__zsfOV=0;const prog=(p,m)=>{p=Math.max(0,Math.min(99,__qm(Math.max(0,p))));window.__zsfOV=Math.max(window.__zsfOV||0,p);__pt=Math.max(__pt,p);__ps=Math.max(__ps,Math.min(p,__ps+Math.max(.3,(p-__ps)*.3)));__pm=m||"";__pl=Date.now();__draw();note(Math.round(__ps),m)};
  const b64of=bl=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const t=String(fr.result);res(t.slice(t.indexOf(",")+1))};fr.onerror=()=>rej(fr.error||new Error("read"));fr.readAsDataURL(bl)});
  const tg="ex"+Date.now(),pcm=tg+".pcm",out=tg+"_out.mp4";let own=null,prep=null,wl=null,keep=false;const M={};M.t0=performance.now();
  try{
@@ -3589,7 +3596,7 @@ async function doExportNative(){if(window.__zsfStop)throw window.__zsfStopErr();
   AC=AC||new(window.AudioContext||window.webkitAudioContext)();
   const base=$("#bgm").value/100;M.prep=performance.now();
   let dub=window.__preDub||null;
-  if(!dub){btn.textContent="🎙 កំពុងបង្កើតសំឡេងខ្មែរ...";dub=await buildDub(btn);window.__preDub=dub}
+  if(!dub){btn.textContent="🎙 កំពុងបង្កើតសំឡេងខ្មែរ...";window.__zsfTdRange=[4,40];try{dub=await buildDub(btn)}finally{window.__zsfTdRange=null}window.__preDub=dub}
   M.dub=performance.now();if(!dub.out.length)throw fatal("បង្កើតសំឡេង TTS មិនបាន — ពិនិត្យអ៊ីនធឺណិត ឬ TTS Worker");
   prog(8,"ភ្លេងអម");try{await zsTO(fxEnsureBgm(btn),1200000,"ភ្លេងអមគាំង")}catch(e){console.warn("bgm",e)}
   let bed=bgmBuf||null,noBed=false;
@@ -9381,7 +9388,7 @@ setInterval(function(){
    ដោយប៊ូតុង «ធ្វើបច្ចុប្បន្នភាព» (IndexedDB) ឬអត់។ បើមាន វាដំណើរការកំណែថ្មីនោះ បើអត់ ដំណើរការកំណែក្នុងឯកសារ។
    បើកំណែដែលបានទាញបរាជ័យ ២ ដង វាលុបវា ហើយត្រឡប់ទៅកំណែក្នុងឯកសារវិញដោយស្វ័យប្រវត្តិ។ */
 (function(){
-  var EMB="28.5.6";
+  var EMB="28.5.8";
   function newer(a,b){var x=String(a).split("."),y=String(b).split(".");for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||0,10),q=parseInt(y[i]||0,10);if(p!==q)return p>q;}return false;}
   function tries(){try{return parseInt(localStorage.getItem("zsf_upd_try")||"0",10)||0}catch(e){return 0}}
   function setTries(n){try{if(n)localStorage.setItem("zsf_upd_try",String(n));else localStorage.removeItem("zsf_upd_try")}catch(e){}}
